@@ -28,7 +28,9 @@ dependencies:
   - ghc-prim
 
 library:
-  source-dirs:      codegen/src
+  source-dirs:
+    - codegen/src
+    - src
   exposed-modules:
     - HCloud
     - HCloud.Common

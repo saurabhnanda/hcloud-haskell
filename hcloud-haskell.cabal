@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 57c6a67182e85feef502b07386dc322a0d82ad83e4f5e3a848cee4f49053bf87
+-- hash: ba0adb094d78b1c8f3b8ff019719ab1a4154e34ea99eceef944955c101383d5c
 
 name:           hcloud-haskell
 version:        0.1.0.0
@@ -163,9 +163,11 @@ library
       HCloud.SecuritySchemes
       HCloud.Types
   other-modules:
+      HCloud.Overrides
       Paths_hcloud_haskell
   hs-source-dirs:
       codegen/src
+      src
   build-depends:
       aeson
     , base >=4.7 && <5
