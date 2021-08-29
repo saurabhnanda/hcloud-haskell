@@ -1,0 +1,30 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 946bfeef676fb0537ed1c56fa8fa26de07006e270b099a73ac7cf7ffafa743e4
+
+name:           hcloud-haskell
+version:        0.1.0.0
+category:       Web
+homepage:       https://github.com/saurabhnanda/hcloud-haskell#readme
+author:         Saurabh Nanda
+maintainer:     saurabhnanda@gmail.com
+copyright:      Saurabh Nanda
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+executable hcloud-haskell
+  main-is: Main.hs
+  other-modules:
+      Paths_hcloud_haskell
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
