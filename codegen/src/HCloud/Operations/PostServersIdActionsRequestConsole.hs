@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsRequestConsole
 module HCloud.Operations.PostServersIdActionsRequestConsole where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,56 +45,19 @@ import HCloud.Types
 -- | > POST /servers/{id}/actions/request_console
 -- 
 -- Requests credentials for remote access via VNC over websocket to keyboard, monitor, and mouse for a Server. The provided URL is valid for 1 minute, after this period a new url needs to be created to connect to the Server. How long the connection is open after the initial connect is not subject to this timeout.
-postServers_Id_ActionsRequestConsole :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                         -- ^ id: ID of the Server
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsRequestConsoleResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsRequestConsole config
-                                     id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRequestConsoleResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRequestConsoleResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        PostServersIdActionsRequestConsoleResponseBody201)
-                                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) [])
--- | > POST /servers/{id}/actions/request_console
--- 
--- The same as 'postServers_Id_ActionsRequestConsole' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsRequestConsoleRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                         HCloud.Common.SecurityScheme s) =>
-                                           HCloud.Common.Configuration s ->
-                                           GHC.Integer.Type.Integer ->
-                                           m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsRequestConsoleRaw config
-                                        id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) [])
--- | > POST /servers/{id}/actions/request_console
--- 
--- Monadic version of 'postServers_Id_ActionsRequestConsole' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsRequestConsoleM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                       HCloud.Common.SecurityScheme s) =>
-                                         GHC.Integer.Type.Integer ->
-                                         Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                            m
-                                                                            (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                (Network.HTTP.Client.Types.Response PostServersIdActionsRequestConsoleResponse))
-postServers_Id_ActionsRequestConsoleM id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRequestConsoleResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRequestConsoleResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         PostServersIdActionsRequestConsoleResponseBody201)
-                                                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) [])
--- | > POST /servers/{id}/actions/request_console
--- 
--- Monadic version of 'postServers_Id_ActionsRequestConsoleRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsRequestConsoleRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                          HCloud.Common.SecurityScheme s) =>
-                                            GHC.Integer.Type.Integer ->
-                                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                               m
-                                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                   (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsRequestConsoleRawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) [])
+postServers_Id_ActionsRequestConsole :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsRequestConsoleResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRequestConsole id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRequestConsoleResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRequestConsoleResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                         PostServersIdActionsRequestConsoleResponseBody201)
+                                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) GHC.Base.mempty)
 -- | Represents a response of the operation 'postServers_Id_ActionsRequestConsole'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsRequestConsoleResponseError' is used.
-data PostServersIdActionsRequestConsoleResponse =                                                    
-   PostServersIdActionsRequestConsoleResponseError GHC.Base.String                                   -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsRequestConsoleResponse201 PostServersIdActionsRequestConsoleResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsRequestConsoleResponse =
+   PostServersIdActionsRequestConsoleResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsRequestConsoleResponse201 PostServersIdActionsRequestConsoleResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsRequestConsoleResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/request_console.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRequestConsoleResponseBody201 = PostServersIdActionsRequestConsoleResponseBody201 {
@@ -106,39 +69,65 @@ data PostServersIdActionsRequestConsoleResponseBody201 = PostServersIdActionsReq
   , postServersIdActionsRequestConsoleResponseBody201WssUrl :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRequestConsoleResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsRequestConsoleResponseBody201Action obj) : (Data.Aeson..=) "password" (postServersIdActionsRequestConsoleResponseBody201Password obj) : (Data.Aeson..=) "wss_url" (postServersIdActionsRequestConsoleResponseBody201WssUrl obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsRequestConsoleResponseBody201Action obj) GHC.Base.<> ((Data.Aeson..=) "password" (postServersIdActionsRequestConsoleResponseBody201Password obj) GHC.Base.<> (Data.Aeson..=) "wss_url" (postServersIdActionsRequestConsoleResponseBody201WssUrl obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRequestConsoleResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201Action obj : "password" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201Password obj : "wss_url" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201WssUrl obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201Action obj) GHC.Base.<> (("password" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201Password obj) GHC.Base.<> ("wss_url" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201WssUrl obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRequestConsoleResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRequestConsoleResponseBody201" (\obj -> ((GHC.Base.pure PostServersIdActionsRequestConsoleResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "password")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "wss_url"))
--- | Defines the data type for the schema PostServersIdActionsRequestConsoleResponseBody201Action
+-- | Create a new 'PostServersIdActionsRequestConsoleResponseBody201' with all required fields.
+mkPostServersIdActionsRequestConsoleResponseBody201 :: PostServersIdActionsRequestConsoleResponseBody201Action -- ^ 'postServersIdActionsRequestConsoleResponseBody201Action'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201Password'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201WssUrl'
+  -> PostServersIdActionsRequestConsoleResponseBody201
+mkPostServersIdActionsRequestConsoleResponseBody201 postServersIdActionsRequestConsoleResponseBody201Action postServersIdActionsRequestConsoleResponseBody201Password postServersIdActionsRequestConsoleResponseBody201WssUrl = PostServersIdActionsRequestConsoleResponseBody201{postServersIdActionsRequestConsoleResponseBody201Action = postServersIdActionsRequestConsoleResponseBody201Action,
+                                                                                                                                                                                                                                                                                  postServersIdActionsRequestConsoleResponseBody201Password = postServersIdActionsRequestConsoleResponseBody201Password,
+                                                                                                                                                                                                                                                                                  postServersIdActionsRequestConsoleResponseBody201WssUrl = postServersIdActionsRequestConsoleResponseBody201WssUrl}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/request_console.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRequestConsoleResponseBody201Action = PostServersIdActionsRequestConsoleResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsRequestConsoleResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsRequestConsoleResponseBody201ActionError :: PostServersIdActionsRequestConsoleResponseBody201ActionError
+  , postServersIdActionsRequestConsoleResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsRequestConsoleResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsRequestConsoleResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsRequestConsoleResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsRequestConsoleResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsRequestConsoleResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsRequestConsoleResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsRequestConsoleResponseBody201ActionResources :: ([] PostServersIdActionsRequestConsoleResponseBody201ActionResources)
+  , postServersIdActionsRequestConsoleResponseBody201ActionResources :: ([PostServersIdActionsRequestConsoleResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsRequestConsoleResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsRequestConsoleResponseBody201ActionStatus :: PostServersIdActionsRequestConsoleResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRequestConsoleResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsRequestConsoleResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsRequestConsoleResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsRequestConsoleResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsRequestConsoleResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsRequestConsoleResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsRequestConsoleResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsRequestConsoleResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsRequestConsoleResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsRequestConsoleResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsRequestConsoleResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsRequestConsoleResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsRequestConsoleResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsRequestConsoleResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsRequestConsoleResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsRequestConsoleResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsRequestConsoleResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRequestConsoleResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRequestConsoleResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRequestConsoleResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsRequestConsoleResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsRequestConsoleResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsRequestConsoleResponseBody201Action' with all required fields.
+mkPostServersIdActionsRequestConsoleResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsRequestConsoleResponseBody201ActionError -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionProgress'
+  -> [PostServersIdActionsRequestConsoleResponseBody201ActionResources] -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionStarted'
+  -> PostServersIdActionsRequestConsoleResponseBody201ActionStatus -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionStatus'
+  -> PostServersIdActionsRequestConsoleResponseBody201Action
+mkPostServersIdActionsRequestConsoleResponseBody201Action postServersIdActionsRequestConsoleResponseBody201ActionCommand postServersIdActionsRequestConsoleResponseBody201ActionError postServersIdActionsRequestConsoleResponseBody201ActionFinished postServersIdActionsRequestConsoleResponseBody201ActionId postServersIdActionsRequestConsoleResponseBody201ActionProgress postServersIdActionsRequestConsoleResponseBody201ActionResources postServersIdActionsRequestConsoleResponseBody201ActionStarted postServersIdActionsRequestConsoleResponseBody201ActionStatus = PostServersIdActionsRequestConsoleResponseBody201Action{postServersIdActionsRequestConsoleResponseBody201ActionCommand = postServersIdActionsRequestConsoleResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionError = postServersIdActionsRequestConsoleResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionFinished = postServersIdActionsRequestConsoleResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionId = postServersIdActionsRequestConsoleResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionProgress = postServersIdActionsRequestConsoleResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionResources = postServersIdActionsRequestConsoleResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionStarted = postServersIdActionsRequestConsoleResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsRequestConsoleResponseBody201ActionStatus = postServersIdActionsRequestConsoleResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/request_console.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsRequestConsoleResponseBody201ActionError = PostServersIdActionsRequestConsoleResponseBody201ActionError {
@@ -148,47 +137,80 @@ data PostServersIdActionsRequestConsoleResponseBody201ActionError = PostServersI
   , postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRequestConsoleResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsRequestConsoleResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsRequestConsoleResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRequestConsoleResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRequestConsoleResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRequestConsoleResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsRequestConsoleResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsRequestConsoleResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsRequestConsoleResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsRequestConsoleResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsRequestConsoleResponseBody201ActionError
+mkPostServersIdActionsRequestConsoleResponseBody201ActionError postServersIdActionsRequestConsoleResponseBody201ActionErrorCode postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage = PostServersIdActionsRequestConsoleResponseBody201ActionError{postServersIdActionsRequestConsoleResponseBody201ActionErrorCode = postServersIdActionsRequestConsoleResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                   postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage = postServersIdActionsRequestConsoleResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/request_console.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRequestConsoleResponseBody201ActionResources = PostServersIdActionsRequestConsoleResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsRequestConsoleResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsRequestConsoleResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsRequestConsoleResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRequestConsoleResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsRequestConsoleResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsRequestConsoleResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsRequestConsoleResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsRequestConsoleResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRequestConsoleResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsRequestConsoleResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRequestConsoleResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRequestConsoleResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsRequestConsoleResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsRequestConsoleResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsRequestConsoleResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsRequestConsoleResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRequestConsoleResponseBody201ActionResourcesType'
+  -> PostServersIdActionsRequestConsoleResponseBody201ActionResources
+mkPostServersIdActionsRequestConsoleResponseBody201ActionResources postServersIdActionsRequestConsoleResponseBody201ActionResourcesId postServersIdActionsRequestConsoleResponseBody201ActionResourcesType = PostServersIdActionsRequestConsoleResponseBody201ActionResources{postServersIdActionsRequestConsoleResponseBody201ActionResourcesId = postServersIdActionsRequestConsoleResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                              postServersIdActionsRequestConsoleResponseBody201ActionResourcesType = postServersIdActionsRequestConsoleResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/request_console.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsRequestConsoleResponseBody201ActionStatus
-    = PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRequestConsoleResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsRequestConsoleResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsRequestConsoleResponseBody201ActionStatus =
+   PostServersIdActionsRequestConsoleResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsRequestConsoleResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRequestConsoleResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRequestConsoleResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsRequestConsoleResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsRequestConsoleResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/request_console
+-- 
+-- The same as 'postServers_Id_ActionsRequestConsole' but accepts an explicit configuration.
+postServers_Id_ActionsRequestConsoleWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsRequestConsoleResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRequestConsoleWithConfiguration config
+                                                      id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRequestConsoleResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRequestConsoleResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          PostServersIdActionsRequestConsoleResponseBody201)
+                                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/request_console
+-- 
+-- The same as 'postServers_Id_ActionsRequestConsole' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsRequestConsoleRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRequestConsoleRaw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/request_console
+-- 
+-- The same as 'postServers_Id_ActionsRequestConsole' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsRequestConsoleWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRequestConsoleWithConfigurationRaw config
+                                                         id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/request_console"))) GHC.Base.mempty)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postImages_Id_ActionsChangeProtection
 module HCloud.Operations.PostImagesIdActionsChangeProtection where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,57 +45,14 @@ import HCloud.Types
 -- | > POST /images/{id}/actions/change_protection
 -- 
 -- Changes the protection configuration of the Image. Can only be used on snapshots.
-postImages_Id_ActionsChangeProtection :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                          -- ^ id: ID of the Image
-  -> GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostImagesIdActionsChangeProtectionResponse))   -- ^ Monad containing the result of the operation
-postImages_Id_ActionsChangeProtection config
-                                      id
-                                      body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostImagesIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostImagesIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             PostImagesIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /images/{id}/actions/change_protection
--- 
--- The same as 'postImages_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'
-postImages_Id_ActionsChangeProtectionRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                          HCloud.Common.SecurityScheme s) =>
-                                            HCloud.Common.Configuration s ->
-                                            GHC.Integer.Type.Integer ->
-                                            GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody ->
-                                            m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postImages_Id_ActionsChangeProtectionRaw config
-                                         id
-                                         body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /images/{id}/actions/change_protection
--- 
--- Monadic version of 'postImages_Id_ActionsChangeProtection' (use with 'HCloud.Common.runWithConfiguration')
-postImages_Id_ActionsChangeProtectionM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                        HCloud.Common.SecurityScheme s) =>
-                                          GHC.Integer.Type.Integer ->
-                                          GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody ->
-                                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                             m
-                                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                 (Network.HTTP.Client.Types.Response PostImagesIdActionsChangeProtectionResponse))
-postImages_Id_ActionsChangeProtectionM id
-                                       body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostImagesIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostImagesIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              PostImagesIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /images/{id}/actions/change_protection
--- 
--- Monadic version of 'postImages_Id_ActionsChangeProtectionRaw' (use with 'HCloud.Common.runWithConfiguration')
-postImages_Id_ActionsChangeProtectionRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                           HCloud.Common.SecurityScheme s) =>
-                                             GHC.Integer.Type.Integer ->
-                                             GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody ->
-                                             Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                m
-                                                                                (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postImages_Id_ActionsChangeProtectionRawM id
-                                          body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postImages_Id_ActionsChangeProtectionRequestBody
+postImages_Id_ActionsChangeProtection :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostImagesIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postImages_Id_ActionsChangeProtection id
+                                      body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostImagesIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostImagesIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              PostImagesIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions\/change_protection.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostImagesIdActionsChangeProtectionRequestBody = PostImagesIdActionsChangeProtectionRequestBody {
@@ -103,19 +60,22 @@ data PostImagesIdActionsChangeProtectionRequestBody = PostImagesIdActionsChangeP
   postImagesIdActionsChangeProtectionRequestBodyDelete :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostImagesIdActionsChangeProtectionRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postImagesIdActionsChangeProtectionRequestBodyDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postImagesIdActionsChangeProtectionRequestBodyDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostImagesIdActionsChangeProtectionRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionRequestBodyDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionRequestBodyDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostImagesIdActionsChangeProtectionRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostImagesIdActionsChangeProtectionRequestBody" (\obj -> GHC.Base.pure PostImagesIdActionsChangeProtectionRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "delete"))
+-- | Create a new 'PostImagesIdActionsChangeProtectionRequestBody' with all required fields.
+mkPostImagesIdActionsChangeProtectionRequestBody :: PostImagesIdActionsChangeProtectionRequestBody
+mkPostImagesIdActionsChangeProtectionRequestBody = PostImagesIdActionsChangeProtectionRequestBody{postImagesIdActionsChangeProtectionRequestBodyDelete = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'postImages_Id_ActionsChangeProtection'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostImagesIdActionsChangeProtectionResponseError' is used.
-data PostImagesIdActionsChangeProtectionResponse =                                                     
-   PostImagesIdActionsChangeProtectionResponseError GHC.Base.String                                    -- ^ Means either no matching case available or a parse error
-  | PostImagesIdActionsChangeProtectionResponse201 PostImagesIdActionsChangeProtectionResponseBody201  -- ^ The \`action\` key contains the \`change_protection\` Action
+data PostImagesIdActionsChangeProtectionResponse =
+   PostImagesIdActionsChangeProtectionResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostImagesIdActionsChangeProtectionResponse201 PostImagesIdActionsChangeProtectionResponseBody201 -- ^ The \`action\` key contains the \`change_protection\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostImagesIdActionsChangeProtectionResponseBody201
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostImagesIdActionsChangeProtectionResponseBody201 = PostImagesIdActionsChangeProtectionResponseBody201 {
@@ -123,39 +83,61 @@ data PostImagesIdActionsChangeProtectionResponseBody201 = PostImagesIdActionsCha
   postImagesIdActionsChangeProtectionResponseBody201Action :: PostImagesIdActionsChangeProtectionResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostImagesIdActionsChangeProtectionResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postImagesIdActionsChangeProtectionResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postImagesIdActionsChangeProtectionResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostImagesIdActionsChangeProtectionResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostImagesIdActionsChangeProtectionResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostImagesIdActionsChangeProtectionResponseBody201" (\obj -> GHC.Base.pure PostImagesIdActionsChangeProtectionResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostImagesIdActionsChangeProtectionResponseBody201Action
+-- | Create a new 'PostImagesIdActionsChangeProtectionResponseBody201' with all required fields.
+mkPostImagesIdActionsChangeProtectionResponseBody201 :: PostImagesIdActionsChangeProtectionResponseBody201Action -- ^ 'postImagesIdActionsChangeProtectionResponseBody201Action'
+  -> PostImagesIdActionsChangeProtectionResponseBody201
+mkPostImagesIdActionsChangeProtectionResponseBody201 postImagesIdActionsChangeProtectionResponseBody201Action = PostImagesIdActionsChangeProtectionResponseBody201{postImagesIdActionsChangeProtectionResponseBody201Action = postImagesIdActionsChangeProtectionResponseBody201Action}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostImagesIdActionsChangeProtectionResponseBody201Action = PostImagesIdActionsChangeProtectionResponseBody201Action {
   -- | command: Command executed in the Action
   postImagesIdActionsChangeProtectionResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postImagesIdActionsChangeProtectionResponseBody201ActionError :: PostImagesIdActionsChangeProtectionResponseBody201ActionError
+  , postImagesIdActionsChangeProtectionResponseBody201ActionError :: (GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postImagesIdActionsChangeProtectionResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postImagesIdActionsChangeProtectionResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postImagesIdActionsChangeProtectionResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postImagesIdActionsChangeProtectionResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postImagesIdActionsChangeProtectionResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postImagesIdActionsChangeProtectionResponseBody201ActionResources :: ([] PostImagesIdActionsChangeProtectionResponseBody201ActionResources)
+  , postImagesIdActionsChangeProtectionResponseBody201ActionResources :: ([PostImagesIdActionsChangeProtectionResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postImagesIdActionsChangeProtectionResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postImagesIdActionsChangeProtectionResponseBody201ActionStatus :: PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostImagesIdActionsChangeProtectionResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postImagesIdActionsChangeProtectionResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postImagesIdActionsChangeProtectionResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postImagesIdActionsChangeProtectionResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postImagesIdActionsChangeProtectionResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postImagesIdActionsChangeProtectionResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postImagesIdActionsChangeProtectionResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postImagesIdActionsChangeProtectionResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postImagesIdActionsChangeProtectionResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postImagesIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postImagesIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postImagesIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postImagesIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postImagesIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postImagesIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postImagesIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postImagesIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostImagesIdActionsChangeProtectionResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostImagesIdActionsChangeProtectionResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostImagesIdActionsChangeProtectionResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostImagesIdActionsChangeProtectionResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostImagesIdActionsChangeProtectionResponseBody201ActionError
+-- | Create a new 'PostImagesIdActionsChangeProtectionResponseBody201Action' with all required fields.
+mkPostImagesIdActionsChangeProtectionResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionResponseBody201ActionError -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionProgress'
+  -> [PostImagesIdActionsChangeProtectionResponseBody201ActionResources] -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionStarted'
+  -> PostImagesIdActionsChangeProtectionResponseBody201ActionStatus -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionStatus'
+  -> PostImagesIdActionsChangeProtectionResponseBody201Action
+mkPostImagesIdActionsChangeProtectionResponseBody201Action postImagesIdActionsChangeProtectionResponseBody201ActionCommand postImagesIdActionsChangeProtectionResponseBody201ActionError postImagesIdActionsChangeProtectionResponseBody201ActionFinished postImagesIdActionsChangeProtectionResponseBody201ActionId postImagesIdActionsChangeProtectionResponseBody201ActionProgress postImagesIdActionsChangeProtectionResponseBody201ActionResources postImagesIdActionsChangeProtectionResponseBody201ActionStarted postImagesIdActionsChangeProtectionResponseBody201ActionStatus = PostImagesIdActionsChangeProtectionResponseBody201Action{postImagesIdActionsChangeProtectionResponseBody201ActionCommand = postImagesIdActionsChangeProtectionResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionError = postImagesIdActionsChangeProtectionResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionFinished = postImagesIdActionsChangeProtectionResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionId = postImagesIdActionsChangeProtectionResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionProgress = postImagesIdActionsChangeProtectionResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionResources = postImagesIdActionsChangeProtectionResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionStarted = postImagesIdActionsChangeProtectionResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionStatus = postImagesIdActionsChangeProtectionResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostImagesIdActionsChangeProtectionResponseBody201ActionError = PostImagesIdActionsChangeProtectionResponseBody201ActionError {
@@ -165,47 +147,86 @@ data PostImagesIdActionsChangeProtectionResponseBody201ActionError = PostImagesI
   , postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostImagesIdActionsChangeProtectionResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostImagesIdActionsChangeProtectionResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostImagesIdActionsChangeProtectionResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostImagesIdActionsChangeProtectionResponseBody201ActionError" (\obj -> (GHC.Base.pure PostImagesIdActionsChangeProtectionResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostImagesIdActionsChangeProtectionResponseBody201ActionResources
+-- | Create a new 'PostImagesIdActionsChangeProtectionResponseBody201ActionError' with all required fields.
+mkPostImagesIdActionsChangeProtectionResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage'
+  -> PostImagesIdActionsChangeProtectionResponseBody201ActionError
+mkPostImagesIdActionsChangeProtectionResponseBody201ActionError postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage = PostImagesIdActionsChangeProtectionResponseBody201ActionError{postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode = postImagesIdActionsChangeProtectionResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                       postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage = postImagesIdActionsChangeProtectionResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostImagesIdActionsChangeProtectionResponseBody201ActionResources = PostImagesIdActionsChangeProtectionResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostImagesIdActionsChangeProtectionResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostImagesIdActionsChangeProtectionResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostImagesIdActionsChangeProtectionResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostImagesIdActionsChangeProtectionResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostImagesIdActionsChangeProtectionResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
+-- | Create a new 'PostImagesIdActionsChangeProtectionResponseBody201ActionResources' with all required fields.
+mkPostImagesIdActionsChangeProtectionResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType'
+  -> PostImagesIdActionsChangeProtectionResponseBody201ActionResources
+mkPostImagesIdActionsChangeProtectionResponseBody201ActionResources postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType = PostImagesIdActionsChangeProtectionResponseBody201ActionResources{postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId = postImagesIdActionsChangeProtectionResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                  postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType = postImagesIdActionsChangeProtectionResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/images\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
-    = PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-    | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-    | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
-    where toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumOther val)
+data PostImagesIdActionsChangeProtectionResponseBody201ActionStatus =
+   PostImagesIdActionsChangeProtectionResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
+    where toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusOther val) = val
+          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostImagesIdActionsChangeProtectionResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostImagesIdActionsChangeProtectionResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostImagesIdActionsChangeProtectionResponseBody201ActionStatusOther val)
+-- | > POST /images/{id}/actions/change_protection
+-- 
+-- The same as 'postImages_Id_ActionsChangeProtection' but accepts an explicit configuration.
+postImages_Id_ActionsChangeProtectionWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostImagesIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postImages_Id_ActionsChangeProtectionWithConfiguration config
+                                                       id
+                                                       body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostImagesIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostImagesIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               PostImagesIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /images/{id}/actions/change_protection
+-- 
+-- The same as 'postImages_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postImages_Id_ActionsChangeProtectionRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postImages_Id_ActionsChangeProtectionRaw id
+                                         body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /images/{id}/actions/change_protection
+-- 
+-- The same as 'postImages_Id_ActionsChangeProtection' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postImages_Id_ActionsChangeProtectionWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PostImagesIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postImages_Id_ActionsChangeProtectionWithConfigurationRaw config
+                                                          id
+                                                          body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postVolumes_Id_ActionsDetach
 module HCloud.Operations.PostVolumesIdActionsDetach where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,56 +45,19 @@ import HCloud.Types
 -- | > POST /volumes/{id}/actions/detach
 -- 
 -- Detaches a Volume from the Server it’s attached to. You may attach it to a Server again at a later time.
-postVolumes_Id_ActionsDetach :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                 -- ^ id: ID of the Volume
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostVolumesIdActionsDetachResponse))   -- ^ Monad containing the result of the operation
-postVolumes_Id_ActionsDetach config
-                             id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsDetachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsDetachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                PostVolumesIdActionsDetachResponseBody201)
-                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) [])
--- | > POST /volumes/{id}/actions/detach
--- 
--- The same as 'postVolumes_Id_ActionsDetach' but returns the raw 'Data.ByteString.Char8.ByteString'
-postVolumes_Id_ActionsDetachRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                 HCloud.Common.SecurityScheme s) =>
-                                   HCloud.Common.Configuration s ->
-                                   GHC.Integer.Type.Integer ->
-                                   m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postVolumes_Id_ActionsDetachRaw config
-                                id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) [])
--- | > POST /volumes/{id}/actions/detach
--- 
--- Monadic version of 'postVolumes_Id_ActionsDetach' (use with 'HCloud.Common.runWithConfiguration')
-postVolumes_Id_ActionsDetachM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                               HCloud.Common.SecurityScheme s) =>
-                                 GHC.Integer.Type.Integer ->
-                                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                    m
-                                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                        (Network.HTTP.Client.Types.Response PostVolumesIdActionsDetachResponse))
-postVolumes_Id_ActionsDetachM id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsDetachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsDetachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                 PostVolumesIdActionsDetachResponseBody201)
-                                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) [])
--- | > POST /volumes/{id}/actions/detach
--- 
--- Monadic version of 'postVolumes_Id_ActionsDetachRaw' (use with 'HCloud.Common.runWithConfiguration')
-postVolumes_Id_ActionsDetachRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                  HCloud.Common.SecurityScheme s) =>
-                                    GHC.Integer.Type.Integer ->
-                                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                       m
-                                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postVolumes_Id_ActionsDetachRawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) [])
+postVolumes_Id_ActionsDetach :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Volume
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostVolumesIdActionsDetachResponse) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsDetach id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsDetachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsDetachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                 PostVolumesIdActionsDetachResponseBody201)
+                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) GHC.Base.mempty)
 -- | Represents a response of the operation 'postVolumes_Id_ActionsDetach'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostVolumesIdActionsDetachResponseError' is used.
-data PostVolumesIdActionsDetachResponse =                                            
-   PostVolumesIdActionsDetachResponseError GHC.Base.String                           -- ^ Means either no matching case available or a parse error
-  | PostVolumesIdActionsDetachResponse201 PostVolumesIdActionsDetachResponseBody201  -- ^ The \`action\` key contains the \`detach_volume\` Action
+data PostVolumesIdActionsDetachResponse =
+   PostVolumesIdActionsDetachResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostVolumesIdActionsDetachResponse201 PostVolumesIdActionsDetachResponseBody201 -- ^ The \`action\` key contains the \`detach_volume\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostVolumesIdActionsDetachResponseBody201
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/detach.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsDetachResponseBody201 = PostVolumesIdActionsDetachResponseBody201 {
@@ -102,39 +65,61 @@ data PostVolumesIdActionsDetachResponseBody201 = PostVolumesIdActionsDetachRespo
   postVolumesIdActionsDetachResponseBody201Action :: PostVolumesIdActionsDetachResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsDetachResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postVolumesIdActionsDetachResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postVolumesIdActionsDetachResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsDetachResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsDetachResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsDetachResponseBody201" (\obj -> GHC.Base.pure PostVolumesIdActionsDetachResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostVolumesIdActionsDetachResponseBody201Action
+-- | Create a new 'PostVolumesIdActionsDetachResponseBody201' with all required fields.
+mkPostVolumesIdActionsDetachResponseBody201 :: PostVolumesIdActionsDetachResponseBody201Action -- ^ 'postVolumesIdActionsDetachResponseBody201Action'
+  -> PostVolumesIdActionsDetachResponseBody201
+mkPostVolumesIdActionsDetachResponseBody201 postVolumesIdActionsDetachResponseBody201Action = PostVolumesIdActionsDetachResponseBody201{postVolumesIdActionsDetachResponseBody201Action = postVolumesIdActionsDetachResponseBody201Action}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/detach.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsDetachResponseBody201Action = PostVolumesIdActionsDetachResponseBody201Action {
   -- | command: Command executed in the Action
   postVolumesIdActionsDetachResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postVolumesIdActionsDetachResponseBody201ActionError :: PostVolumesIdActionsDetachResponseBody201ActionError
+  , postVolumesIdActionsDetachResponseBody201ActionError :: (GHC.Maybe.Maybe PostVolumesIdActionsDetachResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postVolumesIdActionsDetachResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postVolumesIdActionsDetachResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postVolumesIdActionsDetachResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postVolumesIdActionsDetachResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postVolumesIdActionsDetachResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postVolumesIdActionsDetachResponseBody201ActionResources :: ([] PostVolumesIdActionsDetachResponseBody201ActionResources)
+  , postVolumesIdActionsDetachResponseBody201ActionResources :: ([PostVolumesIdActionsDetachResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postVolumesIdActionsDetachResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postVolumesIdActionsDetachResponseBody201ActionStatus :: PostVolumesIdActionsDetachResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsDetachResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postVolumesIdActionsDetachResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postVolumesIdActionsDetachResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postVolumesIdActionsDetachResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postVolumesIdActionsDetachResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postVolumesIdActionsDetachResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postVolumesIdActionsDetachResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postVolumesIdActionsDetachResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postVolumesIdActionsDetachResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postVolumesIdActionsDetachResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postVolumesIdActionsDetachResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postVolumesIdActionsDetachResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postVolumesIdActionsDetachResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postVolumesIdActionsDetachResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postVolumesIdActionsDetachResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postVolumesIdActionsDetachResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postVolumesIdActionsDetachResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsDetachResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsDetachResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsDetachResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostVolumesIdActionsDetachResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostVolumesIdActionsDetachResponseBody201ActionError
+-- | Create a new 'PostVolumesIdActionsDetachResponseBody201Action' with all required fields.
+mkPostVolumesIdActionsDetachResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postVolumesIdActionsDetachResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostVolumesIdActionsDetachResponseBody201ActionError -- ^ 'postVolumesIdActionsDetachResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postVolumesIdActionsDetachResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postVolumesIdActionsDetachResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postVolumesIdActionsDetachResponseBody201ActionProgress'
+  -> [PostVolumesIdActionsDetachResponseBody201ActionResources] -- ^ 'postVolumesIdActionsDetachResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesIdActionsDetachResponseBody201ActionStarted'
+  -> PostVolumesIdActionsDetachResponseBody201ActionStatus -- ^ 'postVolumesIdActionsDetachResponseBody201ActionStatus'
+  -> PostVolumesIdActionsDetachResponseBody201Action
+mkPostVolumesIdActionsDetachResponseBody201Action postVolumesIdActionsDetachResponseBody201ActionCommand postVolumesIdActionsDetachResponseBody201ActionError postVolumesIdActionsDetachResponseBody201ActionFinished postVolumesIdActionsDetachResponseBody201ActionId postVolumesIdActionsDetachResponseBody201ActionProgress postVolumesIdActionsDetachResponseBody201ActionResources postVolumesIdActionsDetachResponseBody201ActionStarted postVolumesIdActionsDetachResponseBody201ActionStatus = PostVolumesIdActionsDetachResponseBody201Action{postVolumesIdActionsDetachResponseBody201ActionCommand = postVolumesIdActionsDetachResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionError = postVolumesIdActionsDetachResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionFinished = postVolumesIdActionsDetachResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionId = postVolumesIdActionsDetachResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionProgress = postVolumesIdActionsDetachResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionResources = postVolumesIdActionsDetachResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionStarted = postVolumesIdActionsDetachResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsDetachResponseBody201ActionStatus = postVolumesIdActionsDetachResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/detach.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostVolumesIdActionsDetachResponseBody201ActionError = PostVolumesIdActionsDetachResponseBody201ActionError {
@@ -144,47 +129,80 @@ data PostVolumesIdActionsDetachResponseBody201ActionError = PostVolumesIdActions
   , postVolumesIdActionsDetachResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsDetachResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postVolumesIdActionsDetachResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postVolumesIdActionsDetachResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postVolumesIdActionsDetachResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postVolumesIdActionsDetachResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsDetachResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsDetachResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsDetachResponseBody201ActionError" (\obj -> (GHC.Base.pure PostVolumesIdActionsDetachResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostVolumesIdActionsDetachResponseBody201ActionResources
+-- | Create a new 'PostVolumesIdActionsDetachResponseBody201ActionError' with all required fields.
+mkPostVolumesIdActionsDetachResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postVolumesIdActionsDetachResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesIdActionsDetachResponseBody201ActionErrorMessage'
+  -> PostVolumesIdActionsDetachResponseBody201ActionError
+mkPostVolumesIdActionsDetachResponseBody201ActionError postVolumesIdActionsDetachResponseBody201ActionErrorCode postVolumesIdActionsDetachResponseBody201ActionErrorMessage = PostVolumesIdActionsDetachResponseBody201ActionError{postVolumesIdActionsDetachResponseBody201ActionErrorCode = postVolumesIdActionsDetachResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                   postVolumesIdActionsDetachResponseBody201ActionErrorMessage = postVolumesIdActionsDetachResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/detach.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsDetachResponseBody201ActionResources = PostVolumesIdActionsDetachResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postVolumesIdActionsDetachResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postVolumesIdActionsDetachResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postVolumesIdActionsDetachResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsDetachResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postVolumesIdActionsDetachResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postVolumesIdActionsDetachResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postVolumesIdActionsDetachResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postVolumesIdActionsDetachResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsDetachResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postVolumesIdActionsDetachResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsDetachResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsDetachResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostVolumesIdActionsDetachResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostVolumesIdActionsDetachResponseBody201ActionStatus
+-- | Create a new 'PostVolumesIdActionsDetachResponseBody201ActionResources' with all required fields.
+mkPostVolumesIdActionsDetachResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postVolumesIdActionsDetachResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesIdActionsDetachResponseBody201ActionResourcesType'
+  -> PostVolumesIdActionsDetachResponseBody201ActionResources
+mkPostVolumesIdActionsDetachResponseBody201ActionResources postVolumesIdActionsDetachResponseBody201ActionResourcesId postVolumesIdActionsDetachResponseBody201ActionResourcesType = PostVolumesIdActionsDetachResponseBody201ActionResources{postVolumesIdActionsDetachResponseBody201ActionResourcesId = postVolumesIdActionsDetachResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                              postVolumesIdActionsDetachResponseBody201ActionResourcesType = postVolumesIdActionsDetachResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/volumes\/{id}\/actions\/detach.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostVolumesIdActionsDetachResponseBody201ActionStatus
-    = PostVolumesIdActionsDetachResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringError
-    | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringRunning
-    | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsDetachResponseBody201ActionStatus
-    where toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostVolumesIdActionsDetachResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostVolumesIdActionsDetachResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostVolumesIdActionsDetachResponseBody201ActionStatusEnumOther val)
+data PostVolumesIdActionsDetachResponseBody201ActionStatus =
+   PostVolumesIdActionsDetachResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostVolumesIdActionsDetachResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostVolumesIdActionsDetachResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsDetachResponseBody201ActionStatus
+    where toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusOther val) = val
+          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostVolumesIdActionsDetachResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsDetachResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostVolumesIdActionsDetachResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostVolumesIdActionsDetachResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostVolumesIdActionsDetachResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostVolumesIdActionsDetachResponseBody201ActionStatusOther val)
+-- | > POST /volumes/{id}/actions/detach
+-- 
+-- The same as 'postVolumes_Id_ActionsDetach' but accepts an explicit configuration.
+postVolumes_Id_ActionsDetachWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Volume
+  -> m (Network.HTTP.Client.Types.Response PostVolumesIdActionsDetachResponse) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsDetachWithConfiguration config
+                                              id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsDetachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsDetachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostVolumesIdActionsDetachResponseBody201)
+                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) GHC.Base.mempty)
+-- | > POST /volumes/{id}/actions/detach
+-- 
+-- The same as 'postVolumes_Id_ActionsDetach' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postVolumes_Id_ActionsDetachRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Volume
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsDetachRaw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) GHC.Base.mempty)
+-- | > POST /volumes/{id}/actions/detach
+-- 
+-- The same as 'postVolumes_Id_ActionsDetach' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postVolumes_Id_ActionsDetachWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Volume
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsDetachWithConfigurationRaw config
+                                                 id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach"))) GHC.Base.mempty)

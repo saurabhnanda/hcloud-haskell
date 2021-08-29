@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsRebuild
 module HCloud.Operations.PostServersIdActionsRebuild where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,57 +49,14 @@ import HCloud.Types
 -- The Image can either be one you have created earlier (\`backup\` or \`snapshot\` Image) or it can be a completely fresh \`system\` Image provided by us. You can get a list of all available Images with \`GET \/images\`.
 -- 
 -- Your Server will automatically be powered off before the rebuild command executes.
-postServers_Id_ActionsRebuild :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                  -- ^ id: ID of the Server
-  -> GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsRebuildResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsRebuild config
-                              id
-                              body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRebuildResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRebuildResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostServersIdActionsRebuildResponseBody201)
-                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/rebuild
--- 
--- The same as 'postServers_Id_ActionsRebuild' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsRebuildRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                  HCloud.Common.SecurityScheme s) =>
-                                    HCloud.Common.Configuration s ->
-                                    GHC.Integer.Type.Integer ->
-                                    GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody ->
-                                    m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsRebuildRaw config
-                                 id
-                                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/rebuild
--- 
--- Monadic version of 'postServers_Id_ActionsRebuild' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsRebuildM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                HCloud.Common.SecurityScheme s) =>
-                                  GHC.Integer.Type.Integer ->
-                                  GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody ->
-                                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                     m
-                                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                         (Network.HTTP.Client.Types.Response PostServersIdActionsRebuildResponse))
-postServers_Id_ActionsRebuildM id
-                               body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRebuildResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRebuildResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsRebuildResponseBody201)
-                                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/rebuild
--- 
--- Monadic version of 'postServers_Id_ActionsRebuildRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsRebuildRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                   HCloud.Common.SecurityScheme s) =>
-                                     GHC.Integer.Type.Integer ->
-                                     GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody ->
-                                     Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                        m
-                                                                        (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsRebuildRawM id
-                                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postServers_Id_ActionsRebuildRequestBody
+postServers_Id_ActionsRebuild :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsRebuildResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRebuild id
+                              body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRebuildResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRebuildResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsRebuildResponseBody201)
+                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/rebuild.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRebuildRequestBody = PostServersIdActionsRebuildRequestBody {
@@ -107,19 +64,23 @@ data PostServersIdActionsRebuildRequestBody = PostServersIdActionsRebuildRequest
   postServersIdActionsRebuildRequestBodyImage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRebuildRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "image" (postServersIdActionsRebuildRequestBodyImage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "image" (postServersIdActionsRebuildRequestBodyImage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRebuildRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("image" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildRequestBodyImage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("image" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildRequestBodyImage obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRebuildRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRebuildRequestBody" (\obj -> GHC.Base.pure PostServersIdActionsRebuildRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image"))
+-- | Create a new 'PostServersIdActionsRebuildRequestBody' with all required fields.
+mkPostServersIdActionsRebuildRequestBody :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildRequestBodyImage'
+  -> PostServersIdActionsRebuildRequestBody
+mkPostServersIdActionsRebuildRequestBody postServersIdActionsRebuildRequestBodyImage = PostServersIdActionsRebuildRequestBody{postServersIdActionsRebuildRequestBodyImage = postServersIdActionsRebuildRequestBodyImage}
 -- | Represents a response of the operation 'postServers_Id_ActionsRebuild'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsRebuildResponseError' is used.
-data PostServersIdActionsRebuildResponse =                                             
-   PostServersIdActionsRebuildResponseError GHC.Base.String                            -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsRebuildResponse201 PostServersIdActionsRebuildResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsRebuildResponse =
+   PostServersIdActionsRebuildResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsRebuildResponse201 PostServersIdActionsRebuildResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsRebuildResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/rebuild.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRebuildResponseBody201 = PostServersIdActionsRebuildResponseBody201 {
@@ -129,39 +90,61 @@ data PostServersIdActionsRebuildResponseBody201 = PostServersIdActionsRebuildRes
   , postServersIdActionsRebuildResponseBody201RootPassword :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRebuildResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsRebuildResponseBody201Action obj) : (Data.Aeson..=) "root_password" (postServersIdActionsRebuildResponseBody201RootPassword obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsRebuildResponseBody201Action obj) GHC.Base.<> (Data.Aeson..=) "root_password" (postServersIdActionsRebuildResponseBody201RootPassword obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRebuildResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201Action obj : "root_password" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201RootPassword obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201Action obj) GHC.Base.<> ("root_password" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201RootPassword obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRebuildResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRebuildResponseBody201" (\obj -> (GHC.Base.pure PostServersIdActionsRebuildResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "root_password"))
--- | Defines the data type for the schema PostServersIdActionsRebuildResponseBody201Action
+-- | Create a new 'PostServersIdActionsRebuildResponseBody201' with all required fields.
+mkPostServersIdActionsRebuildResponseBody201 :: PostServersIdActionsRebuildResponseBody201
+mkPostServersIdActionsRebuildResponseBody201 = PostServersIdActionsRebuildResponseBody201{postServersIdActionsRebuildResponseBody201Action = GHC.Maybe.Nothing,
+                                                                                          postServersIdActionsRebuildResponseBody201RootPassword = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/rebuild.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRebuildResponseBody201Action = PostServersIdActionsRebuildResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsRebuildResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsRebuildResponseBody201ActionError :: PostServersIdActionsRebuildResponseBody201ActionError
+  , postServersIdActionsRebuildResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsRebuildResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsRebuildResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsRebuildResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsRebuildResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsRebuildResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsRebuildResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsRebuildResponseBody201ActionResources :: ([] PostServersIdActionsRebuildResponseBody201ActionResources)
+  , postServersIdActionsRebuildResponseBody201ActionResources :: ([PostServersIdActionsRebuildResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsRebuildResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsRebuildResponseBody201ActionStatus :: PostServersIdActionsRebuildResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRebuildResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsRebuildResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsRebuildResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsRebuildResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsRebuildResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsRebuildResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsRebuildResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsRebuildResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsRebuildResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsRebuildResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsRebuildResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsRebuildResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsRebuildResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsRebuildResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsRebuildResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsRebuildResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsRebuildResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRebuildResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRebuildResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRebuildResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsRebuildResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsRebuildResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsRebuildResponseBody201Action' with all required fields.
+mkPostServersIdActionsRebuildResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsRebuildResponseBody201ActionError -- ^ 'postServersIdActionsRebuildResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsRebuildResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsRebuildResponseBody201ActionProgress'
+  -> [PostServersIdActionsRebuildResponseBody201ActionResources] -- ^ 'postServersIdActionsRebuildResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildResponseBody201ActionStarted'
+  -> PostServersIdActionsRebuildResponseBody201ActionStatus -- ^ 'postServersIdActionsRebuildResponseBody201ActionStatus'
+  -> PostServersIdActionsRebuildResponseBody201Action
+mkPostServersIdActionsRebuildResponseBody201Action postServersIdActionsRebuildResponseBody201ActionCommand postServersIdActionsRebuildResponseBody201ActionError postServersIdActionsRebuildResponseBody201ActionFinished postServersIdActionsRebuildResponseBody201ActionId postServersIdActionsRebuildResponseBody201ActionProgress postServersIdActionsRebuildResponseBody201ActionResources postServersIdActionsRebuildResponseBody201ActionStarted postServersIdActionsRebuildResponseBody201ActionStatus = PostServersIdActionsRebuildResponseBody201Action{postServersIdActionsRebuildResponseBody201ActionCommand = postServersIdActionsRebuildResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionError = postServersIdActionsRebuildResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionFinished = postServersIdActionsRebuildResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionId = postServersIdActionsRebuildResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionProgress = postServersIdActionsRebuildResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionResources = postServersIdActionsRebuildResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionStarted = postServersIdActionsRebuildResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionStatus = postServersIdActionsRebuildResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/rebuild.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsRebuildResponseBody201ActionError = PostServersIdActionsRebuildResponseBody201ActionError {
@@ -171,47 +154,86 @@ data PostServersIdActionsRebuildResponseBody201ActionError = PostServersIdAction
   , postServersIdActionsRebuildResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRebuildResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsRebuildResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsRebuildResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsRebuildResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsRebuildResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRebuildResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRebuildResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRebuildResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsRebuildResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsRebuildResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsRebuildResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsRebuildResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsRebuildResponseBody201ActionError
+mkPostServersIdActionsRebuildResponseBody201ActionError postServersIdActionsRebuildResponseBody201ActionErrorCode postServersIdActionsRebuildResponseBody201ActionErrorMessage = PostServersIdActionsRebuildResponseBody201ActionError{postServersIdActionsRebuildResponseBody201ActionErrorCode = postServersIdActionsRebuildResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                       postServersIdActionsRebuildResponseBody201ActionErrorMessage = postServersIdActionsRebuildResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/rebuild.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRebuildResponseBody201ActionResources = PostServersIdActionsRebuildResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsRebuildResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsRebuildResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsRebuildResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRebuildResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsRebuildResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsRebuildResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsRebuildResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsRebuildResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRebuildResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsRebuildResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRebuildResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRebuildResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsRebuildResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsRebuildResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsRebuildResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsRebuildResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsRebuildResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRebuildResponseBody201ActionResourcesType'
+  -> PostServersIdActionsRebuildResponseBody201ActionResources
+mkPostServersIdActionsRebuildResponseBody201ActionResources postServersIdActionsRebuildResponseBody201ActionResourcesId postServersIdActionsRebuildResponseBody201ActionResourcesType = PostServersIdActionsRebuildResponseBody201ActionResources{postServersIdActionsRebuildResponseBody201ActionResourcesId = postServersIdActionsRebuildResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                  postServersIdActionsRebuildResponseBody201ActionResourcesType = postServersIdActionsRebuildResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/rebuild.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsRebuildResponseBody201ActionStatus
-    = PostServersIdActionsRebuildResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsRebuildResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRebuildResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsRebuildResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsRebuildResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsRebuildResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsRebuildResponseBody201ActionStatus =
+   PostServersIdActionsRebuildResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsRebuildResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsRebuildResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsRebuildResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsRebuildResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRebuildResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsRebuildResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRebuildResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsRebuildResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsRebuildResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsRebuildResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsRebuildResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/rebuild
+-- 
+-- The same as 'postServers_Id_ActionsRebuild' but accepts an explicit configuration.
+postServers_Id_ActionsRebuildWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsRebuildResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRebuildWithConfiguration config
+                                               id
+                                               body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRebuildResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRebuildResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostServersIdActionsRebuildResponseBody201)
+                                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/rebuild
+-- 
+-- The same as 'postServers_Id_ActionsRebuild' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsRebuildRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRebuildRaw id
+                                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/rebuild
+-- 
+-- The same as 'postServers_Id_ActionsRebuild' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsRebuildWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsRebuildRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRebuildWithConfigurationRaw config
+                                                  id
+                                                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/rebuild"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

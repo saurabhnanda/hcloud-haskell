@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getSshKeys_Id_
 module HCloud.Operations.GetSshKeysId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,56 +45,19 @@ import HCloud.Types
 -- | > GET /ssh_keys/{id}
 -- 
 -- Returns a specific SSH key object.
-getSshKeys_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                   -- ^ id: ID of the SSH key
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetSshKeysIdResponse))   -- ^ Monad containing the result of the operation
-getSshKeys_Id_ config
-               id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                      GetSshKeysIdResponseBody200)
-                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /ssh_keys/{id}
--- 
--- The same as 'getSshKeys_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-getSshKeys_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     HCloud.Common.Configuration s ->
-                     GHC.Integer.Type.Integer ->
-                     m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getSshKeys_Id_Raw config
-                  id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /ssh_keys/{id}
--- 
--- Monadic version of 'getSshKeys_Id_' (use with 'HCloud.Common.runWithConfiguration')
-getSshKeys_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Integer.Type.Integer ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response GetSshKeysIdResponse))
-getSshKeys_Id_M id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                       GetSshKeysIdResponseBody200)
-                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /ssh_keys/{id}
--- 
--- Monadic version of 'getSshKeys_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-getSshKeys_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      GHC.Integer.Type.Integer ->
-                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                         m
-                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getSshKeys_Id_RawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
+getSshKeys_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the SSH key
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetSshKeysIdResponse) -- ^ Monadic computation which returns the result of the operation
+getSshKeys_Id_ id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                       GetSshKeysIdResponseBody200)
+                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
 -- | Represents a response of the operation 'getSshKeys_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetSshKeysIdResponseError' is used.
-data GetSshKeysIdResponse =                              
-   GetSshKeysIdResponseError GHC.Base.String             -- ^ Means either no matching case available or a parse error
-  | GetSshKeysIdResponse200 GetSshKeysIdResponseBody200  -- ^ The \`ssh_key\` key in the reply contains an SSH key object with this structure
+data GetSshKeysIdResponse =
+   GetSshKeysIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetSshKeysIdResponse200 GetSshKeysIdResponseBody200 -- ^ The \`ssh_key\` key in the reply contains an SSH key object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetSshKeysIdResponseBody200
+-- | Defines the object schema located at @paths.\/ssh_keys\/{id}.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetSshKeysIdResponseBody200 = GetSshKeysIdResponseBody200 {
@@ -102,12 +65,16 @@ data GetSshKeysIdResponseBody200 = GetSshKeysIdResponseBody200 {
   getSshKeysIdResponseBody200SshKey :: GetSshKeysIdResponseBody200SshKey
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetSshKeysIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ssh_key" (getSshKeysIdResponseBody200SshKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ssh_key" (getSshKeysIdResponseBody200SshKey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetSshKeysIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ssh_key" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ssh_key" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetSshKeysIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetSshKeysIdResponseBody200" (\obj -> GHC.Base.pure GetSshKeysIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ssh_key"))
--- | Defines the data type for the schema GetSshKeysIdResponseBody200Ssh_key
+-- | Create a new 'GetSshKeysIdResponseBody200' with all required fields.
+mkGetSshKeysIdResponseBody200 :: GetSshKeysIdResponseBody200SshKey -- ^ 'getSshKeysIdResponseBody200SshKey'
+  -> GetSshKeysIdResponseBody200
+mkGetSshKeysIdResponseBody200 getSshKeysIdResponseBody200SshKey = GetSshKeysIdResponseBody200{getSshKeysIdResponseBody200SshKey = getSshKeysIdResponseBody200SshKey}
+-- | Defines the object schema located at @paths.\/ssh_keys\/{id}.GET.responses.200.content.application\/json.schema.properties.ssh_key@ in the specification.
 -- 
 -- 
 data GetSshKeysIdResponseBody200SshKey = GetSshKeysIdResponseBody200SshKey {
@@ -116,29 +83,55 @@ data GetSshKeysIdResponseBody200SshKey = GetSshKeysIdResponseBody200SshKey {
   -- | fingerprint: Fingerprint of public key
   , getSshKeysIdResponseBody200SshKeyFingerprint :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getSshKeysIdResponseBody200SshKeyId :: GHC.Integer.Type.Integer
+  , getSshKeysIdResponseBody200SshKeyId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , getSshKeysIdResponseBody200SshKeyLabels :: GetSshKeysIdResponseBody200SshKeyLabels
+  , getSshKeysIdResponseBody200SshKeyLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , getSshKeysIdResponseBody200SshKeyName :: Data.Text.Internal.Text
   -- | public_key: Public key
   , getSshKeysIdResponseBody200SshKeyPublicKey :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetSshKeysIdResponseBody200SshKey
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (getSshKeysIdResponseBody200SshKeyCreated obj) : (Data.Aeson..=) "fingerprint" (getSshKeysIdResponseBody200SshKeyFingerprint obj) : (Data.Aeson..=) "id" (getSshKeysIdResponseBody200SshKeyId obj) : (Data.Aeson..=) "labels" (getSshKeysIdResponseBody200SshKeyLabels obj) : (Data.Aeson..=) "name" (getSshKeysIdResponseBody200SshKeyName obj) : (Data.Aeson..=) "public_key" (getSshKeysIdResponseBody200SshKeyPublicKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (getSshKeysIdResponseBody200SshKeyCreated obj) GHC.Base.<> ((Data.Aeson..=) "fingerprint" (getSshKeysIdResponseBody200SshKeyFingerprint obj) GHC.Base.<> ((Data.Aeson..=) "id" (getSshKeysIdResponseBody200SshKeyId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getSshKeysIdResponseBody200SshKeyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getSshKeysIdResponseBody200SshKeyName obj) GHC.Base.<> (Data.Aeson..=) "public_key" (getSshKeysIdResponseBody200SshKeyPublicKey obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetSshKeysIdResponseBody200SshKey
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyCreated obj : "fingerprint" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyFingerprint obj : "id" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyId obj : "labels" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyLabels obj : "name" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyName obj : "public_key" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyPublicKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyCreated obj) GHC.Base.<> (("fingerprint" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyFingerprint obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyName obj) GHC.Base.<> ("public_key" Data.Aeson.Types.ToJSON..= getSshKeysIdResponseBody200SshKeyPublicKey obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetSshKeysIdResponseBody200SshKey
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetSshKeysIdResponseBody200SshKey" (\obj -> (((((GHC.Base.pure GetSshKeysIdResponseBody200SshKey GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fingerprint")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_key"))
--- | Defines the data type for the schema GetSshKeysIdResponseBody200Ssh_keyLabels
+-- | Create a new 'GetSshKeysIdResponseBody200SshKey' with all required fields.
+mkGetSshKeysIdResponseBody200SshKey :: Data.Text.Internal.Text -- ^ 'getSshKeysIdResponseBody200SshKeyCreated'
+  -> Data.Text.Internal.Text -- ^ 'getSshKeysIdResponseBody200SshKeyFingerprint'
+  -> GHC.Types.Int -- ^ 'getSshKeysIdResponseBody200SshKeyId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getSshKeysIdResponseBody200SshKeyLabels'
+  -> Data.Text.Internal.Text -- ^ 'getSshKeysIdResponseBody200SshKeyName'
+  -> Data.Text.Internal.Text -- ^ 'getSshKeysIdResponseBody200SshKeyPublicKey'
+  -> GetSshKeysIdResponseBody200SshKey
+mkGetSshKeysIdResponseBody200SshKey getSshKeysIdResponseBody200SshKeyCreated getSshKeysIdResponseBody200SshKeyFingerprint getSshKeysIdResponseBody200SshKeyId getSshKeysIdResponseBody200SshKeyLabels getSshKeysIdResponseBody200SshKeyName getSshKeysIdResponseBody200SshKeyPublicKey = GetSshKeysIdResponseBody200SshKey{getSshKeysIdResponseBody200SshKeyCreated = getSshKeysIdResponseBody200SshKeyCreated,
+                                                                                                                                                                                                                                                                                                                           getSshKeysIdResponseBody200SshKeyFingerprint = getSshKeysIdResponseBody200SshKeyFingerprint,
+                                                                                                                                                                                                                                                                                                                           getSshKeysIdResponseBody200SshKeyId = getSshKeysIdResponseBody200SshKeyId,
+                                                                                                                                                                                                                                                                                                                           getSshKeysIdResponseBody200SshKeyLabels = getSshKeysIdResponseBody200SshKeyLabels,
+                                                                                                                                                                                                                                                                                                                           getSshKeysIdResponseBody200SshKeyName = getSshKeysIdResponseBody200SshKeyName,
+                                                                                                                                                                                                                                                                                                                           getSshKeysIdResponseBody200SshKeyPublicKey = getSshKeysIdResponseBody200SshKeyPublicKey}
+-- | > GET /ssh_keys/{id}
 -- 
--- User-defined labels (key-value pairs)
-data GetSshKeysIdResponseBody200SshKeyLabels = GetSshKeysIdResponseBody200SshKeyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetSshKeysIdResponseBody200SshKeyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetSshKeysIdResponseBody200SshKeyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetSshKeysIdResponseBody200SshKeyLabels" (\obj -> GHC.Base.pure GetSshKeysIdResponseBody200SshKeyLabels)
+-- The same as 'getSshKeys_Id_' but accepts an explicit configuration.
+getSshKeys_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the SSH key
+  -> m (Network.HTTP.Client.Types.Response GetSshKeysIdResponse) -- ^ Monadic computation which returns the result of the operation
+getSshKeys_Id_WithConfiguration config
+                                id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                        GetSshKeysIdResponseBody200)
+                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > GET /ssh_keys/{id}
+-- 
+-- The same as 'getSshKeys_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getSshKeys_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the SSH key
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getSshKeys_Id_Raw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > GET /ssh_keys/{id}
+-- 
+-- The same as 'getSshKeys_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getSshKeys_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the SSH key
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getSshKeys_Id_WithConfigurationRaw config
+                                   id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)

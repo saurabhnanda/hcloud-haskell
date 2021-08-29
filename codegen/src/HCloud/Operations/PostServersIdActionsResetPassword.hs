@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsResetPassword
 module HCloud.Operations.PostServersIdActionsResetPassword where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,56 +49,19 @@ import HCloud.Types
 -- This will generate a new password for this Server and return it.
 -- 
 -- If this does not succeed you can use the rescue system to netboot the Server and manually change your Server password by hand.
-postServers_Id_ActionsResetPassword :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                        -- ^ id: ID of the Server
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsResetPasswordResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsResetPassword config
-                                    id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsResetPasswordResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsResetPasswordResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostServersIdActionsResetPasswordResponseBody201)
-                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) [])
--- | > POST /servers/{id}/actions/reset_password
--- 
--- The same as 'postServers_Id_ActionsResetPassword' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsResetPasswordRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                        HCloud.Common.SecurityScheme s) =>
-                                          HCloud.Common.Configuration s ->
-                                          GHC.Integer.Type.Integer ->
-                                          m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsResetPasswordRaw config
-                                       id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) [])
--- | > POST /servers/{id}/actions/reset_password
--- 
--- Monadic version of 'postServers_Id_ActionsResetPassword' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsResetPasswordM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                      HCloud.Common.SecurityScheme s) =>
-                                        GHC.Integer.Type.Integer ->
-                                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                           m
-                                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                               (Network.HTTP.Client.Types.Response PostServersIdActionsResetPasswordResponse))
-postServers_Id_ActionsResetPasswordM id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsResetPasswordResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsResetPasswordResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsResetPasswordResponseBody201)
-                                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) [])
--- | > POST /servers/{id}/actions/reset_password
--- 
--- Monadic version of 'postServers_Id_ActionsResetPasswordRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsResetPasswordRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                         HCloud.Common.SecurityScheme s) =>
-                                           GHC.Integer.Type.Integer ->
-                                           Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                              m
-                                                                              (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsResetPasswordRawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) [])
+postServers_Id_ActionsResetPassword :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsResetPasswordResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsResetPassword id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsResetPasswordResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsResetPasswordResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsResetPasswordResponseBody201)
+                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) GHC.Base.mempty)
 -- | Represents a response of the operation 'postServers_Id_ActionsResetPassword'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsResetPasswordResponseError' is used.
-data PostServersIdActionsResetPasswordResponse =                                                   
-   PostServersIdActionsResetPasswordResponseError GHC.Base.String                                  -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsResetPasswordResponse201 PostServersIdActionsResetPasswordResponseBody201  -- ^ The \`root_password\` key in the reply contains the new root password that will be active if the Action succeeds.  The \`action\` key in the reply contains an Action object with this structure: 
+data PostServersIdActionsResetPasswordResponse =
+   PostServersIdActionsResetPasswordResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsResetPasswordResponse201 PostServersIdActionsResetPasswordResponseBody201 -- ^ The \`root_password\` key in the reply contains the new root password that will be active if the Action succeeds.  The \`action\` key in the reply contains an Action object with this structure: 
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsResetPasswordResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/reset_password.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsResetPasswordResponseBody201 = PostServersIdActionsResetPasswordResponseBody201 {
@@ -108,39 +71,61 @@ data PostServersIdActionsResetPasswordResponseBody201 = PostServersIdActionsRese
   , postServersIdActionsResetPasswordResponseBody201RootPassword :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsResetPasswordResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsResetPasswordResponseBody201Action obj) : (Data.Aeson..=) "root_password" (postServersIdActionsResetPasswordResponseBody201RootPassword obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsResetPasswordResponseBody201Action obj) GHC.Base.<> (Data.Aeson..=) "root_password" (postServersIdActionsResetPasswordResponseBody201RootPassword obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsResetPasswordResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201Action obj : "root_password" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201RootPassword obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201Action obj) GHC.Base.<> ("root_password" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201RootPassword obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsResetPasswordResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsResetPasswordResponseBody201" (\obj -> (GHC.Base.pure PostServersIdActionsResetPasswordResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "root_password"))
--- | Defines the data type for the schema PostServersIdActionsResetPasswordResponseBody201Action
+-- | Create a new 'PostServersIdActionsResetPasswordResponseBody201' with all required fields.
+mkPostServersIdActionsResetPasswordResponseBody201 :: PostServersIdActionsResetPasswordResponseBody201
+mkPostServersIdActionsResetPasswordResponseBody201 = PostServersIdActionsResetPasswordResponseBody201{postServersIdActionsResetPasswordResponseBody201Action = GHC.Maybe.Nothing,
+                                                                                                      postServersIdActionsResetPasswordResponseBody201RootPassword = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/reset_password.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsResetPasswordResponseBody201Action = PostServersIdActionsResetPasswordResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsResetPasswordResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsResetPasswordResponseBody201ActionError :: PostServersIdActionsResetPasswordResponseBody201ActionError
+  , postServersIdActionsResetPasswordResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsResetPasswordResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsResetPasswordResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsResetPasswordResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsResetPasswordResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsResetPasswordResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsResetPasswordResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsResetPasswordResponseBody201ActionResources :: ([] PostServersIdActionsResetPasswordResponseBody201ActionResources)
+  , postServersIdActionsResetPasswordResponseBody201ActionResources :: ([PostServersIdActionsResetPasswordResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsResetPasswordResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsResetPasswordResponseBody201ActionStatus :: PostServersIdActionsResetPasswordResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsResetPasswordResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsResetPasswordResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsResetPasswordResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsResetPasswordResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsResetPasswordResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsResetPasswordResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsResetPasswordResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsResetPasswordResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsResetPasswordResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsResetPasswordResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsResetPasswordResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsResetPasswordResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsResetPasswordResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsResetPasswordResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsResetPasswordResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsResetPasswordResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsResetPasswordResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsResetPasswordResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsResetPasswordResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsResetPasswordResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsResetPasswordResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsResetPasswordResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsResetPasswordResponseBody201Action' with all required fields.
+mkPostServersIdActionsResetPasswordResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsResetPasswordResponseBody201ActionError -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionProgress'
+  -> [PostServersIdActionsResetPasswordResponseBody201ActionResources] -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionStarted'
+  -> PostServersIdActionsResetPasswordResponseBody201ActionStatus -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionStatus'
+  -> PostServersIdActionsResetPasswordResponseBody201Action
+mkPostServersIdActionsResetPasswordResponseBody201Action postServersIdActionsResetPasswordResponseBody201ActionCommand postServersIdActionsResetPasswordResponseBody201ActionError postServersIdActionsResetPasswordResponseBody201ActionFinished postServersIdActionsResetPasswordResponseBody201ActionId postServersIdActionsResetPasswordResponseBody201ActionProgress postServersIdActionsResetPasswordResponseBody201ActionResources postServersIdActionsResetPasswordResponseBody201ActionStarted postServersIdActionsResetPasswordResponseBody201ActionStatus = PostServersIdActionsResetPasswordResponseBody201Action{postServersIdActionsResetPasswordResponseBody201ActionCommand = postServersIdActionsResetPasswordResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionError = postServersIdActionsResetPasswordResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionFinished = postServersIdActionsResetPasswordResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionId = postServersIdActionsResetPasswordResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionProgress = postServersIdActionsResetPasswordResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionResources = postServersIdActionsResetPasswordResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionStarted = postServersIdActionsResetPasswordResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsResetPasswordResponseBody201ActionStatus = postServersIdActionsResetPasswordResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/reset_password.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsResetPasswordResponseBody201ActionError = PostServersIdActionsResetPasswordResponseBody201ActionError {
@@ -150,47 +135,80 @@ data PostServersIdActionsResetPasswordResponseBody201ActionError = PostServersId
   , postServersIdActionsResetPasswordResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsResetPasswordResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsResetPasswordResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsResetPasswordResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsResetPasswordResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsResetPasswordResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsResetPasswordResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsResetPasswordResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsResetPasswordResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsResetPasswordResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsResetPasswordResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsResetPasswordResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsResetPasswordResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsResetPasswordResponseBody201ActionError
+mkPostServersIdActionsResetPasswordResponseBody201ActionError postServersIdActionsResetPasswordResponseBody201ActionErrorCode postServersIdActionsResetPasswordResponseBody201ActionErrorMessage = PostServersIdActionsResetPasswordResponseBody201ActionError{postServersIdActionsResetPasswordResponseBody201ActionErrorCode = postServersIdActionsResetPasswordResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                               postServersIdActionsResetPasswordResponseBody201ActionErrorMessage = postServersIdActionsResetPasswordResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/reset_password.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsResetPasswordResponseBody201ActionResources = PostServersIdActionsResetPasswordResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsResetPasswordResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsResetPasswordResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsResetPasswordResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsResetPasswordResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsResetPasswordResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsResetPasswordResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsResetPasswordResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsResetPasswordResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsResetPasswordResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsResetPasswordResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsResetPasswordResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsResetPasswordResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsResetPasswordResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsResetPasswordResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsResetPasswordResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsResetPasswordResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsResetPasswordResponseBody201ActionResourcesType'
+  -> PostServersIdActionsResetPasswordResponseBody201ActionResources
+mkPostServersIdActionsResetPasswordResponseBody201ActionResources postServersIdActionsResetPasswordResponseBody201ActionResourcesId postServersIdActionsResetPasswordResponseBody201ActionResourcesType = PostServersIdActionsResetPasswordResponseBody201ActionResources{postServersIdActionsResetPasswordResponseBody201ActionResourcesId = postServersIdActionsResetPasswordResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                          postServersIdActionsResetPasswordResponseBody201ActionResourcesType = postServersIdActionsResetPasswordResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/reset_password.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsResetPasswordResponseBody201ActionStatus
-    = PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsResetPasswordResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsResetPasswordResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsResetPasswordResponseBody201ActionStatus =
+   PostServersIdActionsResetPasswordResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsResetPasswordResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsResetPasswordResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsResetPasswordResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsResetPasswordResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsResetPasswordResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/reset_password
+-- 
+-- The same as 'postServers_Id_ActionsResetPassword' but accepts an explicit configuration.
+postServers_Id_ActionsResetPasswordWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsResetPasswordResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsResetPasswordWithConfiguration config
+                                                     id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsResetPasswordResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsResetPasswordResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostServersIdActionsResetPasswordResponseBody201)
+                                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/reset_password
+-- 
+-- The same as 'postServers_Id_ActionsResetPassword' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsResetPasswordRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsResetPasswordRaw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/reset_password
+-- 
+-- The same as 'postServers_Id_ActionsResetPassword' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsResetPasswordWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsResetPasswordWithConfigurationRaw config
+                                                        id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/reset_password"))) GHC.Base.mempty)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getNetworks
 module HCloud.Operations.GetNetworks where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,87 +45,63 @@ import HCloud.Types
 -- | > GET /networks
 -- 
 -- Gets all existing networks that you have available.
-getNetworks :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                 -- ^ name: Can be used to filter networks by their name. The response will only contain the networks matching the specified name.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                 -- ^ label_selector: Can be used to filter networks by labels. The response will only contain networks with a matching label selector pattern.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetNetworksResponse)) -- ^ Monad containing the result of the operation
-getNetworks config
-            name
-            labelSelector = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetNetworksResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetNetworksResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                            GetNetworksResponseBody200)
-                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : [])))
--- | > GET /networks
+getNetworks :: forall m . HCloud.Common.MonadHTTP m => GetNetworksParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetNetworksResponse) -- ^ Monadic computation which returns the result of the operation
+getNetworks parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetNetworksResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetNetworksResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                          GetNetworksResponseBody200)
+                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/networks.GET.parameters@ in the specification.
 -- 
--- The same as 'getNetworks' but returns the raw 'Data.ByteString.Char8.ByteString'
-getNetworksRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  HCloud.Common.Configuration s ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getNetworksRaw config
-               name
-               labelSelector = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") ((Data.Text.pack "name",
-                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : [])))
--- | > GET /networks
 -- 
--- Monadic version of 'getNetworks' (use with 'HCloud.Common.runWithConfiguration')
-getNetworksM :: forall m s . (HCloud.Common.MonadHTTP m,
-                              HCloud.Common.SecurityScheme s) =>
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                   m
-                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response GetNetworksResponse))
-getNetworksM name
-             labelSelector = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetNetworksResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetNetworksResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                             GetNetworksResponseBody200)
-                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : [])))
--- | > GET /networks
--- 
--- Monadic version of 'getNetworksRaw' (use with 'HCloud.Common.runWithConfiguration')
-getNetworksRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getNetworksRawM name
-                labelSelector = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") ((Data.Text.pack "name",
-                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : [])))
+data GetNetworksParameters = GetNetworksParameters {
+  -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+  -- 
+  -- Can be used to filter networks by labels. The response will only contain networks with a matching label selector pattern.
+  getNetworksParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryName: Represents the parameter named \'name\'
+  -- 
+  -- Can be used to filter networks by their name. The response will only contain the networks matching the specified name.
+  , getNetworksParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryLabel_selector" Data.Aeson.Types.ToJSON..= getNetworksParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getNetworksParametersQueryName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getNetworksParametersQueryLabelSelector obj) GHC.Base.<> ("queryName" Data.Aeson.Types.ToJSON..= getNetworksParametersQueryName obj))
+instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksParameters" (\obj -> (GHC.Base.pure GetNetworksParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName"))
+-- | Create a new 'GetNetworksParameters' with all required fields.
+mkGetNetworksParameters :: GetNetworksParameters
+mkGetNetworksParameters = GetNetworksParameters{getNetworksParametersQueryLabelSelector = GHC.Maybe.Nothing,
+                                                getNetworksParametersQueryName = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'getNetworks'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetNetworksResponseError' is used.
-data GetNetworksResponse =                             
-   GetNetworksResponseError GHC.Base.String            -- ^ Means either no matching case available or a parse error
-  | GetNetworksResponse200 GetNetworksResponseBody200  -- ^ The \`networks\` key contains a list of networks
+data GetNetworksResponse =
+   GetNetworksResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetNetworksResponse200 GetNetworksResponseBody200 -- ^ The \`networks\` key contains a list of networks
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetNetworksResponseBody200
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetNetworksResponseBody200 = GetNetworksResponseBody200 {
   -- | meta
   getNetworksResponseBody200Meta :: (GHC.Maybe.Maybe GetNetworksResponseBody200Meta)
   -- | networks
-  , getNetworksResponseBody200Networks :: ([] GetNetworksResponseBody200Networks)
+  , getNetworksResponseBody200Networks :: ([GetNetworksResponseBody200Networks])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "meta" (getNetworksResponseBody200Meta obj) : (Data.Aeson..=) "networks" (getNetworksResponseBody200Networks obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "meta" (getNetworksResponseBody200Meta obj) GHC.Base.<> (Data.Aeson..=) "networks" (getNetworksResponseBody200Networks obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("meta" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200Meta obj : "networks" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200Networks obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("meta" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200Meta obj) GHC.Base.<> ("networks" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200Networks obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200" (\obj -> (GHC.Base.pure GetNetworksResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "networks"))
--- | Defines the data type for the schema GetNetworksResponseBody200Meta
+-- | Create a new 'GetNetworksResponseBody200' with all required fields.
+mkGetNetworksResponseBody200 :: [GetNetworksResponseBody200Networks] -- ^ 'getNetworksResponseBody200Networks'
+  -> GetNetworksResponseBody200
+mkGetNetworksResponseBody200 getNetworksResponseBody200Networks = GetNetworksResponseBody200{getNetworksResponseBody200Meta = GHC.Maybe.Nothing,
+                                                                                             getNetworksResponseBody200Networks = getNetworksResponseBody200Networks}
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetNetworksResponseBody200Meta = GetNetworksResponseBody200Meta {
@@ -133,78 +109,105 @@ data GetNetworksResponseBody200Meta = GetNetworksResponseBody200Meta {
   getNetworksResponseBody200MetaPagination :: GetNetworksResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getNetworksResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getNetworksResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200Meta" (\obj -> GHC.Base.pure GetNetworksResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetNetworksResponseBody200MetaPagination
+-- | Create a new 'GetNetworksResponseBody200Meta' with all required fields.
+mkGetNetworksResponseBody200Meta :: GetNetworksResponseBody200MetaPagination -- ^ 'getNetworksResponseBody200MetaPagination'
+  -> GetNetworksResponseBody200Meta
+mkGetNetworksResponseBody200Meta getNetworksResponseBody200MetaPagination = GetNetworksResponseBody200Meta{getNetworksResponseBody200MetaPagination = getNetworksResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetNetworksResponseBody200MetaPagination = GetNetworksResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getNetworksResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getNetworksResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getNetworksResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getNetworksResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getNetworksResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getNetworksResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getNetworksResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getNetworksResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getNetworksResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getNetworksResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getNetworksResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getNetworksResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getNetworksResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getNetworksResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getNetworksResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getNetworksResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getNetworksResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getNetworksResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getNetworksResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getNetworksResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getNetworksResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getNetworksResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetNetworksResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
--- | Defines the data type for the schema GetNetworksResponseBody200Networks
+-- | Create a new 'GetNetworksResponseBody200MetaPagination' with all required fields.
+mkGetNetworksResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getNetworksResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getNetworksResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getNetworksResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getNetworksResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getNetworksResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getNetworksResponseBody200MetaPaginationTotalEntries'
+  -> GetNetworksResponseBody200MetaPagination
+mkGetNetworksResponseBody200MetaPagination getNetworksResponseBody200MetaPaginationLastPage getNetworksResponseBody200MetaPaginationNextPage getNetworksResponseBody200MetaPaginationPage getNetworksResponseBody200MetaPaginationPerPage getNetworksResponseBody200MetaPaginationPreviousPage getNetworksResponseBody200MetaPaginationTotalEntries = GetNetworksResponseBody200MetaPagination{getNetworksResponseBody200MetaPaginationLastPage = getNetworksResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                               getNetworksResponseBody200MetaPaginationNextPage = getNetworksResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                               getNetworksResponseBody200MetaPaginationPage = getNetworksResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                               getNetworksResponseBody200MetaPaginationPerPage = getNetworksResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                               getNetworksResponseBody200MetaPaginationPreviousPage = getNetworksResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                               getNetworksResponseBody200MetaPaginationTotalEntries = getNetworksResponseBody200MetaPaginationTotalEntries}
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.networks.items@ in the specification.
 -- 
 -- 
 data GetNetworksResponseBody200Networks = GetNetworksResponseBody200Networks {
   -- | created: Point in time when the Network was created (in ISO-8601 format)
   getNetworksResponseBody200NetworksCreated :: Data.Text.Internal.Text
   -- | id: ID of the Network
-  , getNetworksResponseBody200NetworksId :: GHC.Integer.Type.Integer
+  , getNetworksResponseBody200NetworksId :: GHC.Types.Int
   -- | ip_range: IPv4 prefix of the whole Network
   , getNetworksResponseBody200NetworksIpRange :: Data.Text.Internal.Text
   -- | labels: User-defined labels (key-value pairs)
-  , getNetworksResponseBody200NetworksLabels :: GetNetworksResponseBody200NetworksLabels
+  , getNetworksResponseBody200NetworksLabels :: Data.Aeson.Types.Internal.Object
   -- | load_balancers: Array of IDs of Load Balancers attached to this Network
-  , getNetworksResponseBody200NetworksLoadBalancers :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  , getNetworksResponseBody200NetworksLoadBalancers :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | name: Name of the Network
   , getNetworksResponseBody200NetworksName :: Data.Text.Internal.Text
   -- | protection: Protection configuration for the Network
   , getNetworksResponseBody200NetworksProtection :: GetNetworksResponseBody200NetworksProtection
   -- | routes: Array of routes set in this Network
-  , getNetworksResponseBody200NetworksRoutes :: ([] GetNetworksResponseBody200NetworksRoutes)
+  , getNetworksResponseBody200NetworksRoutes :: ([GetNetworksResponseBody200NetworksRoutes])
   -- | servers: Array of IDs of Servers attached to this Network
-  , getNetworksResponseBody200NetworksServers :: ([] GHC.Integer.Type.Integer)
+  , getNetworksResponseBody200NetworksServers :: ([GHC.Types.Int])
   -- | subnets: Array subnets allocated in this Network
-  , getNetworksResponseBody200NetworksSubnets :: ([] GetNetworksResponseBody200NetworksSubnets)
+  , getNetworksResponseBody200NetworksSubnets :: ([GetNetworksResponseBody200NetworksSubnets])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200Networks
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (getNetworksResponseBody200NetworksCreated obj) : (Data.Aeson..=) "id" (getNetworksResponseBody200NetworksId obj) : (Data.Aeson..=) "ip_range" (getNetworksResponseBody200NetworksIpRange obj) : (Data.Aeson..=) "labels" (getNetworksResponseBody200NetworksLabels obj) : (Data.Aeson..=) "load_balancers" (getNetworksResponseBody200NetworksLoadBalancers obj) : (Data.Aeson..=) "name" (getNetworksResponseBody200NetworksName obj) : (Data.Aeson..=) "protection" (getNetworksResponseBody200NetworksProtection obj) : (Data.Aeson..=) "routes" (getNetworksResponseBody200NetworksRoutes obj) : (Data.Aeson..=) "servers" (getNetworksResponseBody200NetworksServers obj) : (Data.Aeson..=) "subnets" (getNetworksResponseBody200NetworksSubnets obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (getNetworksResponseBody200NetworksCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (getNetworksResponseBody200NetworksId obj) GHC.Base.<> ((Data.Aeson..=) "ip_range" (getNetworksResponseBody200NetworksIpRange obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getNetworksResponseBody200NetworksLabels obj) GHC.Base.<> ((Data.Aeson..=) "load_balancers" (getNetworksResponseBody200NetworksLoadBalancers obj) GHC.Base.<> ((Data.Aeson..=) "name" (getNetworksResponseBody200NetworksName obj) GHC.Base.<> ((Data.Aeson..=) "protection" (getNetworksResponseBody200NetworksProtection obj) GHC.Base.<> ((Data.Aeson..=) "routes" (getNetworksResponseBody200NetworksRoutes obj) GHC.Base.<> ((Data.Aeson..=) "servers" (getNetworksResponseBody200NetworksServers obj) GHC.Base.<> (Data.Aeson..=) "subnets" (getNetworksResponseBody200NetworksSubnets obj))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200Networks
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksCreated obj : "id" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksId obj : "ip_range" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksIpRange obj : "labels" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksLabels obj : "load_balancers" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksLoadBalancers obj : "name" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksName obj : "protection" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksProtection obj : "routes" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksRoutes obj : "servers" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksServers obj : "subnets" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnets obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksId obj) GHC.Base.<> (("ip_range" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksIpRange obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksLabels obj) GHC.Base.<> (("load_balancers" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksLoadBalancers obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksName obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksProtection obj) GHC.Base.<> (("routes" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksRoutes obj) GHC.Base.<> (("servers" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksServers obj) GHC.Base.<> ("subnets" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnets obj))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200Networks
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200Networks" (\obj -> (((((((((GHC.Base.pure GetNetworksResponseBody200Networks GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip_range")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "load_balancers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "routes")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "subnets"))
--- | Defines the data type for the schema GetNetworksResponseBody200NetworksLabels
--- 
--- User-defined labels (key-value pairs)
-data GetNetworksResponseBody200NetworksLabels = GetNetworksResponseBody200NetworksLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200NetworksLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200NetworksLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200NetworksLabels" (\obj -> GHC.Base.pure GetNetworksResponseBody200NetworksLabels)
--- | Defines the data type for the schema GetNetworksResponseBody200NetworksProtection
+-- | Create a new 'GetNetworksResponseBody200Networks' with all required fields.
+mkGetNetworksResponseBody200Networks :: Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksCreated'
+  -> GHC.Types.Int -- ^ 'getNetworksResponseBody200NetworksId'
+  -> Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksIpRange'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getNetworksResponseBody200NetworksLabels'
+  -> Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksName'
+  -> GetNetworksResponseBody200NetworksProtection -- ^ 'getNetworksResponseBody200NetworksProtection'
+  -> [GetNetworksResponseBody200NetworksRoutes] -- ^ 'getNetworksResponseBody200NetworksRoutes'
+  -> [GHC.Types.Int] -- ^ 'getNetworksResponseBody200NetworksServers'
+  -> [GetNetworksResponseBody200NetworksSubnets] -- ^ 'getNetworksResponseBody200NetworksSubnets'
+  -> GetNetworksResponseBody200Networks
+mkGetNetworksResponseBody200Networks getNetworksResponseBody200NetworksCreated getNetworksResponseBody200NetworksId getNetworksResponseBody200NetworksIpRange getNetworksResponseBody200NetworksLabels getNetworksResponseBody200NetworksName getNetworksResponseBody200NetworksProtection getNetworksResponseBody200NetworksRoutes getNetworksResponseBody200NetworksServers getNetworksResponseBody200NetworksSubnets = GetNetworksResponseBody200Networks{getNetworksResponseBody200NetworksCreated = getNetworksResponseBody200NetworksCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksId = getNetworksResponseBody200NetworksId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksIpRange = getNetworksResponseBody200NetworksIpRange,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksLabels = getNetworksResponseBody200NetworksLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksLoadBalancers = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksName = getNetworksResponseBody200NetworksName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksProtection = getNetworksResponseBody200NetworksProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksRoutes = getNetworksResponseBody200NetworksRoutes,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksServers = getNetworksResponseBody200NetworksServers,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                             getNetworksResponseBody200NetworksSubnets = getNetworksResponseBody200NetworksSubnets}
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.networks.items.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Network
 data GetNetworksResponseBody200NetworksProtection = GetNetworksResponseBody200NetworksProtection {
@@ -212,12 +215,16 @@ data GetNetworksResponseBody200NetworksProtection = GetNetworksResponseBody200Ne
   getNetworksResponseBody200NetworksProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200NetworksProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (getNetworksResponseBody200NetworksProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (getNetworksResponseBody200NetworksProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200NetworksProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200NetworksProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200NetworksProtection" (\obj -> GHC.Base.pure GetNetworksResponseBody200NetworksProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the data type for the schema GetNetworksResponseBody200NetworksRoutes
+-- | Create a new 'GetNetworksResponseBody200NetworksProtection' with all required fields.
+mkGetNetworksResponseBody200NetworksProtection :: GHC.Types.Bool -- ^ 'getNetworksResponseBody200NetworksProtectionDelete'
+  -> GetNetworksResponseBody200NetworksProtection
+mkGetNetworksResponseBody200NetworksProtection getNetworksResponseBody200NetworksProtectionDelete = GetNetworksResponseBody200NetworksProtection{getNetworksResponseBody200NetworksProtectionDelete = getNetworksResponseBody200NetworksProtectionDelete}
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.networks.items.properties.routes.items@ in the specification.
 -- 
 -- 
 data GetNetworksResponseBody200NetworksRoutes = GetNetworksResponseBody200NetworksRoutes {
@@ -227,12 +234,18 @@ data GetNetworksResponseBody200NetworksRoutes = GetNetworksResponseBody200Networ
   , getNetworksResponseBody200NetworksRoutesGateway :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200NetworksRoutes
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination" (getNetworksResponseBody200NetworksRoutesDestination obj) : (Data.Aeson..=) "gateway" (getNetworksResponseBody200NetworksRoutesGateway obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination" (getNetworksResponseBody200NetworksRoutesDestination obj) GHC.Base.<> (Data.Aeson..=) "gateway" (getNetworksResponseBody200NetworksRoutesGateway obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200NetworksRoutes
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksRoutesDestination obj : "gateway" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksRoutesGateway obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksRoutesDestination obj) GHC.Base.<> ("gateway" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksRoutesGateway obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200NetworksRoutes
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200NetworksRoutes" (\obj -> (GHC.Base.pure GetNetworksResponseBody200NetworksRoutes GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gateway"))
--- | Defines the data type for the schema GetNetworksResponseBody200NetworksSubnets
+-- | Create a new 'GetNetworksResponseBody200NetworksRoutes' with all required fields.
+mkGetNetworksResponseBody200NetworksRoutes :: Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksRoutesDestination'
+  -> Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksRoutesGateway'
+  -> GetNetworksResponseBody200NetworksRoutes
+mkGetNetworksResponseBody200NetworksRoutes getNetworksResponseBody200NetworksRoutesDestination getNetworksResponseBody200NetworksRoutesGateway = GetNetworksResponseBody200NetworksRoutes{getNetworksResponseBody200NetworksRoutesDestination = getNetworksResponseBody200NetworksRoutesDestination,
+                                                                                                                                                                                          getNetworksResponseBody200NetworksRoutesGateway = getNetworksResponseBody200NetworksRoutesGateway}
+-- | Defines the object schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.networks.items.properties.subnets.items@ in the specification.
 -- 
 -- 
 data GetNetworksResponseBody200NetworksSubnets = GetNetworksResponseBody200NetworksSubnets {
@@ -246,32 +259,65 @@ data GetNetworksResponseBody200NetworksSubnets = GetNetworksResponseBody200Netwo
   , getNetworksResponseBody200NetworksSubnetsType :: GetNetworksResponseBody200NetworksSubnetsType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200NetworksSubnets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gateway" (getNetworksResponseBody200NetworksSubnetsGateway obj) : (Data.Aeson..=) "ip_range" (getNetworksResponseBody200NetworksSubnetsIpRange obj) : (Data.Aeson..=) "network_zone" (getNetworksResponseBody200NetworksSubnetsNetworkZone obj) : (Data.Aeson..=) "type" (getNetworksResponseBody200NetworksSubnetsType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gateway" (getNetworksResponseBody200NetworksSubnetsGateway obj) GHC.Base.<> ((Data.Aeson..=) "ip_range" (getNetworksResponseBody200NetworksSubnetsIpRange obj) GHC.Base.<> ((Data.Aeson..=) "network_zone" (getNetworksResponseBody200NetworksSubnetsNetworkZone obj) GHC.Base.<> (Data.Aeson..=) "type" (getNetworksResponseBody200NetworksSubnetsType obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200NetworksSubnets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gateway" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsGateway obj : "ip_range" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsIpRange obj : "network_zone" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsNetworkZone obj : "type" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gateway" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsGateway obj) GHC.Base.<> (("ip_range" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsIpRange obj) GHC.Base.<> (("network_zone" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsNetworkZone obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getNetworksResponseBody200NetworksSubnetsType obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200NetworksSubnets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetNetworksResponseBody200NetworksSubnets" (\obj -> (((GHC.Base.pure GetNetworksResponseBody200NetworksSubnets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gateway")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip_range")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetNetworksResponseBody200NetworksSubnetsType
+-- | Create a new 'GetNetworksResponseBody200NetworksSubnets' with all required fields.
+mkGetNetworksResponseBody200NetworksSubnets :: Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksSubnetsGateway'
+  -> Data.Text.Internal.Text -- ^ 'getNetworksResponseBody200NetworksSubnetsNetworkZone'
+  -> GetNetworksResponseBody200NetworksSubnetsType -- ^ 'getNetworksResponseBody200NetworksSubnetsType'
+  -> GetNetworksResponseBody200NetworksSubnets
+mkGetNetworksResponseBody200NetworksSubnets getNetworksResponseBody200NetworksSubnetsGateway getNetworksResponseBody200NetworksSubnetsNetworkZone getNetworksResponseBody200NetworksSubnetsType = GetNetworksResponseBody200NetworksSubnets{getNetworksResponseBody200NetworksSubnetsGateway = getNetworksResponseBody200NetworksSubnetsGateway,
+                                                                                                                                                                                                                                            getNetworksResponseBody200NetworksSubnetsIpRange = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                            getNetworksResponseBody200NetworksSubnetsNetworkZone = getNetworksResponseBody200NetworksSubnetsNetworkZone,
+                                                                                                                                                                                                                                            getNetworksResponseBody200NetworksSubnetsType = getNetworksResponseBody200NetworksSubnetsType}
+-- | Defines the enum schema located at @paths.\/networks.GET.responses.200.content.application\/json.schema.properties.networks.items.properties.subnets.items.properties.type@ in the specification.
 -- 
 -- Type of Subnetwork
-data GetNetworksResponseBody200NetworksSubnetsType
-    = GetNetworksResponseBody200NetworksSubnetsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetNetworksResponseBody200NetworksSubnetsTypeEnumTyped Data.Text.Internal.Text
-    | GetNetworksResponseBody200NetworksSubnetsTypeEnumStringCloud
-    | GetNetworksResponseBody200NetworksSubnetsTypeEnumStringServer
-    | GetNetworksResponseBody200NetworksSubnetsTypeEnumStringVswitch
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetNetworksResponseBody200NetworksSubnetsType
-    where toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumStringCloud) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "cloud"
-          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumStringVswitch) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "vswitch"
-instance Data.Aeson.FromJSON GetNetworksResponseBody200NetworksSubnetsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "cloud")
-                                          then GetNetworksResponseBody200NetworksSubnetsTypeEnumStringCloud
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                then GetNetworksResponseBody200NetworksSubnetsTypeEnumStringServer
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "vswitch")
-                                                      then GetNetworksResponseBody200NetworksSubnetsTypeEnumStringVswitch
-                                                      else GetNetworksResponseBody200NetworksSubnetsTypeEnumOther val)
+data GetNetworksResponseBody200NetworksSubnetsType =
+   GetNetworksResponseBody200NetworksSubnetsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetNetworksResponseBody200NetworksSubnetsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetNetworksResponseBody200NetworksSubnetsTypeEnumCloud -- ^ Represents the JSON value @"cloud"@
+  | GetNetworksResponseBody200NetworksSubnetsTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | GetNetworksResponseBody200NetworksSubnetsTypeEnumVswitch -- ^ Represents the JSON value @"vswitch"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetNetworksResponseBody200NetworksSubnetsType
+    where toJSON (GetNetworksResponseBody200NetworksSubnetsTypeOther val) = val
+          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumCloud) = "cloud"
+          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumServer) = "server"
+          toJSON (GetNetworksResponseBody200NetworksSubnetsTypeEnumVswitch) = "vswitch"
+instance Data.Aeson.Types.FromJSON.FromJSON GetNetworksResponseBody200NetworksSubnetsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "cloud" -> GetNetworksResponseBody200NetworksSubnetsTypeEnumCloud
+                                            | val GHC.Classes.== "server" -> GetNetworksResponseBody200NetworksSubnetsTypeEnumServer
+                                            | val GHC.Classes.== "vswitch" -> GetNetworksResponseBody200NetworksSubnetsTypeEnumVswitch
+                                            | GHC.Base.otherwise -> GetNetworksResponseBody200NetworksSubnetsTypeOther val)
+-- | > GET /networks
+-- 
+-- The same as 'getNetworks' but accepts an explicit configuration.
+getNetworksWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetNetworksParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetNetworksResponse) -- ^ Monadic computation which returns the result of the operation
+getNetworksWithConfiguration config
+                             parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetNetworksResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetNetworksResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                           GetNetworksResponseBody200)
+                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /networks
+-- 
+-- The same as 'getNetworks' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getNetworksRaw :: forall m . HCloud.Common.MonadHTTP m => GetNetworksParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getNetworksRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /networks
+-- 
+-- The same as 'getNetworks' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getNetworksWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetNetworksParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getNetworksWithConfigurationRaw config
+                                parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/networks") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getNetworksParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])

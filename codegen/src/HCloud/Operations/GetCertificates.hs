@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getCertificates
 module HCloud.Operations.GetCertificates where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,158 +45,195 @@ import HCloud.Types
 -- | > GET /certificates
 -- 
 -- Returns all Certificate objects.
-getCertificates :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                     -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                     -- ^ name: Can be used to filter resources by their name. The response will only contain the resources matching the specified name
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                     -- ^ label_selector: Can be used to filter resources by labels. The response will only contain resources matching the label selector.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                     -- ^ type: Can be used multiple times. The response will only contain Certificates matching the type.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetCertificatesResponse)) -- ^ Monad containing the result of the operation
-getCertificates config
-                sort
-                name
-                labelSelector
-                type' = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetCertificatesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                GetCertificatesResponseBody200)
-                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | > GET /certificates
+getCertificates :: forall m . HCloud.Common.MonadHTTP m => GetCertificatesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetCertificatesResponse) -- ^ Monadic computation which returns the result of the operation
+getCertificates parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetCertificatesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                      GetCertificatesResponseBody200)
+                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/certificates.GET.parameters@ in the specification.
 -- 
--- The same as 'getCertificates' but returns the raw 'Data.ByteString.Char8.ByteString'
-getCertificatesRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      HCloud.Common.Configuration s ->
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getCertificatesRaw config
-                   sort
-                   name
-                   labelSelector
-                   type' = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") ((Data.Text.pack "sort",
-                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | > GET /certificates
 -- 
--- Monadic version of 'getCertificates' (use with 'HCloud.Common.runWithConfiguration')
-getCertificatesM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                  HCloud.Common.SecurityScheme s) =>
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                       m
-                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                           (Network.HTTP.Client.Types.Response GetCertificatesResponse))
-getCertificatesM sort
-                 name
-                 labelSelector
-                 type' = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetCertificatesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                 GetCertificatesResponseBody200)
-                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | > GET /certificates
+data GetCertificatesParameters = GetCertificatesParameters {
+  -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+  -- 
+  -- Can be used to filter resources by labels. The response will only contain resources matching the label selector.
+  getCertificatesParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryName: Represents the parameter named \'name\'
+  -- 
+  -- Can be used to filter resources by their name. The response will only contain the resources matching the specified name
+  , getCertificatesParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getCertificatesParametersQuerySort :: (GHC.Maybe.Maybe GetCertificatesParametersQuerySort)
+  -- | queryType: Represents the parameter named \'type\'
+  -- 
+  -- Can be used multiple times. The response will only contain Certificates matching the type.
+  , getCertificatesParametersQueryType :: (GHC.Maybe.Maybe GetCertificatesParametersQueryType)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryLabel_selector" Data.Aeson.Types.ToJSON..= getCertificatesParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getCertificatesParametersQueryName obj : "querySort" Data.Aeson.Types.ToJSON..= getCertificatesParametersQuerySort obj : "queryType" Data.Aeson.Types.ToJSON..= getCertificatesParametersQueryType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getCertificatesParametersQueryLabelSelector obj) GHC.Base.<> (("queryName" Data.Aeson.Types.ToJSON..= getCertificatesParametersQueryName obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getCertificatesParametersQuerySort obj) GHC.Base.<> ("queryType" Data.Aeson.Types.ToJSON..= getCertificatesParametersQueryType obj))))
+instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesParameters" (\obj -> (((GHC.Base.pure GetCertificatesParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryType"))
+-- | Create a new 'GetCertificatesParameters' with all required fields.
+mkGetCertificatesParameters :: GetCertificatesParameters
+mkGetCertificatesParameters = GetCertificatesParameters{getCertificatesParametersQueryLabelSelector = GHC.Maybe.Nothing,
+                                                        getCertificatesParametersQueryName = GHC.Maybe.Nothing,
+                                                        getCertificatesParametersQuerySort = GHC.Maybe.Nothing,
+                                                        getCertificatesParametersQueryType = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/certificates.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getCertificatesRaw' (use with 'HCloud.Common.runWithConfiguration')
-getCertificatesRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                     HCloud.Common.SecurityScheme s) =>
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                          m
-                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getCertificatesRawM sort
-                    name
-                    labelSelector
-                    type' = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") ((Data.Text.pack "sort",
-                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetCertificatesParametersQuerySort =
+   GetCertificatesParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetCertificatesParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetCertificatesParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetCertificatesParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetCertificatesParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetCertificatesParametersQuerySortEnumName -- ^ Represents the JSON value @"name"@
+  | GetCertificatesParametersQuerySortEnumNameAsc -- ^ Represents the JSON value @"name:asc"@
+  | GetCertificatesParametersQuerySortEnumNameDesc -- ^ Represents the JSON value @"name:desc"@
+  | GetCertificatesParametersQuerySortEnumCreated -- ^ Represents the JSON value @"created"@
+  | GetCertificatesParametersQuerySortEnumCreatedAsc -- ^ Represents the JSON value @"created:asc"@
+  | GetCertificatesParametersQuerySortEnumCreatedDesc -- ^ Represents the JSON value @"created:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesParametersQuerySort
+    where toJSON (GetCertificatesParametersQuerySortOther val) = val
+          toJSON (GetCertificatesParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetCertificatesParametersQuerySortEnumId) = "id"
+          toJSON (GetCertificatesParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetCertificatesParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetCertificatesParametersQuerySortEnumName) = "name"
+          toJSON (GetCertificatesParametersQuerySortEnumNameAsc) = "name:asc"
+          toJSON (GetCertificatesParametersQuerySortEnumNameDesc) = "name:desc"
+          toJSON (GetCertificatesParametersQuerySortEnumCreated) = "created"
+          toJSON (GetCertificatesParametersQuerySortEnumCreatedAsc) = "created:asc"
+          toJSON (GetCertificatesParametersQuerySortEnumCreatedDesc) = "created:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetCertificatesParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetCertificatesParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetCertificatesParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "name" -> GetCertificatesParametersQuerySortEnumName
+                                            | val GHC.Classes.== "name:asc" -> GetCertificatesParametersQuerySortEnumNameAsc
+                                            | val GHC.Classes.== "name:desc" -> GetCertificatesParametersQuerySortEnumNameDesc
+                                            | val GHC.Classes.== "created" -> GetCertificatesParametersQuerySortEnumCreated
+                                            | val GHC.Classes.== "created:asc" -> GetCertificatesParametersQuerySortEnumCreatedAsc
+                                            | val GHC.Classes.== "created:desc" -> GetCertificatesParametersQuerySortEnumCreatedDesc
+                                            | GHC.Base.otherwise -> GetCertificatesParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/certificates.GET.parameters.properties.queryType@ in the specification.
+-- 
+-- Represents the parameter named \'type\'
+-- 
+-- Can be used multiple times. The response will only contain Certificates matching the type.
+data GetCertificatesParametersQueryType =
+   GetCertificatesParametersQueryTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetCertificatesParametersQueryTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetCertificatesParametersQueryTypeEnumUploaded -- ^ Represents the JSON value @"uploaded"@
+  | GetCertificatesParametersQueryTypeEnumManaged -- ^ Represents the JSON value @"managed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesParametersQueryType
+    where toJSON (GetCertificatesParametersQueryTypeOther val) = val
+          toJSON (GetCertificatesParametersQueryTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetCertificatesParametersQueryTypeEnumUploaded) = "uploaded"
+          toJSON (GetCertificatesParametersQueryTypeEnumManaged) = "managed"
+instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesParametersQueryType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "uploaded" -> GetCertificatesParametersQueryTypeEnumUploaded
+                                            | val GHC.Classes.== "managed" -> GetCertificatesParametersQueryTypeEnumManaged
+                                            | GHC.Base.otherwise -> GetCertificatesParametersQueryTypeOther val)
 -- | Represents a response of the operation 'getCertificates'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetCertificatesResponseError' is used.
-data GetCertificatesResponse =                                 
-   GetCertificatesResponseError GHC.Base.String                -- ^ Means either no matching case available or a parse error
-  | GetCertificatesResponse200 GetCertificatesResponseBody200  -- ^ The \`certificates\` key contains an array of Certificate objects
+data GetCertificatesResponse =
+   GetCertificatesResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetCertificatesResponse200 GetCertificatesResponseBody200 -- ^ The \`certificates\` key contains an array of Certificate objects
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetCertificatesResponseBody200
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetCertificatesResponseBody200 = GetCertificatesResponseBody200 {
   -- | certificates
-  getCertificatesResponseBody200Certificates :: ([] GetCertificatesResponseBody200Certificates)
+  getCertificatesResponseBody200Certificates :: ([GetCertificatesResponseBody200Certificates])
   -- | meta
   , getCertificatesResponseBody200Meta :: (GHC.Maybe.Maybe GetCertificatesResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificates" (getCertificatesResponseBody200Certificates obj) : (Data.Aeson..=) "meta" (getCertificatesResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificates" (getCertificatesResponseBody200Certificates obj) GHC.Base.<> (Data.Aeson..=) "meta" (getCertificatesResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificates" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200Certificates obj : "meta" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificates" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200Certificates obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200" (\obj -> (GHC.Base.pure GetCertificatesResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetCertificatesResponseBody200Certificates
+-- | Create a new 'GetCertificatesResponseBody200' with all required fields.
+mkGetCertificatesResponseBody200 :: [GetCertificatesResponseBody200Certificates] -- ^ 'getCertificatesResponseBody200Certificates'
+  -> GetCertificatesResponseBody200
+mkGetCertificatesResponseBody200 getCertificatesResponseBody200Certificates = GetCertificatesResponseBody200{getCertificatesResponseBody200Certificates = getCertificatesResponseBody200Certificates,
+                                                                                                             getCertificatesResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items@ in the specification.
 -- 
 -- 
 data GetCertificatesResponseBody200Certificates = GetCertificatesResponseBody200Certificates {
   -- | certificate: Certificate and chain in PEM format, in order so that each record directly certifies the one preceding
-  getCertificatesResponseBody200CertificatesCertificate :: Data.Text.Internal.Text
+  getCertificatesResponseBody200CertificatesCertificate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , getCertificatesResponseBody200CertificatesCreated :: Data.Text.Internal.Text
   -- | domain_names: Domains and subdomains covered by the Certificate
-  , getCertificatesResponseBody200CertificatesDomainNames :: ([] Data.Text.Internal.Text)
+  , getCertificatesResponseBody200CertificatesDomainNames :: ([Data.Text.Internal.Text])
   -- | fingerprint: SHA256 fingerprint of the Certificate
-  , getCertificatesResponseBody200CertificatesFingerprint :: Data.Text.Internal.Text
+  , getCertificatesResponseBody200CertificatesFingerprint :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getCertificatesResponseBody200CertificatesId :: GHC.Integer.Type.Integer
+  , getCertificatesResponseBody200CertificatesId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , getCertificatesResponseBody200CertificatesLabels :: GetCertificatesResponseBody200CertificatesLabels
+  , getCertificatesResponseBody200CertificatesLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , getCertificatesResponseBody200CertificatesName :: Data.Text.Internal.Text
   -- | not_valid_after: Point in time when the Certificate stops being valid (in ISO-8601 format)
-  , getCertificatesResponseBody200CertificatesNotValidAfter :: Data.Text.Internal.Text
+  , getCertificatesResponseBody200CertificatesNotValidAfter :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | not_valid_before: Point in time when the Certificate becomes valid (in ISO-8601 format)
-  , getCertificatesResponseBody200CertificatesNotValidBefore :: Data.Text.Internal.Text
+  , getCertificatesResponseBody200CertificatesNotValidBefore :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status: Current status of a type \`managed\` Certificate, always *null* for type \`uploaded\` Certificates
   , getCertificatesResponseBody200CertificatesStatus :: (GHC.Maybe.Maybe GetCertificatesResponseBody200CertificatesStatus)
   -- | type: Type of the Certificate
   , getCertificatesResponseBody200CertificatesType :: (GHC.Maybe.Maybe GetCertificatesResponseBody200CertificatesType)
   -- | used_by: Resources currently using the Certificate
-  , getCertificatesResponseBody200CertificatesUsedBy :: ([] GetCertificatesResponseBody200CertificatesUsedBy)
+  , getCertificatesResponseBody200CertificatesUsedBy :: ([GetCertificatesResponseBody200CertificatesUsedBy])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200Certificates
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificate" (getCertificatesResponseBody200CertificatesCertificate obj) : (Data.Aeson..=) "created" (getCertificatesResponseBody200CertificatesCreated obj) : (Data.Aeson..=) "domain_names" (getCertificatesResponseBody200CertificatesDomainNames obj) : (Data.Aeson..=) "fingerprint" (getCertificatesResponseBody200CertificatesFingerprint obj) : (Data.Aeson..=) "id" (getCertificatesResponseBody200CertificatesId obj) : (Data.Aeson..=) "labels" (getCertificatesResponseBody200CertificatesLabels obj) : (Data.Aeson..=) "name" (getCertificatesResponseBody200CertificatesName obj) : (Data.Aeson..=) "not_valid_after" (getCertificatesResponseBody200CertificatesNotValidAfter obj) : (Data.Aeson..=) "not_valid_before" (getCertificatesResponseBody200CertificatesNotValidBefore obj) : (Data.Aeson..=) "status" (getCertificatesResponseBody200CertificatesStatus obj) : (Data.Aeson..=) "type" (getCertificatesResponseBody200CertificatesType obj) : (Data.Aeson..=) "used_by" (getCertificatesResponseBody200CertificatesUsedBy obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificate" (getCertificatesResponseBody200CertificatesCertificate obj) GHC.Base.<> ((Data.Aeson..=) "created" (getCertificatesResponseBody200CertificatesCreated obj) GHC.Base.<> ((Data.Aeson..=) "domain_names" (getCertificatesResponseBody200CertificatesDomainNames obj) GHC.Base.<> ((Data.Aeson..=) "fingerprint" (getCertificatesResponseBody200CertificatesFingerprint obj) GHC.Base.<> ((Data.Aeson..=) "id" (getCertificatesResponseBody200CertificatesId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getCertificatesResponseBody200CertificatesLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getCertificatesResponseBody200CertificatesName obj) GHC.Base.<> ((Data.Aeson..=) "not_valid_after" (getCertificatesResponseBody200CertificatesNotValidAfter obj) GHC.Base.<> ((Data.Aeson..=) "not_valid_before" (getCertificatesResponseBody200CertificatesNotValidBefore obj) GHC.Base.<> ((Data.Aeson..=) "status" (getCertificatesResponseBody200CertificatesStatus obj) GHC.Base.<> ((Data.Aeson..=) "type" (getCertificatesResponseBody200CertificatesType obj) GHC.Base.<> (Data.Aeson..=) "used_by" (getCertificatesResponseBody200CertificatesUsedBy obj))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200Certificates
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificate" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesCertificate obj : "created" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesCreated obj : "domain_names" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesDomainNames obj : "fingerprint" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesFingerprint obj : "id" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesId obj : "labels" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesLabels obj : "name" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesName obj : "not_valid_after" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesNotValidAfter obj : "not_valid_before" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesNotValidBefore obj : "status" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatus obj : "type" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesType obj : "used_by" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesUsedBy obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificate" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesCertificate obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesCreated obj) GHC.Base.<> (("domain_names" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesDomainNames obj) GHC.Base.<> (("fingerprint" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesFingerprint obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesName obj) GHC.Base.<> (("not_valid_after" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesNotValidAfter obj) GHC.Base.<> (("not_valid_before" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesNotValidBefore obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatus obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesType obj) GHC.Base.<> ("used_by" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesUsedBy obj))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200Certificates
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200Certificates" (\obj -> (((((((((((GHC.Base.pure GetCertificatesResponseBody200Certificates GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "certificate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain_names")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fingerprint")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "not_valid_after")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "not_valid_before")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "used_by"))
--- | Defines the data type for the schema GetCertificatesResponseBody200CertificatesLabels
--- 
--- User-defined labels (key-value pairs)
-data GetCertificatesResponseBody200CertificatesLabels = GetCertificatesResponseBody200CertificatesLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200CertificatesLabels" (\obj -> GHC.Base.pure GetCertificatesResponseBody200CertificatesLabels)
--- | Defines the data type for the schema GetCertificatesResponseBody200CertificatesStatus
+-- | Create a new 'GetCertificatesResponseBody200Certificates' with all required fields.
+mkGetCertificatesResponseBody200Certificates :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesCertificate'
+  -> Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesCreated'
+  -> [Data.Text.Internal.Text] -- ^ 'getCertificatesResponseBody200CertificatesDomainNames'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesFingerprint'
+  -> GHC.Types.Int -- ^ 'getCertificatesResponseBody200CertificatesId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getCertificatesResponseBody200CertificatesLabels'
+  -> Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesName'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesNotValidAfter'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesNotValidBefore'
+  -> [GetCertificatesResponseBody200CertificatesUsedBy] -- ^ 'getCertificatesResponseBody200CertificatesUsedBy'
+  -> GetCertificatesResponseBody200Certificates
+mkGetCertificatesResponseBody200Certificates getCertificatesResponseBody200CertificatesCertificate getCertificatesResponseBody200CertificatesCreated getCertificatesResponseBody200CertificatesDomainNames getCertificatesResponseBody200CertificatesFingerprint getCertificatesResponseBody200CertificatesId getCertificatesResponseBody200CertificatesLabels getCertificatesResponseBody200CertificatesName getCertificatesResponseBody200CertificatesNotValidAfter getCertificatesResponseBody200CertificatesNotValidBefore getCertificatesResponseBody200CertificatesUsedBy = GetCertificatesResponseBody200Certificates{getCertificatesResponseBody200CertificatesCertificate = getCertificatesResponseBody200CertificatesCertificate,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesCreated = getCertificatesResponseBody200CertificatesCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesDomainNames = getCertificatesResponseBody200CertificatesDomainNames,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesFingerprint = getCertificatesResponseBody200CertificatesFingerprint,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesId = getCertificatesResponseBody200CertificatesId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesLabels = getCertificatesResponseBody200CertificatesLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesName = getCertificatesResponseBody200CertificatesName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesNotValidAfter = getCertificatesResponseBody200CertificatesNotValidAfter,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesNotValidBefore = getCertificatesResponseBody200CertificatesNotValidBefore,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesStatus = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesType = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             getCertificatesResponseBody200CertificatesUsedBy = getCertificatesResponseBody200CertificatesUsedBy}
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items.properties.status@ in the specification.
 -- 
 -- Current status of a type \`managed\` Certificate, always *null* for type \`uploaded\` Certificates
 data GetCertificatesResponseBody200CertificatesStatus = GetCertificatesResponseBody200CertificatesStatus {
@@ -208,12 +245,17 @@ data GetCertificatesResponseBody200CertificatesStatus = GetCertificatesResponseB
   , getCertificatesResponseBody200CertificatesStatusRenewal :: (GHC.Maybe.Maybe GetCertificatesResponseBody200CertificatesStatusRenewal)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "error" (getCertificatesResponseBody200CertificatesStatusError obj) : (Data.Aeson..=) "issuance" (getCertificatesResponseBody200CertificatesStatusIssuance obj) : (Data.Aeson..=) "renewal" (getCertificatesResponseBody200CertificatesStatusRenewal obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "error" (getCertificatesResponseBody200CertificatesStatusError obj) GHC.Base.<> ((Data.Aeson..=) "issuance" (getCertificatesResponseBody200CertificatesStatusIssuance obj) GHC.Base.<> (Data.Aeson..=) "renewal" (getCertificatesResponseBody200CertificatesStatusRenewal obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200CertificatesStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("error" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusError obj : "issuance" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusIssuance obj : "renewal" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusRenewal obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("error" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusError obj) GHC.Base.<> (("issuance" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusIssuance obj) GHC.Base.<> ("renewal" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusRenewal obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200CertificatesStatus" (\obj -> ((GHC.Base.pure GetCertificatesResponseBody200CertificatesStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "issuance")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "renewal"))
--- | Defines the data type for the schema GetCertificatesResponseBody200CertificatesStatusError
+-- | Create a new 'GetCertificatesResponseBody200CertificatesStatus' with all required fields.
+mkGetCertificatesResponseBody200CertificatesStatus :: GetCertificatesResponseBody200CertificatesStatus
+mkGetCertificatesResponseBody200CertificatesStatus = GetCertificatesResponseBody200CertificatesStatus{getCertificatesResponseBody200CertificatesStatusError = GHC.Maybe.Nothing,
+                                                                                                      getCertificatesResponseBody200CertificatesStatusIssuance = GHC.Maybe.Nothing,
+                                                                                                      getCertificatesResponseBody200CertificatesStatusRenewal = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items.properties.status.properties.error@ in the specification.
 -- 
 -- If issuance or renewal reports \`failed\`, this property contains information about what happened
 data GetCertificatesResponseBody200CertificatesStatusError = GetCertificatesResponseBody200CertificatesStatusError {
@@ -223,99 +265,100 @@ data GetCertificatesResponseBody200CertificatesStatusError = GetCertificatesResp
   , getCertificatesResponseBody200CertificatesStatusErrorMessage :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesStatusError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getCertificatesResponseBody200CertificatesStatusErrorCode obj) : (Data.Aeson..=) "message" (getCertificatesResponseBody200CertificatesStatusErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getCertificatesResponseBody200CertificatesStatusErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getCertificatesResponseBody200CertificatesStatusErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200CertificatesStatusError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesStatusErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesStatusError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200CertificatesStatusError" (\obj -> (GHC.Base.pure GetCertificatesResponseBody200CertificatesStatusError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "message"))
--- | Defines the enum schema GetCertificatesResponseBody200CertificatesStatusIssuance
+-- | Create a new 'GetCertificatesResponseBody200CertificatesStatusError' with all required fields.
+mkGetCertificatesResponseBody200CertificatesStatusError :: GetCertificatesResponseBody200CertificatesStatusError
+mkGetCertificatesResponseBody200CertificatesStatusError = GetCertificatesResponseBody200CertificatesStatusError{getCertificatesResponseBody200CertificatesStatusErrorCode = GHC.Maybe.Nothing,
+                                                                                                                getCertificatesResponseBody200CertificatesStatusErrorMessage = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items.properties.status.properties.issuance@ in the specification.
 -- 
 -- Status of the issuance process of the Certificate
-data GetCertificatesResponseBody200CertificatesStatusIssuance
-    = GetCertificatesResponseBody200CertificatesStatusIssuanceEnumOther Data.Aeson.Types.Internal.Value
-    | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumTyped Data.Text.Internal.Text
-    | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringCompleted
-    | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringFailed
-    | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringPending
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesStatusIssuance
-    where toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringCompleted) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "completed"
-          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringFailed) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed"
-          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-instance Data.Aeson.FromJSON GetCertificatesResponseBody200CertificatesStatusIssuance
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "completed")
-                                          then GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringCompleted
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed")
-                                                then GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringFailed
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                      then GetCertificatesResponseBody200CertificatesStatusIssuanceEnumStringPending
-                                                      else GetCertificatesResponseBody200CertificatesStatusIssuanceEnumOther val)
--- | Defines the enum schema GetCertificatesResponseBody200CertificatesStatusRenewal
+data GetCertificatesResponseBody200CertificatesStatusIssuance =
+   GetCertificatesResponseBody200CertificatesStatusIssuanceOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetCertificatesResponseBody200CertificatesStatusIssuanceTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumPending -- ^ Represents the JSON value @"pending"@
+  | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumCompleted -- ^ Represents the JSON value @"completed"@
+  | GetCertificatesResponseBody200CertificatesStatusIssuanceEnumFailed -- ^ Represents the JSON value @"failed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200CertificatesStatusIssuance
+    where toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceOther val) = val
+          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumPending) = "pending"
+          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumCompleted) = "completed"
+          toJSON (GetCertificatesResponseBody200CertificatesStatusIssuanceEnumFailed) = "failed"
+instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesStatusIssuance
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "pending" -> GetCertificatesResponseBody200CertificatesStatusIssuanceEnumPending
+                                            | val GHC.Classes.== "completed" -> GetCertificatesResponseBody200CertificatesStatusIssuanceEnumCompleted
+                                            | val GHC.Classes.== "failed" -> GetCertificatesResponseBody200CertificatesStatusIssuanceEnumFailed
+                                            | GHC.Base.otherwise -> GetCertificatesResponseBody200CertificatesStatusIssuanceOther val)
+-- | Defines the enum schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items.properties.status.properties.renewal@ in the specification.
 -- 
 -- Status of the renewal process of the Certificate.
-data GetCertificatesResponseBody200CertificatesStatusRenewal
-    = GetCertificatesResponseBody200CertificatesStatusRenewalEnumOther Data.Aeson.Types.Internal.Value
-    | GetCertificatesResponseBody200CertificatesStatusRenewalEnumTyped Data.Text.Internal.Text
-    | GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringFailed
-    | GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringPending
-    | GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringScheduled
-    | GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesStatusRenewal
-    where toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringFailed) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed"
-          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringScheduled) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "scheduled"
-          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON GetCertificatesResponseBody200CertificatesStatusRenewal
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed")
-                                          then GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringFailed
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                then GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringPending
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "scheduled")
-                                                      then GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringScheduled
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                            then GetCertificatesResponseBody200CertificatesStatusRenewalEnumStringUnavailable
-                                                            else GetCertificatesResponseBody200CertificatesStatusRenewalEnumOther val)
--- | Defines the enum schema GetCertificatesResponseBody200CertificatesType
+data GetCertificatesResponseBody200CertificatesStatusRenewal =
+   GetCertificatesResponseBody200CertificatesStatusRenewalOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetCertificatesResponseBody200CertificatesStatusRenewalTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetCertificatesResponseBody200CertificatesStatusRenewalEnumScheduled -- ^ Represents the JSON value @"scheduled"@
+  | GetCertificatesResponseBody200CertificatesStatusRenewalEnumPending -- ^ Represents the JSON value @"pending"@
+  | GetCertificatesResponseBody200CertificatesStatusRenewalEnumFailed -- ^ Represents the JSON value @"failed"@
+  | GetCertificatesResponseBody200CertificatesStatusRenewalEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200CertificatesStatusRenewal
+    where toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalOther val) = val
+          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumScheduled) = "scheduled"
+          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumPending) = "pending"
+          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumFailed) = "failed"
+          toJSON (GetCertificatesResponseBody200CertificatesStatusRenewalEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesStatusRenewal
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "scheduled" -> GetCertificatesResponseBody200CertificatesStatusRenewalEnumScheduled
+                                            | val GHC.Classes.== "pending" -> GetCertificatesResponseBody200CertificatesStatusRenewalEnumPending
+                                            | val GHC.Classes.== "failed" -> GetCertificatesResponseBody200CertificatesStatusRenewalEnumFailed
+                                            | val GHC.Classes.== "unavailable" -> GetCertificatesResponseBody200CertificatesStatusRenewalEnumUnavailable
+                                            | GHC.Base.otherwise -> GetCertificatesResponseBody200CertificatesStatusRenewalOther val)
+-- | Defines the enum schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items.properties.type@ in the specification.
 -- 
 -- Type of the Certificate
-data GetCertificatesResponseBody200CertificatesType
-    = GetCertificatesResponseBody200CertificatesTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetCertificatesResponseBody200CertificatesTypeEnumTyped Data.Text.Internal.Text
-    | GetCertificatesResponseBody200CertificatesTypeEnumStringManaged
-    | GetCertificatesResponseBody200CertificatesTypeEnumStringUploaded
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesType
-    where toJSON (GetCertificatesResponseBody200CertificatesTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetCertificatesResponseBody200CertificatesTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetCertificatesResponseBody200CertificatesTypeEnumStringManaged) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed"
-          toJSON (GetCertificatesResponseBody200CertificatesTypeEnumStringUploaded) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded"
-instance Data.Aeson.FromJSON GetCertificatesResponseBody200CertificatesType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed")
-                                          then GetCertificatesResponseBody200CertificatesTypeEnumStringManaged
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded")
-                                                then GetCertificatesResponseBody200CertificatesTypeEnumStringUploaded
-                                                else GetCertificatesResponseBody200CertificatesTypeEnumOther val)
--- | Defines the data type for the schema GetCertificatesResponseBody200CertificatesUsed_by
+data GetCertificatesResponseBody200CertificatesType =
+   GetCertificatesResponseBody200CertificatesTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetCertificatesResponseBody200CertificatesTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetCertificatesResponseBody200CertificatesTypeEnumUploaded -- ^ Represents the JSON value @"uploaded"@
+  | GetCertificatesResponseBody200CertificatesTypeEnumManaged -- ^ Represents the JSON value @"managed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200CertificatesType
+    where toJSON (GetCertificatesResponseBody200CertificatesTypeOther val) = val
+          toJSON (GetCertificatesResponseBody200CertificatesTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetCertificatesResponseBody200CertificatesTypeEnumUploaded) = "uploaded"
+          toJSON (GetCertificatesResponseBody200CertificatesTypeEnumManaged) = "managed"
+instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "uploaded" -> GetCertificatesResponseBody200CertificatesTypeEnumUploaded
+                                            | val GHC.Classes.== "managed" -> GetCertificatesResponseBody200CertificatesTypeEnumManaged
+                                            | GHC.Base.otherwise -> GetCertificatesResponseBody200CertificatesTypeOther val)
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.certificates.items.properties.used_by.items@ in the specification.
 -- 
 -- 
 data GetCertificatesResponseBody200CertificatesUsedBy = GetCertificatesResponseBody200CertificatesUsedBy {
   -- | id: ID of resource referenced
-  getCertificatesResponseBody200CertificatesUsedById :: GHC.Integer.Type.Integer
+  getCertificatesResponseBody200CertificatesUsedById :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getCertificatesResponseBody200CertificatesUsedByType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200CertificatesUsedBy
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getCertificatesResponseBody200CertificatesUsedById obj) : (Data.Aeson..=) "type" (getCertificatesResponseBody200CertificatesUsedByType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getCertificatesResponseBody200CertificatesUsedById obj) GHC.Base.<> (Data.Aeson..=) "type" (getCertificatesResponseBody200CertificatesUsedByType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200CertificatesUsedBy
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesUsedById obj : "type" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesUsedByType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesUsedById obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200CertificatesUsedByType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200CertificatesUsedBy
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200CertificatesUsedBy" (\obj -> (GHC.Base.pure GetCertificatesResponseBody200CertificatesUsedBy GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetCertificatesResponseBody200Meta
+-- | Create a new 'GetCertificatesResponseBody200CertificatesUsedBy' with all required fields.
+mkGetCertificatesResponseBody200CertificatesUsedBy :: GHC.Types.Int -- ^ 'getCertificatesResponseBody200CertificatesUsedById'
+  -> Data.Text.Internal.Text -- ^ 'getCertificatesResponseBody200CertificatesUsedByType'
+  -> GetCertificatesResponseBody200CertificatesUsedBy
+mkGetCertificatesResponseBody200CertificatesUsedBy getCertificatesResponseBody200CertificatesUsedById getCertificatesResponseBody200CertificatesUsedByType = GetCertificatesResponseBody200CertificatesUsedBy{getCertificatesResponseBody200CertificatesUsedById = getCertificatesResponseBody200CertificatesUsedById,
+                                                                                                                                                                                                              getCertificatesResponseBody200CertificatesUsedByType = getCertificatesResponseBody200CertificatesUsedByType}
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetCertificatesResponseBody200Meta = GetCertificatesResponseBody200Meta {
@@ -323,31 +366,82 @@ data GetCertificatesResponseBody200Meta = GetCertificatesResponseBody200Meta {
   getCertificatesResponseBody200MetaPagination :: GetCertificatesResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getCertificatesResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getCertificatesResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200Meta" (\obj -> GHC.Base.pure GetCertificatesResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetCertificatesResponseBody200MetaPagination
+-- | Create a new 'GetCertificatesResponseBody200Meta' with all required fields.
+mkGetCertificatesResponseBody200Meta :: GetCertificatesResponseBody200MetaPagination -- ^ 'getCertificatesResponseBody200MetaPagination'
+  -> GetCertificatesResponseBody200Meta
+mkGetCertificatesResponseBody200Meta getCertificatesResponseBody200MetaPagination = GetCertificatesResponseBody200Meta{getCertificatesResponseBody200MetaPagination = getCertificatesResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/certificates.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetCertificatesResponseBody200MetaPagination = GetCertificatesResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getCertificatesResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getCertificatesResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getCertificatesResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getCertificatesResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getCertificatesResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getCertificatesResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getCertificatesResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getCertificatesResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getCertificatesResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getCertificatesResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetCertificatesResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getCertificatesResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getCertificatesResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getCertificatesResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getCertificatesResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getCertificatesResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getCertificatesResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getCertificatesResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getCertificatesResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getCertificatesResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getCertificatesResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getCertificatesResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getCertificatesResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetCertificatesResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getCertificatesResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetCertificatesResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetCertificatesResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetCertificatesResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetCertificatesResponseBody200MetaPagination' with all required fields.
+mkGetCertificatesResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getCertificatesResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getCertificatesResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getCertificatesResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getCertificatesResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getCertificatesResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getCertificatesResponseBody200MetaPaginationTotalEntries'
+  -> GetCertificatesResponseBody200MetaPagination
+mkGetCertificatesResponseBody200MetaPagination getCertificatesResponseBody200MetaPaginationLastPage getCertificatesResponseBody200MetaPaginationNextPage getCertificatesResponseBody200MetaPaginationPage getCertificatesResponseBody200MetaPaginationPerPage getCertificatesResponseBody200MetaPaginationPreviousPage getCertificatesResponseBody200MetaPaginationTotalEntries = GetCertificatesResponseBody200MetaPagination{getCertificatesResponseBody200MetaPaginationLastPage = getCertificatesResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                               getCertificatesResponseBody200MetaPaginationNextPage = getCertificatesResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                               getCertificatesResponseBody200MetaPaginationPage = getCertificatesResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                               getCertificatesResponseBody200MetaPaginationPerPage = getCertificatesResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                               getCertificatesResponseBody200MetaPaginationPreviousPage = getCertificatesResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                               getCertificatesResponseBody200MetaPaginationTotalEntries = getCertificatesResponseBody200MetaPaginationTotalEntries}
+-- | > GET /certificates
+-- 
+-- The same as 'getCertificates' but accepts an explicit configuration.
+getCertificatesWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetCertificatesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetCertificatesResponse) -- ^ Monadic computation which returns the result of the operation
+getCertificatesWithConfiguration config
+                                 parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetCertificatesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                       GetCertificatesResponseBody200)
+                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /certificates
+-- 
+-- The same as 'getCertificates' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getCertificatesRaw :: forall m . HCloud.Common.MonadHTTP m => GetCertificatesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getCertificatesRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                           HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                           HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                           HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /certificates
+-- 
+-- The same as 'getCertificates' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getCertificatesWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetCertificatesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getCertificatesWithConfigurationRaw config
+                                    parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/certificates") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getCertificatesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])

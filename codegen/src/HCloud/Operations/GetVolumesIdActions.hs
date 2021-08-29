@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getVolumes_Id_Actions
 module HCloud.Operations.GetVolumesIdActions where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,122 +45,205 @@ import HCloud.Types
 -- | > GET /volumes/{id}/actions
 -- 
 -- Returns all Action objects for a Volume. You can \`sort\` the results by using the sort URI parameter, and filter them with the \`status\` parameter.
-getVolumes_Id_Actions :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                          -- ^ id: ID of the Volume
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                           -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                           -- ^ status: Can be used multiple times, the response will contain only Actions with specified statuses
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetVolumesIdActionsResponse))   -- ^ Monad containing the result of the operation
-getVolumes_Id_Actions config
-                      id
-                      sort
-                      status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetVolumesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetVolumesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                               GetVolumesIdActionsResponseBody200)
-                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /volumes/{id}/actions
+getVolumes_Id_Actions :: forall m . HCloud.Common.MonadHTTP m => GetVolumesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetVolumesIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getVolumes_Id_Actions parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetVolumesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetVolumesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                    GetVolumesIdActionsResponseBody200)
+                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getVolumesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.parameters@ in the specification.
 -- 
--- The same as 'getVolumes_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'
-getVolumes_Id_ActionsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                          HCloud.Common.SecurityScheme s) =>
-                            HCloud.Common.Configuration s ->
-                            GHC.Integer.Type.Integer ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getVolumes_Id_ActionsRaw config
-                         id
-                         sort
-                         status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /volumes/{id}/actions
 -- 
--- Monadic version of 'getVolumes_Id_Actions' (use with 'HCloud.Common.runWithConfiguration')
-getVolumes_Id_ActionsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                        HCloud.Common.SecurityScheme s) =>
-                          GHC.Integer.Type.Integer ->
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                             m
-                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                 (Network.HTTP.Client.Types.Response GetVolumesIdActionsResponse))
-getVolumes_Id_ActionsM id
-                       sort
-                       status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetVolumesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetVolumesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                GetVolumesIdActionsResponseBody200)
-                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /volumes/{id}/actions
+data GetVolumesIdActionsParameters = GetVolumesIdActionsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Volume
+  getVolumesIdActionsParametersPathId :: GHC.Types.Int
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getVolumesIdActionsParametersQuerySort :: (GHC.Maybe.Maybe GetVolumesIdActionsParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified statuses
+  , getVolumesIdActionsParametersQueryStatus :: (GHC.Maybe.Maybe GetVolumesIdActionsParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getVolumesIdActionsParametersPathId obj : "querySort" Data.Aeson.Types.ToJSON..= getVolumesIdActionsParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getVolumesIdActionsParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getVolumesIdActionsParametersPathId obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getVolumesIdActionsParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getVolumesIdActionsParametersQueryStatus obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsParameters" (\obj -> ((GHC.Base.pure GetVolumesIdActionsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetVolumesIdActionsParameters' with all required fields.
+mkGetVolumesIdActionsParameters :: GHC.Types.Int -- ^ 'getVolumesIdActionsParametersPathId'
+  -> GetVolumesIdActionsParameters
+mkGetVolumesIdActionsParameters getVolumesIdActionsParametersPathId = GetVolumesIdActionsParameters{getVolumesIdActionsParametersPathId = getVolumesIdActionsParametersPathId,
+                                                                                                    getVolumesIdActionsParametersQuerySort = GHC.Maybe.Nothing,
+                                                                                                    getVolumesIdActionsParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/volumes\/{id}\/actions.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getVolumes_Id_ActionsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getVolumes_Id_ActionsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                           HCloud.Common.SecurityScheme s) =>
-                             GHC.Integer.Type.Integer ->
-                             GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                             GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                             Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                m
-                                                                (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getVolumes_Id_ActionsRawM id
-                          sort
-                          status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetVolumesIdActionsParametersQuerySort =
+   GetVolumesIdActionsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetVolumesIdActionsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetVolumesIdActionsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetVolumesIdActionsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetVolumesIdActionsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetVolumesIdActionsParametersQuerySortEnumCommand -- ^ Represents the JSON value @"command"@
+  | GetVolumesIdActionsParametersQuerySortEnumCommandAsc -- ^ Represents the JSON value @"command:asc"@
+  | GetVolumesIdActionsParametersQuerySortEnumCommandDesc -- ^ Represents the JSON value @"command:desc"@
+  | GetVolumesIdActionsParametersQuerySortEnumStatus -- ^ Represents the JSON value @"status"@
+  | GetVolumesIdActionsParametersQuerySortEnumStatusAsc -- ^ Represents the JSON value @"status:asc"@
+  | GetVolumesIdActionsParametersQuerySortEnumStatusDesc -- ^ Represents the JSON value @"status:desc"@
+  | GetVolumesIdActionsParametersQuerySortEnumProgress -- ^ Represents the JSON value @"progress"@
+  | GetVolumesIdActionsParametersQuerySortEnumProgressAsc -- ^ Represents the JSON value @"progress:asc"@
+  | GetVolumesIdActionsParametersQuerySortEnumProgressDesc -- ^ Represents the JSON value @"progress:desc"@
+  | GetVolumesIdActionsParametersQuerySortEnumStarted -- ^ Represents the JSON value @"started"@
+  | GetVolumesIdActionsParametersQuerySortEnumStartedAsc -- ^ Represents the JSON value @"started:asc"@
+  | GetVolumesIdActionsParametersQuerySortEnumStartedDesc -- ^ Represents the JSON value @"started:desc"@
+  | GetVolumesIdActionsParametersQuerySortEnumFinished -- ^ Represents the JSON value @"finished"@
+  | GetVolumesIdActionsParametersQuerySortEnumFinishedAsc -- ^ Represents the JSON value @"finished:asc"@
+  | GetVolumesIdActionsParametersQuerySortEnumFinishedDesc -- ^ Represents the JSON value @"finished:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsParametersQuerySort
+    where toJSON (GetVolumesIdActionsParametersQuerySortOther val) = val
+          toJSON (GetVolumesIdActionsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumId) = "id"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumCommand) = "command"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumCommandAsc) = "command:asc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumCommandDesc) = "command:desc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumStatus) = "status"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumStatusAsc) = "status:asc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumStatusDesc) = "status:desc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumProgress) = "progress"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumProgressAsc) = "progress:asc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumProgressDesc) = "progress:desc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumStarted) = "started"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumStartedAsc) = "started:asc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumStartedDesc) = "started:desc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumFinished) = "finished"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumFinishedAsc) = "finished:asc"
+          toJSON (GetVolumesIdActionsParametersQuerySortEnumFinishedDesc) = "finished:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetVolumesIdActionsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetVolumesIdActionsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetVolumesIdActionsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "command" -> GetVolumesIdActionsParametersQuerySortEnumCommand
+                                            | val GHC.Classes.== "command:asc" -> GetVolumesIdActionsParametersQuerySortEnumCommandAsc
+                                            | val GHC.Classes.== "command:desc" -> GetVolumesIdActionsParametersQuerySortEnumCommandDesc
+                                            | val GHC.Classes.== "status" -> GetVolumesIdActionsParametersQuerySortEnumStatus
+                                            | val GHC.Classes.== "status:asc" -> GetVolumesIdActionsParametersQuerySortEnumStatusAsc
+                                            | val GHC.Classes.== "status:desc" -> GetVolumesIdActionsParametersQuerySortEnumStatusDesc
+                                            | val GHC.Classes.== "progress" -> GetVolumesIdActionsParametersQuerySortEnumProgress
+                                            | val GHC.Classes.== "progress:asc" -> GetVolumesIdActionsParametersQuerySortEnumProgressAsc
+                                            | val GHC.Classes.== "progress:desc" -> GetVolumesIdActionsParametersQuerySortEnumProgressDesc
+                                            | val GHC.Classes.== "started" -> GetVolumesIdActionsParametersQuerySortEnumStarted
+                                            | val GHC.Classes.== "started:asc" -> GetVolumesIdActionsParametersQuerySortEnumStartedAsc
+                                            | val GHC.Classes.== "started:desc" -> GetVolumesIdActionsParametersQuerySortEnumStartedDesc
+                                            | val GHC.Classes.== "finished" -> GetVolumesIdActionsParametersQuerySortEnumFinished
+                                            | val GHC.Classes.== "finished:asc" -> GetVolumesIdActionsParametersQuerySortEnumFinishedAsc
+                                            | val GHC.Classes.== "finished:desc" -> GetVolumesIdActionsParametersQuerySortEnumFinishedDesc
+                                            | GHC.Base.otherwise -> GetVolumesIdActionsParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/volumes\/{id}\/actions.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times, the response will contain only Actions with specified statuses
+data GetVolumesIdActionsParametersQueryStatus =
+   GetVolumesIdActionsParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetVolumesIdActionsParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetVolumesIdActionsParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetVolumesIdActionsParametersQueryStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetVolumesIdActionsParametersQueryStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsParametersQueryStatus
+    where toJSON (GetVolumesIdActionsParametersQueryStatusOther val) = val
+          toJSON (GetVolumesIdActionsParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetVolumesIdActionsParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetVolumesIdActionsParametersQueryStatusEnumSuccess) = "success"
+          toJSON (GetVolumesIdActionsParametersQueryStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetVolumesIdActionsParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "success" -> GetVolumesIdActionsParametersQueryStatusEnumSuccess
+                                            | val GHC.Classes.== "error" -> GetVolumesIdActionsParametersQueryStatusEnumError
+                                            | GHC.Base.otherwise -> GetVolumesIdActionsParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getVolumes_Id_Actions'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetVolumesIdActionsResponseError' is used.
-data GetVolumesIdActionsResponse =                                     
-   GetVolumesIdActionsResponseError GHC.Base.String                    -- ^ Means either no matching case available or a parse error
-  | GetVolumesIdActionsResponse200 GetVolumesIdActionsResponseBody200  -- ^ The \`actions\` key contains a list of Actions
+data GetVolumesIdActionsResponse =
+   GetVolumesIdActionsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetVolumesIdActionsResponse200 GetVolumesIdActionsResponseBody200 -- ^ The \`actions\` key contains a list of Actions
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetVolumesIdActionsResponseBody200
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetVolumesIdActionsResponseBody200 = GetVolumesIdActionsResponseBody200 {
   -- | actions
-  getVolumesIdActionsResponseBody200Actions :: ([] GetVolumesIdActionsResponseBody200Actions)
+  getVolumesIdActionsResponseBody200Actions :: ([GetVolumesIdActionsResponseBody200Actions])
   -- | meta
   , getVolumesIdActionsResponseBody200Meta :: (GHC.Maybe.Maybe GetVolumesIdActionsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (getVolumesIdActionsResponseBody200Actions obj) : (Data.Aeson..=) "meta" (getVolumesIdActionsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (getVolumesIdActionsResponseBody200Actions obj) GHC.Base.<> (Data.Aeson..=) "meta" (getVolumesIdActionsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200Actions obj : "meta" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("actions" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200Actions obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsResponseBody200" (\obj -> (GHC.Base.pure GetVolumesIdActionsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetVolumesIdActionsResponseBody200Actions
+-- | Create a new 'GetVolumesIdActionsResponseBody200' with all required fields.
+mkGetVolumesIdActionsResponseBody200 :: [GetVolumesIdActionsResponseBody200Actions] -- ^ 'getVolumesIdActionsResponseBody200Actions'
+  -> GetVolumesIdActionsResponseBody200
+mkGetVolumesIdActionsResponseBody200 getVolumesIdActionsResponseBody200Actions = GetVolumesIdActionsResponseBody200{getVolumesIdActionsResponseBody200Actions = getVolumesIdActionsResponseBody200Actions,
+                                                                                                                    getVolumesIdActionsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data GetVolumesIdActionsResponseBody200Actions = GetVolumesIdActionsResponseBody200Actions {
   -- | command: Command executed in the Action
   getVolumesIdActionsResponseBody200ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getVolumesIdActionsResponseBody200ActionsError :: GetVolumesIdActionsResponseBody200ActionsError
+  , getVolumesIdActionsResponseBody200ActionsError :: (GHC.Maybe.Maybe GetVolumesIdActionsResponseBody200ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getVolumesIdActionsResponseBody200ActionsFinished :: Data.Text.Internal.Text
+  , getVolumesIdActionsResponseBody200ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getVolumesIdActionsResponseBody200ActionsId :: GHC.Integer.Type.Integer
+  , getVolumesIdActionsResponseBody200ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getVolumesIdActionsResponseBody200ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getVolumesIdActionsResponseBody200ActionsResources :: ([] GetVolumesIdActionsResponseBody200ActionsResources)
+  , getVolumesIdActionsResponseBody200ActionsResources :: ([GetVolumesIdActionsResponseBody200ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getVolumesIdActionsResponseBody200ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getVolumesIdActionsResponseBody200ActionsStatus :: GetVolumesIdActionsResponseBody200ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getVolumesIdActionsResponseBody200ActionsCommand obj) : (Data.Aeson..=) "error" (getVolumesIdActionsResponseBody200ActionsError obj) : (Data.Aeson..=) "finished" (getVolumesIdActionsResponseBody200ActionsFinished obj) : (Data.Aeson..=) "id" (getVolumesIdActionsResponseBody200ActionsId obj) : (Data.Aeson..=) "progress" (getVolumesIdActionsResponseBody200ActionsProgress obj) : (Data.Aeson..=) "resources" (getVolumesIdActionsResponseBody200ActionsResources obj) : (Data.Aeson..=) "started" (getVolumesIdActionsResponseBody200ActionsStarted obj) : (Data.Aeson..=) "status" (getVolumesIdActionsResponseBody200ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getVolumesIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getVolumesIdActionsResponseBody200ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getVolumesIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getVolumesIdActionsResponseBody200ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getVolumesIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getVolumesIdActionsResponseBody200ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getVolumesIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getVolumesIdActionsResponseBody200ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsResponseBody200Actions" (\obj -> (((((((GHC.Base.pure GetVolumesIdActionsResponseBody200Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetVolumesIdActionsResponseBody200ActionsError
+-- | Create a new 'GetVolumesIdActionsResponseBody200Actions' with all required fields.
+mkGetVolumesIdActionsResponseBody200Actions :: Data.Text.Internal.Text -- ^ 'getVolumesIdActionsResponseBody200ActionsCommand'
+  -> GHC.Maybe.Maybe GetVolumesIdActionsResponseBody200ActionsError -- ^ 'getVolumesIdActionsResponseBody200ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getVolumesIdActionsResponseBody200ActionsFinished'
+  -> GHC.Types.Int -- ^ 'getVolumesIdActionsResponseBody200ActionsId'
+  -> GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200ActionsProgress'
+  -> [GetVolumesIdActionsResponseBody200ActionsResources] -- ^ 'getVolumesIdActionsResponseBody200ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'getVolumesIdActionsResponseBody200ActionsStarted'
+  -> GetVolumesIdActionsResponseBody200ActionsStatus -- ^ 'getVolumesIdActionsResponseBody200ActionsStatus'
+  -> GetVolumesIdActionsResponseBody200Actions
+mkGetVolumesIdActionsResponseBody200Actions getVolumesIdActionsResponseBody200ActionsCommand getVolumesIdActionsResponseBody200ActionsError getVolumesIdActionsResponseBody200ActionsFinished getVolumesIdActionsResponseBody200ActionsId getVolumesIdActionsResponseBody200ActionsProgress getVolumesIdActionsResponseBody200ActionsResources getVolumesIdActionsResponseBody200ActionsStarted getVolumesIdActionsResponseBody200ActionsStatus = GetVolumesIdActionsResponseBody200Actions{getVolumesIdActionsResponseBody200ActionsCommand = getVolumesIdActionsResponseBody200ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsError = getVolumesIdActionsResponseBody200ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsFinished = getVolumesIdActionsResponseBody200ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsId = getVolumesIdActionsResponseBody200ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsProgress = getVolumesIdActionsResponseBody200ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsResources = getVolumesIdActionsResponseBody200ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsStarted = getVolumesIdActionsResponseBody200ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            getVolumesIdActionsResponseBody200ActionsStatus = getVolumesIdActionsResponseBody200ActionsStatus}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetVolumesIdActionsResponseBody200ActionsError = GetVolumesIdActionsResponseBody200ActionsError {
@@ -170,51 +253,60 @@ data GetVolumesIdActionsResponseBody200ActionsError = GetVolumesIdActionsRespons
   , getVolumesIdActionsResponseBody200ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getVolumesIdActionsResponseBody200ActionsErrorCode obj) : (Data.Aeson..=) "message" (getVolumesIdActionsResponseBody200ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getVolumesIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getVolumesIdActionsResponseBody200ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsResponseBody200ActionsError" (\obj -> (GHC.Base.pure GetVolumesIdActionsResponseBody200ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetVolumesIdActionsResponseBody200ActionsResources
+-- | Create a new 'GetVolumesIdActionsResponseBody200ActionsError' with all required fields.
+mkGetVolumesIdActionsResponseBody200ActionsError :: Data.Text.Internal.Text -- ^ 'getVolumesIdActionsResponseBody200ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getVolumesIdActionsResponseBody200ActionsErrorMessage'
+  -> GetVolumesIdActionsResponseBody200ActionsError
+mkGetVolumesIdActionsResponseBody200ActionsError getVolumesIdActionsResponseBody200ActionsErrorCode getVolumesIdActionsResponseBody200ActionsErrorMessage = GetVolumesIdActionsResponseBody200ActionsError{getVolumesIdActionsResponseBody200ActionsErrorCode = getVolumesIdActionsResponseBody200ActionsErrorCode,
+                                                                                                                                                                                                           getVolumesIdActionsResponseBody200ActionsErrorMessage = getVolumesIdActionsResponseBody200ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetVolumesIdActionsResponseBody200ActionsResources = GetVolumesIdActionsResponseBody200ActionsResources {
   -- | id: ID of the Resource
-  getVolumesIdActionsResponseBody200ActionsResourcesId :: GHC.Integer.Type.Integer
+  getVolumesIdActionsResponseBody200ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getVolumesIdActionsResponseBody200ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getVolumesIdActionsResponseBody200ActionsResourcesId obj) : (Data.Aeson..=) "type" (getVolumesIdActionsResponseBody200ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getVolumesIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getVolumesIdActionsResponseBody200ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsResponseBody200ActionsResources" (\obj -> (GHC.Base.pure GetVolumesIdActionsResponseBody200ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetVolumesIdActionsResponseBody200ActionsStatus
+-- | Create a new 'GetVolumesIdActionsResponseBody200ActionsResources' with all required fields.
+mkGetVolumesIdActionsResponseBody200ActionsResources :: GHC.Types.Int -- ^ 'getVolumesIdActionsResponseBody200ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getVolumesIdActionsResponseBody200ActionsResourcesType'
+  -> GetVolumesIdActionsResponseBody200ActionsResources
+mkGetVolumesIdActionsResponseBody200ActionsResources getVolumesIdActionsResponseBody200ActionsResourcesId getVolumesIdActionsResponseBody200ActionsResourcesType = GetVolumesIdActionsResponseBody200ActionsResources{getVolumesIdActionsResponseBody200ActionsResourcesId = getVolumesIdActionsResponseBody200ActionsResourcesId,
+                                                                                                                                                                                                                      getVolumesIdActionsResponseBody200ActionsResourcesType = getVolumesIdActionsResponseBody200ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetVolumesIdActionsResponseBody200ActionsStatus
-    = GetVolumesIdActionsResponseBody200ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetVolumesIdActionsResponseBody200ActionsStatusEnumTyped Data.Text.Internal.Text
-    | GetVolumesIdActionsResponseBody200ActionsStatusEnumStringError
-    | GetVolumesIdActionsResponseBody200ActionsStatusEnumStringRunning
-    | GetVolumesIdActionsResponseBody200ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200ActionsStatus
-    where toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetVolumesIdActionsResponseBody200ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetVolumesIdActionsResponseBody200ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetVolumesIdActionsResponseBody200ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetVolumesIdActionsResponseBody200ActionsStatusEnumStringSuccess
-                                                      else GetVolumesIdActionsResponseBody200ActionsStatusEnumOther val)
--- | Defines the data type for the schema GetVolumesIdActionsResponseBody200Meta
+data GetVolumesIdActionsResponseBody200ActionsStatus =
+   GetVolumesIdActionsResponseBody200ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetVolumesIdActionsResponseBody200ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetVolumesIdActionsResponseBody200ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetVolumesIdActionsResponseBody200ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetVolumesIdActionsResponseBody200ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200ActionsStatus
+    where toJSON (GetVolumesIdActionsResponseBody200ActionsStatusOther val) = val
+          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumSuccess) = "success"
+          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumRunning) = "running"
+          toJSON (GetVolumesIdActionsResponseBody200ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetVolumesIdActionsResponseBody200ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetVolumesIdActionsResponseBody200ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetVolumesIdActionsResponseBody200ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> GetVolumesIdActionsResponseBody200ActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetVolumesIdActionsResponseBody200Meta = GetVolumesIdActionsResponseBody200Meta {
@@ -222,31 +314,76 @@ data GetVolumesIdActionsResponseBody200Meta = GetVolumesIdActionsResponseBody200
   getVolumesIdActionsResponseBody200MetaPagination :: GetVolumesIdActionsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getVolumesIdActionsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getVolumesIdActionsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsResponseBody200Meta" (\obj -> GHC.Base.pure GetVolumesIdActionsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetVolumesIdActionsResponseBody200MetaPagination
+-- | Create a new 'GetVolumesIdActionsResponseBody200Meta' with all required fields.
+mkGetVolumesIdActionsResponseBody200Meta :: GetVolumesIdActionsResponseBody200MetaPagination -- ^ 'getVolumesIdActionsResponseBody200MetaPagination'
+  -> GetVolumesIdActionsResponseBody200Meta
+mkGetVolumesIdActionsResponseBody200Meta getVolumesIdActionsResponseBody200MetaPagination = GetVolumesIdActionsResponseBody200Meta{getVolumesIdActionsResponseBody200MetaPagination = getVolumesIdActionsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetVolumesIdActionsResponseBody200MetaPagination = GetVolumesIdActionsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getVolumesIdActionsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getVolumesIdActionsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getVolumesIdActionsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getVolumesIdActionsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getVolumesIdActionsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getVolumesIdActionsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getVolumesIdActionsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getVolumesIdActionsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getVolumesIdActionsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getVolumesIdActionsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetVolumesIdActionsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getVolumesIdActionsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getVolumesIdActionsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getVolumesIdActionsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getVolumesIdActionsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getVolumesIdActionsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getVolumesIdActionsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getVolumesIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getVolumesIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getVolumesIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getVolumesIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getVolumesIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getVolumesIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetVolumesIdActionsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getVolumesIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetVolumesIdActionsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetVolumesIdActionsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetVolumesIdActionsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetVolumesIdActionsResponseBody200MetaPagination' with all required fields.
+mkGetVolumesIdActionsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getVolumesIdActionsResponseBody200MetaPaginationTotalEntries'
+  -> GetVolumesIdActionsResponseBody200MetaPagination
+mkGetVolumesIdActionsResponseBody200MetaPagination getVolumesIdActionsResponseBody200MetaPaginationLastPage getVolumesIdActionsResponseBody200MetaPaginationNextPage getVolumesIdActionsResponseBody200MetaPaginationPage getVolumesIdActionsResponseBody200MetaPaginationPerPage getVolumesIdActionsResponseBody200MetaPaginationPreviousPage getVolumesIdActionsResponseBody200MetaPaginationTotalEntries = GetVolumesIdActionsResponseBody200MetaPagination{getVolumesIdActionsResponseBody200MetaPaginationLastPage = getVolumesIdActionsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               getVolumesIdActionsResponseBody200MetaPaginationNextPage = getVolumesIdActionsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               getVolumesIdActionsResponseBody200MetaPaginationPage = getVolumesIdActionsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               getVolumesIdActionsResponseBody200MetaPaginationPerPage = getVolumesIdActionsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               getVolumesIdActionsResponseBody200MetaPaginationPreviousPage = getVolumesIdActionsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               getVolumesIdActionsResponseBody200MetaPaginationTotalEntries = getVolumesIdActionsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /volumes/{id}/actions
+-- 
+-- The same as 'getVolumes_Id_Actions' but accepts an explicit configuration.
+getVolumes_Id_ActionsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetVolumesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetVolumesIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getVolumes_Id_ActionsWithConfiguration config
+                                       parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetVolumesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetVolumesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     GetVolumesIdActionsResponseBody200)
+                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getVolumesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /volumes/{id}/actions
+-- 
+-- The same as 'getVolumes_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getVolumes_Id_ActionsRaw :: forall m . HCloud.Common.MonadHTTP m => GetVolumesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getVolumes_Id_ActionsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getVolumesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /volumes/{id}/actions
+-- 
+-- The same as 'getVolumes_Id_Actions' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getVolumes_Id_ActionsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetVolumesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getVolumes_Id_ActionsWithConfigurationRaw config
+                                          parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getVolumesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getVolumesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

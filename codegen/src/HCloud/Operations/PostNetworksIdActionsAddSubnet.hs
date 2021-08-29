@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postNetworks_Id_ActionsAddSubnet
 module HCloud.Operations.PostNetworksIdActionsAddSubnet where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,57 +47,14 @@ import HCloud.Types
 -- Adds a new subnet object to the Network. If you do not specify an \`ip_range\` for the subnet we will automatically pick the first available \/24 range for you if possible.
 -- 
 -- Note: if the parent Network object changes during the request, the response will be a “conflict” error.
-postNetworks_Id_ActionsAddSubnet :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                     -- ^ id: ID of the Network
-  -> GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddSubnetResponse))   -- ^ Monad containing the result of the operation
-postNetworks_Id_ActionsAddSubnet config
-                                 id
-                                 body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddSubnetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddSubnetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              PostNetworksIdActionsAddSubnetResponseBody201)
-                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/add_subnet
--- 
--- The same as 'postNetworks_Id_ActionsAddSubnet' but returns the raw 'Data.ByteString.Char8.ByteString'
-postNetworks_Id_ActionsAddSubnetRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                     HCloud.Common.SecurityScheme s) =>
-                                       HCloud.Common.Configuration s ->
-                                       GHC.Integer.Type.Integer ->
-                                       GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody ->
-                                       m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postNetworks_Id_ActionsAddSubnetRaw config
-                                    id
-                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/add_subnet
--- 
--- Monadic version of 'postNetworks_Id_ActionsAddSubnet' (use with 'HCloud.Common.runWithConfiguration')
-postNetworks_Id_ActionsAddSubnetM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                   HCloud.Common.SecurityScheme s) =>
-                                     GHC.Integer.Type.Integer ->
-                                     GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody ->
-                                     Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                        m
-                                                                        (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                            (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddSubnetResponse))
-postNetworks_Id_ActionsAddSubnetM id
-                                  body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddSubnetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddSubnetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                               PostNetworksIdActionsAddSubnetResponseBody201)
-                                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/add_subnet
--- 
--- Monadic version of 'postNetworks_Id_ActionsAddSubnetRaw' (use with 'HCloud.Common.runWithConfiguration')
-postNetworks_Id_ActionsAddSubnetRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                      HCloud.Common.SecurityScheme s) =>
-                                        GHC.Integer.Type.Integer ->
-                                        GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody ->
-                                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                           m
-                                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postNetworks_Id_ActionsAddSubnetRawM id
-                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postNetworks_Id_ActionsAddSubnetRequestBody
+postNetworks_Id_ActionsAddSubnet :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddSubnetResponse) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddSubnet id
+                                 body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddSubnetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddSubnetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               PostNetworksIdActionsAddSubnetResponseBody201)
+                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddSubnetRequestBody = PostNetworksIdActionsAddSubnetRequestBody {
@@ -108,46 +65,51 @@ data PostNetworksIdActionsAddSubnetRequestBody = PostNetworksIdActionsAddSubnetR
   -- | type: Type of Subnetwork
   , postNetworksIdActionsAddSubnetRequestBodyType :: PostNetworksIdActionsAddSubnetRequestBodyType
   -- | vswitch_id: ID of the robot vSwitch. Must be supplied if the subnet is of type vswitch.
-  , postNetworksIdActionsAddSubnetRequestBodyVswitchId :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , postNetworksIdActionsAddSubnetRequestBodyVswitchId :: (GHC.Maybe.Maybe GHC.Types.Int)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip_range" (postNetworksIdActionsAddSubnetRequestBodyIpRange obj) : (Data.Aeson..=) "network_zone" (postNetworksIdActionsAddSubnetRequestBodyNetworkZone obj) : (Data.Aeson..=) "type" (postNetworksIdActionsAddSubnetRequestBodyType obj) : (Data.Aeson..=) "vswitch_id" (postNetworksIdActionsAddSubnetRequestBodyVswitchId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip_range" (postNetworksIdActionsAddSubnetRequestBodyIpRange obj) GHC.Base.<> ((Data.Aeson..=) "network_zone" (postNetworksIdActionsAddSubnetRequestBodyNetworkZone obj) GHC.Base.<> ((Data.Aeson..=) "type" (postNetworksIdActionsAddSubnetRequestBodyType obj) GHC.Base.<> (Data.Aeson..=) "vswitch_id" (postNetworksIdActionsAddSubnetRequestBodyVswitchId obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip_range" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyIpRange obj : "network_zone" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyNetworkZone obj : "type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyType obj : "vswitch_id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyVswitchId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("ip_range" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyIpRange obj) GHC.Base.<> (("network_zone" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyNetworkZone obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyType obj) GHC.Base.<> ("vswitch_id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetRequestBodyVswitchId obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddSubnetRequestBody" (\obj -> (((GHC.Base.pure PostNetworksIdActionsAddSubnetRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip_range")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "vswitch_id"))
--- | Defines the enum schema postNetworks_Id_ActionsAddSubnetRequestBodyType
+-- | Create a new 'PostNetworksIdActionsAddSubnetRequestBody' with all required fields.
+mkPostNetworksIdActionsAddSubnetRequestBody :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetRequestBodyNetworkZone'
+  -> PostNetworksIdActionsAddSubnetRequestBodyType -- ^ 'postNetworksIdActionsAddSubnetRequestBodyType'
+  -> PostNetworksIdActionsAddSubnetRequestBody
+mkPostNetworksIdActionsAddSubnetRequestBody postNetworksIdActionsAddSubnetRequestBodyNetworkZone postNetworksIdActionsAddSubnetRequestBodyType = PostNetworksIdActionsAddSubnetRequestBody{postNetworksIdActionsAddSubnetRequestBodyIpRange = GHC.Maybe.Nothing,
+                                                                                                                                                                                           postNetworksIdActionsAddSubnetRequestBodyNetworkZone = postNetworksIdActionsAddSubnetRequestBodyNetworkZone,
+                                                                                                                                                                                           postNetworksIdActionsAddSubnetRequestBodyType = postNetworksIdActionsAddSubnetRequestBodyType,
+                                                                                                                                                                                           postNetworksIdActionsAddSubnetRequestBodyVswitchId = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.requestBody.content.application\/json.schema.properties.type@ in the specification.
 -- 
 -- Type of Subnetwork
-data PostNetworksIdActionsAddSubnetRequestBodyType
-    = PostNetworksIdActionsAddSubnetRequestBodyTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumTyped Data.Text.Internal.Text
-    | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringCloud
-    | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringServer
-    | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringVswitch
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetRequestBodyType
-    where toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringCloud) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "cloud"
-          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringVswitch) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "vswitch"
-instance Data.Aeson.FromJSON PostNetworksIdActionsAddSubnetRequestBodyType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "cloud")
-                                          then PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringCloud
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                then PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringServer
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "vswitch")
-                                                      then PostNetworksIdActionsAddSubnetRequestBodyTypeEnumStringVswitch
-                                                      else PostNetworksIdActionsAddSubnetRequestBodyTypeEnumOther val)
+data PostNetworksIdActionsAddSubnetRequestBodyType =
+   PostNetworksIdActionsAddSubnetRequestBodyTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostNetworksIdActionsAddSubnetRequestBodyTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumCloud -- ^ Represents the JSON value @"cloud"@
+  | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PostNetworksIdActionsAddSubnetRequestBodyTypeEnumVswitch -- ^ Represents the JSON value @"vswitch"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetRequestBodyType
+    where toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeOther val) = val
+          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumCloud) = "cloud"
+          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumServer) = "server"
+          toJSON (PostNetworksIdActionsAddSubnetRequestBodyTypeEnumVswitch) = "vswitch"
+instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetRequestBodyType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "cloud" -> PostNetworksIdActionsAddSubnetRequestBodyTypeEnumCloud
+                                            | val GHC.Classes.== "server" -> PostNetworksIdActionsAddSubnetRequestBodyTypeEnumServer
+                                            | val GHC.Classes.== "vswitch" -> PostNetworksIdActionsAddSubnetRequestBodyTypeEnumVswitch
+                                            | GHC.Base.otherwise -> PostNetworksIdActionsAddSubnetRequestBodyTypeOther val)
 -- | Represents a response of the operation 'postNetworks_Id_ActionsAddSubnet'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostNetworksIdActionsAddSubnetResponseError' is used.
-data PostNetworksIdActionsAddSubnetResponse =                                                
-   PostNetworksIdActionsAddSubnetResponseError GHC.Base.String                               -- ^ Means either no matching case available or a parse error
-  | PostNetworksIdActionsAddSubnetResponse201 PostNetworksIdActionsAddSubnetResponseBody201  -- ^ The \`action\` key contains the \`add_subnet\` Action
+data PostNetworksIdActionsAddSubnetResponse =
+   PostNetworksIdActionsAddSubnetResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostNetworksIdActionsAddSubnetResponse201 PostNetworksIdActionsAddSubnetResponseBody201 -- ^ The \`action\` key contains the \`add_subnet\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostNetworksIdActionsAddSubnetResponseBody201
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddSubnetResponseBody201 = PostNetworksIdActionsAddSubnetResponseBody201 {
@@ -155,39 +117,61 @@ data PostNetworksIdActionsAddSubnetResponseBody201 = PostNetworksIdActionsAddSub
   postNetworksIdActionsAddSubnetResponseBody201Action :: PostNetworksIdActionsAddSubnetResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postNetworksIdActionsAddSubnetResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postNetworksIdActionsAddSubnetResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddSubnetResponseBody201" (\obj -> GHC.Base.pure PostNetworksIdActionsAddSubnetResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostNetworksIdActionsAddSubnetResponseBody201Action
+-- | Create a new 'PostNetworksIdActionsAddSubnetResponseBody201' with all required fields.
+mkPostNetworksIdActionsAddSubnetResponseBody201 :: PostNetworksIdActionsAddSubnetResponseBody201Action -- ^ 'postNetworksIdActionsAddSubnetResponseBody201Action'
+  -> PostNetworksIdActionsAddSubnetResponseBody201
+mkPostNetworksIdActionsAddSubnetResponseBody201 postNetworksIdActionsAddSubnetResponseBody201Action = PostNetworksIdActionsAddSubnetResponseBody201{postNetworksIdActionsAddSubnetResponseBody201Action = postNetworksIdActionsAddSubnetResponseBody201Action}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddSubnetResponseBody201Action = PostNetworksIdActionsAddSubnetResponseBody201Action {
   -- | command: Command executed in the Action
   postNetworksIdActionsAddSubnetResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postNetworksIdActionsAddSubnetResponseBody201ActionError :: PostNetworksIdActionsAddSubnetResponseBody201ActionError
+  , postNetworksIdActionsAddSubnetResponseBody201ActionError :: (GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postNetworksIdActionsAddSubnetResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postNetworksIdActionsAddSubnetResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postNetworksIdActionsAddSubnetResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postNetworksIdActionsAddSubnetResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postNetworksIdActionsAddSubnetResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postNetworksIdActionsAddSubnetResponseBody201ActionResources :: ([] PostNetworksIdActionsAddSubnetResponseBody201ActionResources)
+  , postNetworksIdActionsAddSubnetResponseBody201ActionResources :: ([PostNetworksIdActionsAddSubnetResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postNetworksIdActionsAddSubnetResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postNetworksIdActionsAddSubnetResponseBody201ActionStatus :: PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postNetworksIdActionsAddSubnetResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postNetworksIdActionsAddSubnetResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postNetworksIdActionsAddSubnetResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postNetworksIdActionsAddSubnetResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postNetworksIdActionsAddSubnetResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postNetworksIdActionsAddSubnetResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postNetworksIdActionsAddSubnetResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postNetworksIdActionsAddSubnetResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postNetworksIdActionsAddSubnetResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postNetworksIdActionsAddSubnetResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postNetworksIdActionsAddSubnetResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postNetworksIdActionsAddSubnetResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postNetworksIdActionsAddSubnetResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postNetworksIdActionsAddSubnetResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postNetworksIdActionsAddSubnetResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postNetworksIdActionsAddSubnetResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddSubnetResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostNetworksIdActionsAddSubnetResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostNetworksIdActionsAddSubnetResponseBody201ActionError
+-- | Create a new 'PostNetworksIdActionsAddSubnetResponseBody201Action' with all required fields.
+mkPostNetworksIdActionsAddSubnetResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetResponseBody201ActionError -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionProgress'
+  -> [PostNetworksIdActionsAddSubnetResponseBody201ActionResources] -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionStarted'
+  -> PostNetworksIdActionsAddSubnetResponseBody201ActionStatus -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionStatus'
+  -> PostNetworksIdActionsAddSubnetResponseBody201Action
+mkPostNetworksIdActionsAddSubnetResponseBody201Action postNetworksIdActionsAddSubnetResponseBody201ActionCommand postNetworksIdActionsAddSubnetResponseBody201ActionError postNetworksIdActionsAddSubnetResponseBody201ActionFinished postNetworksIdActionsAddSubnetResponseBody201ActionId postNetworksIdActionsAddSubnetResponseBody201ActionProgress postNetworksIdActionsAddSubnetResponseBody201ActionResources postNetworksIdActionsAddSubnetResponseBody201ActionStarted postNetworksIdActionsAddSubnetResponseBody201ActionStatus = PostNetworksIdActionsAddSubnetResponseBody201Action{postNetworksIdActionsAddSubnetResponseBody201ActionCommand = postNetworksIdActionsAddSubnetResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionError = postNetworksIdActionsAddSubnetResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionFinished = postNetworksIdActionsAddSubnetResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionId = postNetworksIdActionsAddSubnetResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionProgress = postNetworksIdActionsAddSubnetResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionResources = postNetworksIdActionsAddSubnetResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionStarted = postNetworksIdActionsAddSubnetResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postNetworksIdActionsAddSubnetResponseBody201ActionStatus = postNetworksIdActionsAddSubnetResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostNetworksIdActionsAddSubnetResponseBody201ActionError = PostNetworksIdActionsAddSubnetResponseBody201ActionError {
@@ -197,47 +181,86 @@ data PostNetworksIdActionsAddSubnetResponseBody201ActionError = PostNetworksIdAc
   , postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddSubnetResponseBody201ActionError" (\obj -> (GHC.Base.pure PostNetworksIdActionsAddSubnetResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostNetworksIdActionsAddSubnetResponseBody201ActionResources
+-- | Create a new 'PostNetworksIdActionsAddSubnetResponseBody201ActionError' with all required fields.
+mkPostNetworksIdActionsAddSubnetResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage'
+  -> PostNetworksIdActionsAddSubnetResponseBody201ActionError
+mkPostNetworksIdActionsAddSubnetResponseBody201ActionError postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage = PostNetworksIdActionsAddSubnetResponseBody201ActionError{postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode = postNetworksIdActionsAddSubnetResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                   postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage = postNetworksIdActionsAddSubnetResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddSubnetResponseBody201ActionResources = PostNetworksIdActionsAddSubnetResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddSubnetResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostNetworksIdActionsAddSubnetResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
+-- | Create a new 'PostNetworksIdActionsAddSubnetResponseBody201ActionResources' with all required fields.
+mkPostNetworksIdActionsAddSubnetResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType'
+  -> PostNetworksIdActionsAddSubnetResponseBody201ActionResources
+mkPostNetworksIdActionsAddSubnetResponseBody201ActionResources postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType = PostNetworksIdActionsAddSubnetResponseBody201ActionResources{postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId = postNetworksIdActionsAddSubnetResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                              postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType = postNetworksIdActionsAddSubnetResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/networks\/{id}\/actions\/add_subnet.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
-    = PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringError
-    | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringRunning
-    | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
-    where toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumOther val)
+data PostNetworksIdActionsAddSubnetResponseBody201ActionStatus =
+   PostNetworksIdActionsAddSubnetResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
+    where toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusOther val) = val
+          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddSubnetResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostNetworksIdActionsAddSubnetResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostNetworksIdActionsAddSubnetResponseBody201ActionStatusOther val)
+-- | > POST /networks/{id}/actions/add_subnet
+-- 
+-- The same as 'postNetworks_Id_ActionsAddSubnet' but accepts an explicit configuration.
+postNetworks_Id_ActionsAddSubnetWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddSubnetResponse) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddSubnetWithConfiguration config
+                                                  id
+                                                  body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddSubnetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddSubnetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                PostNetworksIdActionsAddSubnetResponseBody201)
+                                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /networks/{id}/actions/add_subnet
+-- 
+-- The same as 'postNetworks_Id_ActionsAddSubnet' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postNetworks_Id_ActionsAddSubnetRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddSubnetRaw id
+                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /networks/{id}/actions/add_subnet
+-- 
+-- The same as 'postNetworks_Id_ActionsAddSubnet' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postNetworks_Id_ActionsAddSubnetWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddSubnetRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddSubnetWithConfigurationRaw config
+                                                     id
+                                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_subnet"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsAttachIso
 module HCloud.Operations.PostServersIdActionsAttachIso where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,57 +47,14 @@ import HCloud.Types
 -- Attaches an ISO to a Server. The Server will immediately see it as a new disk. An already attached ISO will automatically be detached before the new ISO is attached.
 -- 
 -- Servers with attached ISOs have a modified boot order: They will try to boot from the ISO first before falling back to hard disk.
-postServers_Id_ActionsAttachIso :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                    -- ^ id: ID of the Server
-  -> GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsAttachIsoResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsAttachIso config
-                                id
-                                body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsAttachIsoResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsAttachIsoResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           PostServersIdActionsAttachIsoResponseBody201)
-                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/attach_iso
--- 
--- The same as 'postServers_Id_ActionsAttachIso' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsAttachIsoRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                    HCloud.Common.SecurityScheme s) =>
-                                      HCloud.Common.Configuration s ->
-                                      GHC.Integer.Type.Integer ->
-                                      GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody ->
-                                      m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsAttachIsoRaw config
-                                   id
-                                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/attach_iso
--- 
--- Monadic version of 'postServers_Id_ActionsAttachIso' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsAttachIsoM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                  HCloud.Common.SecurityScheme s) =>
-                                    GHC.Integer.Type.Integer ->
-                                    GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody ->
-                                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                       m
-                                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                           (Network.HTTP.Client.Types.Response PostServersIdActionsAttachIsoResponse))
-postServers_Id_ActionsAttachIsoM id
-                                 body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsAttachIsoResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsAttachIsoResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            PostServersIdActionsAttachIsoResponseBody201)
-                                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/attach_iso
--- 
--- Monadic version of 'postServers_Id_ActionsAttachIsoRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsAttachIsoRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                     HCloud.Common.SecurityScheme s) =>
-                                       GHC.Integer.Type.Integer ->
-                                       GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody ->
-                                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                          m
-                                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsAttachIsoRawM id
-                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postServers_Id_ActionsAttachIsoRequestBody
+postServers_Id_ActionsAttachIso :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsAttachIsoResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsAttachIso id
+                                body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsAttachIsoResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsAttachIsoResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            PostServersIdActionsAttachIsoResponseBody201)
+                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/attach_iso.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsAttachIsoRequestBody = PostServersIdActionsAttachIsoRequestBody {
@@ -105,19 +62,23 @@ data PostServersIdActionsAttachIsoRequestBody = PostServersIdActionsAttachIsoReq
   postServersIdActionsAttachIsoRequestBodyIso :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsAttachIsoRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "iso" (postServersIdActionsAttachIsoRequestBodyIso obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "iso" (postServersIdActionsAttachIsoRequestBodyIso obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsAttachIsoRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("iso" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoRequestBodyIso obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("iso" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoRequestBodyIso obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsAttachIsoRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsAttachIsoRequestBody" (\obj -> GHC.Base.pure PostServersIdActionsAttachIsoRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "iso"))
+-- | Create a new 'PostServersIdActionsAttachIsoRequestBody' with all required fields.
+mkPostServersIdActionsAttachIsoRequestBody :: Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoRequestBodyIso'
+  -> PostServersIdActionsAttachIsoRequestBody
+mkPostServersIdActionsAttachIsoRequestBody postServersIdActionsAttachIsoRequestBodyIso = PostServersIdActionsAttachIsoRequestBody{postServersIdActionsAttachIsoRequestBodyIso = postServersIdActionsAttachIsoRequestBodyIso}
 -- | Represents a response of the operation 'postServers_Id_ActionsAttachIso'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsAttachIsoResponseError' is used.
-data PostServersIdActionsAttachIsoResponse =                                               
-   PostServersIdActionsAttachIsoResponseError GHC.Base.String                              -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsAttachIsoResponse201 PostServersIdActionsAttachIsoResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsAttachIsoResponse =
+   PostServersIdActionsAttachIsoResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsAttachIsoResponse201 PostServersIdActionsAttachIsoResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsAttachIsoResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/attach_iso.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsAttachIsoResponseBody201 = PostServersIdActionsAttachIsoResponseBody201 {
@@ -125,39 +86,61 @@ data PostServersIdActionsAttachIsoResponseBody201 = PostServersIdActionsAttachIs
   postServersIdActionsAttachIsoResponseBody201Action :: PostServersIdActionsAttachIsoResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsAttachIsoResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsAttachIsoResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsAttachIsoResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsAttachIsoResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsAttachIsoResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsAttachIsoResponseBody201" (\obj -> GHC.Base.pure PostServersIdActionsAttachIsoResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostServersIdActionsAttachIsoResponseBody201Action
+-- | Create a new 'PostServersIdActionsAttachIsoResponseBody201' with all required fields.
+mkPostServersIdActionsAttachIsoResponseBody201 :: PostServersIdActionsAttachIsoResponseBody201Action -- ^ 'postServersIdActionsAttachIsoResponseBody201Action'
+  -> PostServersIdActionsAttachIsoResponseBody201
+mkPostServersIdActionsAttachIsoResponseBody201 postServersIdActionsAttachIsoResponseBody201Action = PostServersIdActionsAttachIsoResponseBody201{postServersIdActionsAttachIsoResponseBody201Action = postServersIdActionsAttachIsoResponseBody201Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/attach_iso.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsAttachIsoResponseBody201Action = PostServersIdActionsAttachIsoResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsAttachIsoResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsAttachIsoResponseBody201ActionError :: PostServersIdActionsAttachIsoResponseBody201ActionError
+  , postServersIdActionsAttachIsoResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsAttachIsoResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsAttachIsoResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsAttachIsoResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsAttachIsoResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsAttachIsoResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsAttachIsoResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsAttachIsoResponseBody201ActionResources :: ([] PostServersIdActionsAttachIsoResponseBody201ActionResources)
+  , postServersIdActionsAttachIsoResponseBody201ActionResources :: ([PostServersIdActionsAttachIsoResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsAttachIsoResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsAttachIsoResponseBody201ActionStatus :: PostServersIdActionsAttachIsoResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsAttachIsoResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsAttachIsoResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsAttachIsoResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsAttachIsoResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsAttachIsoResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsAttachIsoResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsAttachIsoResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsAttachIsoResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsAttachIsoResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsAttachIsoResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsAttachIsoResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsAttachIsoResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsAttachIsoResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsAttachIsoResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsAttachIsoResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsAttachIsoResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsAttachIsoResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsAttachIsoResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsAttachIsoResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsAttachIsoResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsAttachIsoResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsAttachIsoResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsAttachIsoResponseBody201Action' with all required fields.
+mkPostServersIdActionsAttachIsoResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsAttachIsoResponseBody201ActionError -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionProgress'
+  -> [PostServersIdActionsAttachIsoResponseBody201ActionResources] -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionStarted'
+  -> PostServersIdActionsAttachIsoResponseBody201ActionStatus -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionStatus'
+  -> PostServersIdActionsAttachIsoResponseBody201Action
+mkPostServersIdActionsAttachIsoResponseBody201Action postServersIdActionsAttachIsoResponseBody201ActionCommand postServersIdActionsAttachIsoResponseBody201ActionError postServersIdActionsAttachIsoResponseBody201ActionFinished postServersIdActionsAttachIsoResponseBody201ActionId postServersIdActionsAttachIsoResponseBody201ActionProgress postServersIdActionsAttachIsoResponseBody201ActionResources postServersIdActionsAttachIsoResponseBody201ActionStarted postServersIdActionsAttachIsoResponseBody201ActionStatus = PostServersIdActionsAttachIsoResponseBody201Action{postServersIdActionsAttachIsoResponseBody201ActionCommand = postServersIdActionsAttachIsoResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionError = postServersIdActionsAttachIsoResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionFinished = postServersIdActionsAttachIsoResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionId = postServersIdActionsAttachIsoResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionProgress = postServersIdActionsAttachIsoResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionResources = postServersIdActionsAttachIsoResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionStarted = postServersIdActionsAttachIsoResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsAttachIsoResponseBody201ActionStatus = postServersIdActionsAttachIsoResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/attach_iso.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsAttachIsoResponseBody201ActionError = PostServersIdActionsAttachIsoResponseBody201ActionError {
@@ -167,47 +150,86 @@ data PostServersIdActionsAttachIsoResponseBody201ActionError = PostServersIdActi
   , postServersIdActionsAttachIsoResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsAttachIsoResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsAttachIsoResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsAttachIsoResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsAttachIsoResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsAttachIsoResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsAttachIsoResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsAttachIsoResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsAttachIsoResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsAttachIsoResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsAttachIsoResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsAttachIsoResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsAttachIsoResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsAttachIsoResponseBody201ActionError
+mkPostServersIdActionsAttachIsoResponseBody201ActionError postServersIdActionsAttachIsoResponseBody201ActionErrorCode postServersIdActionsAttachIsoResponseBody201ActionErrorMessage = PostServersIdActionsAttachIsoResponseBody201ActionError{postServersIdActionsAttachIsoResponseBody201ActionErrorCode = postServersIdActionsAttachIsoResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                               postServersIdActionsAttachIsoResponseBody201ActionErrorMessage = postServersIdActionsAttachIsoResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/attach_iso.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsAttachIsoResponseBody201ActionResources = PostServersIdActionsAttachIsoResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsAttachIsoResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsAttachIsoResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsAttachIsoResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsAttachIsoResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsAttachIsoResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsAttachIsoResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsAttachIsoResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsAttachIsoResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsAttachIsoResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsAttachIsoResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsAttachIsoResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsAttachIsoResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsAttachIsoResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsAttachIsoResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsAttachIsoResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsAttachIsoResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsAttachIsoResponseBody201ActionResourcesType'
+  -> PostServersIdActionsAttachIsoResponseBody201ActionResources
+mkPostServersIdActionsAttachIsoResponseBody201ActionResources postServersIdActionsAttachIsoResponseBody201ActionResourcesId postServersIdActionsAttachIsoResponseBody201ActionResourcesType = PostServersIdActionsAttachIsoResponseBody201ActionResources{postServersIdActionsAttachIsoResponseBody201ActionResourcesId = postServersIdActionsAttachIsoResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                          postServersIdActionsAttachIsoResponseBody201ActionResourcesType = postServersIdActionsAttachIsoResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/attach_iso.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsAttachIsoResponseBody201ActionStatus
-    = PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsAttachIsoResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsAttachIsoResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsAttachIsoResponseBody201ActionStatus =
+   PostServersIdActionsAttachIsoResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsAttachIsoResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsAttachIsoResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsAttachIsoResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsAttachIsoResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsAttachIsoResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/attach_iso
+-- 
+-- The same as 'postServers_Id_ActionsAttachIso' but accepts an explicit configuration.
+postServers_Id_ActionsAttachIsoWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsAttachIsoResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsAttachIsoWithConfiguration config
+                                                 id
+                                                 body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsAttachIsoResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsAttachIsoResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             PostServersIdActionsAttachIsoResponseBody201)
+                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/attach_iso
+-- 
+-- The same as 'postServers_Id_ActionsAttachIso' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsAttachIsoRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsAttachIsoRaw id
+                                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/attach_iso
+-- 
+-- The same as 'postServers_Id_ActionsAttachIso' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsAttachIsoWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsAttachIsoRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsAttachIsoWithConfigurationRaw config
+                                                    id
+                                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_iso"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

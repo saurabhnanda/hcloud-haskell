@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postPlacementGroups
 module HCloud.Operations.PostPlacementGroups where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,101 +45,39 @@ import HCloud.Types
 -- | > POST /placement_groups
 -- 
 -- Creates a new PlacementGroup.
-postPlacementGroups :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe PostPlacementGroupsRequestBody                                                                                  -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostPlacementGroupsResponse)) -- ^ Monad containing the result of the operation
-postPlacementGroups config
-                    body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostPlacementGroupsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                           PostPlacementGroupsResponseBody201)
-                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /placement_groups
--- 
--- The same as 'postPlacementGroups' but returns the raw 'Data.ByteString.Char8.ByteString'
-postPlacementGroupsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                        HCloud.Common.SecurityScheme s) =>
-                          HCloud.Common.Configuration s ->
-                          GHC.Maybe.Maybe PostPlacementGroupsRequestBody ->
-                          m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postPlacementGroupsRaw config
-                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /placement_groups
--- 
--- Monadic version of 'postPlacementGroups' (use with 'HCloud.Common.runWithConfiguration')
-postPlacementGroupsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                      HCloud.Common.SecurityScheme s) =>
-                        GHC.Maybe.Maybe PostPlacementGroupsRequestBody ->
-                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                           m
-                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                               (Network.HTTP.Client.Types.Response PostPlacementGroupsResponse))
-postPlacementGroupsM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostPlacementGroupsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                            PostPlacementGroupsResponseBody201)
-                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /placement_groups
--- 
--- Monadic version of 'postPlacementGroupsRaw' (use with 'HCloud.Common.runWithConfiguration')
-postPlacementGroupsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                         HCloud.Common.SecurityScheme s) =>
-                           GHC.Maybe.Maybe PostPlacementGroupsRequestBody ->
-                           Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                              m
-                                                              (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postPlacementGroupsRawM body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postPlacementGroupsRequestBody
+postPlacementGroups :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostPlacementGroupsRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostPlacementGroupsResponse) -- ^ Monadic computation which returns the result of the operation
+postPlacementGroups body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostPlacementGroupsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                            PostPlacementGroupsResponseBody201)
+                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/placement_groups.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostPlacementGroupsRequestBody = PostPlacementGroupsRequestBody {
   -- | labels: User-defined labels (key-value pairs)
-  postPlacementGroupsRequestBodyLabels :: (GHC.Maybe.Maybe PostPlacementGroupsRequestBodyLabels)
+  postPlacementGroupsRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: Name of the PlacementGroup
   , postPlacementGroupsRequestBodyName :: Data.Text.Internal.Text
-  -- | type: Define the Placement Group Type.
-  , postPlacementGroupsRequestBodyType :: PostPlacementGroupsRequestBodyType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (postPlacementGroupsRequestBodyLabels obj) : (Data.Aeson..=) "name" (postPlacementGroupsRequestBodyName obj) : (Data.Aeson..=) "type" (postPlacementGroupsRequestBodyType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (postPlacementGroupsRequestBodyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postPlacementGroupsRequestBodyName obj) GHC.Base.<> (Data.Aeson..=) "type" (postPlacementGroupsRequestBodyType obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= postPlacementGroupsRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= postPlacementGroupsRequestBodyName obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= postPlacementGroupsRequestBodyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postPlacementGroupsRequestBodyName obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread")))
 instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsRequestBody
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsRequestBody" (\obj -> ((GHC.Base.pure PostPlacementGroupsRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema postPlacementGroupsRequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PostPlacementGroupsRequestBodyLabels = PostPlacementGroupsRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsRequestBodyLabels" (\obj -> GHC.Base.pure PostPlacementGroupsRequestBodyLabels)
--- | Defines the enum schema postPlacementGroupsRequestBodyType
--- 
--- Define the Placement Group Type.
-data PostPlacementGroupsRequestBodyType
-    = PostPlacementGroupsRequestBodyTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostPlacementGroupsRequestBodyTypeEnumTyped Data.Text.Internal.Text
-    | PostPlacementGroupsRequestBodyTypeEnumStringSpread
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsRequestBodyType
-    where toJSON (PostPlacementGroupsRequestBodyTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostPlacementGroupsRequestBodyTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostPlacementGroupsRequestBodyTypeEnumStringSpread) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread"
-instance Data.Aeson.FromJSON PostPlacementGroupsRequestBodyType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread")
-                                          then PostPlacementGroupsRequestBodyTypeEnumStringSpread
-                                          else PostPlacementGroupsRequestBodyTypeEnumOther val)
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsRequestBody" (\obj -> (GHC.Base.pure PostPlacementGroupsRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name"))
+-- | Create a new 'PostPlacementGroupsRequestBody' with all required fields.
+mkPostPlacementGroupsRequestBody :: Data.Text.Internal.Text -- ^ 'postPlacementGroupsRequestBodyName'
+  -> PostPlacementGroupsRequestBody
+mkPostPlacementGroupsRequestBody postPlacementGroupsRequestBodyName = PostPlacementGroupsRequestBody{postPlacementGroupsRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                                     postPlacementGroupsRequestBodyName = postPlacementGroupsRequestBodyName}
 -- | Represents a response of the operation 'postPlacementGroups'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostPlacementGroupsResponseError' is used.
-data PostPlacementGroupsResponse =                                     
-   PostPlacementGroupsResponseError GHC.Base.String                    -- ^ Means either no matching case available or a parse error
-  | PostPlacementGroupsResponse201 PostPlacementGroupsResponseBody201  -- ^ The \`PlacementGroup\` key contains the PlacementGroup that was just created.
+data PostPlacementGroupsResponse =
+   PostPlacementGroupsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostPlacementGroupsResponse201 PostPlacementGroupsResponseBody201 -- ^ The \`PlacementGroup\` key contains the PlacementGroup that was just created.
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostPlacementGroupsResponseBody201
+-- | Defines the object schema located at @paths.\/placement_groups.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostPlacementGroupsResponseBody201 = PostPlacementGroupsResponseBody201 {
@@ -149,39 +87,62 @@ data PostPlacementGroupsResponseBody201 = PostPlacementGroupsResponseBody201 {
   , postPlacementGroupsResponseBody201PlacementGroup :: PostPlacementGroupsResponseBody201PlacementGroup
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postPlacementGroupsResponseBody201Action obj) : (Data.Aeson..=) "placement_group" (postPlacementGroupsResponseBody201PlacementGroup obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postPlacementGroupsResponseBody201Action obj) GHC.Base.<> (Data.Aeson..=) "placement_group" (postPlacementGroupsResponseBody201PlacementGroup obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201Action obj : "placement_group" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroup obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201Action obj) GHC.Base.<> ("placement_group" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroup obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201" (\obj -> (GHC.Base.pure PostPlacementGroupsResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "placement_group"))
--- | Defines the data type for the schema PostPlacementGroupsResponseBody201Action
+-- | Create a new 'PostPlacementGroupsResponseBody201' with all required fields.
+mkPostPlacementGroupsResponseBody201 :: PostPlacementGroupsResponseBody201PlacementGroup -- ^ 'postPlacementGroupsResponseBody201PlacementGroup'
+  -> PostPlacementGroupsResponseBody201
+mkPostPlacementGroupsResponseBody201 postPlacementGroupsResponseBody201PlacementGroup = PostPlacementGroupsResponseBody201{postPlacementGroupsResponseBody201Action = GHC.Maybe.Nothing,
+                                                                                                                           postPlacementGroupsResponseBody201PlacementGroup = postPlacementGroupsResponseBody201PlacementGroup}
+-- | Defines the object schema located at @paths.\/placement_groups.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostPlacementGroupsResponseBody201Action = PostPlacementGroupsResponseBody201Action {
   -- | command: Command executed in the Action
   postPlacementGroupsResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postPlacementGroupsResponseBody201ActionError :: PostPlacementGroupsResponseBody201ActionError
+  , postPlacementGroupsResponseBody201ActionError :: (GHC.Maybe.Maybe PostPlacementGroupsResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postPlacementGroupsResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postPlacementGroupsResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postPlacementGroupsResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postPlacementGroupsResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postPlacementGroupsResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postPlacementGroupsResponseBody201ActionResources :: ([] PostPlacementGroupsResponseBody201ActionResources)
+  , postPlacementGroupsResponseBody201ActionResources :: ([PostPlacementGroupsResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postPlacementGroupsResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postPlacementGroupsResponseBody201ActionStatus :: PostPlacementGroupsResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postPlacementGroupsResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postPlacementGroupsResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postPlacementGroupsResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postPlacementGroupsResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postPlacementGroupsResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postPlacementGroupsResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postPlacementGroupsResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postPlacementGroupsResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postPlacementGroupsResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postPlacementGroupsResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postPlacementGroupsResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postPlacementGroupsResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postPlacementGroupsResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postPlacementGroupsResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postPlacementGroupsResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postPlacementGroupsResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostPlacementGroupsResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostPlacementGroupsResponseBody201ActionError
+-- | Create a new 'PostPlacementGroupsResponseBody201Action' with all required fields.
+mkPostPlacementGroupsResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostPlacementGroupsResponseBody201ActionError -- ^ 'postPlacementGroupsResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postPlacementGroupsResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postPlacementGroupsResponseBody201ActionProgress'
+  -> [PostPlacementGroupsResponseBody201ActionResources] -- ^ 'postPlacementGroupsResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201ActionStarted'
+  -> PostPlacementGroupsResponseBody201ActionStatus -- ^ 'postPlacementGroupsResponseBody201ActionStatus'
+  -> PostPlacementGroupsResponseBody201Action
+mkPostPlacementGroupsResponseBody201Action postPlacementGroupsResponseBody201ActionCommand postPlacementGroupsResponseBody201ActionError postPlacementGroupsResponseBody201ActionFinished postPlacementGroupsResponseBody201ActionId postPlacementGroupsResponseBody201ActionProgress postPlacementGroupsResponseBody201ActionResources postPlacementGroupsResponseBody201ActionStarted postPlacementGroupsResponseBody201ActionStatus = PostPlacementGroupsResponseBody201Action{postPlacementGroupsResponseBody201ActionCommand = postPlacementGroupsResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionError = postPlacementGroupsResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionFinished = postPlacementGroupsResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionId = postPlacementGroupsResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionProgress = postPlacementGroupsResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionResources = postPlacementGroupsResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionStarted = postPlacementGroupsResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionStatus = postPlacementGroupsResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/placement_groups.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostPlacementGroupsResponseBody201ActionError = PostPlacementGroupsResponseBody201ActionError {
@@ -191,98 +152,113 @@ data PostPlacementGroupsResponseBody201ActionError = PostPlacementGroupsResponse
   , postPlacementGroupsResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postPlacementGroupsResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postPlacementGroupsResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postPlacementGroupsResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postPlacementGroupsResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201ActionError" (\obj -> (GHC.Base.pure PostPlacementGroupsResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostPlacementGroupsResponseBody201ActionResources
+-- | Create a new 'PostPlacementGroupsResponseBody201ActionError' with all required fields.
+mkPostPlacementGroupsResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201ActionErrorMessage'
+  -> PostPlacementGroupsResponseBody201ActionError
+mkPostPlacementGroupsResponseBody201ActionError postPlacementGroupsResponseBody201ActionErrorCode postPlacementGroupsResponseBody201ActionErrorMessage = PostPlacementGroupsResponseBody201ActionError{postPlacementGroupsResponseBody201ActionErrorCode = postPlacementGroupsResponseBody201ActionErrorCode,
+                                                                                                                                                                                                       postPlacementGroupsResponseBody201ActionErrorMessage = postPlacementGroupsResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/placement_groups.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostPlacementGroupsResponseBody201ActionResources = PostPlacementGroupsResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postPlacementGroupsResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postPlacementGroupsResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postPlacementGroupsResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postPlacementGroupsResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postPlacementGroupsResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postPlacementGroupsResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postPlacementGroupsResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostPlacementGroupsResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostPlacementGroupsResponseBody201ActionStatus
+-- | Create a new 'PostPlacementGroupsResponseBody201ActionResources' with all required fields.
+mkPostPlacementGroupsResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postPlacementGroupsResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201ActionResourcesType'
+  -> PostPlacementGroupsResponseBody201ActionResources
+mkPostPlacementGroupsResponseBody201ActionResources postPlacementGroupsResponseBody201ActionResourcesId postPlacementGroupsResponseBody201ActionResourcesType = PostPlacementGroupsResponseBody201ActionResources{postPlacementGroupsResponseBody201ActionResourcesId = postPlacementGroupsResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                  postPlacementGroupsResponseBody201ActionResourcesType = postPlacementGroupsResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/placement_groups.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostPlacementGroupsResponseBody201ActionStatus
-    = PostPlacementGroupsResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostPlacementGroupsResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostPlacementGroupsResponseBody201ActionStatusEnumStringError
-    | PostPlacementGroupsResponseBody201ActionStatusEnumStringRunning
-    | PostPlacementGroupsResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201ActionStatus
-    where toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostPlacementGroupsResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostPlacementGroupsResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostPlacementGroupsResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostPlacementGroupsResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostPlacementGroupsResponseBody201ActionStatusEnumOther val)
--- | Defines the data type for the schema PostPlacementGroupsResponseBody201Placement_group
+data PostPlacementGroupsResponseBody201ActionStatus =
+   PostPlacementGroupsResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostPlacementGroupsResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostPlacementGroupsResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostPlacementGroupsResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostPlacementGroupsResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsResponseBody201ActionStatus
+    where toJSON (PostPlacementGroupsResponseBody201ActionStatusOther val) = val
+          toJSON (PostPlacementGroupsResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostPlacementGroupsResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostPlacementGroupsResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostPlacementGroupsResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostPlacementGroupsResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostPlacementGroupsResponseBody201ActionStatusOther val)
+-- | Defines the object schema located at @paths.\/placement_groups.POST.responses.201.content.application\/json.schema.properties.placement_group@ in the specification.
 -- 
 -- 
 data PostPlacementGroupsResponseBody201PlacementGroup = PostPlacementGroupsResponseBody201PlacementGroup {
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   postPlacementGroupsResponseBody201PlacementGroupCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , postPlacementGroupsResponseBody201PlacementGroupId :: GHC.Integer.Type.Integer
+  , postPlacementGroupsResponseBody201PlacementGroupId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , postPlacementGroupsResponseBody201PlacementGroupLabels :: PostPlacementGroupsResponseBody201PlacementGroupLabels
+  , postPlacementGroupsResponseBody201PlacementGroupLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , postPlacementGroupsResponseBody201PlacementGroupName :: Data.Text.Internal.Text
   -- | servers: Array of IDs of Servers that are part of this Placement Group
-  , postPlacementGroupsResponseBody201PlacementGroupServers :: ([] GHC.Integer.Type.Integer)
-  -- | type: Type of the Placement Group
-  , postPlacementGroupsResponseBody201PlacementGroupType :: PostPlacementGroupsResponseBody201PlacementGroupType
+  , postPlacementGroupsResponseBody201PlacementGroupServers :: ([GHC.Types.Int])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201PlacementGroup
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (postPlacementGroupsResponseBody201PlacementGroupCreated obj) : (Data.Aeson..=) "id" (postPlacementGroupsResponseBody201PlacementGroupId obj) : (Data.Aeson..=) "labels" (postPlacementGroupsResponseBody201PlacementGroupLabels obj) : (Data.Aeson..=) "name" (postPlacementGroupsResponseBody201PlacementGroupName obj) : (Data.Aeson..=) "servers" (postPlacementGroupsResponseBody201PlacementGroupServers obj) : (Data.Aeson..=) "type" (postPlacementGroupsResponseBody201PlacementGroupType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (postPlacementGroupsResponseBody201PlacementGroupCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (postPlacementGroupsResponseBody201PlacementGroupId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postPlacementGroupsResponseBody201PlacementGroupLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postPlacementGroupsResponseBody201PlacementGroupName obj) GHC.Base.<> ((Data.Aeson..=) "servers" (postPlacementGroupsResponseBody201PlacementGroupServers obj) GHC.Base.<> (Data.Aeson..=) "type" (postPlacementGroupsResponseBody201PlacementGroupType obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostPlacementGroupsResponseBody201PlacementGroup
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupCreated obj : "id" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupId obj : "labels" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupLabels obj : "name" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupName obj : "servers" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupServers obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupName obj) GHC.Base.<> (("servers" Data.Aeson.Types.ToJSON..= postPlacementGroupsResponseBody201PlacementGroupServers obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread"))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201PlacementGroup
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201PlacementGroup" (\obj -> (((((GHC.Base.pure PostPlacementGroupsResponseBody201PlacementGroup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema PostPlacementGroupsResponseBody201Placement_groupLabels
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201PlacementGroup" (\obj -> ((((GHC.Base.pure PostPlacementGroupsResponseBody201PlacementGroup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers"))
+-- | Create a new 'PostPlacementGroupsResponseBody201PlacementGroup' with all required fields.
+mkPostPlacementGroupsResponseBody201PlacementGroup :: Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201PlacementGroupCreated'
+  -> GHC.Types.Int -- ^ 'postPlacementGroupsResponseBody201PlacementGroupId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'postPlacementGroupsResponseBody201PlacementGroupLabels'
+  -> Data.Text.Internal.Text -- ^ 'postPlacementGroupsResponseBody201PlacementGroupName'
+  -> [GHC.Types.Int] -- ^ 'postPlacementGroupsResponseBody201PlacementGroupServers'
+  -> PostPlacementGroupsResponseBody201PlacementGroup
+mkPostPlacementGroupsResponseBody201PlacementGroup postPlacementGroupsResponseBody201PlacementGroupCreated postPlacementGroupsResponseBody201PlacementGroupId postPlacementGroupsResponseBody201PlacementGroupLabels postPlacementGroupsResponseBody201PlacementGroupName postPlacementGroupsResponseBody201PlacementGroupServers = PostPlacementGroupsResponseBody201PlacementGroup{postPlacementGroupsResponseBody201PlacementGroupCreated = postPlacementGroupsResponseBody201PlacementGroupCreated,
+                                                                                                                                                                                                                                                                                                                                                                                     postPlacementGroupsResponseBody201PlacementGroupId = postPlacementGroupsResponseBody201PlacementGroupId,
+                                                                                                                                                                                                                                                                                                                                                                                     postPlacementGroupsResponseBody201PlacementGroupLabels = postPlacementGroupsResponseBody201PlacementGroupLabels,
+                                                                                                                                                                                                                                                                                                                                                                                     postPlacementGroupsResponseBody201PlacementGroupName = postPlacementGroupsResponseBody201PlacementGroupName,
+                                                                                                                                                                                                                                                                                                                                                                                     postPlacementGroupsResponseBody201PlacementGroupServers = postPlacementGroupsResponseBody201PlacementGroupServers}
+-- | > POST /placement_groups
 -- 
--- User-defined labels (key-value pairs)
-data PostPlacementGroupsResponseBody201PlacementGroupLabels = PostPlacementGroupsResponseBody201PlacementGroupLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201PlacementGroupLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostPlacementGroupsResponseBody201PlacementGroupLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostPlacementGroupsResponseBody201PlacementGroupLabels" (\obj -> GHC.Base.pure PostPlacementGroupsResponseBody201PlacementGroupLabels)
--- | Defines the enum schema PostPlacementGroupsResponseBody201Placement_groupType
+-- The same as 'postPlacementGroups' but accepts an explicit configuration.
+postPlacementGroupsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostPlacementGroupsRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostPlacementGroupsResponse) -- ^ Monadic computation which returns the result of the operation
+postPlacementGroupsWithConfiguration config
+                                     body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostPlacementGroupsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                             PostPlacementGroupsResponseBody201)
+                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /placement_groups
 -- 
--- Type of the Placement Group
-data PostPlacementGroupsResponseBody201PlacementGroupType
-    = PostPlacementGroupsResponseBody201PlacementGroupTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostPlacementGroupsResponseBody201PlacementGroupTypeEnumTyped Data.Text.Internal.Text
-    | PostPlacementGroupsResponseBody201PlacementGroupTypeEnumStringSpread
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostPlacementGroupsResponseBody201PlacementGroupType
-    where toJSON (PostPlacementGroupsResponseBody201PlacementGroupTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostPlacementGroupsResponseBody201PlacementGroupTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostPlacementGroupsResponseBody201PlacementGroupTypeEnumStringSpread) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread"
-instance Data.Aeson.FromJSON PostPlacementGroupsResponseBody201PlacementGroupType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread")
-                                          then PostPlacementGroupsResponseBody201PlacementGroupTypeEnumStringSpread
-                                          else PostPlacementGroupsResponseBody201PlacementGroupTypeEnumOther val)
+-- The same as 'postPlacementGroups' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postPlacementGroupsRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostPlacementGroupsRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postPlacementGroupsRaw body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /placement_groups
+-- 
+-- The same as 'postPlacementGroups' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postPlacementGroupsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostPlacementGroupsRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postPlacementGroupsWithConfigurationRaw config
+                                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/placement_groups") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

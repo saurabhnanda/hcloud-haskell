@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postFirewalls
 module HCloud.Operations.PostFirewalls where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -52,68 +52,38 @@ import HCloud.Types
 -- |-----------------------------|---------------------------------------------------------|
 -- | \`server_already_added\`      | Server added more than one time to resource             |
 -- | \`incompatible_network_type\` | The Network type is incompatible for the given resource |
-postFirewalls :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe PostFirewallsRequestBody                                                                                  -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostFirewallsResponse)) -- ^ Monad containing the result of the operation
-postFirewalls config
-              body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFirewallsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                         PostFirewallsResponseBody201)
-                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /firewalls
--- 
--- The same as 'postFirewalls' but returns the raw 'Data.ByteString.Char8.ByteString'
-postFirewallsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                  HCloud.Common.SecurityScheme s) =>
-                    HCloud.Common.Configuration s ->
-                    GHC.Maybe.Maybe PostFirewallsRequestBody ->
-                    m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postFirewallsRaw config
-                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /firewalls
--- 
--- Monadic version of 'postFirewalls' (use with 'HCloud.Common.runWithConfiguration')
-postFirewallsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  GHC.Maybe.Maybe PostFirewallsRequestBody ->
-                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                     m
-                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                         (Network.HTTP.Client.Types.Response PostFirewallsResponse))
-postFirewallsM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFirewallsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                          PostFirewallsResponseBody201)
-                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /firewalls
--- 
--- Monadic version of 'postFirewallsRaw' (use with 'HCloud.Common.runWithConfiguration')
-postFirewallsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     GHC.Maybe.Maybe PostFirewallsRequestBody ->
-                     Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                        m
-                                                        (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postFirewallsRawM body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postFirewallsRequestBody
+postFirewalls :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostFirewallsRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostFirewallsResponse) -- ^ Monadic computation which returns the result of the operation
+postFirewalls body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFirewallsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                          PostFirewallsResponseBody201)
+                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostFirewallsRequestBody = PostFirewallsRequestBody {
   -- | apply_to: Resources the Firewall should be applied to after creation
-  postFirewallsRequestBodyApplyTo :: (GHC.Maybe.Maybe ([] PostFirewallsRequestBodyApplyTo))
+  postFirewallsRequestBodyApplyTo :: (GHC.Maybe.Maybe ([PostFirewallsRequestBodyApplyTo]))
   -- | labels: User-defined labels (key-value pairs)
-  , postFirewallsRequestBodyLabels :: (GHC.Maybe.Maybe PostFirewallsRequestBodyLabels)
+  , postFirewallsRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: Name of the Firewall
   , postFirewallsRequestBodyName :: Data.Text.Internal.Text
   -- | rules: Array of rules
-  , postFirewallsRequestBodyRules :: (GHC.Maybe.Maybe ([] PostFirewallsRequestBodyRules))
+  , postFirewallsRequestBodyRules :: (GHC.Maybe.Maybe ([PostFirewallsRequestBodyRules]))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "apply_to" (postFirewallsRequestBodyApplyTo obj) : (Data.Aeson..=) "labels" (postFirewallsRequestBodyLabels obj) : (Data.Aeson..=) "name" (postFirewallsRequestBodyName obj) : (Data.Aeson..=) "rules" (postFirewallsRequestBodyRules obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "apply_to" (postFirewallsRequestBodyApplyTo obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postFirewallsRequestBodyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postFirewallsRequestBodyName obj) GHC.Base.<> (Data.Aeson..=) "rules" (postFirewallsRequestBodyRules obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("apply_to" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyTo obj : "labels" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyName obj : "rules" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRules obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("apply_to" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyTo obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyName obj) GHC.Base.<> ("rules" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRules obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsRequestBody" (\obj -> (((GHC.Base.pure PostFirewallsRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "apply_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "rules"))
--- | Defines the data type for the schema postFirewallsRequestBodyApply_to
+-- | Create a new 'PostFirewallsRequestBody' with all required fields.
+mkPostFirewallsRequestBody :: Data.Text.Internal.Text -- ^ 'postFirewallsRequestBodyName'
+  -> PostFirewallsRequestBody
+mkPostFirewallsRequestBody postFirewallsRequestBodyName = PostFirewallsRequestBody{postFirewallsRequestBodyApplyTo = GHC.Maybe.Nothing,
+                                                                                   postFirewallsRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                   postFirewallsRequestBodyName = postFirewallsRequestBodyName,
+                                                                                   postFirewallsRequestBodyRules = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.apply_to.items@ in the specification.
 -- 
 -- 
 data PostFirewallsRequestBodyApplyTo = PostFirewallsRequestBodyApplyTo {
@@ -125,12 +95,18 @@ data PostFirewallsRequestBodyApplyTo = PostFirewallsRequestBodyApplyTo {
   , postFirewallsRequestBodyApplyToType :: PostFirewallsRequestBodyApplyToType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyApplyTo
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "label_selector" (postFirewallsRequestBodyApplyToLabelSelector obj) : (Data.Aeson..=) "server" (postFirewallsRequestBodyApplyToServer obj) : (Data.Aeson..=) "type" (postFirewallsRequestBodyApplyToType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "label_selector" (postFirewallsRequestBodyApplyToLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (postFirewallsRequestBodyApplyToServer obj) GHC.Base.<> (Data.Aeson..=) "type" (postFirewallsRequestBodyApplyToType obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyApplyTo
+    where toJSON obj = Data.Aeson.Types.Internal.object ("label_selector" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToServer obj : "type" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("label_selector" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToType obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyApplyTo
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsRequestBodyApplyTo" (\obj -> ((GHC.Base.pure PostFirewallsRequestBodyApplyTo GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema postFirewallsRequestBodyApply_toLabel_selector
+-- | Create a new 'PostFirewallsRequestBodyApplyTo' with all required fields.
+mkPostFirewallsRequestBodyApplyTo :: PostFirewallsRequestBodyApplyToType -- ^ 'postFirewallsRequestBodyApplyToType'
+  -> PostFirewallsRequestBodyApplyTo
+mkPostFirewallsRequestBodyApplyTo postFirewallsRequestBodyApplyToType = PostFirewallsRequestBodyApplyTo{postFirewallsRequestBodyApplyToLabelSelector = GHC.Maybe.Nothing,
+                                                                                                        postFirewallsRequestBodyApplyToServer = GHC.Maybe.Nothing,
+                                                                                                        postFirewallsRequestBodyApplyToType = postFirewallsRequestBodyApplyToType}
+-- | Defines the object schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.apply_to.items.properties.label_selector@ in the specification.
 -- 
 -- Configuration for type LabelSelector, required if type is \`label_selector\`
 data PostFirewallsRequestBodyApplyToLabelSelector = PostFirewallsRequestBodyApplyToLabelSelector {
@@ -138,57 +114,51 @@ data PostFirewallsRequestBodyApplyToLabelSelector = PostFirewallsRequestBodyAppl
   postFirewallsRequestBodyApplyToLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyApplyToLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (postFirewallsRequestBodyApplyToLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (postFirewallsRequestBodyApplyToLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyApplyToLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyApplyToLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsRequestBodyApplyToLabelSelector" (\obj -> GHC.Base.pure PostFirewallsRequestBodyApplyToLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema postFirewallsRequestBodyApply_toServer
+-- | Create a new 'PostFirewallsRequestBodyApplyToLabelSelector' with all required fields.
+mkPostFirewallsRequestBodyApplyToLabelSelector :: Data.Text.Internal.Text -- ^ 'postFirewallsRequestBodyApplyToLabelSelectorSelector'
+  -> PostFirewallsRequestBodyApplyToLabelSelector
+mkPostFirewallsRequestBodyApplyToLabelSelector postFirewallsRequestBodyApplyToLabelSelectorSelector = PostFirewallsRequestBodyApplyToLabelSelector{postFirewallsRequestBodyApplyToLabelSelectorSelector = postFirewallsRequestBodyApplyToLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.apply_to.items.properties.server@ in the specification.
 -- 
 -- Configuration for type Server, required if type is \`server\`
 data PostFirewallsRequestBodyApplyToServer = PostFirewallsRequestBodyApplyToServer {
   -- | id: ID of the Server
-  postFirewallsRequestBodyApplyToServerId :: GHC.Integer.Type.Integer
+  postFirewallsRequestBodyApplyToServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyApplyToServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postFirewallsRequestBodyApplyToServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postFirewallsRequestBodyApplyToServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyApplyToServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyApplyToServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyApplyToServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsRequestBodyApplyToServer" (\obj -> GHC.Base.pure PostFirewallsRequestBodyApplyToServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema postFirewallsRequestBodyApply_toType
+-- | Create a new 'PostFirewallsRequestBodyApplyToServer' with all required fields.
+mkPostFirewallsRequestBodyApplyToServer :: GHC.Types.Int -- ^ 'postFirewallsRequestBodyApplyToServerId'
+  -> PostFirewallsRequestBodyApplyToServer
+mkPostFirewallsRequestBodyApplyToServer postFirewallsRequestBodyApplyToServerId = PostFirewallsRequestBodyApplyToServer{postFirewallsRequestBodyApplyToServerId = postFirewallsRequestBodyApplyToServerId}
+-- | Defines the enum schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.apply_to.items.properties.type@ in the specification.
 -- 
 -- Type of the resource
-data PostFirewallsRequestBodyApplyToType
-    = PostFirewallsRequestBodyApplyToTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsRequestBodyApplyToTypeEnumTyped Data.Text.Internal.Text
-    | PostFirewallsRequestBodyApplyToTypeEnumStringLabelSelector
-    | PostFirewallsRequestBodyApplyToTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyApplyToType
-    where toJSON (PostFirewallsRequestBodyApplyToTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsRequestBodyApplyToTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsRequestBodyApplyToTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (PostFirewallsRequestBodyApplyToTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PostFirewallsRequestBodyApplyToType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                          then PostFirewallsRequestBodyApplyToTypeEnumStringLabelSelector
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                then PostFirewallsRequestBodyApplyToTypeEnumStringServer
-                                                else PostFirewallsRequestBodyApplyToTypeEnumOther val)
--- | Defines the data type for the schema postFirewallsRequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PostFirewallsRequestBodyLabels = PostFirewallsRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsRequestBodyLabels" (\obj -> GHC.Base.pure PostFirewallsRequestBodyLabels)
--- | Defines the data type for the schema postFirewallsRequestBodyRules
+data PostFirewallsRequestBodyApplyToType =
+   PostFirewallsRequestBodyApplyToTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsRequestBodyApplyToTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsRequestBodyApplyToTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PostFirewallsRequestBodyApplyToTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyApplyToType
+    where toJSON (PostFirewallsRequestBodyApplyToTypeOther val) = val
+          toJSON (PostFirewallsRequestBodyApplyToTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsRequestBodyApplyToTypeEnumServer) = "server"
+          toJSON (PostFirewallsRequestBodyApplyToTypeEnumLabelSelector) = "label_selector"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyApplyToType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> PostFirewallsRequestBodyApplyToTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> PostFirewallsRequestBodyApplyToTypeEnumLabelSelector
+                                            | GHC.Base.otherwise -> PostFirewallsRequestBodyApplyToTypeOther val)
+-- | Defines the object schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.rules.items@ in the specification.
 -- 
 -- 
 data PostFirewallsRequestBodyRules = PostFirewallsRequestBodyRules {
@@ -199,7 +169,7 @@ data PostFirewallsRequestBodyRules = PostFirewallsRequestBodyRules {
   -- * Maximum length of 255
   postFirewallsRequestBodyRulesDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | destination_ips: List of permitted IPv4\/IPv6 addresses in CIDR notation. Use \`0.0.0.0\/0\` to allow all IPv4 addresses and \`::\/0\` to allow all IPv6 addresses. You can specify 100 CIDRs at most.
-  , postFirewallsRequestBodyRulesDestinationIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postFirewallsRequestBodyRulesDestinationIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | direction: Select traffic direction on which rule should be applied. Use \`source_ips\` for direction \`in\` and \`destination_ips\` for direction \`out\`.
   , postFirewallsRequestBodyRulesDirection :: PostFirewallsRequestBodyRulesDirection
   -- | port: Port or port range to which traffic will be allowed, only applicable for protocols TCP and UDP. A port range can be specified by separating two ports with a dash, e.g \`1024-5000\`.
@@ -207,116 +177,141 @@ data PostFirewallsRequestBodyRules = PostFirewallsRequestBodyRules {
   -- | protocol: Type of traffic to allow
   , postFirewallsRequestBodyRulesProtocol :: PostFirewallsRequestBodyRulesProtocol
   -- | source_ips: List of permitted IPv4\/IPv6 addresses in CIDR notation. Use \`0.0.0.0\/0\` to allow all IPv4 addresses and \`::\/0\` to allow all IPv6 addresses. You can specify 100 CIDRs at most.
-  , postFirewallsRequestBodyRulesSourceIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postFirewallsRequestBodyRulesSourceIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyRules
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (postFirewallsRequestBodyRulesDescription obj) : (Data.Aeson..=) "destination_ips" (postFirewallsRequestBodyRulesDestinationIps obj) : (Data.Aeson..=) "direction" (postFirewallsRequestBodyRulesDirection obj) : (Data.Aeson..=) "port" (postFirewallsRequestBodyRulesPort obj) : (Data.Aeson..=) "protocol" (postFirewallsRequestBodyRulesProtocol obj) : (Data.Aeson..=) "source_ips" (postFirewallsRequestBodyRulesSourceIps obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (postFirewallsRequestBodyRulesDescription obj) GHC.Base.<> ((Data.Aeson..=) "destination_ips" (postFirewallsRequestBodyRulesDestinationIps obj) GHC.Base.<> ((Data.Aeson..=) "direction" (postFirewallsRequestBodyRulesDirection obj) GHC.Base.<> ((Data.Aeson..=) "port" (postFirewallsRequestBodyRulesPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postFirewallsRequestBodyRulesProtocol obj) GHC.Base.<> (Data.Aeson..=) "source_ips" (postFirewallsRequestBodyRulesSourceIps obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyRules
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesDescription obj : "destination_ips" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesDestinationIps obj : "direction" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesDirection obj : "port" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesPort obj : "protocol" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesProtocol obj : "source_ips" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesSourceIps obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesDescription obj) GHC.Base.<> (("destination_ips" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesDestinationIps obj) GHC.Base.<> (("direction" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesDirection obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesProtocol obj) GHC.Base.<> ("source_ips" Data.Aeson.Types.ToJSON..= postFirewallsRequestBodyRulesSourceIps obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyRules
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsRequestBodyRules" (\obj -> (((((GHC.Base.pure PostFirewallsRequestBodyRules GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "destination_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "direction")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "source_ips"))
--- | Defines the enum schema postFirewallsRequestBodyRulesDirection
+-- | Create a new 'PostFirewallsRequestBodyRules' with all required fields.
+mkPostFirewallsRequestBodyRules :: PostFirewallsRequestBodyRulesDirection -- ^ 'postFirewallsRequestBodyRulesDirection'
+  -> PostFirewallsRequestBodyRulesProtocol -- ^ 'postFirewallsRequestBodyRulesProtocol'
+  -> PostFirewallsRequestBodyRules
+mkPostFirewallsRequestBodyRules postFirewallsRequestBodyRulesDirection postFirewallsRequestBodyRulesProtocol = PostFirewallsRequestBodyRules{postFirewallsRequestBodyRulesDescription = GHC.Maybe.Nothing,
+                                                                                                                                             postFirewallsRequestBodyRulesDestinationIps = GHC.Maybe.Nothing,
+                                                                                                                                             postFirewallsRequestBodyRulesDirection = postFirewallsRequestBodyRulesDirection,
+                                                                                                                                             postFirewallsRequestBodyRulesPort = GHC.Maybe.Nothing,
+                                                                                                                                             postFirewallsRequestBodyRulesProtocol = postFirewallsRequestBodyRulesProtocol,
+                                                                                                                                             postFirewallsRequestBodyRulesSourceIps = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.rules.items.properties.direction@ in the specification.
 -- 
 -- Select traffic direction on which rule should be applied. Use \`source_ips\` for direction \`in\` and \`destination_ips\` for direction \`out\`.
-data PostFirewallsRequestBodyRulesDirection
-    = PostFirewallsRequestBodyRulesDirectionEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsRequestBodyRulesDirectionEnumTyped Data.Text.Internal.Text
-    | PostFirewallsRequestBodyRulesDirectionEnumStringIn
-    | PostFirewallsRequestBodyRulesDirectionEnumStringOut
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyRulesDirection
-    where toJSON (PostFirewallsRequestBodyRulesDirectionEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsRequestBodyRulesDirectionEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsRequestBodyRulesDirectionEnumStringIn) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "in"
-          toJSON (PostFirewallsRequestBodyRulesDirectionEnumStringOut) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "out"
-instance Data.Aeson.FromJSON PostFirewallsRequestBodyRulesDirection
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "in")
-                                          then PostFirewallsRequestBodyRulesDirectionEnumStringIn
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "out")
-                                                then PostFirewallsRequestBodyRulesDirectionEnumStringOut
-                                                else PostFirewallsRequestBodyRulesDirectionEnumOther val)
--- | Defines the enum schema postFirewallsRequestBodyRulesProtocol
+data PostFirewallsRequestBodyRulesDirection =
+   PostFirewallsRequestBodyRulesDirectionOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsRequestBodyRulesDirectionTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsRequestBodyRulesDirectionEnumIn -- ^ Represents the JSON value @"in"@
+  | PostFirewallsRequestBodyRulesDirectionEnumOut -- ^ Represents the JSON value @"out"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyRulesDirection
+    where toJSON (PostFirewallsRequestBodyRulesDirectionOther val) = val
+          toJSON (PostFirewallsRequestBodyRulesDirectionTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsRequestBodyRulesDirectionEnumIn) = "in"
+          toJSON (PostFirewallsRequestBodyRulesDirectionEnumOut) = "out"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyRulesDirection
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "in" -> PostFirewallsRequestBodyRulesDirectionEnumIn
+                                            | val GHC.Classes.== "out" -> PostFirewallsRequestBodyRulesDirectionEnumOut
+                                            | GHC.Base.otherwise -> PostFirewallsRequestBodyRulesDirectionOther val)
+-- | Defines the enum schema located at @paths.\/firewalls.POST.requestBody.content.application\/json.schema.properties.rules.items.properties.protocol@ in the specification.
 -- 
 -- Type of traffic to allow
-data PostFirewallsRequestBodyRulesProtocol
-    = PostFirewallsRequestBodyRulesProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsRequestBodyRulesProtocolEnumTyped Data.Text.Internal.Text
-    | PostFirewallsRequestBodyRulesProtocolEnumStringEsp
-    | PostFirewallsRequestBodyRulesProtocolEnumStringGre
-    | PostFirewallsRequestBodyRulesProtocolEnumStringIcmp
-    | PostFirewallsRequestBodyRulesProtocolEnumStringTcp
-    | PostFirewallsRequestBodyRulesProtocolEnumStringUdp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsRequestBodyRulesProtocol
-    where toJSON (PostFirewallsRequestBodyRulesProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsRequestBodyRulesProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsRequestBodyRulesProtocolEnumStringEsp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "esp"
-          toJSON (PostFirewallsRequestBodyRulesProtocolEnumStringGre) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "gre"
-          toJSON (PostFirewallsRequestBodyRulesProtocolEnumStringIcmp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "icmp"
-          toJSON (PostFirewallsRequestBodyRulesProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-          toJSON (PostFirewallsRequestBodyRulesProtocolEnumStringUdp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "udp"
-instance Data.Aeson.FromJSON PostFirewallsRequestBodyRulesProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "esp")
-                                          then PostFirewallsRequestBodyRulesProtocolEnumStringEsp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "gre")
-                                                then PostFirewallsRequestBodyRulesProtocolEnumStringGre
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "icmp")
-                                                      then PostFirewallsRequestBodyRulesProtocolEnumStringIcmp
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                            then PostFirewallsRequestBodyRulesProtocolEnumStringTcp
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "udp")
-                                                                  then PostFirewallsRequestBodyRulesProtocolEnumStringUdp
-                                                                  else PostFirewallsRequestBodyRulesProtocolEnumOther val)
+data PostFirewallsRequestBodyRulesProtocol =
+   PostFirewallsRequestBodyRulesProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsRequestBodyRulesProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsRequestBodyRulesProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostFirewallsRequestBodyRulesProtocolEnumUdp -- ^ Represents the JSON value @"udp"@
+  | PostFirewallsRequestBodyRulesProtocolEnumIcmp -- ^ Represents the JSON value @"icmp"@
+  | PostFirewallsRequestBodyRulesProtocolEnumEsp -- ^ Represents the JSON value @"esp"@
+  | PostFirewallsRequestBodyRulesProtocolEnumGre -- ^ Represents the JSON value @"gre"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsRequestBodyRulesProtocol
+    where toJSON (PostFirewallsRequestBodyRulesProtocolOther val) = val
+          toJSON (PostFirewallsRequestBodyRulesProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsRequestBodyRulesProtocolEnumTcp) = "tcp"
+          toJSON (PostFirewallsRequestBodyRulesProtocolEnumUdp) = "udp"
+          toJSON (PostFirewallsRequestBodyRulesProtocolEnumIcmp) = "icmp"
+          toJSON (PostFirewallsRequestBodyRulesProtocolEnumEsp) = "esp"
+          toJSON (PostFirewallsRequestBodyRulesProtocolEnumGre) = "gre"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsRequestBodyRulesProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostFirewallsRequestBodyRulesProtocolEnumTcp
+                                            | val GHC.Classes.== "udp" -> PostFirewallsRequestBodyRulesProtocolEnumUdp
+                                            | val GHC.Classes.== "icmp" -> PostFirewallsRequestBodyRulesProtocolEnumIcmp
+                                            | val GHC.Classes.== "esp" -> PostFirewallsRequestBodyRulesProtocolEnumEsp
+                                            | val GHC.Classes.== "gre" -> PostFirewallsRequestBodyRulesProtocolEnumGre
+                                            | GHC.Base.otherwise -> PostFirewallsRequestBodyRulesProtocolOther val)
 -- | Represents a response of the operation 'postFirewalls'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostFirewallsResponseError' is used.
-data PostFirewallsResponse =                               
-   PostFirewallsResponseError GHC.Base.String              -- ^ Means either no matching case available or a parse error
-  | PostFirewallsResponse201 PostFirewallsResponseBody201  -- ^ The \`firewall\` key contains the Firewall that was just created
+data PostFirewallsResponse =
+   PostFirewallsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostFirewallsResponse201 PostFirewallsResponseBody201 -- ^ The \`firewall\` key contains the Firewall that was just created
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostFirewallsResponseBody201
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201 = PostFirewallsResponseBody201 {
   -- | actions
-  postFirewallsResponseBody201Actions :: (GHC.Maybe.Maybe ([] PostFirewallsResponseBody201Actions))
+  postFirewallsResponseBody201Actions :: (GHC.Maybe.Maybe ([PostFirewallsResponseBody201Actions]))
   -- | firewall
   , postFirewallsResponseBody201Firewall :: (GHC.Maybe.Maybe PostFirewallsResponseBody201Firewall)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (postFirewallsResponseBody201Actions obj) : (Data.Aeson..=) "firewall" (postFirewallsResponseBody201Firewall obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (postFirewallsResponseBody201Actions obj) GHC.Base.<> (Data.Aeson..=) "firewall" (postFirewallsResponseBody201Firewall obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201Actions obj : "firewall" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201Firewall obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("actions" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201Actions obj) GHC.Base.<> ("firewall" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201Firewall obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201" (\obj -> (GHC.Base.pure PostFirewallsResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "firewall"))
--- | Defines the data type for the schema PostFirewallsResponseBody201Actions
+-- | Create a new 'PostFirewallsResponseBody201' with all required fields.
+mkPostFirewallsResponseBody201 :: PostFirewallsResponseBody201
+mkPostFirewallsResponseBody201 = PostFirewallsResponseBody201{postFirewallsResponseBody201Actions = GHC.Maybe.Nothing,
+                                                              postFirewallsResponseBody201Firewall = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201Actions = PostFirewallsResponseBody201Actions {
   -- | command: Command executed in the Action
   postFirewallsResponseBody201ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postFirewallsResponseBody201ActionsError :: PostFirewallsResponseBody201ActionsError
+  , postFirewallsResponseBody201ActionsError :: (GHC.Maybe.Maybe PostFirewallsResponseBody201ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postFirewallsResponseBody201ActionsFinished :: Data.Text.Internal.Text
+  , postFirewallsResponseBody201ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postFirewallsResponseBody201ActionsId :: GHC.Integer.Type.Integer
+  , postFirewallsResponseBody201ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postFirewallsResponseBody201ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postFirewallsResponseBody201ActionsResources :: ([] PostFirewallsResponseBody201ActionsResources)
+  , postFirewallsResponseBody201ActionsResources :: ([PostFirewallsResponseBody201ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postFirewallsResponseBody201ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postFirewallsResponseBody201ActionsStatus :: PostFirewallsResponseBody201ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postFirewallsResponseBody201ActionsCommand obj) : (Data.Aeson..=) "error" (postFirewallsResponseBody201ActionsError obj) : (Data.Aeson..=) "finished" (postFirewallsResponseBody201ActionsFinished obj) : (Data.Aeson..=) "id" (postFirewallsResponseBody201ActionsId obj) : (Data.Aeson..=) "progress" (postFirewallsResponseBody201ActionsProgress obj) : (Data.Aeson..=) "resources" (postFirewallsResponseBody201ActionsResources obj) : (Data.Aeson..=) "started" (postFirewallsResponseBody201ActionsStarted obj) : (Data.Aeson..=) "status" (postFirewallsResponseBody201ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postFirewallsResponseBody201ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postFirewallsResponseBody201ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postFirewallsResponseBody201ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postFirewallsResponseBody201ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postFirewallsResponseBody201ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postFirewallsResponseBody201ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postFirewallsResponseBody201ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postFirewallsResponseBody201ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201Actions" (\obj -> (((((((GHC.Base.pure PostFirewallsResponseBody201Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostFirewallsResponseBody201ActionsError
+-- | Create a new 'PostFirewallsResponseBody201Actions' with all required fields.
+mkPostFirewallsResponseBody201Actions :: Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201ActionsCommand'
+  -> GHC.Maybe.Maybe PostFirewallsResponseBody201ActionsError -- ^ 'postFirewallsResponseBody201ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201ActionsFinished'
+  -> GHC.Types.Int -- ^ 'postFirewallsResponseBody201ActionsId'
+  -> GHC.Types.Double -- ^ 'postFirewallsResponseBody201ActionsProgress'
+  -> [PostFirewallsResponseBody201ActionsResources] -- ^ 'postFirewallsResponseBody201ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201ActionsStarted'
+  -> PostFirewallsResponseBody201ActionsStatus -- ^ 'postFirewallsResponseBody201ActionsStatus'
+  -> PostFirewallsResponseBody201Actions
+mkPostFirewallsResponseBody201Actions postFirewallsResponseBody201ActionsCommand postFirewallsResponseBody201ActionsError postFirewallsResponseBody201ActionsFinished postFirewallsResponseBody201ActionsId postFirewallsResponseBody201ActionsProgress postFirewallsResponseBody201ActionsResources postFirewallsResponseBody201ActionsStarted postFirewallsResponseBody201ActionsStatus = PostFirewallsResponseBody201Actions{postFirewallsResponseBody201ActionsCommand = postFirewallsResponseBody201ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsError = postFirewallsResponseBody201ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsFinished = postFirewallsResponseBody201ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsId = postFirewallsResponseBody201ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsProgress = postFirewallsResponseBody201ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsResources = postFirewallsResponseBody201ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsStarted = postFirewallsResponseBody201ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                postFirewallsResponseBody201ActionsStatus = postFirewallsResponseBody201ActionsStatus}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostFirewallsResponseBody201ActionsError = PostFirewallsResponseBody201ActionsError {
@@ -326,79 +321,101 @@ data PostFirewallsResponseBody201ActionsError = PostFirewallsResponseBody201Acti
   , postFirewallsResponseBody201ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postFirewallsResponseBody201ActionsErrorCode obj) : (Data.Aeson..=) "message" (postFirewallsResponseBody201ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postFirewallsResponseBody201ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postFirewallsResponseBody201ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201ActionsError" (\obj -> (GHC.Base.pure PostFirewallsResponseBody201ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostFirewallsResponseBody201ActionsResources
+-- | Create a new 'PostFirewallsResponseBody201ActionsError' with all required fields.
+mkPostFirewallsResponseBody201ActionsError :: Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201ActionsErrorMessage'
+  -> PostFirewallsResponseBody201ActionsError
+mkPostFirewallsResponseBody201ActionsError postFirewallsResponseBody201ActionsErrorCode postFirewallsResponseBody201ActionsErrorMessage = PostFirewallsResponseBody201ActionsError{postFirewallsResponseBody201ActionsErrorCode = postFirewallsResponseBody201ActionsErrorCode,
+                                                                                                                                                                                   postFirewallsResponseBody201ActionsErrorMessage = postFirewallsResponseBody201ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201ActionsResources = PostFirewallsResponseBody201ActionsResources {
   -- | id: ID of the Resource
-  postFirewallsResponseBody201ActionsResourcesId :: GHC.Integer.Type.Integer
+  postFirewallsResponseBody201ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postFirewallsResponseBody201ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postFirewallsResponseBody201ActionsResourcesId obj) : (Data.Aeson..=) "type" (postFirewallsResponseBody201ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postFirewallsResponseBody201ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postFirewallsResponseBody201ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201ActionsResources" (\obj -> (GHC.Base.pure PostFirewallsResponseBody201ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostFirewallsResponseBody201ActionsStatus
+-- | Create a new 'PostFirewallsResponseBody201ActionsResources' with all required fields.
+mkPostFirewallsResponseBody201ActionsResources :: GHC.Types.Int -- ^ 'postFirewallsResponseBody201ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201ActionsResourcesType'
+  -> PostFirewallsResponseBody201ActionsResources
+mkPostFirewallsResponseBody201ActionsResources postFirewallsResponseBody201ActionsResourcesId postFirewallsResponseBody201ActionsResourcesType = PostFirewallsResponseBody201ActionsResources{postFirewallsResponseBody201ActionsResourcesId = postFirewallsResponseBody201ActionsResourcesId,
+                                                                                                                                                                                              postFirewallsResponseBody201ActionsResourcesType = postFirewallsResponseBody201ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostFirewallsResponseBody201ActionsStatus
-    = PostFirewallsResponseBody201ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsResponseBody201ActionsStatusEnumTyped Data.Text.Internal.Text
-    | PostFirewallsResponseBody201ActionsStatusEnumStringError
-    | PostFirewallsResponseBody201ActionsStatusEnumStringRunning
-    | PostFirewallsResponseBody201ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201ActionsStatus
-    where toJSON (PostFirewallsResponseBody201ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostFirewallsResponseBody201ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostFirewallsResponseBody201ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostFirewallsResponseBody201ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostFirewallsResponseBody201ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostFirewallsResponseBody201ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostFirewallsResponseBody201ActionsStatusEnumStringSuccess
-                                                      else PostFirewallsResponseBody201ActionsStatusEnumOther val)
--- | Defines the data type for the schema PostFirewallsResponseBody201Firewall
+data PostFirewallsResponseBody201ActionsStatus =
+   PostFirewallsResponseBody201ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsResponseBody201ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsResponseBody201ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostFirewallsResponseBody201ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostFirewallsResponseBody201ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201ActionsStatus
+    where toJSON (PostFirewallsResponseBody201ActionsStatusOther val) = val
+          toJSON (PostFirewallsResponseBody201ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsResponseBody201ActionsStatusEnumSuccess) = "success"
+          toJSON (PostFirewallsResponseBody201ActionsStatusEnumRunning) = "running"
+          toJSON (PostFirewallsResponseBody201ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostFirewallsResponseBody201ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostFirewallsResponseBody201ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostFirewallsResponseBody201ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> PostFirewallsResponseBody201ActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201Firewall = PostFirewallsResponseBody201Firewall {
   -- | applied_to
-  postFirewallsResponseBody201FirewallAppliedTo :: ([] PostFirewallsResponseBody201FirewallAppliedTo)
+  postFirewallsResponseBody201FirewallAppliedTo :: ([PostFirewallsResponseBody201FirewallAppliedTo])
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , postFirewallsResponseBody201FirewallCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , postFirewallsResponseBody201FirewallId :: GHC.Integer.Type.Integer
+  , postFirewallsResponseBody201FirewallId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , postFirewallsResponseBody201FirewallLabels :: (GHC.Maybe.Maybe PostFirewallsResponseBody201FirewallLabels)
+  , postFirewallsResponseBody201FirewallLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: Name of the Resource. Must be unique per Project.
   , postFirewallsResponseBody201FirewallName :: Data.Text.Internal.Text
   -- | rules
-  , postFirewallsResponseBody201FirewallRules :: ([] PostFirewallsResponseBody201FirewallRules)
+  , postFirewallsResponseBody201FirewallRules :: ([PostFirewallsResponseBody201FirewallRules])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201Firewall
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "applied_to" (postFirewallsResponseBody201FirewallAppliedTo obj) : (Data.Aeson..=) "created" (postFirewallsResponseBody201FirewallCreated obj) : (Data.Aeson..=) "id" (postFirewallsResponseBody201FirewallId obj) : (Data.Aeson..=) "labels" (postFirewallsResponseBody201FirewallLabels obj) : (Data.Aeson..=) "name" (postFirewallsResponseBody201FirewallName obj) : (Data.Aeson..=) "rules" (postFirewallsResponseBody201FirewallRules obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "applied_to" (postFirewallsResponseBody201FirewallAppliedTo obj) GHC.Base.<> ((Data.Aeson..=) "created" (postFirewallsResponseBody201FirewallCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (postFirewallsResponseBody201FirewallId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postFirewallsResponseBody201FirewallLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postFirewallsResponseBody201FirewallName obj) GHC.Base.<> (Data.Aeson..=) "rules" (postFirewallsResponseBody201FirewallRules obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201Firewall
+    where toJSON obj = Data.Aeson.Types.Internal.object ("applied_to" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedTo obj : "created" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallCreated obj : "id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallId obj : "labels" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallLabels obj : "name" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallName obj : "rules" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRules obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("applied_to" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedTo obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallName obj) GHC.Base.<> ("rules" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRules obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201Firewall
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201Firewall" (\obj -> (((((GHC.Base.pure PostFirewallsResponseBody201Firewall GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "applied_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "rules"))
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallApplied_to
+-- | Create a new 'PostFirewallsResponseBody201Firewall' with all required fields.
+mkPostFirewallsResponseBody201Firewall :: [PostFirewallsResponseBody201FirewallAppliedTo] -- ^ 'postFirewallsResponseBody201FirewallAppliedTo'
+  -> Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201FirewallCreated'
+  -> GHC.Types.Int -- ^ 'postFirewallsResponseBody201FirewallId'
+  -> Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201FirewallName'
+  -> [PostFirewallsResponseBody201FirewallRules] -- ^ 'postFirewallsResponseBody201FirewallRules'
+  -> PostFirewallsResponseBody201Firewall
+mkPostFirewallsResponseBody201Firewall postFirewallsResponseBody201FirewallAppliedTo postFirewallsResponseBody201FirewallCreated postFirewallsResponseBody201FirewallId postFirewallsResponseBody201FirewallName postFirewallsResponseBody201FirewallRules = PostFirewallsResponseBody201Firewall{postFirewallsResponseBody201FirewallAppliedTo = postFirewallsResponseBody201FirewallAppliedTo,
+                                                                                                                                                                                                                                                                                                  postFirewallsResponseBody201FirewallCreated = postFirewallsResponseBody201FirewallCreated,
+                                                                                                                                                                                                                                                                                                  postFirewallsResponseBody201FirewallId = postFirewallsResponseBody201FirewallId,
+                                                                                                                                                                                                                                                                                                  postFirewallsResponseBody201FirewallLabels = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                  postFirewallsResponseBody201FirewallName = postFirewallsResponseBody201FirewallName,
+                                                                                                                                                                                                                                                                                                  postFirewallsResponseBody201FirewallRules = postFirewallsResponseBody201FirewallRules}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.applied_to.items@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201FirewallAppliedTo = PostFirewallsResponseBody201FirewallAppliedTo {
   -- | applied_to_resources
-  postFirewallsResponseBody201FirewallAppliedToAppliedToResources :: (GHC.Maybe.Maybe ([] PostFirewallsResponseBody201FirewallAppliedToAppliedToResources))
+  postFirewallsResponseBody201FirewallAppliedToAppliedToResources :: (GHC.Maybe.Maybe ([PostFirewallsResponseBody201FirewallAppliedToAppliedToResources]))
   -- | label_selector
   , postFirewallsResponseBody201FirewallAppliedToLabelSelector :: (GHC.Maybe.Maybe PostFirewallsResponseBody201FirewallAppliedToLabelSelector)
   -- | server
@@ -407,56 +424,52 @@ data PostFirewallsResponseBody201FirewallAppliedTo = PostFirewallsResponseBody20
   , postFirewallsResponseBody201FirewallAppliedToType :: PostFirewallsResponseBody201FirewallAppliedToType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedTo
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "applied_to_resources" (postFirewallsResponseBody201FirewallAppliedToAppliedToResources obj) : (Data.Aeson..=) "label_selector" (postFirewallsResponseBody201FirewallAppliedToLabelSelector obj) : (Data.Aeson..=) "server" (postFirewallsResponseBody201FirewallAppliedToServer obj) : (Data.Aeson..=) "type" (postFirewallsResponseBody201FirewallAppliedToType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "applied_to_resources" (postFirewallsResponseBody201FirewallAppliedToAppliedToResources obj) GHC.Base.<> ((Data.Aeson..=) "label_selector" (postFirewallsResponseBody201FirewallAppliedToLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (postFirewallsResponseBody201FirewallAppliedToServer obj) GHC.Base.<> (Data.Aeson..=) "type" (postFirewallsResponseBody201FirewallAppliedToType obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallAppliedTo
+    where toJSON obj = Data.Aeson.Types.Internal.object ("applied_to_resources" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToAppliedToResources obj : "label_selector" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToServer obj : "type" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("applied_to_resources" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToAppliedToResources obj) GHC.Base.<> (("label_selector" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToType obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallAppliedTo
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallAppliedTo" (\obj -> (((GHC.Base.pure PostFirewallsResponseBody201FirewallAppliedTo GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "applied_to_resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallApplied_toApplied_to_resources
+-- | Create a new 'PostFirewallsResponseBody201FirewallAppliedTo' with all required fields.
+mkPostFirewallsResponseBody201FirewallAppliedTo :: PostFirewallsResponseBody201FirewallAppliedToType -- ^ 'postFirewallsResponseBody201FirewallAppliedToType'
+  -> PostFirewallsResponseBody201FirewallAppliedTo
+mkPostFirewallsResponseBody201FirewallAppliedTo postFirewallsResponseBody201FirewallAppliedToType = PostFirewallsResponseBody201FirewallAppliedTo{postFirewallsResponseBody201FirewallAppliedToAppliedToResources = GHC.Maybe.Nothing,
+                                                                                                                                                  postFirewallsResponseBody201FirewallAppliedToLabelSelector = GHC.Maybe.Nothing,
+                                                                                                                                                  postFirewallsResponseBody201FirewallAppliedToServer = GHC.Maybe.Nothing,
+                                                                                                                                                  postFirewallsResponseBody201FirewallAppliedToType = postFirewallsResponseBody201FirewallAppliedToType}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.applied_to.items.properties.applied_to_resources.items@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201FirewallAppliedToAppliedToResources = PostFirewallsResponseBody201FirewallAppliedToAppliedToResources {
   -- | server
   postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer :: (GHC.Maybe.Maybe PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer)
-  -- | type: Type of resource referenced
-  , postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType :: (GHC.Maybe.Maybe PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "server" (postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer obj) : (Data.Aeson..=) "type" (postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "server" (postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer obj) GHC.Base.<> (Data.Aeson..=) "type" (postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("server" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "server" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("server" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "server"))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResources
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallAppliedToAppliedToResources" (\obj -> (GHC.Base.pure PostFirewallsResponseBody201FirewallAppliedToAppliedToResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type"))
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallApplied_toApplied_to_resourcesServer
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallAppliedToAppliedToResources" (\obj -> GHC.Base.pure PostFirewallsResponseBody201FirewallAppliedToAppliedToResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server"))
+-- | Create a new 'PostFirewallsResponseBody201FirewallAppliedToAppliedToResources' with all required fields.
+mkPostFirewallsResponseBody201FirewallAppliedToAppliedToResources :: PostFirewallsResponseBody201FirewallAppliedToAppliedToResources
+mkPostFirewallsResponseBody201FirewallAppliedToAppliedToResources = PostFirewallsResponseBody201FirewallAppliedToAppliedToResources{postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.applied_to.items.properties.applied_to_resources.items.properties.server@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer = PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer {
   -- | id: ID of the Resource
-  postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId :: GHC.Integer.Type.Integer
+  postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer" (\obj -> GHC.Base.pure PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema PostFirewallsResponseBody201FirewallApplied_toApplied_to_resourcesType
--- 
--- Type of resource referenced
-data PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType
-    = PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumTyped Data.Text.Internal.Text
-    | PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType
-    where toJSON (PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                          then PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumStringServer
-                                          else PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesTypeEnumOther val)
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallApplied_toLabel_selector
+-- | Create a new 'PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer' with all required fields.
+mkPostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer :: GHC.Types.Int -- ^ 'postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId'
+  -> PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer
+mkPostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId = PostFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServer{postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId = postFirewallsResponseBody201FirewallAppliedToAppliedToResourcesServerId}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.applied_to.items.properties.label_selector@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201FirewallAppliedToLabelSelector = PostFirewallsResponseBody201FirewallAppliedToLabelSelector {
@@ -464,57 +477,51 @@ data PostFirewallsResponseBody201FirewallAppliedToLabelSelector = PostFirewallsR
   postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedToLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallAppliedToLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallAppliedToLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallAppliedToLabelSelector" (\obj -> GHC.Base.pure PostFirewallsResponseBody201FirewallAppliedToLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallApplied_toServer
+-- | Create a new 'PostFirewallsResponseBody201FirewallAppliedToLabelSelector' with all required fields.
+mkPostFirewallsResponseBody201FirewallAppliedToLabelSelector :: Data.Text.Internal.Text -- ^ 'postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector'
+  -> PostFirewallsResponseBody201FirewallAppliedToLabelSelector
+mkPostFirewallsResponseBody201FirewallAppliedToLabelSelector postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector = PostFirewallsResponseBody201FirewallAppliedToLabelSelector{postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector = postFirewallsResponseBody201FirewallAppliedToLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.applied_to.items.properties.server@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201FirewallAppliedToServer = PostFirewallsResponseBody201FirewallAppliedToServer {
   -- | id: ID of the Resource
-  postFirewallsResponseBody201FirewallAppliedToServerId :: GHC.Integer.Type.Integer
+  postFirewallsResponseBody201FirewallAppliedToServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedToServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postFirewallsResponseBody201FirewallAppliedToServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postFirewallsResponseBody201FirewallAppliedToServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallAppliedToServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallAppliedToServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallAppliedToServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallAppliedToServer" (\obj -> GHC.Base.pure PostFirewallsResponseBody201FirewallAppliedToServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema PostFirewallsResponseBody201FirewallApplied_toType
+-- | Create a new 'PostFirewallsResponseBody201FirewallAppliedToServer' with all required fields.
+mkPostFirewallsResponseBody201FirewallAppliedToServer :: GHC.Types.Int -- ^ 'postFirewallsResponseBody201FirewallAppliedToServerId'
+  -> PostFirewallsResponseBody201FirewallAppliedToServer
+mkPostFirewallsResponseBody201FirewallAppliedToServer postFirewallsResponseBody201FirewallAppliedToServerId = PostFirewallsResponseBody201FirewallAppliedToServer{postFirewallsResponseBody201FirewallAppliedToServerId = postFirewallsResponseBody201FirewallAppliedToServerId}
+-- | Defines the enum schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.applied_to.items.properties.type@ in the specification.
 -- 
 -- Type of resource referenced
-data PostFirewallsResponseBody201FirewallAppliedToType
-    = PostFirewallsResponseBody201FirewallAppliedToTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsResponseBody201FirewallAppliedToTypeEnumTyped Data.Text.Internal.Text
-    | PostFirewallsResponseBody201FirewallAppliedToTypeEnumStringLabelSelector
-    | PostFirewallsResponseBody201FirewallAppliedToTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallAppliedToType
-    where toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PostFirewallsResponseBody201FirewallAppliedToType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                          then PostFirewallsResponseBody201FirewallAppliedToTypeEnumStringLabelSelector
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                then PostFirewallsResponseBody201FirewallAppliedToTypeEnumStringServer
-                                                else PostFirewallsResponseBody201FirewallAppliedToTypeEnumOther val)
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallLabels
--- 
--- User-defined labels (key-value pairs)
-data PostFirewallsResponseBody201FirewallLabels = PostFirewallsResponseBody201FirewallLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallLabels" (\obj -> GHC.Base.pure PostFirewallsResponseBody201FirewallLabels)
--- | Defines the data type for the schema PostFirewallsResponseBody201FirewallRules
+data PostFirewallsResponseBody201FirewallAppliedToType =
+   PostFirewallsResponseBody201FirewallAppliedToTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsResponseBody201FirewallAppliedToTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsResponseBody201FirewallAppliedToTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PostFirewallsResponseBody201FirewallAppliedToTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallAppliedToType
+    where toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeOther val) = val
+          toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeEnumServer) = "server"
+          toJSON (PostFirewallsResponseBody201FirewallAppliedToTypeEnumLabelSelector) = "label_selector"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallAppliedToType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> PostFirewallsResponseBody201FirewallAppliedToTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> PostFirewallsResponseBody201FirewallAppliedToTypeEnumLabelSelector
+                                            | GHC.Base.otherwise -> PostFirewallsResponseBody201FirewallAppliedToTypeOther val)
+-- | Defines the object schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.rules.items@ in the specification.
 -- 
 -- 
 data PostFirewallsResponseBody201FirewallRules = PostFirewallsResponseBody201FirewallRules {
@@ -525,7 +532,7 @@ data PostFirewallsResponseBody201FirewallRules = PostFirewallsResponseBody201Fir
   -- * Maximum length of 255
   postFirewallsResponseBody201FirewallRulesDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | destination_ips: List of permitted IPv4\/IPv6 addresses in CIDR notation. Use \`0.0.0.0\/0\` to allow all IPv4 addresses and \`::\/0\` to allow all IPv6 addresses. You can specify 100 CIDRs at most.
-  , postFirewallsResponseBody201FirewallRulesDestinationIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postFirewallsResponseBody201FirewallRulesDestinationIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | direction: Select traffic direction on which rule should be applied. Use \`source_ips\` for direction \`in\` and \`destination_ips\` for direction \`out\`.
   , postFirewallsResponseBody201FirewallRulesDirection :: PostFirewallsResponseBody201FirewallRulesDirection
   -- | port: Port or port range to which traffic will be allowed, only applicable for protocols TCP and UDP. A port range can be specified by separating two ports with a dash, e.g \`1024-5000\`.
@@ -533,63 +540,90 @@ data PostFirewallsResponseBody201FirewallRules = PostFirewallsResponseBody201Fir
   -- | protocol: Type of traffic to allow
   , postFirewallsResponseBody201FirewallRulesProtocol :: PostFirewallsResponseBody201FirewallRulesProtocol
   -- | source_ips: List of permitted IPv4\/IPv6 addresses in CIDR notation. Use \`0.0.0.0\/0\` to allow all IPv4 addresses and \`::\/0\` to allow all IPv6 addresses. You can specify 100 CIDRs at most.
-  , postFirewallsResponseBody201FirewallRulesSourceIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postFirewallsResponseBody201FirewallRulesSourceIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallRules
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (postFirewallsResponseBody201FirewallRulesDescription obj) : (Data.Aeson..=) "destination_ips" (postFirewallsResponseBody201FirewallRulesDestinationIps obj) : (Data.Aeson..=) "direction" (postFirewallsResponseBody201FirewallRulesDirection obj) : (Data.Aeson..=) "port" (postFirewallsResponseBody201FirewallRulesPort obj) : (Data.Aeson..=) "protocol" (postFirewallsResponseBody201FirewallRulesProtocol obj) : (Data.Aeson..=) "source_ips" (postFirewallsResponseBody201FirewallRulesSourceIps obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (postFirewallsResponseBody201FirewallRulesDescription obj) GHC.Base.<> ((Data.Aeson..=) "destination_ips" (postFirewallsResponseBody201FirewallRulesDestinationIps obj) GHC.Base.<> ((Data.Aeson..=) "direction" (postFirewallsResponseBody201FirewallRulesDirection obj) GHC.Base.<> ((Data.Aeson..=) "port" (postFirewallsResponseBody201FirewallRulesPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postFirewallsResponseBody201FirewallRulesProtocol obj) GHC.Base.<> (Data.Aeson..=) "source_ips" (postFirewallsResponseBody201FirewallRulesSourceIps obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallRules
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesDescription obj : "destination_ips" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesDestinationIps obj : "direction" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesDirection obj : "port" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesPort obj : "protocol" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesProtocol obj : "source_ips" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesSourceIps obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesDescription obj) GHC.Base.<> (("destination_ips" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesDestinationIps obj) GHC.Base.<> (("direction" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesDirection obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesProtocol obj) GHC.Base.<> ("source_ips" Data.Aeson.Types.ToJSON..= postFirewallsResponseBody201FirewallRulesSourceIps obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallRules
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFirewallsResponseBody201FirewallRules" (\obj -> (((((GHC.Base.pure PostFirewallsResponseBody201FirewallRules GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "destination_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "direction")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "source_ips"))
--- | Defines the enum schema PostFirewallsResponseBody201FirewallRulesDirection
+-- | Create a new 'PostFirewallsResponseBody201FirewallRules' with all required fields.
+mkPostFirewallsResponseBody201FirewallRules :: PostFirewallsResponseBody201FirewallRulesDirection -- ^ 'postFirewallsResponseBody201FirewallRulesDirection'
+  -> PostFirewallsResponseBody201FirewallRulesProtocol -- ^ 'postFirewallsResponseBody201FirewallRulesProtocol'
+  -> PostFirewallsResponseBody201FirewallRules
+mkPostFirewallsResponseBody201FirewallRules postFirewallsResponseBody201FirewallRulesDirection postFirewallsResponseBody201FirewallRulesProtocol = PostFirewallsResponseBody201FirewallRules{postFirewallsResponseBody201FirewallRulesDescription = GHC.Maybe.Nothing,
+                                                                                                                                                                                             postFirewallsResponseBody201FirewallRulesDestinationIps = GHC.Maybe.Nothing,
+                                                                                                                                                                                             postFirewallsResponseBody201FirewallRulesDirection = postFirewallsResponseBody201FirewallRulesDirection,
+                                                                                                                                                                                             postFirewallsResponseBody201FirewallRulesPort = GHC.Maybe.Nothing,
+                                                                                                                                                                                             postFirewallsResponseBody201FirewallRulesProtocol = postFirewallsResponseBody201FirewallRulesProtocol,
+                                                                                                                                                                                             postFirewallsResponseBody201FirewallRulesSourceIps = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.rules.items.properties.direction@ in the specification.
 -- 
 -- Select traffic direction on which rule should be applied. Use \`source_ips\` for direction \`in\` and \`destination_ips\` for direction \`out\`.
-data PostFirewallsResponseBody201FirewallRulesDirection
-    = PostFirewallsResponseBody201FirewallRulesDirectionEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsResponseBody201FirewallRulesDirectionEnumTyped Data.Text.Internal.Text
-    | PostFirewallsResponseBody201FirewallRulesDirectionEnumStringIn
-    | PostFirewallsResponseBody201FirewallRulesDirectionEnumStringOut
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallRulesDirection
-    where toJSON (PostFirewallsResponseBody201FirewallRulesDirectionEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallRulesDirectionEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallRulesDirectionEnumStringIn) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "in"
-          toJSON (PostFirewallsResponseBody201FirewallRulesDirectionEnumStringOut) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "out"
-instance Data.Aeson.FromJSON PostFirewallsResponseBody201FirewallRulesDirection
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "in")
-                                          then PostFirewallsResponseBody201FirewallRulesDirectionEnumStringIn
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "out")
-                                                then PostFirewallsResponseBody201FirewallRulesDirectionEnumStringOut
-                                                else PostFirewallsResponseBody201FirewallRulesDirectionEnumOther val)
--- | Defines the enum schema PostFirewallsResponseBody201FirewallRulesProtocol
+data PostFirewallsResponseBody201FirewallRulesDirection =
+   PostFirewallsResponseBody201FirewallRulesDirectionOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsResponseBody201FirewallRulesDirectionTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsResponseBody201FirewallRulesDirectionEnumIn -- ^ Represents the JSON value @"in"@
+  | PostFirewallsResponseBody201FirewallRulesDirectionEnumOut -- ^ Represents the JSON value @"out"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallRulesDirection
+    where toJSON (PostFirewallsResponseBody201FirewallRulesDirectionOther val) = val
+          toJSON (PostFirewallsResponseBody201FirewallRulesDirectionTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsResponseBody201FirewallRulesDirectionEnumIn) = "in"
+          toJSON (PostFirewallsResponseBody201FirewallRulesDirectionEnumOut) = "out"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallRulesDirection
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "in" -> PostFirewallsResponseBody201FirewallRulesDirectionEnumIn
+                                            | val GHC.Classes.== "out" -> PostFirewallsResponseBody201FirewallRulesDirectionEnumOut
+                                            | GHC.Base.otherwise -> PostFirewallsResponseBody201FirewallRulesDirectionOther val)
+-- | Defines the enum schema located at @paths.\/firewalls.POST.responses.201.content.application\/json.schema.properties.firewall.properties.rules.items.properties.protocol@ in the specification.
 -- 
 -- Type of traffic to allow
-data PostFirewallsResponseBody201FirewallRulesProtocol
-    = PostFirewallsResponseBody201FirewallRulesProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostFirewallsResponseBody201FirewallRulesProtocolEnumTyped Data.Text.Internal.Text
-    | PostFirewallsResponseBody201FirewallRulesProtocolEnumStringEsp
-    | PostFirewallsResponseBody201FirewallRulesProtocolEnumStringGre
-    | PostFirewallsResponseBody201FirewallRulesProtocolEnumStringIcmp
-    | PostFirewallsResponseBody201FirewallRulesProtocolEnumStringTcp
-    | PostFirewallsResponseBody201FirewallRulesProtocolEnumStringUdp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFirewallsResponseBody201FirewallRulesProtocol
-    where toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumStringEsp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "esp"
-          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumStringGre) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "gre"
-          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumStringIcmp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "icmp"
-          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumStringUdp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "udp"
-instance Data.Aeson.FromJSON PostFirewallsResponseBody201FirewallRulesProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "esp")
-                                          then PostFirewallsResponseBody201FirewallRulesProtocolEnumStringEsp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "gre")
-                                                then PostFirewallsResponseBody201FirewallRulesProtocolEnumStringGre
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "icmp")
-                                                      then PostFirewallsResponseBody201FirewallRulesProtocolEnumStringIcmp
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                            then PostFirewallsResponseBody201FirewallRulesProtocolEnumStringTcp
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "udp")
-                                                                  then PostFirewallsResponseBody201FirewallRulesProtocolEnumStringUdp
-                                                                  else PostFirewallsResponseBody201FirewallRulesProtocolEnumOther val)
+data PostFirewallsResponseBody201FirewallRulesProtocol =
+   PostFirewallsResponseBody201FirewallRulesProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFirewallsResponseBody201FirewallRulesProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFirewallsResponseBody201FirewallRulesProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostFirewallsResponseBody201FirewallRulesProtocolEnumUdp -- ^ Represents the JSON value @"udp"@
+  | PostFirewallsResponseBody201FirewallRulesProtocolEnumIcmp -- ^ Represents the JSON value @"icmp"@
+  | PostFirewallsResponseBody201FirewallRulesProtocolEnumEsp -- ^ Represents the JSON value @"esp"@
+  | PostFirewallsResponseBody201FirewallRulesProtocolEnumGre -- ^ Represents the JSON value @"gre"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFirewallsResponseBody201FirewallRulesProtocol
+    where toJSON (PostFirewallsResponseBody201FirewallRulesProtocolOther val) = val
+          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumTcp) = "tcp"
+          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumUdp) = "udp"
+          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumIcmp) = "icmp"
+          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumEsp) = "esp"
+          toJSON (PostFirewallsResponseBody201FirewallRulesProtocolEnumGre) = "gre"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFirewallsResponseBody201FirewallRulesProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostFirewallsResponseBody201FirewallRulesProtocolEnumTcp
+                                            | val GHC.Classes.== "udp" -> PostFirewallsResponseBody201FirewallRulesProtocolEnumUdp
+                                            | val GHC.Classes.== "icmp" -> PostFirewallsResponseBody201FirewallRulesProtocolEnumIcmp
+                                            | val GHC.Classes.== "esp" -> PostFirewallsResponseBody201FirewallRulesProtocolEnumEsp
+                                            | val GHC.Classes.== "gre" -> PostFirewallsResponseBody201FirewallRulesProtocolEnumGre
+                                            | GHC.Base.otherwise -> PostFirewallsResponseBody201FirewallRulesProtocolOther val)
+-- | > POST /firewalls
+-- 
+-- The same as 'postFirewalls' but accepts an explicit configuration.
+postFirewallsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostFirewallsRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostFirewallsResponse) -- ^ Monadic computation which returns the result of the operation
+postFirewallsWithConfiguration config
+                               body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFirewallsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                           PostFirewallsResponseBody201)
+                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /firewalls
+-- 
+-- The same as 'postFirewalls' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postFirewallsRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostFirewallsRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postFirewallsRaw body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /firewalls
+-- 
+-- The same as 'postFirewalls' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postFirewallsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostFirewallsRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postFirewallsWithConfigurationRaw config
+                                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/firewalls") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

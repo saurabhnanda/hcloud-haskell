@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postFloatingIps_Id_ActionsAssign
 module HCloud.Operations.PostFloatingIpsIdActionsAssign where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,77 +45,38 @@ import HCloud.Types
 -- | > POST /floating_ips/{id}/actions/assign
 -- 
 -- Assigns a Floating IP to a Server.
-postFloatingIps_Id_ActionsAssign :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                     -- ^ id: ID of the Floating IP
-  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsAssignResponse))   -- ^ Monad containing the result of the operation
-postFloatingIps_Id_ActionsAssign config
-                                 id
-                                 body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsAssignResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsAssignResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                              PostFloatingIpsIdActionsAssignResponseBody201)
-                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /floating_ips/{id}/actions/assign
--- 
--- The same as 'postFloatingIps_Id_ActionsAssign' but returns the raw 'Data.ByteString.Char8.ByteString'
-postFloatingIps_Id_ActionsAssignRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                     HCloud.Common.SecurityScheme s) =>
-                                       HCloud.Common.Configuration s ->
-                                       GHC.Integer.Type.Integer ->
-                                       GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody ->
-                                       m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postFloatingIps_Id_ActionsAssignRaw config
-                                    id
-                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /floating_ips/{id}/actions/assign
--- 
--- Monadic version of 'postFloatingIps_Id_ActionsAssign' (use with 'HCloud.Common.runWithConfiguration')
-postFloatingIps_Id_ActionsAssignM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                   HCloud.Common.SecurityScheme s) =>
-                                     GHC.Integer.Type.Integer ->
-                                     GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody ->
-                                     Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                        m
-                                                                        (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                            (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsAssignResponse))
-postFloatingIps_Id_ActionsAssignM id
-                                  body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsAssignResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsAssignResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                               PostFloatingIpsIdActionsAssignResponseBody201)
-                                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /floating_ips/{id}/actions/assign
--- 
--- Monadic version of 'postFloatingIps_Id_ActionsAssignRaw' (use with 'HCloud.Common.runWithConfiguration')
-postFloatingIps_Id_ActionsAssignRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                      HCloud.Common.SecurityScheme s) =>
-                                        GHC.Integer.Type.Integer ->
-                                        GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody ->
-                                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                           m
-                                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postFloatingIps_Id_ActionsAssignRawM id
-                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postFloatingIps_Id_ActionsAssignRequestBody
+postFloatingIps_Id_ActionsAssign :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsAssignResponse) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsAssign id
+                                 body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsAssignResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsAssignResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                               PostFloatingIpsIdActionsAssignResponseBody201)
+                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/assign.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsAssignRequestBody = PostFloatingIpsIdActionsAssignRequestBody {
   -- | server: ID of the Server the Floating IP shall be assigned to
-  postFloatingIpsIdActionsAssignRequestBodyServer :: GHC.Integer.Type.Integer
+  postFloatingIpsIdActionsAssignRequestBodyServer :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsAssignRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "server" (postFloatingIpsIdActionsAssignRequestBodyServer obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "server" (postFloatingIpsIdActionsAssignRequestBodyServer obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsAssignRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("server" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignRequestBodyServer obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("server" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignRequestBodyServer obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsAssignRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsAssignRequestBody" (\obj -> GHC.Base.pure PostFloatingIpsIdActionsAssignRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server"))
+-- | Create a new 'PostFloatingIpsIdActionsAssignRequestBody' with all required fields.
+mkPostFloatingIpsIdActionsAssignRequestBody :: GHC.Types.Int -- ^ 'postFloatingIpsIdActionsAssignRequestBodyServer'
+  -> PostFloatingIpsIdActionsAssignRequestBody
+mkPostFloatingIpsIdActionsAssignRequestBody postFloatingIpsIdActionsAssignRequestBodyServer = PostFloatingIpsIdActionsAssignRequestBody{postFloatingIpsIdActionsAssignRequestBodyServer = postFloatingIpsIdActionsAssignRequestBodyServer}
 -- | Represents a response of the operation 'postFloatingIps_Id_ActionsAssign'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostFloatingIpsIdActionsAssignResponseError' is used.
-data PostFloatingIpsIdActionsAssignResponse =                                                
-   PostFloatingIpsIdActionsAssignResponseError GHC.Base.String                               -- ^ Means either no matching case available or a parse error
-  | PostFloatingIpsIdActionsAssignResponse201 PostFloatingIpsIdActionsAssignResponseBody201  -- ^ The \`action\` key contains the \`assign\` Action
+data PostFloatingIpsIdActionsAssignResponse =
+   PostFloatingIpsIdActionsAssignResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostFloatingIpsIdActionsAssignResponse201 PostFloatingIpsIdActionsAssignResponseBody201 -- ^ The \`action\` key contains the \`assign\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostFloatingIpsIdActionsAssignResponseBody201
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/assign.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsAssignResponseBody201 = PostFloatingIpsIdActionsAssignResponseBody201 {
@@ -123,39 +84,61 @@ data PostFloatingIpsIdActionsAssignResponseBody201 = PostFloatingIpsIdActionsAss
   postFloatingIpsIdActionsAssignResponseBody201Action :: PostFloatingIpsIdActionsAssignResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsAssignResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postFloatingIpsIdActionsAssignResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postFloatingIpsIdActionsAssignResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsAssignResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsAssignResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsAssignResponseBody201" (\obj -> GHC.Base.pure PostFloatingIpsIdActionsAssignResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostFloatingIpsIdActionsAssignResponseBody201Action
+-- | Create a new 'PostFloatingIpsIdActionsAssignResponseBody201' with all required fields.
+mkPostFloatingIpsIdActionsAssignResponseBody201 :: PostFloatingIpsIdActionsAssignResponseBody201Action -- ^ 'postFloatingIpsIdActionsAssignResponseBody201Action'
+  -> PostFloatingIpsIdActionsAssignResponseBody201
+mkPostFloatingIpsIdActionsAssignResponseBody201 postFloatingIpsIdActionsAssignResponseBody201Action = PostFloatingIpsIdActionsAssignResponseBody201{postFloatingIpsIdActionsAssignResponseBody201Action = postFloatingIpsIdActionsAssignResponseBody201Action}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/assign.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsAssignResponseBody201Action = PostFloatingIpsIdActionsAssignResponseBody201Action {
   -- | command: Command executed in the Action
   postFloatingIpsIdActionsAssignResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postFloatingIpsIdActionsAssignResponseBody201ActionError :: PostFloatingIpsIdActionsAssignResponseBody201ActionError
+  , postFloatingIpsIdActionsAssignResponseBody201ActionError :: (GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postFloatingIpsIdActionsAssignResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postFloatingIpsIdActionsAssignResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postFloatingIpsIdActionsAssignResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postFloatingIpsIdActionsAssignResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postFloatingIpsIdActionsAssignResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postFloatingIpsIdActionsAssignResponseBody201ActionResources :: ([] PostFloatingIpsIdActionsAssignResponseBody201ActionResources)
+  , postFloatingIpsIdActionsAssignResponseBody201ActionResources :: ([PostFloatingIpsIdActionsAssignResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postFloatingIpsIdActionsAssignResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postFloatingIpsIdActionsAssignResponseBody201ActionStatus :: PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsAssignResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postFloatingIpsIdActionsAssignResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postFloatingIpsIdActionsAssignResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postFloatingIpsIdActionsAssignResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postFloatingIpsIdActionsAssignResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postFloatingIpsIdActionsAssignResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postFloatingIpsIdActionsAssignResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postFloatingIpsIdActionsAssignResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postFloatingIpsIdActionsAssignResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postFloatingIpsIdActionsAssignResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postFloatingIpsIdActionsAssignResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postFloatingIpsIdActionsAssignResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postFloatingIpsIdActionsAssignResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postFloatingIpsIdActionsAssignResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postFloatingIpsIdActionsAssignResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postFloatingIpsIdActionsAssignResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postFloatingIpsIdActionsAssignResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsAssignResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsAssignResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsAssignResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostFloatingIpsIdActionsAssignResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostFloatingIpsIdActionsAssignResponseBody201ActionError
+-- | Create a new 'PostFloatingIpsIdActionsAssignResponseBody201Action' with all required fields.
+mkPostFloatingIpsIdActionsAssignResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignResponseBody201ActionError -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionProgress'
+  -> [PostFloatingIpsIdActionsAssignResponseBody201ActionResources] -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionStarted'
+  -> PostFloatingIpsIdActionsAssignResponseBody201ActionStatus -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionStatus'
+  -> PostFloatingIpsIdActionsAssignResponseBody201Action
+mkPostFloatingIpsIdActionsAssignResponseBody201Action postFloatingIpsIdActionsAssignResponseBody201ActionCommand postFloatingIpsIdActionsAssignResponseBody201ActionError postFloatingIpsIdActionsAssignResponseBody201ActionFinished postFloatingIpsIdActionsAssignResponseBody201ActionId postFloatingIpsIdActionsAssignResponseBody201ActionProgress postFloatingIpsIdActionsAssignResponseBody201ActionResources postFloatingIpsIdActionsAssignResponseBody201ActionStarted postFloatingIpsIdActionsAssignResponseBody201ActionStatus = PostFloatingIpsIdActionsAssignResponseBody201Action{postFloatingIpsIdActionsAssignResponseBody201ActionCommand = postFloatingIpsIdActionsAssignResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionError = postFloatingIpsIdActionsAssignResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionFinished = postFloatingIpsIdActionsAssignResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionId = postFloatingIpsIdActionsAssignResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionProgress = postFloatingIpsIdActionsAssignResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionResources = postFloatingIpsIdActionsAssignResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionStarted = postFloatingIpsIdActionsAssignResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postFloatingIpsIdActionsAssignResponseBody201ActionStatus = postFloatingIpsIdActionsAssignResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/assign.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostFloatingIpsIdActionsAssignResponseBody201ActionError = PostFloatingIpsIdActionsAssignResponseBody201ActionError {
@@ -165,47 +148,86 @@ data PostFloatingIpsIdActionsAssignResponseBody201ActionError = PostFloatingIpsI
   , postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsAssignResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsAssignResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsAssignResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsAssignResponseBody201ActionError" (\obj -> (GHC.Base.pure PostFloatingIpsIdActionsAssignResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostFloatingIpsIdActionsAssignResponseBody201ActionResources
+-- | Create a new 'PostFloatingIpsIdActionsAssignResponseBody201ActionError' with all required fields.
+mkPostFloatingIpsIdActionsAssignResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage'
+  -> PostFloatingIpsIdActionsAssignResponseBody201ActionError
+mkPostFloatingIpsIdActionsAssignResponseBody201ActionError postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage = PostFloatingIpsIdActionsAssignResponseBody201ActionError{postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode = postFloatingIpsIdActionsAssignResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                   postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage = postFloatingIpsIdActionsAssignResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/assign.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsAssignResponseBody201ActionResources = PostFloatingIpsIdActionsAssignResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsAssignResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsAssignResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsAssignResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsAssignResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostFloatingIpsIdActionsAssignResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
+-- | Create a new 'PostFloatingIpsIdActionsAssignResponseBody201ActionResources' with all required fields.
+mkPostFloatingIpsIdActionsAssignResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType'
+  -> PostFloatingIpsIdActionsAssignResponseBody201ActionResources
+mkPostFloatingIpsIdActionsAssignResponseBody201ActionResources postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType = PostFloatingIpsIdActionsAssignResponseBody201ActionResources{postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId = postFloatingIpsIdActionsAssignResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                              postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType = postFloatingIpsIdActionsAssignResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/floating_ips\/{id}\/actions\/assign.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
-    = PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringError
-    | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringRunning
-    | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
-    where toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumOther val)
+data PostFloatingIpsIdActionsAssignResponseBody201ActionStatus =
+   PostFloatingIpsIdActionsAssignResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
+    where toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusOther val) = val
+          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsAssignResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostFloatingIpsIdActionsAssignResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostFloatingIpsIdActionsAssignResponseBody201ActionStatusOther val)
+-- | > POST /floating_ips/{id}/actions/assign
+-- 
+-- The same as 'postFloatingIps_Id_ActionsAssign' but accepts an explicit configuration.
+postFloatingIps_Id_ActionsAssignWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsAssignResponse) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsAssignWithConfiguration config
+                                                  id
+                                                  body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsAssignResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsAssignResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                PostFloatingIpsIdActionsAssignResponseBody201)
+                                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /floating_ips/{id}/actions/assign
+-- 
+-- The same as 'postFloatingIps_Id_ActionsAssign' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postFloatingIps_Id_ActionsAssignRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsAssignRaw id
+                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /floating_ips/{id}/actions/assign
+-- 
+-- The same as 'postFloatingIps_Id_ActionsAssign' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postFloatingIps_Id_ActionsAssignWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsAssignRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsAssignWithConfigurationRaw config
+                                                     id
+                                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/assign"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

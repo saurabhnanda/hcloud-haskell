@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postVolumes
 module HCloud.Operations.PostVolumes where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -57,49 +57,12 @@ import HCloud.Types
 -- | Code                                | Description                                         |
 -- |-------------------------------------|-----------------------------------------------------|
 -- | \`no_space_left_in_location\`         | There is no volume space left in the given location |
-postVolumes :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe PostVolumesRequestBody                                                                                  -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostVolumesResponse)) -- ^ Monad containing the result of the operation
-postVolumes config
-            body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostVolumesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                   PostVolumesResponseBody201)
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /volumes
--- 
--- The same as 'postVolumes' but returns the raw 'Data.ByteString.Char8.ByteString'
-postVolumesRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  HCloud.Common.Configuration s ->
-                  GHC.Maybe.Maybe PostVolumesRequestBody ->
-                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postVolumesRaw config
-               body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /volumes
--- 
--- Monadic version of 'postVolumes' (use with 'HCloud.Common.runWithConfiguration')
-postVolumesM :: forall m s . (HCloud.Common.MonadHTTP m,
-                              HCloud.Common.SecurityScheme s) =>
-                GHC.Maybe.Maybe PostVolumesRequestBody ->
-                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                   m
-                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response PostVolumesResponse))
-postVolumesM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostVolumesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                    PostVolumesResponseBody201)
-                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /volumes
--- 
--- Monadic version of 'postVolumesRaw' (use with 'HCloud.Common.runWithConfiguration')
-postVolumesRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Maybe.Maybe PostVolumesRequestBody ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postVolumesRawM body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postVolumesRequestBody
+postVolumes :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostVolumesRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostVolumesResponse) -- ^ Monadic computation which returns the result of the operation
+postVolumes body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostVolumesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                    PostVolumesResponseBody201)
+                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/volumes.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostVolumesRequestBody = PostVolumesRequestBody {
@@ -108,86 +71,111 @@ data PostVolumesRequestBody = PostVolumesRequestBody {
   -- | format: Format Volume after creation. One of: \`xfs\`, \`ext4\`
   , postVolumesRequestBodyFormat :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | labels: User-defined labels (key-value pairs)
-  , postVolumesRequestBodyLabels :: (GHC.Maybe.Maybe PostVolumesRequestBodyLabels)
+  , postVolumesRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | location: Location to create the Volume in (can be omitted if Server is specified)
   , postVolumesRequestBodyLocation :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | name: Name of the volume
   , postVolumesRequestBodyName :: Data.Text.Internal.Text
   -- | server: Server to which to attach the Volume once it\'s created (Volume will be created in the same Location as the server)
-  , postVolumesRequestBodyServer :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , postVolumesRequestBodyServer :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | size: Size of the Volume in GB
-  , postVolumesRequestBodySize :: GHC.Integer.Type.Integer
+  , postVolumesRequestBodySize :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "automount" (postVolumesRequestBodyAutomount obj) : (Data.Aeson..=) "format" (postVolumesRequestBodyFormat obj) : (Data.Aeson..=) "labels" (postVolumesRequestBodyLabels obj) : (Data.Aeson..=) "location" (postVolumesRequestBodyLocation obj) : (Data.Aeson..=) "name" (postVolumesRequestBodyName obj) : (Data.Aeson..=) "server" (postVolumesRequestBodyServer obj) : (Data.Aeson..=) "size" (postVolumesRequestBodySize obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "automount" (postVolumesRequestBodyAutomount obj) GHC.Base.<> ((Data.Aeson..=) "format" (postVolumesRequestBodyFormat obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postVolumesRequestBodyLabels obj) GHC.Base.<> ((Data.Aeson..=) "location" (postVolumesRequestBodyLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (postVolumesRequestBodyName obj) GHC.Base.<> ((Data.Aeson..=) "server" (postVolumesRequestBodyServer obj) GHC.Base.<> (Data.Aeson..=) "size" (postVolumesRequestBodySize obj)))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("automount" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyAutomount obj : "format" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyFormat obj : "labels" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyLabels obj : "location" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyLocation obj : "name" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyName obj : "server" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyServer obj : "size" Data.Aeson.Types.ToJSON..= postVolumesRequestBodySize obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("automount" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyAutomount obj) GHC.Base.<> (("format" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyFormat obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyLabels obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyName obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postVolumesRequestBodyServer obj) GHC.Base.<> ("size" Data.Aeson.Types.ToJSON..= postVolumesRequestBodySize obj)))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesRequestBody" (\obj -> ((((((GHC.Base.pure PostVolumesRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "automount")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "format")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "size"))
--- | Defines the data type for the schema postVolumesRequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PostVolumesRequestBodyLabels = PostVolumesRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesRequestBodyLabels" (\obj -> GHC.Base.pure PostVolumesRequestBodyLabels)
+-- | Create a new 'PostVolumesRequestBody' with all required fields.
+mkPostVolumesRequestBody :: Data.Text.Internal.Text -- ^ 'postVolumesRequestBodyName'
+  -> GHC.Types.Int -- ^ 'postVolumesRequestBodySize'
+  -> PostVolumesRequestBody
+mkPostVolumesRequestBody postVolumesRequestBodyName postVolumesRequestBodySize = PostVolumesRequestBody{postVolumesRequestBodyAutomount = GHC.Maybe.Nothing,
+                                                                                                        postVolumesRequestBodyFormat = GHC.Maybe.Nothing,
+                                                                                                        postVolumesRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                                        postVolumesRequestBodyLocation = GHC.Maybe.Nothing,
+                                                                                                        postVolumesRequestBodyName = postVolumesRequestBodyName,
+                                                                                                        postVolumesRequestBodyServer = GHC.Maybe.Nothing,
+                                                                                                        postVolumesRequestBodySize = postVolumesRequestBodySize}
 -- | Represents a response of the operation 'postVolumes'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostVolumesResponseError' is used.
-data PostVolumesResponse =                             
-   PostVolumesResponseError GHC.Base.String            -- ^ Means either no matching case available or a parse error
-  | PostVolumesResponse201 PostVolumesResponseBody201  -- ^ The \`volume\` key contains the Volume that was just created  The \`action\` key contains the Action tracking Volume creation 
+data PostVolumesResponse =
+   PostVolumesResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostVolumesResponse201 PostVolumesResponseBody201 -- ^ The \`volume\` key contains the Volume that was just created  The \`action\` key contains the Action tracking Volume creation 
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostVolumesResponseBody201
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostVolumesResponseBody201 = PostVolumesResponseBody201 {
   -- | action
   postVolumesResponseBody201Action :: PostVolumesResponseBody201Action
   -- | next_actions
-  , postVolumesResponseBody201NextActions :: ([] PostVolumesResponseBody201NextActions)
+  , postVolumesResponseBody201NextActions :: ([PostVolumesResponseBody201NextActions])
   -- | volume
   , postVolumesResponseBody201Volume :: PostVolumesResponseBody201Volume
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postVolumesResponseBody201Action obj) : (Data.Aeson..=) "next_actions" (postVolumesResponseBody201NextActions obj) : (Data.Aeson..=) "volume" (postVolumesResponseBody201Volume obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postVolumesResponseBody201Action obj) GHC.Base.<> ((Data.Aeson..=) "next_actions" (postVolumesResponseBody201NextActions obj) GHC.Base.<> (Data.Aeson..=) "volume" (postVolumesResponseBody201Volume obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201Action obj : "next_actions" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActions obj : "volume" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201Volume obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201Action obj) GHC.Base.<> (("next_actions" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActions obj) GHC.Base.<> ("volume" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201Volume obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201" (\obj -> ((GHC.Base.pure PostVolumesResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "volume"))
--- | Defines the data type for the schema PostVolumesResponseBody201Action
+-- | Create a new 'PostVolumesResponseBody201' with all required fields.
+mkPostVolumesResponseBody201 :: PostVolumesResponseBody201Action -- ^ 'postVolumesResponseBody201Action'
+  -> [PostVolumesResponseBody201NextActions] -- ^ 'postVolumesResponseBody201NextActions'
+  -> PostVolumesResponseBody201Volume -- ^ 'postVolumesResponseBody201Volume'
+  -> PostVolumesResponseBody201
+mkPostVolumesResponseBody201 postVolumesResponseBody201Action postVolumesResponseBody201NextActions postVolumesResponseBody201Volume = PostVolumesResponseBody201{postVolumesResponseBody201Action = postVolumesResponseBody201Action,
+                                                                                                                                                                  postVolumesResponseBody201NextActions = postVolumesResponseBody201NextActions,
+                                                                                                                                                                  postVolumesResponseBody201Volume = postVolumesResponseBody201Volume}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostVolumesResponseBody201Action = PostVolumesResponseBody201Action {
   -- | command: Command executed in the Action
   postVolumesResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postVolumesResponseBody201ActionError :: PostVolumesResponseBody201ActionError
+  , postVolumesResponseBody201ActionError :: (GHC.Maybe.Maybe PostVolumesResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postVolumesResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postVolumesResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postVolumesResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postVolumesResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postVolumesResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postVolumesResponseBody201ActionResources :: ([] PostVolumesResponseBody201ActionResources)
+  , postVolumesResponseBody201ActionResources :: ([PostVolumesResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postVolumesResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postVolumesResponseBody201ActionStatus :: PostVolumesResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postVolumesResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postVolumesResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postVolumesResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postVolumesResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postVolumesResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postVolumesResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postVolumesResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postVolumesResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postVolumesResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postVolumesResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postVolumesResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postVolumesResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postVolumesResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postVolumesResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postVolumesResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postVolumesResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostVolumesResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostVolumesResponseBody201ActionError
+-- | Create a new 'PostVolumesResponseBody201Action' with all required fields.
+mkPostVolumesResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostVolumesResponseBody201ActionError -- ^ 'postVolumesResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postVolumesResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postVolumesResponseBody201ActionProgress'
+  -> [PostVolumesResponseBody201ActionResources] -- ^ 'postVolumesResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201ActionStarted'
+  -> PostVolumesResponseBody201ActionStatus -- ^ 'postVolumesResponseBody201ActionStatus'
+  -> PostVolumesResponseBody201Action
+mkPostVolumesResponseBody201Action postVolumesResponseBody201ActionCommand postVolumesResponseBody201ActionError postVolumesResponseBody201ActionFinished postVolumesResponseBody201ActionId postVolumesResponseBody201ActionProgress postVolumesResponseBody201ActionResources postVolumesResponseBody201ActionStarted postVolumesResponseBody201ActionStatus = PostVolumesResponseBody201Action{postVolumesResponseBody201ActionCommand = postVolumesResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionError = postVolumesResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionFinished = postVolumesResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionId = postVolumesResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionProgress = postVolumesResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionResources = postVolumesResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionStarted = postVolumesResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                  postVolumesResponseBody201ActionStatus = postVolumesResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostVolumesResponseBody201ActionError = PostVolumesResponseBody201ActionError {
@@ -197,78 +185,105 @@ data PostVolumesResponseBody201ActionError = PostVolumesResponseBody201ActionErr
   , postVolumesResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postVolumesResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postVolumesResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postVolumesResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postVolumesResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201ActionError" (\obj -> (GHC.Base.pure PostVolumesResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostVolumesResponseBody201ActionResources
+-- | Create a new 'PostVolumesResponseBody201ActionError' with all required fields.
+mkPostVolumesResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201ActionErrorMessage'
+  -> PostVolumesResponseBody201ActionError
+mkPostVolumesResponseBody201ActionError postVolumesResponseBody201ActionErrorCode postVolumesResponseBody201ActionErrorMessage = PostVolumesResponseBody201ActionError{postVolumesResponseBody201ActionErrorCode = postVolumesResponseBody201ActionErrorCode,
+                                                                                                                                                                       postVolumesResponseBody201ActionErrorMessage = postVolumesResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostVolumesResponseBody201ActionResources = PostVolumesResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postVolumesResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postVolumesResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postVolumesResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postVolumesResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postVolumesResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postVolumesResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postVolumesResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostVolumesResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostVolumesResponseBody201ActionStatus
+-- | Create a new 'PostVolumesResponseBody201ActionResources' with all required fields.
+mkPostVolumesResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postVolumesResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201ActionResourcesType'
+  -> PostVolumesResponseBody201ActionResources
+mkPostVolumesResponseBody201ActionResources postVolumesResponseBody201ActionResourcesId postVolumesResponseBody201ActionResourcesType = PostVolumesResponseBody201ActionResources{postVolumesResponseBody201ActionResourcesId = postVolumesResponseBody201ActionResourcesId,
+                                                                                                                                                                                  postVolumesResponseBody201ActionResourcesType = postVolumesResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostVolumesResponseBody201ActionStatus
-    = PostVolumesResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostVolumesResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostVolumesResponseBody201ActionStatusEnumStringError
-    | PostVolumesResponseBody201ActionStatusEnumStringRunning
-    | PostVolumesResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201ActionStatus
-    where toJSON (PostVolumesResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostVolumesResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostVolumesResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostVolumesResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostVolumesResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostVolumesResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostVolumesResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostVolumesResponseBody201ActionStatusEnumOther val)
--- | Defines the data type for the schema PostVolumesResponseBody201Next_actions
+data PostVolumesResponseBody201ActionStatus =
+   PostVolumesResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostVolumesResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostVolumesResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostVolumesResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostVolumesResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201ActionStatus
+    where toJSON (PostVolumesResponseBody201ActionStatusOther val) = val
+          toJSON (PostVolumesResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostVolumesResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostVolumesResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostVolumesResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostVolumesResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostVolumesResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostVolumesResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostVolumesResponseBody201ActionStatusOther val)
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.next_actions.items@ in the specification.
 -- 
 -- 
 data PostVolumesResponseBody201NextActions = PostVolumesResponseBody201NextActions {
   -- | command: Command executed in the Action
   postVolumesResponseBody201NextActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postVolumesResponseBody201NextActionsError :: PostVolumesResponseBody201NextActionsError
+  , postVolumesResponseBody201NextActionsError :: (GHC.Maybe.Maybe PostVolumesResponseBody201NextActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postVolumesResponseBody201NextActionsFinished :: Data.Text.Internal.Text
+  , postVolumesResponseBody201NextActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postVolumesResponseBody201NextActionsId :: GHC.Integer.Type.Integer
+  , postVolumesResponseBody201NextActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postVolumesResponseBody201NextActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postVolumesResponseBody201NextActionsResources :: ([] PostVolumesResponseBody201NextActionsResources)
+  , postVolumesResponseBody201NextActionsResources :: ([PostVolumesResponseBody201NextActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postVolumesResponseBody201NextActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postVolumesResponseBody201NextActionsStatus :: PostVolumesResponseBody201NextActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201NextActions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postVolumesResponseBody201NextActionsCommand obj) : (Data.Aeson..=) "error" (postVolumesResponseBody201NextActionsError obj) : (Data.Aeson..=) "finished" (postVolumesResponseBody201NextActionsFinished obj) : (Data.Aeson..=) "id" (postVolumesResponseBody201NextActionsId obj) : (Data.Aeson..=) "progress" (postVolumesResponseBody201NextActionsProgress obj) : (Data.Aeson..=) "resources" (postVolumesResponseBody201NextActionsResources obj) : (Data.Aeson..=) "started" (postVolumesResponseBody201NextActionsStarted obj) : (Data.Aeson..=) "status" (postVolumesResponseBody201NextActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postVolumesResponseBody201NextActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postVolumesResponseBody201NextActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postVolumesResponseBody201NextActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postVolumesResponseBody201NextActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postVolumesResponseBody201NextActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postVolumesResponseBody201NextActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postVolumesResponseBody201NextActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postVolumesResponseBody201NextActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201NextActions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsError obj : "finished" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsId obj : "progress" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsResources obj : "started" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201NextActions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201NextActions" (\obj -> (((((((GHC.Base.pure PostVolumesResponseBody201NextActions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostVolumesResponseBody201Next_actionsError
+-- | Create a new 'PostVolumesResponseBody201NextActions' with all required fields.
+mkPostVolumesResponseBody201NextActions :: Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201NextActionsCommand'
+  -> GHC.Maybe.Maybe PostVolumesResponseBody201NextActionsError -- ^ 'postVolumesResponseBody201NextActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201NextActionsFinished'
+  -> GHC.Types.Int -- ^ 'postVolumesResponseBody201NextActionsId'
+  -> GHC.Types.Double -- ^ 'postVolumesResponseBody201NextActionsProgress'
+  -> [PostVolumesResponseBody201NextActionsResources] -- ^ 'postVolumesResponseBody201NextActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201NextActionsStarted'
+  -> PostVolumesResponseBody201NextActionsStatus -- ^ 'postVolumesResponseBody201NextActionsStatus'
+  -> PostVolumesResponseBody201NextActions
+mkPostVolumesResponseBody201NextActions postVolumesResponseBody201NextActionsCommand postVolumesResponseBody201NextActionsError postVolumesResponseBody201NextActionsFinished postVolumesResponseBody201NextActionsId postVolumesResponseBody201NextActionsProgress postVolumesResponseBody201NextActionsResources postVolumesResponseBody201NextActionsStarted postVolumesResponseBody201NextActionsStatus = PostVolumesResponseBody201NextActions{postVolumesResponseBody201NextActionsCommand = postVolumesResponseBody201NextActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsError = postVolumesResponseBody201NextActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsFinished = postVolumesResponseBody201NextActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsId = postVolumesResponseBody201NextActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsProgress = postVolumesResponseBody201NextActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsResources = postVolumesResponseBody201NextActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsStarted = postVolumesResponseBody201NextActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postVolumesResponseBody201NextActionsStatus = postVolumesResponseBody201NextActionsStatus}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.next_actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostVolumesResponseBody201NextActionsError = PostVolumesResponseBody201NextActionsError {
@@ -278,62 +293,71 @@ data PostVolumesResponseBody201NextActionsError = PostVolumesResponseBody201Next
   , postVolumesResponseBody201NextActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201NextActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postVolumesResponseBody201NextActionsErrorCode obj) : (Data.Aeson..=) "message" (postVolumesResponseBody201NextActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postVolumesResponseBody201NextActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postVolumesResponseBody201NextActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201NextActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201NextActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201NextActionsError" (\obj -> (GHC.Base.pure PostVolumesResponseBody201NextActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostVolumesResponseBody201Next_actionsResources
+-- | Create a new 'PostVolumesResponseBody201NextActionsError' with all required fields.
+mkPostVolumesResponseBody201NextActionsError :: Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201NextActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201NextActionsErrorMessage'
+  -> PostVolumesResponseBody201NextActionsError
+mkPostVolumesResponseBody201NextActionsError postVolumesResponseBody201NextActionsErrorCode postVolumesResponseBody201NextActionsErrorMessage = PostVolumesResponseBody201NextActionsError{postVolumesResponseBody201NextActionsErrorCode = postVolumesResponseBody201NextActionsErrorCode,
+                                                                                                                                                                                           postVolumesResponseBody201NextActionsErrorMessage = postVolumesResponseBody201NextActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.next_actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostVolumesResponseBody201NextActionsResources = PostVolumesResponseBody201NextActionsResources {
   -- | id: ID of the Resource
-  postVolumesResponseBody201NextActionsResourcesId :: GHC.Integer.Type.Integer
+  postVolumesResponseBody201NextActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postVolumesResponseBody201NextActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201NextActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postVolumesResponseBody201NextActionsResourcesId obj) : (Data.Aeson..=) "type" (postVolumesResponseBody201NextActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postVolumesResponseBody201NextActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postVolumesResponseBody201NextActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201NextActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201NextActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201NextActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201NextActionsResources" (\obj -> (GHC.Base.pure PostVolumesResponseBody201NextActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostVolumesResponseBody201Next_actionsStatus
+-- | Create a new 'PostVolumesResponseBody201NextActionsResources' with all required fields.
+mkPostVolumesResponseBody201NextActionsResources :: GHC.Types.Int -- ^ 'postVolumesResponseBody201NextActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201NextActionsResourcesType'
+  -> PostVolumesResponseBody201NextActionsResources
+mkPostVolumesResponseBody201NextActionsResources postVolumesResponseBody201NextActionsResourcesId postVolumesResponseBody201NextActionsResourcesType = PostVolumesResponseBody201NextActionsResources{postVolumesResponseBody201NextActionsResourcesId = postVolumesResponseBody201NextActionsResourcesId,
+                                                                                                                                                                                                      postVolumesResponseBody201NextActionsResourcesType = postVolumesResponseBody201NextActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.next_actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostVolumesResponseBody201NextActionsStatus
-    = PostVolumesResponseBody201NextActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostVolumesResponseBody201NextActionsStatusEnumTyped Data.Text.Internal.Text
-    | PostVolumesResponseBody201NextActionsStatusEnumStringError
-    | PostVolumesResponseBody201NextActionsStatusEnumStringRunning
-    | PostVolumesResponseBody201NextActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201NextActionsStatus
-    where toJSON (PostVolumesResponseBody201NextActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesResponseBody201NextActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesResponseBody201NextActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostVolumesResponseBody201NextActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostVolumesResponseBody201NextActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostVolumesResponseBody201NextActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostVolumesResponseBody201NextActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostVolumesResponseBody201NextActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostVolumesResponseBody201NextActionsStatusEnumStringSuccess
-                                                      else PostVolumesResponseBody201NextActionsStatusEnumOther val)
--- | Defines the data type for the schema PostVolumesResponseBody201Volume
+data PostVolumesResponseBody201NextActionsStatus =
+   PostVolumesResponseBody201NextActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostVolumesResponseBody201NextActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostVolumesResponseBody201NextActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostVolumesResponseBody201NextActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostVolumesResponseBody201NextActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201NextActionsStatus
+    where toJSON (PostVolumesResponseBody201NextActionsStatusOther val) = val
+          toJSON (PostVolumesResponseBody201NextActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostVolumesResponseBody201NextActionsStatusEnumSuccess) = "success"
+          toJSON (PostVolumesResponseBody201NextActionsStatusEnumRunning) = "running"
+          toJSON (PostVolumesResponseBody201NextActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201NextActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostVolumesResponseBody201NextActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostVolumesResponseBody201NextActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostVolumesResponseBody201NextActionsStatusEnumError
+                                            | GHC.Base.otherwise -> PostVolumesResponseBody201NextActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.volume@ in the specification.
 -- 
 -- 
 data PostVolumesResponseBody201Volume = PostVolumesResponseBody201Volume {
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   postVolumesResponseBody201VolumeCreated :: Data.Text.Internal.Text
   -- | format: Filesystem of the Volume if formatted on creation, null if not formatted on creation
-  , postVolumesResponseBody201VolumeFormat :: Data.Text.Internal.Text
+  , postVolumesResponseBody201VolumeFormat :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postVolumesResponseBody201VolumeId :: GHC.Integer.Type.Integer
+  , postVolumesResponseBody201VolumeId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , postVolumesResponseBody201VolumeLabels :: PostVolumesResponseBody201VolumeLabels
+  , postVolumesResponseBody201VolumeLabels :: Data.Aeson.Types.Internal.Object
   -- | linux_device: Device path on the file system for the Volume
   , postVolumesResponseBody201VolumeLinuxDevice :: Data.Text.Internal.Text
   -- | location: Location of the Volume. Volume can only be attached to Servers in the same Location.
@@ -343,31 +367,43 @@ data PostVolumesResponseBody201Volume = PostVolumesResponseBody201Volume {
   -- | protection: Protection configuration for the Resource
   , postVolumesResponseBody201VolumeProtection :: PostVolumesResponseBody201VolumeProtection
   -- | server: ID of the Server the Volume is attached to, null if it is not attached at all
-  , postVolumesResponseBody201VolumeServer :: GHC.Integer.Type.Integer
+  , postVolumesResponseBody201VolumeServer :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | size: Size in GB of the Volume
   , postVolumesResponseBody201VolumeSize :: GHC.Types.Double
   -- | status: Current status of the Volume
   , postVolumesResponseBody201VolumeStatus :: PostVolumesResponseBody201VolumeStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201Volume
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (postVolumesResponseBody201VolumeCreated obj) : (Data.Aeson..=) "format" (postVolumesResponseBody201VolumeFormat obj) : (Data.Aeson..=) "id" (postVolumesResponseBody201VolumeId obj) : (Data.Aeson..=) "labels" (postVolumesResponseBody201VolumeLabels obj) : (Data.Aeson..=) "linux_device" (postVolumesResponseBody201VolumeLinuxDevice obj) : (Data.Aeson..=) "location" (postVolumesResponseBody201VolumeLocation obj) : (Data.Aeson..=) "name" (postVolumesResponseBody201VolumeName obj) : (Data.Aeson..=) "protection" (postVolumesResponseBody201VolumeProtection obj) : (Data.Aeson..=) "server" (postVolumesResponseBody201VolumeServer obj) : (Data.Aeson..=) "size" (postVolumesResponseBody201VolumeSize obj) : (Data.Aeson..=) "status" (postVolumesResponseBody201VolumeStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (postVolumesResponseBody201VolumeCreated obj) GHC.Base.<> ((Data.Aeson..=) "format" (postVolumesResponseBody201VolumeFormat obj) GHC.Base.<> ((Data.Aeson..=) "id" (postVolumesResponseBody201VolumeId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postVolumesResponseBody201VolumeLabels obj) GHC.Base.<> ((Data.Aeson..=) "linux_device" (postVolumesResponseBody201VolumeLinuxDevice obj) GHC.Base.<> ((Data.Aeson..=) "location" (postVolumesResponseBody201VolumeLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (postVolumesResponseBody201VolumeName obj) GHC.Base.<> ((Data.Aeson..=) "protection" (postVolumesResponseBody201VolumeProtection obj) GHC.Base.<> ((Data.Aeson..=) "server" (postVolumesResponseBody201VolumeServer obj) GHC.Base.<> ((Data.Aeson..=) "size" (postVolumesResponseBody201VolumeSize obj) GHC.Base.<> (Data.Aeson..=) "status" (postVolumesResponseBody201VolumeStatus obj)))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201Volume
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeCreated obj : "format" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeFormat obj : "id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeId obj : "labels" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLabels obj : "linux_device" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLinuxDevice obj : "location" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocation obj : "name" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeName obj : "protection" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeProtection obj : "server" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeServer obj : "size" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeSize obj : "status" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeCreated obj) GHC.Base.<> (("format" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeFormat obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLabels obj) GHC.Base.<> (("linux_device" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLinuxDevice obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeName obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeProtection obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeServer obj) GHC.Base.<> (("size" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeSize obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeStatus obj)))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201Volume
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201Volume" (\obj -> ((((((((((GHC.Base.pure PostVolumesResponseBody201Volume GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "format")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "linux_device")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostVolumesResponseBody201VolumeLabels
--- 
--- User-defined labels (key-value pairs)
-data PostVolumesResponseBody201VolumeLabels = PostVolumesResponseBody201VolumeLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201VolumeLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201VolumeLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201VolumeLabels" (\obj -> GHC.Base.pure PostVolumesResponseBody201VolumeLabels)
--- | Defines the data type for the schema PostVolumesResponseBody201VolumeLocation
+-- | Create a new 'PostVolumesResponseBody201Volume' with all required fields.
+mkPostVolumesResponseBody201Volume :: Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeCreated'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeFormat'
+  -> GHC.Types.Int -- ^ 'postVolumesResponseBody201VolumeId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'postVolumesResponseBody201VolumeLabels'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeLinuxDevice'
+  -> PostVolumesResponseBody201VolumeLocation -- ^ 'postVolumesResponseBody201VolumeLocation'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeName'
+  -> PostVolumesResponseBody201VolumeProtection -- ^ 'postVolumesResponseBody201VolumeProtection'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'postVolumesResponseBody201VolumeServer'
+  -> GHC.Types.Double -- ^ 'postVolumesResponseBody201VolumeSize'
+  -> PostVolumesResponseBody201VolumeStatus -- ^ 'postVolumesResponseBody201VolumeStatus'
+  -> PostVolumesResponseBody201Volume
+mkPostVolumesResponseBody201Volume postVolumesResponseBody201VolumeCreated postVolumesResponseBody201VolumeFormat postVolumesResponseBody201VolumeId postVolumesResponseBody201VolumeLabels postVolumesResponseBody201VolumeLinuxDevice postVolumesResponseBody201VolumeLocation postVolumesResponseBody201VolumeName postVolumesResponseBody201VolumeProtection postVolumesResponseBody201VolumeServer postVolumesResponseBody201VolumeSize postVolumesResponseBody201VolumeStatus = PostVolumesResponseBody201Volume{postVolumesResponseBody201VolumeCreated = postVolumesResponseBody201VolumeCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeFormat = postVolumesResponseBody201VolumeFormat,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeId = postVolumesResponseBody201VolumeId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeLabels = postVolumesResponseBody201VolumeLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeLinuxDevice = postVolumesResponseBody201VolumeLinuxDevice,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeLocation = postVolumesResponseBody201VolumeLocation,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeName = postVolumesResponseBody201VolumeName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeProtection = postVolumesResponseBody201VolumeProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeServer = postVolumesResponseBody201VolumeServer,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeSize = postVolumesResponseBody201VolumeSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       postVolumesResponseBody201VolumeStatus = postVolumesResponseBody201VolumeStatus}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.volume.properties.location@ in the specification.
 -- 
 -- Location of the Volume. Volume can only be attached to Servers in the same Location.
 data PostVolumesResponseBody201VolumeLocation = PostVolumesResponseBody201VolumeLocation {
@@ -389,12 +425,30 @@ data PostVolumesResponseBody201VolumeLocation = PostVolumesResponseBody201Volume
   , postVolumesResponseBody201VolumeLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201VolumeLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (postVolumesResponseBody201VolumeLocationCity obj) : (Data.Aeson..=) "country" (postVolumesResponseBody201VolumeLocationCountry obj) : (Data.Aeson..=) "description" (postVolumesResponseBody201VolumeLocationDescription obj) : (Data.Aeson..=) "id" (postVolumesResponseBody201VolumeLocationId obj) : (Data.Aeson..=) "latitude" (postVolumesResponseBody201VolumeLocationLatitude obj) : (Data.Aeson..=) "longitude" (postVolumesResponseBody201VolumeLocationLongitude obj) : (Data.Aeson..=) "name" (postVolumesResponseBody201VolumeLocationName obj) : (Data.Aeson..=) "network_zone" (postVolumesResponseBody201VolumeLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (postVolumesResponseBody201VolumeLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (postVolumesResponseBody201VolumeLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (postVolumesResponseBody201VolumeLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (postVolumesResponseBody201VolumeLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (postVolumesResponseBody201VolumeLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (postVolumesResponseBody201VolumeLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (postVolumesResponseBody201VolumeLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (postVolumesResponseBody201VolumeLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201VolumeLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationCity obj : "country" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201VolumeLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201VolumeLocation" (\obj -> (((((((GHC.Base.pure PostVolumesResponseBody201VolumeLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema PostVolumesResponseBody201VolumeProtection
+-- | Create a new 'PostVolumesResponseBody201VolumeLocation' with all required fields.
+mkPostVolumesResponseBody201VolumeLocation :: Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeLocationDescription'
+  -> GHC.Types.Double -- ^ 'postVolumesResponseBody201VolumeLocationId'
+  -> GHC.Types.Double -- ^ 'postVolumesResponseBody201VolumeLocationLatitude'
+  -> GHC.Types.Double -- ^ 'postVolumesResponseBody201VolumeLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeLocationName'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesResponseBody201VolumeLocationNetworkZone'
+  -> PostVolumesResponseBody201VolumeLocation
+mkPostVolumesResponseBody201VolumeLocation postVolumesResponseBody201VolumeLocationCity postVolumesResponseBody201VolumeLocationCountry postVolumesResponseBody201VolumeLocationDescription postVolumesResponseBody201VolumeLocationId postVolumesResponseBody201VolumeLocationLatitude postVolumesResponseBody201VolumeLocationLongitude postVolumesResponseBody201VolumeLocationName postVolumesResponseBody201VolumeLocationNetworkZone = PostVolumesResponseBody201VolumeLocation{postVolumesResponseBody201VolumeLocationCity = postVolumesResponseBody201VolumeLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationCountry = postVolumesResponseBody201VolumeLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationDescription = postVolumesResponseBody201VolumeLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationId = postVolumesResponseBody201VolumeLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationLatitude = postVolumesResponseBody201VolumeLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationLongitude = postVolumesResponseBody201VolumeLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationName = postVolumesResponseBody201VolumeLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postVolumesResponseBody201VolumeLocationNetworkZone = postVolumesResponseBody201VolumeLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.volume.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PostVolumesResponseBody201VolumeProtection = PostVolumesResponseBody201VolumeProtection {
@@ -402,28 +456,54 @@ data PostVolumesResponseBody201VolumeProtection = PostVolumesResponseBody201Volu
   postVolumesResponseBody201VolumeProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201VolumeProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postVolumesResponseBody201VolumeProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postVolumesResponseBody201VolumeProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201VolumeProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postVolumesResponseBody201VolumeProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201VolumeProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesResponseBody201VolumeProtection" (\obj -> GHC.Base.pure PostVolumesResponseBody201VolumeProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema PostVolumesResponseBody201VolumeStatus
+-- | Create a new 'PostVolumesResponseBody201VolumeProtection' with all required fields.
+mkPostVolumesResponseBody201VolumeProtection :: GHC.Types.Bool -- ^ 'postVolumesResponseBody201VolumeProtectionDelete'
+  -> PostVolumesResponseBody201VolumeProtection
+mkPostVolumesResponseBody201VolumeProtection postVolumesResponseBody201VolumeProtectionDelete = PostVolumesResponseBody201VolumeProtection{postVolumesResponseBody201VolumeProtectionDelete = postVolumesResponseBody201VolumeProtectionDelete}
+-- | Defines the enum schema located at @paths.\/volumes.POST.responses.201.content.application\/json.schema.properties.volume.properties.status@ in the specification.
 -- 
 -- Current status of the Volume
-data PostVolumesResponseBody201VolumeStatus
-    = PostVolumesResponseBody201VolumeStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostVolumesResponseBody201VolumeStatusEnumTyped Data.Text.Internal.Text
-    | PostVolumesResponseBody201VolumeStatusEnumStringAvailable
-    | PostVolumesResponseBody201VolumeStatusEnumStringCreating
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesResponseBody201VolumeStatus
-    where toJSON (PostVolumesResponseBody201VolumeStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesResponseBody201VolumeStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesResponseBody201VolumeStatusEnumStringAvailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (PostVolumesResponseBody201VolumeStatusEnumStringCreating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating"
-instance Data.Aeson.FromJSON PostVolumesResponseBody201VolumeStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then PostVolumesResponseBody201VolumeStatusEnumStringAvailable
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating")
-                                                then PostVolumesResponseBody201VolumeStatusEnumStringCreating
-                                                else PostVolumesResponseBody201VolumeStatusEnumOther val)
+data PostVolumesResponseBody201VolumeStatus =
+   PostVolumesResponseBody201VolumeStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostVolumesResponseBody201VolumeStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostVolumesResponseBody201VolumeStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  | PostVolumesResponseBody201VolumeStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesResponseBody201VolumeStatus
+    where toJSON (PostVolumesResponseBody201VolumeStatusOther val) = val
+          toJSON (PostVolumesResponseBody201VolumeStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostVolumesResponseBody201VolumeStatusEnumCreating) = "creating"
+          toJSON (PostVolumesResponseBody201VolumeStatusEnumAvailable) = "available"
+instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesResponseBody201VolumeStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "creating" -> PostVolumesResponseBody201VolumeStatusEnumCreating
+                                            | val GHC.Classes.== "available" -> PostVolumesResponseBody201VolumeStatusEnumAvailable
+                                            | GHC.Base.otherwise -> PostVolumesResponseBody201VolumeStatusOther val)
+-- | > POST /volumes
+-- 
+-- The same as 'postVolumes' but accepts an explicit configuration.
+postVolumesWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostVolumesRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostVolumesResponse) -- ^ Monadic computation which returns the result of the operation
+postVolumesWithConfiguration config
+                             body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostVolumesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                     PostVolumesResponseBody201)
+                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /volumes
+-- 
+-- The same as 'postVolumes' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postVolumesRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostVolumesRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postVolumesRaw body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /volumes
+-- 
+-- The same as 'postVolumes' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postVolumesWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostVolumesRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postVolumesWithConfigurationRaw config
+                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/volumes") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

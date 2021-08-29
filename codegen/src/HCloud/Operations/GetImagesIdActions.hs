@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getImages_Id_Actions
 module HCloud.Operations.GetImagesIdActions where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,122 +45,205 @@ import HCloud.Types
 -- | > GET /images/{id}/actions
 -- 
 -- Returns all Action objects for an Image. You can sort the results by using the \`sort\` URI parameter, and filter them with the \`status\` parameter.
-getImages_Id_Actions :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                         -- ^ id: ID of the Image
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                          -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                          -- ^ status: Can be used multiple times, the response will contain only Actions with specified statuses
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetImagesIdActionsResponse))   -- ^ Monad containing the result of the operation
-getImages_Id_Actions config
-                     id
-                     sort
-                     status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetImagesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                            GetImagesIdActionsResponseBody200)
-                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /images/{id}/actions
+getImages_Id_Actions :: forall m . HCloud.Common.MonadHTTP m => GetImagesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetImagesIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getImages_Id_Actions parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetImagesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                 GetImagesIdActionsResponseBody200)
+                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getImagesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.parameters@ in the specification.
 -- 
--- The same as 'getImages_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'
-getImages_Id_ActionsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                         HCloud.Common.SecurityScheme s) =>
-                           HCloud.Common.Configuration s ->
-                           GHC.Integer.Type.Integer ->
-                           GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                           GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                           m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getImages_Id_ActionsRaw config
-                        id
-                        sort
-                        status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /images/{id}/actions
 -- 
--- Monadic version of 'getImages_Id_Actions' (use with 'HCloud.Common.runWithConfiguration')
-getImages_Id_ActionsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                       HCloud.Common.SecurityScheme s) =>
-                         GHC.Integer.Type.Integer ->
-                         GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                         GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                         Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                            m
-                                                            (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                (Network.HTTP.Client.Types.Response GetImagesIdActionsResponse))
-getImages_Id_ActionsM id
-                      sort
-                      status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetImagesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                             GetImagesIdActionsResponseBody200)
-                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /images/{id}/actions
+data GetImagesIdActionsParameters = GetImagesIdActionsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Image
+  getImagesIdActionsParametersPathId :: GHC.Types.Int
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getImagesIdActionsParametersQuerySort :: (GHC.Maybe.Maybe GetImagesIdActionsParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified statuses
+  , getImagesIdActionsParametersQueryStatus :: (GHC.Maybe.Maybe GetImagesIdActionsParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getImagesIdActionsParametersPathId obj : "querySort" Data.Aeson.Types.ToJSON..= getImagesIdActionsParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getImagesIdActionsParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getImagesIdActionsParametersPathId obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getImagesIdActionsParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getImagesIdActionsParametersQueryStatus obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsParameters" (\obj -> ((GHC.Base.pure GetImagesIdActionsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetImagesIdActionsParameters' with all required fields.
+mkGetImagesIdActionsParameters :: GHC.Types.Int -- ^ 'getImagesIdActionsParametersPathId'
+  -> GetImagesIdActionsParameters
+mkGetImagesIdActionsParameters getImagesIdActionsParametersPathId = GetImagesIdActionsParameters{getImagesIdActionsParametersPathId = getImagesIdActionsParametersPathId,
+                                                                                                 getImagesIdActionsParametersQuerySort = GHC.Maybe.Nothing,
+                                                                                                 getImagesIdActionsParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/images\/{id}\/actions.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getImages_Id_ActionsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getImages_Id_ActionsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                          HCloud.Common.SecurityScheme s) =>
-                            GHC.Integer.Type.Integer ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                               m
-                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                   (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getImages_Id_ActionsRawM id
-                         sort
-                         status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetImagesIdActionsParametersQuerySort =
+   GetImagesIdActionsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesIdActionsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesIdActionsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetImagesIdActionsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetImagesIdActionsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetImagesIdActionsParametersQuerySortEnumCommand -- ^ Represents the JSON value @"command"@
+  | GetImagesIdActionsParametersQuerySortEnumCommandAsc -- ^ Represents the JSON value @"command:asc"@
+  | GetImagesIdActionsParametersQuerySortEnumCommandDesc -- ^ Represents the JSON value @"command:desc"@
+  | GetImagesIdActionsParametersQuerySortEnumStatus -- ^ Represents the JSON value @"status"@
+  | GetImagesIdActionsParametersQuerySortEnumStatusAsc -- ^ Represents the JSON value @"status:asc"@
+  | GetImagesIdActionsParametersQuerySortEnumStatusDesc -- ^ Represents the JSON value @"status:desc"@
+  | GetImagesIdActionsParametersQuerySortEnumProgress -- ^ Represents the JSON value @"progress"@
+  | GetImagesIdActionsParametersQuerySortEnumProgressAsc -- ^ Represents the JSON value @"progress:asc"@
+  | GetImagesIdActionsParametersQuerySortEnumProgressDesc -- ^ Represents the JSON value @"progress:desc"@
+  | GetImagesIdActionsParametersQuerySortEnumStarted -- ^ Represents the JSON value @"started"@
+  | GetImagesIdActionsParametersQuerySortEnumStartedAsc -- ^ Represents the JSON value @"started:asc"@
+  | GetImagesIdActionsParametersQuerySortEnumStartedDesc -- ^ Represents the JSON value @"started:desc"@
+  | GetImagesIdActionsParametersQuerySortEnumFinished -- ^ Represents the JSON value @"finished"@
+  | GetImagesIdActionsParametersQuerySortEnumFinishedAsc -- ^ Represents the JSON value @"finished:asc"@
+  | GetImagesIdActionsParametersQuerySortEnumFinishedDesc -- ^ Represents the JSON value @"finished:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsParametersQuerySort
+    where toJSON (GetImagesIdActionsParametersQuerySortOther val) = val
+          toJSON (GetImagesIdActionsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesIdActionsParametersQuerySortEnumId) = "id"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumCommand) = "command"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumCommandAsc) = "command:asc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumCommandDesc) = "command:desc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumStatus) = "status"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumStatusAsc) = "status:asc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumStatusDesc) = "status:desc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumProgress) = "progress"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumProgressAsc) = "progress:asc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumProgressDesc) = "progress:desc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumStarted) = "started"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumStartedAsc) = "started:asc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumStartedDesc) = "started:desc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumFinished) = "finished"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumFinishedAsc) = "finished:asc"
+          toJSON (GetImagesIdActionsParametersQuerySortEnumFinishedDesc) = "finished:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetImagesIdActionsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetImagesIdActionsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetImagesIdActionsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "command" -> GetImagesIdActionsParametersQuerySortEnumCommand
+                                            | val GHC.Classes.== "command:asc" -> GetImagesIdActionsParametersQuerySortEnumCommandAsc
+                                            | val GHC.Classes.== "command:desc" -> GetImagesIdActionsParametersQuerySortEnumCommandDesc
+                                            | val GHC.Classes.== "status" -> GetImagesIdActionsParametersQuerySortEnumStatus
+                                            | val GHC.Classes.== "status:asc" -> GetImagesIdActionsParametersQuerySortEnumStatusAsc
+                                            | val GHC.Classes.== "status:desc" -> GetImagesIdActionsParametersQuerySortEnumStatusDesc
+                                            | val GHC.Classes.== "progress" -> GetImagesIdActionsParametersQuerySortEnumProgress
+                                            | val GHC.Classes.== "progress:asc" -> GetImagesIdActionsParametersQuerySortEnumProgressAsc
+                                            | val GHC.Classes.== "progress:desc" -> GetImagesIdActionsParametersQuerySortEnumProgressDesc
+                                            | val GHC.Classes.== "started" -> GetImagesIdActionsParametersQuerySortEnumStarted
+                                            | val GHC.Classes.== "started:asc" -> GetImagesIdActionsParametersQuerySortEnumStartedAsc
+                                            | val GHC.Classes.== "started:desc" -> GetImagesIdActionsParametersQuerySortEnumStartedDesc
+                                            | val GHC.Classes.== "finished" -> GetImagesIdActionsParametersQuerySortEnumFinished
+                                            | val GHC.Classes.== "finished:asc" -> GetImagesIdActionsParametersQuerySortEnumFinishedAsc
+                                            | val GHC.Classes.== "finished:desc" -> GetImagesIdActionsParametersQuerySortEnumFinishedDesc
+                                            | GHC.Base.otherwise -> GetImagesIdActionsParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/images\/{id}\/actions.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times, the response will contain only Actions with specified statuses
+data GetImagesIdActionsParametersQueryStatus =
+   GetImagesIdActionsParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesIdActionsParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesIdActionsParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetImagesIdActionsParametersQueryStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetImagesIdActionsParametersQueryStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsParametersQueryStatus
+    where toJSON (GetImagesIdActionsParametersQueryStatusOther val) = val
+          toJSON (GetImagesIdActionsParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesIdActionsParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetImagesIdActionsParametersQueryStatusEnumSuccess) = "success"
+          toJSON (GetImagesIdActionsParametersQueryStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetImagesIdActionsParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "success" -> GetImagesIdActionsParametersQueryStatusEnumSuccess
+                                            | val GHC.Classes.== "error" -> GetImagesIdActionsParametersQueryStatusEnumError
+                                            | GHC.Base.otherwise -> GetImagesIdActionsParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getImages_Id_Actions'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetImagesIdActionsResponseError' is used.
-data GetImagesIdActionsResponse =                                    
-   GetImagesIdActionsResponseError GHC.Base.String                   -- ^ Means either no matching case available or a parse error
-  | GetImagesIdActionsResponse200 GetImagesIdActionsResponseBody200  -- ^ The \`actions\` key contains a list of Actions
+data GetImagesIdActionsResponse =
+   GetImagesIdActionsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetImagesIdActionsResponse200 GetImagesIdActionsResponseBody200 -- ^ The \`actions\` key contains a list of Actions
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetImagesIdActionsResponseBody200
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetImagesIdActionsResponseBody200 = GetImagesIdActionsResponseBody200 {
   -- | actions
-  getImagesIdActionsResponseBody200Actions :: ([] GetImagesIdActionsResponseBody200Actions)
+  getImagesIdActionsResponseBody200Actions :: ([GetImagesIdActionsResponseBody200Actions])
   -- | meta
   , getImagesIdActionsResponseBody200Meta :: (GHC.Maybe.Maybe GetImagesIdActionsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (getImagesIdActionsResponseBody200Actions obj) : (Data.Aeson..=) "meta" (getImagesIdActionsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (getImagesIdActionsResponseBody200Actions obj) GHC.Base.<> (Data.Aeson..=) "meta" (getImagesIdActionsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200Actions obj : "meta" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("actions" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200Actions obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsResponseBody200" (\obj -> (GHC.Base.pure GetImagesIdActionsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetImagesIdActionsResponseBody200Actions
+-- | Create a new 'GetImagesIdActionsResponseBody200' with all required fields.
+mkGetImagesIdActionsResponseBody200 :: [GetImagesIdActionsResponseBody200Actions] -- ^ 'getImagesIdActionsResponseBody200Actions'
+  -> GetImagesIdActionsResponseBody200
+mkGetImagesIdActionsResponseBody200 getImagesIdActionsResponseBody200Actions = GetImagesIdActionsResponseBody200{getImagesIdActionsResponseBody200Actions = getImagesIdActionsResponseBody200Actions,
+                                                                                                                 getImagesIdActionsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data GetImagesIdActionsResponseBody200Actions = GetImagesIdActionsResponseBody200Actions {
   -- | command: Command executed in the Action
   getImagesIdActionsResponseBody200ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getImagesIdActionsResponseBody200ActionsError :: GetImagesIdActionsResponseBody200ActionsError
+  , getImagesIdActionsResponseBody200ActionsError :: (GHC.Maybe.Maybe GetImagesIdActionsResponseBody200ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getImagesIdActionsResponseBody200ActionsFinished :: Data.Text.Internal.Text
+  , getImagesIdActionsResponseBody200ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getImagesIdActionsResponseBody200ActionsId :: GHC.Integer.Type.Integer
+  , getImagesIdActionsResponseBody200ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getImagesIdActionsResponseBody200ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getImagesIdActionsResponseBody200ActionsResources :: ([] GetImagesIdActionsResponseBody200ActionsResources)
+  , getImagesIdActionsResponseBody200ActionsResources :: ([GetImagesIdActionsResponseBody200ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getImagesIdActionsResponseBody200ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getImagesIdActionsResponseBody200ActionsStatus :: GetImagesIdActionsResponseBody200ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getImagesIdActionsResponseBody200ActionsCommand obj) : (Data.Aeson..=) "error" (getImagesIdActionsResponseBody200ActionsError obj) : (Data.Aeson..=) "finished" (getImagesIdActionsResponseBody200ActionsFinished obj) : (Data.Aeson..=) "id" (getImagesIdActionsResponseBody200ActionsId obj) : (Data.Aeson..=) "progress" (getImagesIdActionsResponseBody200ActionsProgress obj) : (Data.Aeson..=) "resources" (getImagesIdActionsResponseBody200ActionsResources obj) : (Data.Aeson..=) "started" (getImagesIdActionsResponseBody200ActionsStarted obj) : (Data.Aeson..=) "status" (getImagesIdActionsResponseBody200ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getImagesIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getImagesIdActionsResponseBody200ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getImagesIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getImagesIdActionsResponseBody200ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getImagesIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getImagesIdActionsResponseBody200ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getImagesIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getImagesIdActionsResponseBody200ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsResponseBody200Actions" (\obj -> (((((((GHC.Base.pure GetImagesIdActionsResponseBody200Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetImagesIdActionsResponseBody200ActionsError
+-- | Create a new 'GetImagesIdActionsResponseBody200Actions' with all required fields.
+mkGetImagesIdActionsResponseBody200Actions :: Data.Text.Internal.Text -- ^ 'getImagesIdActionsResponseBody200ActionsCommand'
+  -> GHC.Maybe.Maybe GetImagesIdActionsResponseBody200ActionsError -- ^ 'getImagesIdActionsResponseBody200ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getImagesIdActionsResponseBody200ActionsFinished'
+  -> GHC.Types.Int -- ^ 'getImagesIdActionsResponseBody200ActionsId'
+  -> GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200ActionsProgress'
+  -> [GetImagesIdActionsResponseBody200ActionsResources] -- ^ 'getImagesIdActionsResponseBody200ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'getImagesIdActionsResponseBody200ActionsStarted'
+  -> GetImagesIdActionsResponseBody200ActionsStatus -- ^ 'getImagesIdActionsResponseBody200ActionsStatus'
+  -> GetImagesIdActionsResponseBody200Actions
+mkGetImagesIdActionsResponseBody200Actions getImagesIdActionsResponseBody200ActionsCommand getImagesIdActionsResponseBody200ActionsError getImagesIdActionsResponseBody200ActionsFinished getImagesIdActionsResponseBody200ActionsId getImagesIdActionsResponseBody200ActionsProgress getImagesIdActionsResponseBody200ActionsResources getImagesIdActionsResponseBody200ActionsStarted getImagesIdActionsResponseBody200ActionsStatus = GetImagesIdActionsResponseBody200Actions{getImagesIdActionsResponseBody200ActionsCommand = getImagesIdActionsResponseBody200ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsError = getImagesIdActionsResponseBody200ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsFinished = getImagesIdActionsResponseBody200ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsId = getImagesIdActionsResponseBody200ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsProgress = getImagesIdActionsResponseBody200ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsResources = getImagesIdActionsResponseBody200ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsStarted = getImagesIdActionsResponseBody200ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsStatus = getImagesIdActionsResponseBody200ActionsStatus}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetImagesIdActionsResponseBody200ActionsError = GetImagesIdActionsResponseBody200ActionsError {
@@ -170,51 +253,60 @@ data GetImagesIdActionsResponseBody200ActionsError = GetImagesIdActionsResponseB
   , getImagesIdActionsResponseBody200ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getImagesIdActionsResponseBody200ActionsErrorCode obj) : (Data.Aeson..=) "message" (getImagesIdActionsResponseBody200ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getImagesIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getImagesIdActionsResponseBody200ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsResponseBody200ActionsError" (\obj -> (GHC.Base.pure GetImagesIdActionsResponseBody200ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetImagesIdActionsResponseBody200ActionsResources
+-- | Create a new 'GetImagesIdActionsResponseBody200ActionsError' with all required fields.
+mkGetImagesIdActionsResponseBody200ActionsError :: Data.Text.Internal.Text -- ^ 'getImagesIdActionsResponseBody200ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getImagesIdActionsResponseBody200ActionsErrorMessage'
+  -> GetImagesIdActionsResponseBody200ActionsError
+mkGetImagesIdActionsResponseBody200ActionsError getImagesIdActionsResponseBody200ActionsErrorCode getImagesIdActionsResponseBody200ActionsErrorMessage = GetImagesIdActionsResponseBody200ActionsError{getImagesIdActionsResponseBody200ActionsErrorCode = getImagesIdActionsResponseBody200ActionsErrorCode,
+                                                                                                                                                                                                       getImagesIdActionsResponseBody200ActionsErrorMessage = getImagesIdActionsResponseBody200ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetImagesIdActionsResponseBody200ActionsResources = GetImagesIdActionsResponseBody200ActionsResources {
   -- | id: ID of the Resource
-  getImagesIdActionsResponseBody200ActionsResourcesId :: GHC.Integer.Type.Integer
+  getImagesIdActionsResponseBody200ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getImagesIdActionsResponseBody200ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getImagesIdActionsResponseBody200ActionsResourcesId obj) : (Data.Aeson..=) "type" (getImagesIdActionsResponseBody200ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getImagesIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getImagesIdActionsResponseBody200ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsResponseBody200ActionsResources" (\obj -> (GHC.Base.pure GetImagesIdActionsResponseBody200ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetImagesIdActionsResponseBody200ActionsStatus
+-- | Create a new 'GetImagesIdActionsResponseBody200ActionsResources' with all required fields.
+mkGetImagesIdActionsResponseBody200ActionsResources :: GHC.Types.Int -- ^ 'getImagesIdActionsResponseBody200ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getImagesIdActionsResponseBody200ActionsResourcesType'
+  -> GetImagesIdActionsResponseBody200ActionsResources
+mkGetImagesIdActionsResponseBody200ActionsResources getImagesIdActionsResponseBody200ActionsResourcesId getImagesIdActionsResponseBody200ActionsResourcesType = GetImagesIdActionsResponseBody200ActionsResources{getImagesIdActionsResponseBody200ActionsResourcesId = getImagesIdActionsResponseBody200ActionsResourcesId,
+                                                                                                                                                                                                                  getImagesIdActionsResponseBody200ActionsResourcesType = getImagesIdActionsResponseBody200ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetImagesIdActionsResponseBody200ActionsStatus
-    = GetImagesIdActionsResponseBody200ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetImagesIdActionsResponseBody200ActionsStatusEnumTyped Data.Text.Internal.Text
-    | GetImagesIdActionsResponseBody200ActionsStatusEnumStringError
-    | GetImagesIdActionsResponseBody200ActionsStatusEnumStringRunning
-    | GetImagesIdActionsResponseBody200ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200ActionsStatus
-    where toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetImagesIdActionsResponseBody200ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetImagesIdActionsResponseBody200ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetImagesIdActionsResponseBody200ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetImagesIdActionsResponseBody200ActionsStatusEnumStringSuccess
-                                                      else GetImagesIdActionsResponseBody200ActionsStatusEnumOther val)
--- | Defines the data type for the schema GetImagesIdActionsResponseBody200Meta
+data GetImagesIdActionsResponseBody200ActionsStatus =
+   GetImagesIdActionsResponseBody200ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesIdActionsResponseBody200ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesIdActionsResponseBody200ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetImagesIdActionsResponseBody200ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetImagesIdActionsResponseBody200ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200ActionsStatus
+    where toJSON (GetImagesIdActionsResponseBody200ActionsStatusOther val) = val
+          toJSON (GetImagesIdActionsResponseBody200ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumSuccess) = "success"
+          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumRunning) = "running"
+          toJSON (GetImagesIdActionsResponseBody200ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetImagesIdActionsResponseBody200ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetImagesIdActionsResponseBody200ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetImagesIdActionsResponseBody200ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> GetImagesIdActionsResponseBody200ActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetImagesIdActionsResponseBody200Meta = GetImagesIdActionsResponseBody200Meta {
@@ -222,31 +314,76 @@ data GetImagesIdActionsResponseBody200Meta = GetImagesIdActionsResponseBody200Me
   getImagesIdActionsResponseBody200MetaPagination :: GetImagesIdActionsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getImagesIdActionsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getImagesIdActionsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsResponseBody200Meta" (\obj -> GHC.Base.pure GetImagesIdActionsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetImagesIdActionsResponseBody200MetaPagination
+-- | Create a new 'GetImagesIdActionsResponseBody200Meta' with all required fields.
+mkGetImagesIdActionsResponseBody200Meta :: GetImagesIdActionsResponseBody200MetaPagination -- ^ 'getImagesIdActionsResponseBody200MetaPagination'
+  -> GetImagesIdActionsResponseBody200Meta
+mkGetImagesIdActionsResponseBody200Meta getImagesIdActionsResponseBody200MetaPagination = GetImagesIdActionsResponseBody200Meta{getImagesIdActionsResponseBody200MetaPagination = getImagesIdActionsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/images\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetImagesIdActionsResponseBody200MetaPagination = GetImagesIdActionsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getImagesIdActionsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getImagesIdActionsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getImagesIdActionsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getImagesIdActionsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getImagesIdActionsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getImagesIdActionsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getImagesIdActionsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getImagesIdActionsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getImagesIdActionsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getImagesIdActionsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesIdActionsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getImagesIdActionsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getImagesIdActionsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getImagesIdActionsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getImagesIdActionsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getImagesIdActionsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getImagesIdActionsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getImagesIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getImagesIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getImagesIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getImagesIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getImagesIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getImagesIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesIdActionsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getImagesIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesIdActionsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesIdActionsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetImagesIdActionsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetImagesIdActionsResponseBody200MetaPagination' with all required fields.
+mkGetImagesIdActionsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesIdActionsResponseBody200MetaPaginationTotalEntries'
+  -> GetImagesIdActionsResponseBody200MetaPagination
+mkGetImagesIdActionsResponseBody200MetaPagination getImagesIdActionsResponseBody200MetaPaginationLastPage getImagesIdActionsResponseBody200MetaPaginationNextPage getImagesIdActionsResponseBody200MetaPaginationPage getImagesIdActionsResponseBody200MetaPaginationPerPage getImagesIdActionsResponseBody200MetaPaginationPreviousPage getImagesIdActionsResponseBody200MetaPaginationTotalEntries = GetImagesIdActionsResponseBody200MetaPagination{getImagesIdActionsResponseBody200MetaPaginationLastPage = getImagesIdActionsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       getImagesIdActionsResponseBody200MetaPaginationNextPage = getImagesIdActionsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       getImagesIdActionsResponseBody200MetaPaginationPage = getImagesIdActionsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       getImagesIdActionsResponseBody200MetaPaginationPerPage = getImagesIdActionsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       getImagesIdActionsResponseBody200MetaPaginationPreviousPage = getImagesIdActionsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       getImagesIdActionsResponseBody200MetaPaginationTotalEntries = getImagesIdActionsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /images/{id}/actions
+-- 
+-- The same as 'getImages_Id_Actions' but accepts an explicit configuration.
+getImages_Id_ActionsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetImagesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetImagesIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getImages_Id_ActionsWithConfiguration config
+                                      parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetImagesIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  GetImagesIdActionsResponseBody200)
+                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getImagesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /images/{id}/actions
+-- 
+-- The same as 'getImages_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getImages_Id_ActionsRaw :: forall m . HCloud.Common.MonadHTTP m => GetImagesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getImages_Id_ActionsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getImagesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /images/{id}/actions
+-- 
+-- The same as 'getImages_Id_Actions' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getImages_Id_ActionsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetImagesIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getImages_Id_ActionsWithConfigurationRaw config
+                                         parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getImagesIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

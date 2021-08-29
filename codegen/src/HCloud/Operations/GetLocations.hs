@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getLocations
 module HCloud.Operations.GetLocations where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,73 +45,36 @@ import HCloud.Types
 -- | > GET /locations
 -- 
 -- Returns all Location objects.
-getLocations :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                  -- ^ name: Can be used to filter Locations by their name. The response will only contain the Location matching the specified name.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetLocationsResponse)) -- ^ Monad containing the result of the operation
-getLocations config
-             name = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLocationsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLocationsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                      GetLocationsResponseBody200)
-                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /locations
--- 
--- The same as 'getLocations' but returns the raw 'Data.ByteString.Char8.ByteString'
-getLocationsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   HCloud.Common.Configuration s ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLocationsRaw config
-                name = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") ((Data.Text.pack "name",
-                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /locations
--- 
--- Monadic version of 'getLocations' (use with 'HCloud.Common.runWithConfiguration')
-getLocationsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                               HCloud.Common.SecurityScheme s) =>
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                    m
-                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                        (Network.HTTP.Client.Types.Response GetLocationsResponse))
-getLocationsM name = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLocationsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLocationsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                       GetLocationsResponseBody200)
-                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /locations
--- 
--- Monadic version of 'getLocationsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getLocationsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                  HCloud.Common.SecurityScheme s) =>
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                       m
-                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLocationsRawM name = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") ((Data.Text.pack "name",
-                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
+getLocations :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Locations by their name. The response will only contain the Location matching the specified name.
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetLocationsResponse) -- ^ Monadic computation which returns the result of the operation
+getLocations name = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLocationsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLocationsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                       GetLocationsResponseBody200)
+                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
 -- | Represents a response of the operation 'getLocations'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetLocationsResponseError' is used.
-data GetLocationsResponse =                              
-   GetLocationsResponseError GHC.Base.String             -- ^ Means either no matching case available or a parse error
-  | GetLocationsResponse200 GetLocationsResponseBody200  -- ^ The \`locations\` key in the reply contains an array of Location objects with this structure
+data GetLocationsResponse =
+   GetLocationsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetLocationsResponse200 GetLocationsResponseBody200 -- ^ The \`locations\` key in the reply contains an array of Location objects with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetLocationsResponseBody200
+-- | Defines the object schema located at @paths.\/locations.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetLocationsResponseBody200 = GetLocationsResponseBody200 {
   -- | locations
-  getLocationsResponseBody200Locations :: ([] GetLocationsResponseBody200Locations)
+  getLocationsResponseBody200Locations :: ([GetLocationsResponseBody200Locations])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLocationsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "locations" (getLocationsResponseBody200Locations obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "locations" (getLocationsResponseBody200Locations obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLocationsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("locations" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200Locations obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("locations" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200Locations obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetLocationsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLocationsResponseBody200" (\obj -> GHC.Base.pure GetLocationsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "locations"))
--- | Defines the data type for the schema GetLocationsResponseBody200Locations
+-- | Create a new 'GetLocationsResponseBody200' with all required fields.
+mkGetLocationsResponseBody200 :: [GetLocationsResponseBody200Locations] -- ^ 'getLocationsResponseBody200Locations'
+  -> GetLocationsResponseBody200
+mkGetLocationsResponseBody200 getLocationsResponseBody200Locations = GetLocationsResponseBody200{getLocationsResponseBody200Locations = getLocationsResponseBody200Locations}
+-- | Defines the object schema located at @paths.\/locations.GET.responses.200.content.application\/json.schema.properties.locations.items@ in the specification.
 -- 
 -- 
 data GetLocationsResponseBody200Locations = GetLocationsResponseBody200Locations {
@@ -133,8 +96,50 @@ data GetLocationsResponseBody200Locations = GetLocationsResponseBody200Locations
   , getLocationsResponseBody200LocationsNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLocationsResponseBody200Locations
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (getLocationsResponseBody200LocationsCity obj) : (Data.Aeson..=) "country" (getLocationsResponseBody200LocationsCountry obj) : (Data.Aeson..=) "description" (getLocationsResponseBody200LocationsDescription obj) : (Data.Aeson..=) "id" (getLocationsResponseBody200LocationsId obj) : (Data.Aeson..=) "latitude" (getLocationsResponseBody200LocationsLatitude obj) : (Data.Aeson..=) "longitude" (getLocationsResponseBody200LocationsLongitude obj) : (Data.Aeson..=) "name" (getLocationsResponseBody200LocationsName obj) : (Data.Aeson..=) "network_zone" (getLocationsResponseBody200LocationsNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (getLocationsResponseBody200LocationsCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (getLocationsResponseBody200LocationsCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (getLocationsResponseBody200LocationsDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getLocationsResponseBody200LocationsId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (getLocationsResponseBody200LocationsLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (getLocationsResponseBody200LocationsLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (getLocationsResponseBody200LocationsName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (getLocationsResponseBody200LocationsNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLocationsResponseBody200Locations
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsCity obj : "country" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsCountry obj : "description" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsDescription obj : "id" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsId obj : "latitude" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsLongitude obj : "name" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsName obj : "network_zone" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= getLocationsResponseBody200LocationsNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLocationsResponseBody200Locations
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLocationsResponseBody200Locations" (\obj -> (((((((GHC.Base.pure GetLocationsResponseBody200Locations GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
+-- | Create a new 'GetLocationsResponseBody200Locations' with all required fields.
+mkGetLocationsResponseBody200Locations :: Data.Text.Internal.Text -- ^ 'getLocationsResponseBody200LocationsCity'
+  -> Data.Text.Internal.Text -- ^ 'getLocationsResponseBody200LocationsCountry'
+  -> Data.Text.Internal.Text -- ^ 'getLocationsResponseBody200LocationsDescription'
+  -> GHC.Types.Double -- ^ 'getLocationsResponseBody200LocationsId'
+  -> GHC.Types.Double -- ^ 'getLocationsResponseBody200LocationsLatitude'
+  -> GHC.Types.Double -- ^ 'getLocationsResponseBody200LocationsLongitude'
+  -> Data.Text.Internal.Text -- ^ 'getLocationsResponseBody200LocationsName'
+  -> Data.Text.Internal.Text -- ^ 'getLocationsResponseBody200LocationsNetworkZone'
+  -> GetLocationsResponseBody200Locations
+mkGetLocationsResponseBody200Locations getLocationsResponseBody200LocationsCity getLocationsResponseBody200LocationsCountry getLocationsResponseBody200LocationsDescription getLocationsResponseBody200LocationsId getLocationsResponseBody200LocationsLatitude getLocationsResponseBody200LocationsLongitude getLocationsResponseBody200LocationsName getLocationsResponseBody200LocationsNetworkZone = GetLocationsResponseBody200Locations{getLocationsResponseBody200LocationsCity = getLocationsResponseBody200LocationsCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsCountry = getLocationsResponseBody200LocationsCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsDescription = getLocationsResponseBody200LocationsDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsId = getLocationsResponseBody200LocationsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsLatitude = getLocationsResponseBody200LocationsLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsLongitude = getLocationsResponseBody200LocationsLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsName = getLocationsResponseBody200LocationsName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                              getLocationsResponseBody200LocationsNetworkZone = getLocationsResponseBody200LocationsNetworkZone}
+-- | > GET /locations
+-- 
+-- The same as 'getLocations' but accepts an explicit configuration.
+getLocationsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Locations by their name. The response will only contain the Location matching the specified name.
+  -> m (Network.HTTP.Client.Types.Response GetLocationsResponse) -- ^ Monadic computation which returns the result of the operation
+getLocationsWithConfiguration config
+                              name = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLocationsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLocationsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                        GetLocationsResponseBody200)
+                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /locations
+-- 
+-- The same as 'getLocations' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getLocationsRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Locations by their name. The response will only contain the Location matching the specified name.
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLocationsRaw name = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /locations
+-- 
+-- The same as 'getLocations' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getLocationsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Locations by their name. The response will only contain the Location matching the specified name.
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLocationsWithConfigurationRaw config
+                                 name = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/locations") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])

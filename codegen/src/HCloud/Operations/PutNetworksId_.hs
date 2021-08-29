@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putNetworks_Id_
 module HCloud.Operations.PutNetworksId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,57 +49,14 @@ import HCloud.Types
 -- Note that when updating labels, the network’s current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
 -- 
 -- Note: if the network object changes during the request, the response will be a “conflict” error.
-putNetworks_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                    -- ^ id: ID of the network
-  -> GHC.Maybe.Maybe PutNetworksIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutNetworksIdResponse))   -- ^ Monad containing the result of the operation
-putNetworks_Id_ config
-                id
-                body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutNetworksIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutNetworksIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                           PutNetworksIdResponseBody200)
-                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /networks/{id}
--- 
--- The same as 'putNetworks_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putNetworks_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      HCloud.Common.Configuration s ->
-                      GHC.Integer.Type.Integer ->
-                      GHC.Maybe.Maybe PutNetworksIdRequestBody ->
-                      m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putNetworks_Id_Raw config
-                   id
-                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /networks/{id}
--- 
--- Monadic version of 'putNetworks_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putNetworks_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                  HCloud.Common.SecurityScheme s) =>
-                    GHC.Integer.Type.Integer ->
-                    GHC.Maybe.Maybe PutNetworksIdRequestBody ->
-                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                       m
-                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                           (Network.HTTP.Client.Types.Response PutNetworksIdResponse))
-putNetworks_Id_M id
-                 body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutNetworksIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutNetworksIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                            PutNetworksIdResponseBody200)
-                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /networks/{id}
--- 
--- Monadic version of 'putNetworks_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putNetworks_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                     HCloud.Common.SecurityScheme s) =>
-                       GHC.Integer.Type.Integer ->
-                       GHC.Maybe.Maybe PutNetworksIdRequestBody ->
-                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                          m
-                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putNetworks_Id_RawM id
-                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putNetworks_Id_RequestBody
+putNetworks_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the network
+  -> GHC.Maybe.Maybe PutNetworksIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutNetworksIdResponse) -- ^ Monadic computation which returns the result of the operation
+putNetworks_Id_ id
+                body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutNetworksIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutNetworksIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                            PutNetworksIdResponseBody200)
+                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutNetworksIdRequestBody = PutNetworksIdRequestBody {
@@ -109,12 +66,16 @@ data PutNetworksIdRequestBody = PutNetworksIdRequestBody {
   , putNetworksIdRequestBodyName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (putNetworksIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putNetworksIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (putNetworksIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putNetworksIdRequestBodyName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= putNetworksIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putNetworksIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= putNetworksIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putNetworksIdRequestBodyName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdRequestBody" (\obj -> (GHC.Base.pure PutNetworksIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name"))
--- | Defines the data type for the schema putNetworks_Id_RequestBodyLabels
+-- | Create a new 'PutNetworksIdRequestBody' with all required fields.
+mkPutNetworksIdRequestBody :: PutNetworksIdRequestBody
+mkPutNetworksIdRequestBody = PutNetworksIdRequestBody{putNetworksIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                      putNetworksIdRequestBodyName = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.requestBody.content.application\/json.schema.properties.labels@ in the specification.
 -- 
 -- User-defined labels (key-value pairs)
 data PutNetworksIdRequestBodyLabels = PutNetworksIdRequestBodyLabels {
@@ -122,19 +83,22 @@ data PutNetworksIdRequestBodyLabels = PutNetworksIdRequestBodyLabels {
   putNetworksIdRequestBodyLabelsLabelkey :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labelkey" (putNetworksIdRequestBodyLabelsLabelkey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labelkey" (putNetworksIdRequestBodyLabelsLabelkey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdRequestBodyLabels
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labelkey" Data.Aeson.Types.ToJSON..= putNetworksIdRequestBodyLabelsLabelkey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("labelkey" Data.Aeson.Types.ToJSON..= putNetworksIdRequestBodyLabelsLabelkey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdRequestBodyLabels
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdRequestBodyLabels" (\obj -> GHC.Base.pure PutNetworksIdRequestBodyLabels GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labelkey"))
+-- | Create a new 'PutNetworksIdRequestBodyLabels' with all required fields.
+mkPutNetworksIdRequestBodyLabels :: PutNetworksIdRequestBodyLabels
+mkPutNetworksIdRequestBodyLabels = PutNetworksIdRequestBodyLabels{putNetworksIdRequestBodyLabelsLabelkey = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putNetworks_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutNetworksIdResponseError' is used.
-data PutNetworksIdResponse =                               
-   PutNetworksIdResponseError GHC.Base.String              -- ^ Means either no matching case available or a parse error
-  | PutNetworksIdResponse200 PutNetworksIdResponseBody200  -- ^ The \`network\` key contains the updated network
+data PutNetworksIdResponse =
+   PutNetworksIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutNetworksIdResponse200 PutNetworksIdResponseBody200 -- ^ The \`network\` key contains the updated network
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutNetworksIdResponseBody200
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutNetworksIdResponseBody200 = PutNetworksIdResponseBody200 {
@@ -142,55 +106,67 @@ data PutNetworksIdResponseBody200 = PutNetworksIdResponseBody200 {
   putNetworksIdResponseBody200Network :: (GHC.Maybe.Maybe PutNetworksIdResponseBody200Network)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "network" (putNetworksIdResponseBody200Network obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "network" (putNetworksIdResponseBody200Network obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("network" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200Network obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("network" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200Network obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdResponseBody200" (\obj -> GHC.Base.pure PutNetworksIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "network"))
--- | Defines the data type for the schema PutNetworksIdResponseBody200Network
+-- | Create a new 'PutNetworksIdResponseBody200' with all required fields.
+mkPutNetworksIdResponseBody200 :: PutNetworksIdResponseBody200
+mkPutNetworksIdResponseBody200 = PutNetworksIdResponseBody200{putNetworksIdResponseBody200Network = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.responses.200.content.application\/json.schema.properties.network@ in the specification.
 -- 
 -- 
 data PutNetworksIdResponseBody200Network = PutNetworksIdResponseBody200Network {
   -- | created: Point in time when the Network was created (in ISO-8601 format)
   putNetworksIdResponseBody200NetworkCreated :: Data.Text.Internal.Text
   -- | id: ID of the Network
-  , putNetworksIdResponseBody200NetworkId :: GHC.Integer.Type.Integer
+  , putNetworksIdResponseBody200NetworkId :: GHC.Types.Int
   -- | ip_range: IPv4 prefix of the whole Network
   , putNetworksIdResponseBody200NetworkIpRange :: Data.Text.Internal.Text
   -- | labels: User-defined labels (key-value pairs)
-  , putNetworksIdResponseBody200NetworkLabels :: PutNetworksIdResponseBody200NetworkLabels
+  , putNetworksIdResponseBody200NetworkLabels :: Data.Aeson.Types.Internal.Object
   -- | load_balancers: Array of IDs of Load Balancers attached to this Network
-  , putNetworksIdResponseBody200NetworkLoadBalancers :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  , putNetworksIdResponseBody200NetworkLoadBalancers :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | name: Name of the Network
   , putNetworksIdResponseBody200NetworkName :: Data.Text.Internal.Text
   -- | protection: Protection configuration for the Network
   , putNetworksIdResponseBody200NetworkProtection :: PutNetworksIdResponseBody200NetworkProtection
   -- | routes: Array of routes set in this Network
-  , putNetworksIdResponseBody200NetworkRoutes :: ([] PutNetworksIdResponseBody200NetworkRoutes)
+  , putNetworksIdResponseBody200NetworkRoutes :: ([PutNetworksIdResponseBody200NetworkRoutes])
   -- | servers: Array of IDs of Servers attached to this Network
-  , putNetworksIdResponseBody200NetworkServers :: ([] GHC.Integer.Type.Integer)
+  , putNetworksIdResponseBody200NetworkServers :: ([GHC.Types.Int])
   -- | subnets: Array subnets allocated in this Network
-  , putNetworksIdResponseBody200NetworkSubnets :: ([] PutNetworksIdResponseBody200NetworkSubnets)
+  , putNetworksIdResponseBody200NetworkSubnets :: ([PutNetworksIdResponseBody200NetworkSubnets])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200Network
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (putNetworksIdResponseBody200NetworkCreated obj) : (Data.Aeson..=) "id" (putNetworksIdResponseBody200NetworkId obj) : (Data.Aeson..=) "ip_range" (putNetworksIdResponseBody200NetworkIpRange obj) : (Data.Aeson..=) "labels" (putNetworksIdResponseBody200NetworkLabels obj) : (Data.Aeson..=) "load_balancers" (putNetworksIdResponseBody200NetworkLoadBalancers obj) : (Data.Aeson..=) "name" (putNetworksIdResponseBody200NetworkName obj) : (Data.Aeson..=) "protection" (putNetworksIdResponseBody200NetworkProtection obj) : (Data.Aeson..=) "routes" (putNetworksIdResponseBody200NetworkRoutes obj) : (Data.Aeson..=) "servers" (putNetworksIdResponseBody200NetworkServers obj) : (Data.Aeson..=) "subnets" (putNetworksIdResponseBody200NetworkSubnets obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (putNetworksIdResponseBody200NetworkCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (putNetworksIdResponseBody200NetworkId obj) GHC.Base.<> ((Data.Aeson..=) "ip_range" (putNetworksIdResponseBody200NetworkIpRange obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putNetworksIdResponseBody200NetworkLabels obj) GHC.Base.<> ((Data.Aeson..=) "load_balancers" (putNetworksIdResponseBody200NetworkLoadBalancers obj) GHC.Base.<> ((Data.Aeson..=) "name" (putNetworksIdResponseBody200NetworkName obj) GHC.Base.<> ((Data.Aeson..=) "protection" (putNetworksIdResponseBody200NetworkProtection obj) GHC.Base.<> ((Data.Aeson..=) "routes" (putNetworksIdResponseBody200NetworkRoutes obj) GHC.Base.<> ((Data.Aeson..=) "servers" (putNetworksIdResponseBody200NetworkServers obj) GHC.Base.<> (Data.Aeson..=) "subnets" (putNetworksIdResponseBody200NetworkSubnets obj))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdResponseBody200Network
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkCreated obj : "id" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkId obj : "ip_range" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkIpRange obj : "labels" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkLabels obj : "load_balancers" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkLoadBalancers obj : "name" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkName obj : "protection" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkProtection obj : "routes" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkRoutes obj : "servers" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkServers obj : "subnets" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnets obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkId obj) GHC.Base.<> (("ip_range" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkIpRange obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkLabels obj) GHC.Base.<> (("load_balancers" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkLoadBalancers obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkName obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkProtection obj) GHC.Base.<> (("routes" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkRoutes obj) GHC.Base.<> (("servers" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkServers obj) GHC.Base.<> ("subnets" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnets obj))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200Network
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdResponseBody200Network" (\obj -> (((((((((GHC.Base.pure PutNetworksIdResponseBody200Network GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip_range")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "load_balancers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "routes")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "subnets"))
--- | Defines the data type for the schema PutNetworksIdResponseBody200NetworkLabels
--- 
--- User-defined labels (key-value pairs)
-data PutNetworksIdResponseBody200NetworkLabels = PutNetworksIdResponseBody200NetworkLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200NetworkLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200NetworkLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdResponseBody200NetworkLabels" (\obj -> GHC.Base.pure PutNetworksIdResponseBody200NetworkLabels)
--- | Defines the data type for the schema PutNetworksIdResponseBody200NetworkProtection
+-- | Create a new 'PutNetworksIdResponseBody200Network' with all required fields.
+mkPutNetworksIdResponseBody200Network :: Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkCreated'
+  -> GHC.Types.Int -- ^ 'putNetworksIdResponseBody200NetworkId'
+  -> Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkIpRange'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putNetworksIdResponseBody200NetworkLabels'
+  -> Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkName'
+  -> PutNetworksIdResponseBody200NetworkProtection -- ^ 'putNetworksIdResponseBody200NetworkProtection'
+  -> [PutNetworksIdResponseBody200NetworkRoutes] -- ^ 'putNetworksIdResponseBody200NetworkRoutes'
+  -> [GHC.Types.Int] -- ^ 'putNetworksIdResponseBody200NetworkServers'
+  -> [PutNetworksIdResponseBody200NetworkSubnets] -- ^ 'putNetworksIdResponseBody200NetworkSubnets'
+  -> PutNetworksIdResponseBody200Network
+mkPutNetworksIdResponseBody200Network putNetworksIdResponseBody200NetworkCreated putNetworksIdResponseBody200NetworkId putNetworksIdResponseBody200NetworkIpRange putNetworksIdResponseBody200NetworkLabels putNetworksIdResponseBody200NetworkName putNetworksIdResponseBody200NetworkProtection putNetworksIdResponseBody200NetworkRoutes putNetworksIdResponseBody200NetworkServers putNetworksIdResponseBody200NetworkSubnets = PutNetworksIdResponseBody200Network{putNetworksIdResponseBody200NetworkCreated = putNetworksIdResponseBody200NetworkCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkId = putNetworksIdResponseBody200NetworkId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkIpRange = putNetworksIdResponseBody200NetworkIpRange,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkLabels = putNetworksIdResponseBody200NetworkLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkLoadBalancers = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkName = putNetworksIdResponseBody200NetworkName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkProtection = putNetworksIdResponseBody200NetworkProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkRoutes = putNetworksIdResponseBody200NetworkRoutes,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkServers = putNetworksIdResponseBody200NetworkServers,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putNetworksIdResponseBody200NetworkSubnets = putNetworksIdResponseBody200NetworkSubnets}
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.responses.200.content.application\/json.schema.properties.network.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Network
 data PutNetworksIdResponseBody200NetworkProtection = PutNetworksIdResponseBody200NetworkProtection {
@@ -198,12 +174,16 @@ data PutNetworksIdResponseBody200NetworkProtection = PutNetworksIdResponseBody20
   putNetworksIdResponseBody200NetworkProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200NetworkProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (putNetworksIdResponseBody200NetworkProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (putNetworksIdResponseBody200NetworkProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdResponseBody200NetworkProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200NetworkProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdResponseBody200NetworkProtection" (\obj -> GHC.Base.pure PutNetworksIdResponseBody200NetworkProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the data type for the schema PutNetworksIdResponseBody200NetworkRoutes
+-- | Create a new 'PutNetworksIdResponseBody200NetworkProtection' with all required fields.
+mkPutNetworksIdResponseBody200NetworkProtection :: GHC.Types.Bool -- ^ 'putNetworksIdResponseBody200NetworkProtectionDelete'
+  -> PutNetworksIdResponseBody200NetworkProtection
+mkPutNetworksIdResponseBody200NetworkProtection putNetworksIdResponseBody200NetworkProtectionDelete = PutNetworksIdResponseBody200NetworkProtection{putNetworksIdResponseBody200NetworkProtectionDelete = putNetworksIdResponseBody200NetworkProtectionDelete}
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.responses.200.content.application\/json.schema.properties.network.properties.routes.items@ in the specification.
 -- 
 -- 
 data PutNetworksIdResponseBody200NetworkRoutes = PutNetworksIdResponseBody200NetworkRoutes {
@@ -213,12 +193,18 @@ data PutNetworksIdResponseBody200NetworkRoutes = PutNetworksIdResponseBody200Net
   , putNetworksIdResponseBody200NetworkRoutesGateway :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200NetworkRoutes
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination" (putNetworksIdResponseBody200NetworkRoutesDestination obj) : (Data.Aeson..=) "gateway" (putNetworksIdResponseBody200NetworkRoutesGateway obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination" (putNetworksIdResponseBody200NetworkRoutesDestination obj) GHC.Base.<> (Data.Aeson..=) "gateway" (putNetworksIdResponseBody200NetworkRoutesGateway obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdResponseBody200NetworkRoutes
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkRoutesDestination obj : "gateway" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkRoutesGateway obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkRoutesDestination obj) GHC.Base.<> ("gateway" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkRoutesGateway obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200NetworkRoutes
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdResponseBody200NetworkRoutes" (\obj -> (GHC.Base.pure PutNetworksIdResponseBody200NetworkRoutes GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gateway"))
--- | Defines the data type for the schema PutNetworksIdResponseBody200NetworkSubnets
+-- | Create a new 'PutNetworksIdResponseBody200NetworkRoutes' with all required fields.
+mkPutNetworksIdResponseBody200NetworkRoutes :: Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkRoutesDestination'
+  -> Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkRoutesGateway'
+  -> PutNetworksIdResponseBody200NetworkRoutes
+mkPutNetworksIdResponseBody200NetworkRoutes putNetworksIdResponseBody200NetworkRoutesDestination putNetworksIdResponseBody200NetworkRoutesGateway = PutNetworksIdResponseBody200NetworkRoutes{putNetworksIdResponseBody200NetworkRoutesDestination = putNetworksIdResponseBody200NetworkRoutesDestination,
+                                                                                                                                                                                              putNetworksIdResponseBody200NetworkRoutesGateway = putNetworksIdResponseBody200NetworkRoutesGateway}
+-- | Defines the object schema located at @paths.\/networks\/{id}.PUT.responses.200.content.application\/json.schema.properties.network.properties.subnets.items@ in the specification.
 -- 
 -- 
 data PutNetworksIdResponseBody200NetworkSubnets = PutNetworksIdResponseBody200NetworkSubnets {
@@ -232,32 +218,68 @@ data PutNetworksIdResponseBody200NetworkSubnets = PutNetworksIdResponseBody200Ne
   , putNetworksIdResponseBody200NetworkSubnetsType :: PutNetworksIdResponseBody200NetworkSubnetsType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200NetworkSubnets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gateway" (putNetworksIdResponseBody200NetworkSubnetsGateway obj) : (Data.Aeson..=) "ip_range" (putNetworksIdResponseBody200NetworkSubnetsIpRange obj) : (Data.Aeson..=) "network_zone" (putNetworksIdResponseBody200NetworkSubnetsNetworkZone obj) : (Data.Aeson..=) "type" (putNetworksIdResponseBody200NetworkSubnetsType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gateway" (putNetworksIdResponseBody200NetworkSubnetsGateway obj) GHC.Base.<> ((Data.Aeson..=) "ip_range" (putNetworksIdResponseBody200NetworkSubnetsIpRange obj) GHC.Base.<> ((Data.Aeson..=) "network_zone" (putNetworksIdResponseBody200NetworkSubnetsNetworkZone obj) GHC.Base.<> (Data.Aeson..=) "type" (putNetworksIdResponseBody200NetworkSubnetsType obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdResponseBody200NetworkSubnets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gateway" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsGateway obj : "ip_range" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsIpRange obj : "network_zone" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsNetworkZone obj : "type" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gateway" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsGateway obj) GHC.Base.<> (("ip_range" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsIpRange obj) GHC.Base.<> (("network_zone" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsNetworkZone obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= putNetworksIdResponseBody200NetworkSubnetsType obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200NetworkSubnets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutNetworksIdResponseBody200NetworkSubnets" (\obj -> (((GHC.Base.pure PutNetworksIdResponseBody200NetworkSubnets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gateway")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip_range")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PutNetworksIdResponseBody200NetworkSubnetsType
+-- | Create a new 'PutNetworksIdResponseBody200NetworkSubnets' with all required fields.
+mkPutNetworksIdResponseBody200NetworkSubnets :: Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkSubnetsGateway'
+  -> Data.Text.Internal.Text -- ^ 'putNetworksIdResponseBody200NetworkSubnetsNetworkZone'
+  -> PutNetworksIdResponseBody200NetworkSubnetsType -- ^ 'putNetworksIdResponseBody200NetworkSubnetsType'
+  -> PutNetworksIdResponseBody200NetworkSubnets
+mkPutNetworksIdResponseBody200NetworkSubnets putNetworksIdResponseBody200NetworkSubnetsGateway putNetworksIdResponseBody200NetworkSubnetsNetworkZone putNetworksIdResponseBody200NetworkSubnetsType = PutNetworksIdResponseBody200NetworkSubnets{putNetworksIdResponseBody200NetworkSubnetsGateway = putNetworksIdResponseBody200NetworkSubnetsGateway,
+                                                                                                                                                                                                                                                 putNetworksIdResponseBody200NetworkSubnetsIpRange = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                 putNetworksIdResponseBody200NetworkSubnetsNetworkZone = putNetworksIdResponseBody200NetworkSubnetsNetworkZone,
+                                                                                                                                                                                                                                                 putNetworksIdResponseBody200NetworkSubnetsType = putNetworksIdResponseBody200NetworkSubnetsType}
+-- | Defines the enum schema located at @paths.\/networks\/{id}.PUT.responses.200.content.application\/json.schema.properties.network.properties.subnets.items.properties.type@ in the specification.
 -- 
 -- Type of Subnetwork
-data PutNetworksIdResponseBody200NetworkSubnetsType
-    = PutNetworksIdResponseBody200NetworkSubnetsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumTyped Data.Text.Internal.Text
-    | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringCloud
-    | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringServer
-    | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringVswitch
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutNetworksIdResponseBody200NetworkSubnetsType
-    where toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringCloud) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "cloud"
-          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringVswitch) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "vswitch"
-instance Data.Aeson.FromJSON PutNetworksIdResponseBody200NetworkSubnetsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "cloud")
-                                          then PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringCloud
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                then PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringServer
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "vswitch")
-                                                      then PutNetworksIdResponseBody200NetworkSubnetsTypeEnumStringVswitch
-                                                      else PutNetworksIdResponseBody200NetworkSubnetsTypeEnumOther val)
+data PutNetworksIdResponseBody200NetworkSubnetsType =
+   PutNetworksIdResponseBody200NetworkSubnetsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutNetworksIdResponseBody200NetworkSubnetsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumCloud -- ^ Represents the JSON value @"cloud"@
+  | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PutNetworksIdResponseBody200NetworkSubnetsTypeEnumVswitch -- ^ Represents the JSON value @"vswitch"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutNetworksIdResponseBody200NetworkSubnetsType
+    where toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeOther val) = val
+          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumCloud) = "cloud"
+          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumServer) = "server"
+          toJSON (PutNetworksIdResponseBody200NetworkSubnetsTypeEnumVswitch) = "vswitch"
+instance Data.Aeson.Types.FromJSON.FromJSON PutNetworksIdResponseBody200NetworkSubnetsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "cloud" -> PutNetworksIdResponseBody200NetworkSubnetsTypeEnumCloud
+                                            | val GHC.Classes.== "server" -> PutNetworksIdResponseBody200NetworkSubnetsTypeEnumServer
+                                            | val GHC.Classes.== "vswitch" -> PutNetworksIdResponseBody200NetworkSubnetsTypeEnumVswitch
+                                            | GHC.Base.otherwise -> PutNetworksIdResponseBody200NetworkSubnetsTypeOther val)
+-- | > PUT /networks/{id}
+-- 
+-- The same as 'putNetworks_Id_' but accepts an explicit configuration.
+putNetworks_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the network
+  -> GHC.Maybe.Maybe PutNetworksIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutNetworksIdResponse) -- ^ Monadic computation which returns the result of the operation
+putNetworks_Id_WithConfiguration config
+                                 id
+                                 body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutNetworksIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutNetworksIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                             PutNetworksIdResponseBody200)
+                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /networks/{id}
+-- 
+-- The same as 'putNetworks_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putNetworks_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the network
+  -> GHC.Maybe.Maybe PutNetworksIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putNetworks_Id_Raw id
+                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /networks/{id}
+-- 
+-- The same as 'putNetworks_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putNetworks_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the network
+  -> GHC.Maybe.Maybe PutNetworksIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putNetworks_Id_WithConfigurationRaw config
+                                    id
+                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

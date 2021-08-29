@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postFloatingIps_Id_ActionsChangeProtection
 module HCloud.Operations.PostFloatingIpsIdActionsChangeProtection where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,57 +45,14 @@ import HCloud.Types
 -- | > POST /floating_ips/{id}/actions/change_protection
 -- 
 -- Changes the protection configuration of the Floating IP.
-postFloatingIps_Id_ActionsChangeProtection :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                               -- ^ id: ID of the Floating IP
-  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsChangeProtectionResponse))   -- ^ Monad containing the result of the operation
-postFloatingIps_Id_ActionsChangeProtection config
-                                           id
-                                           body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            PostFloatingIpsIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /floating_ips/{id}/actions/change_protection
--- 
--- The same as 'postFloatingIps_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'
-postFloatingIps_Id_ActionsChangeProtectionRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                               HCloud.Common.SecurityScheme s) =>
-                                                 HCloud.Common.Configuration s ->
-                                                 GHC.Integer.Type.Integer ->
-                                                 GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody ->
-                                                 m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postFloatingIps_Id_ActionsChangeProtectionRaw config
-                                              id
-                                              body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /floating_ips/{id}/actions/change_protection
--- 
--- Monadic version of 'postFloatingIps_Id_ActionsChangeProtection' (use with 'HCloud.Common.runWithConfiguration')
-postFloatingIps_Id_ActionsChangeProtectionM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                             HCloud.Common.SecurityScheme s) =>
-                                               GHC.Integer.Type.Integer ->
-                                               GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody ->
-                                               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                  m
-                                                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                      (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsChangeProtectionResponse))
-postFloatingIps_Id_ActionsChangeProtectionM id
-                                            body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             PostFloatingIpsIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /floating_ips/{id}/actions/change_protection
--- 
--- Monadic version of 'postFloatingIps_Id_ActionsChangeProtectionRaw' (use with 'HCloud.Common.runWithConfiguration')
-postFloatingIps_Id_ActionsChangeProtectionRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                HCloud.Common.SecurityScheme s) =>
-                                                  GHC.Integer.Type.Integer ->
-                                                  GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody ->
-                                                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                     m
-                                                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postFloatingIps_Id_ActionsChangeProtectionRawM id
-                                               body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postFloatingIps_Id_ActionsChangeProtectionRequestBody
+postFloatingIps_Id_ActionsChangeProtection :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsChangeProtection id
+                                           body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             PostFloatingIpsIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/change_protection.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsChangeProtectionRequestBody = PostFloatingIpsIdActionsChangeProtectionRequestBody {
@@ -103,19 +60,22 @@ data PostFloatingIpsIdActionsChangeProtectionRequestBody = PostFloatingIpsIdActi
   postFloatingIpsIdActionsChangeProtectionRequestBodyDelete :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsChangeProtectionRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postFloatingIpsIdActionsChangeProtectionRequestBodyDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postFloatingIpsIdActionsChangeProtectionRequestBodyDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsChangeProtectionRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionRequestBodyDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionRequestBodyDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsChangeProtectionRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsChangeProtectionRequestBody" (\obj -> GHC.Base.pure PostFloatingIpsIdActionsChangeProtectionRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "delete"))
+-- | Create a new 'PostFloatingIpsIdActionsChangeProtectionRequestBody' with all required fields.
+mkPostFloatingIpsIdActionsChangeProtectionRequestBody :: PostFloatingIpsIdActionsChangeProtectionRequestBody
+mkPostFloatingIpsIdActionsChangeProtectionRequestBody = PostFloatingIpsIdActionsChangeProtectionRequestBody{postFloatingIpsIdActionsChangeProtectionRequestBodyDelete = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'postFloatingIps_Id_ActionsChangeProtection'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostFloatingIpsIdActionsChangeProtectionResponseError' is used.
-data PostFloatingIpsIdActionsChangeProtectionResponse =                                                          
-   PostFloatingIpsIdActionsChangeProtectionResponseError GHC.Base.String                                         -- ^ Means either no matching case available or a parse error
-  | PostFloatingIpsIdActionsChangeProtectionResponse201 PostFloatingIpsIdActionsChangeProtectionResponseBody201  -- ^ The \`action\` key contains the \`change_protection\` Action
+data PostFloatingIpsIdActionsChangeProtectionResponse =
+   PostFloatingIpsIdActionsChangeProtectionResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostFloatingIpsIdActionsChangeProtectionResponse201 PostFloatingIpsIdActionsChangeProtectionResponseBody201 -- ^ The \`action\` key contains the \`change_protection\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostFloatingIpsIdActionsChangeProtectionResponseBody201
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsChangeProtectionResponseBody201 = PostFloatingIpsIdActionsChangeProtectionResponseBody201 {
@@ -123,39 +83,61 @@ data PostFloatingIpsIdActionsChangeProtectionResponseBody201 = PostFloatingIpsId
   postFloatingIpsIdActionsChangeProtectionResponseBody201Action :: PostFloatingIpsIdActionsChangeProtectionResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postFloatingIpsIdActionsChangeProtectionResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postFloatingIpsIdActionsChangeProtectionResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsChangeProtectionResponseBody201" (\obj -> GHC.Base.pure PostFloatingIpsIdActionsChangeProtectionResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostFloatingIpsIdActionsChangeProtectionResponseBody201Action
+-- | Create a new 'PostFloatingIpsIdActionsChangeProtectionResponseBody201' with all required fields.
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201 :: PostFloatingIpsIdActionsChangeProtectionResponseBody201Action -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201Action'
+  -> PostFloatingIpsIdActionsChangeProtectionResponseBody201
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201 postFloatingIpsIdActionsChangeProtectionResponseBody201Action = PostFloatingIpsIdActionsChangeProtectionResponseBody201{postFloatingIpsIdActionsChangeProtectionResponseBody201Action = postFloatingIpsIdActionsChangeProtectionResponseBody201Action}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsChangeProtectionResponseBody201Action = PostFloatingIpsIdActionsChangeProtectionResponseBody201Action {
   -- | command: Command executed in the Action
   postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError :: PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError
+  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError :: (GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources :: ([] PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources)
+  , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources :: ([PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus :: PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsChangeProtectionResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostFloatingIpsIdActionsChangeProtectionResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError
+-- | Create a new 'PostFloatingIpsIdActionsChangeProtectionResponseBody201Action' with all required fields.
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress'
+  -> [PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources] -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted'
+  -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus'
+  -> PostFloatingIpsIdActionsChangeProtectionResponseBody201Action
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201Action postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus = PostFloatingIpsIdActionsChangeProtectionResponseBody201Action{postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError = PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError {
@@ -165,47 +147,86 @@ data PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError = PostFl
   , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError" (\obj -> (GHC.Base.pure PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources
+-- | Create a new 'PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError' with all required fields.
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage'
+  -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage = PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionError{postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                                           postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources = PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
+-- | Create a new 'PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources' with all required fields.
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType'
+  -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources
+mkPostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType = PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionResources{postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                                      postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType = postFloatingIpsIdActionsChangeProtectionResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/floating_ips\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
-    = PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-    | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-    | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
-    where toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumOther val)
+data PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus =
+   PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
+    where toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusOther val) = val
+          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostFloatingIpsIdActionsChangeProtectionResponseBody201ActionStatusOther val)
+-- | > POST /floating_ips/{id}/actions/change_protection
+-- 
+-- The same as 'postFloatingIps_Id_ActionsChangeProtection' but accepts an explicit configuration.
+postFloatingIps_Id_ActionsChangeProtectionWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostFloatingIpsIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsChangeProtectionWithConfiguration config
+                                                            id
+                                                            body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostFloatingIpsIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostFloatingIpsIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              PostFloatingIpsIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /floating_ips/{id}/actions/change_protection
+-- 
+-- The same as 'postFloatingIps_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postFloatingIps_Id_ActionsChangeProtectionRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsChangeProtectionRaw id
+                                              body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /floating_ips/{id}/actions/change_protection
+-- 
+-- The same as 'postFloatingIps_Id_ActionsChangeProtection' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postFloatingIps_Id_ActionsChangeProtectionWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PostFloatingIpsIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postFloatingIps_Id_ActionsChangeProtectionWithConfigurationRaw config
+                                                               id
+                                                               body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

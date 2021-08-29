@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postLoadBalancers_Id_ActionsDisablePublicInterface
 module HCloud.Operations.PostLoadBalancersIdActionsDisablePublicInterface where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -52,56 +52,19 @@ import HCloud.Types
 -- |-------------------------------------------|--------------------------------------------------------------------------------|
 -- | \`load_balancer_not_attached_to_network\`   |  The Load Balancer is not attached to a network                                |
 -- | \`targets_without_use_private_ip\`          | The Load Balancer has targets that use the public IP instead of the private IP |
-postLoadBalancers_Id_ActionsDisablePublicInterface :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                                       -- ^ id: ID of the Load Balancer
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsDisablePublicInterfaceResponse))   -- ^ Monad containing the result of the operation
-postLoadBalancers_Id_ActionsDisablePublicInterface config
-                                                   id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsDisablePublicInterfaceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsDisablePublicInterfaceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201)
-                                                                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) [])
--- | > POST /load_balancers/{id}/actions/disable_public_interface
--- 
--- The same as 'postLoadBalancers_Id_ActionsDisablePublicInterface' but returns the raw 'Data.ByteString.Char8.ByteString'
-postLoadBalancers_Id_ActionsDisablePublicInterfaceRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                       HCloud.Common.SecurityScheme s) =>
-                                                         HCloud.Common.Configuration s ->
-                                                         GHC.Integer.Type.Integer ->
-                                                         m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsDisablePublicInterfaceRaw config
-                                                      id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) [])
--- | > POST /load_balancers/{id}/actions/disable_public_interface
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsDisablePublicInterface' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsDisablePublicInterfaceM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                     HCloud.Common.SecurityScheme s) =>
-                                                       GHC.Integer.Type.Integer ->
-                                                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                          m
-                                                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                              (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsDisablePublicInterfaceResponse))
-postLoadBalancers_Id_ActionsDisablePublicInterfaceM id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsDisablePublicInterfaceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsDisablePublicInterfaceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201)
-                                                                                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) [])
--- | > POST /load_balancers/{id}/actions/disable_public_interface
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsDisablePublicInterfaceRaw' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsDisablePublicInterfaceRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                        HCloud.Common.SecurityScheme s) =>
-                                                          GHC.Integer.Type.Integer ->
-                                                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                             m
-                                                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsDisablePublicInterfaceRawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) [])
+postLoadBalancers_Id_ActionsDisablePublicInterface :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsDisablePublicInterfaceResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsDisablePublicInterface id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsDisablePublicInterfaceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsDisablePublicInterfaceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201)
+                                                                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) GHC.Base.mempty)
 -- | Represents a response of the operation 'postLoadBalancers_Id_ActionsDisablePublicInterface'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostLoadBalancersIdActionsDisablePublicInterfaceResponseError' is used.
-data PostLoadBalancersIdActionsDisablePublicInterfaceResponse =                                                                  
-   PostLoadBalancersIdActionsDisablePublicInterfaceResponseError GHC.Base.String                                                 -- ^ Means either no matching case available or a parse error
-  | PostLoadBalancersIdActionsDisablePublicInterfaceResponse201 PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201  -- ^ The \`action\` key contains the \`disable_public_interface\` Action
+data PostLoadBalancersIdActionsDisablePublicInterfaceResponse =
+   PostLoadBalancersIdActionsDisablePublicInterfaceResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostLoadBalancersIdActionsDisablePublicInterfaceResponse201 PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 -- ^ The \`action\` key contains the \`disable_public_interface\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/disable_public_interface.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 {
@@ -109,39 +72,61 @@ data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 = PostLoadB
   postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action :: PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action
+-- | Create a new 'PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201' with all required fields.
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 :: PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action'
+  -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201 postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201{postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/disable_public_interface.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action {
   -- | command: Command executed in the Action
   postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError :: PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError
+  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources :: ([] PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources)
+  , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources :: ([PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus :: PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError
+-- | Create a new 'PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action' with all required fields.
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress'
+  -> [PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources] -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted'
+  -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus'
+  -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201Action{postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/disable_public_interface.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError {
@@ -151,47 +136,80 @@ data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError 
   , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources
+-- | Create a new 'PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError' with all required fields.
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage'
+  -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionError{postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                                                                           postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/disable_public_interface.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
+-- | Create a new 'PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources' with all required fields.
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType'
+  -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources
+mkPostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResources{postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                                                                      postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType = postLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/disable_public_interface.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
-    = PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringError
-    | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringRunning
-    | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
-    where toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumOther val)
+data PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus =
+   PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
+    where toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusOther val) = val
+          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201ActionStatusOther val)
+-- | > POST /load_balancers/{id}/actions/disable_public_interface
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsDisablePublicInterface' but accepts an explicit configuration.
+postLoadBalancers_Id_ActionsDisablePublicInterfaceWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsDisablePublicInterfaceResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsDisablePublicInterfaceWithConfiguration config
+                                                                    id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsDisablePublicInterfaceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsDisablePublicInterfaceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostLoadBalancersIdActionsDisablePublicInterfaceResponseBody201)
+                                                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) GHC.Base.mempty)
+-- | > POST /load_balancers/{id}/actions/disable_public_interface
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsDisablePublicInterface' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsDisablePublicInterfaceRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsDisablePublicInterfaceRaw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) GHC.Base.mempty)
+-- | > POST /load_balancers/{id}/actions/disable_public_interface
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsDisablePublicInterface' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsDisablePublicInterfaceWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsDisablePublicInterfaceWithConfigurationRaw config
+                                                                       id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_public_interface"))) GHC.Base.mempty)

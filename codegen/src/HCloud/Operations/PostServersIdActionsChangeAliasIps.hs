@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsChangeAliasIps
 module HCloud.Operations.PostServersIdActionsChangeAliasIps where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,79 +45,42 @@ import HCloud.Types
 -- | > POST /servers/{id}/actions/change_alias_ips
 -- 
 -- Changes the alias IPs of an already attached Network. Note that the existing aliases for the specified Network will be replaced with these provided in the request body. So if you want to add an alias IP, you have to provide the existing ones from the Network plus the new alias IP in the request body.
-postServers_Id_ActionsChangeAliasIps :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                         -- ^ id: ID of the Server
-  -> GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsChangeAliasIpsResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsChangeAliasIps config
-                                     id
-                                     body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeAliasIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeAliasIpsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          PostServersIdActionsChangeAliasIpsResponseBody201)
-                                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/change_alias_ips
--- 
--- The same as 'postServers_Id_ActionsChangeAliasIps' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsChangeAliasIpsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                         HCloud.Common.SecurityScheme s) =>
-                                           HCloud.Common.Configuration s ->
-                                           GHC.Integer.Type.Integer ->
-                                           GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody ->
-                                           m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsChangeAliasIpsRaw config
-                                        id
-                                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/change_alias_ips
--- 
--- Monadic version of 'postServers_Id_ActionsChangeAliasIps' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsChangeAliasIpsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                       HCloud.Common.SecurityScheme s) =>
-                                         GHC.Integer.Type.Integer ->
-                                         GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody ->
-                                         Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                            m
-                                                                            (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                (Network.HTTP.Client.Types.Response PostServersIdActionsChangeAliasIpsResponse))
-postServers_Id_ActionsChangeAliasIpsM id
-                                      body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeAliasIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeAliasIpsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           PostServersIdActionsChangeAliasIpsResponseBody201)
-                                                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/change_alias_ips
--- 
--- Monadic version of 'postServers_Id_ActionsChangeAliasIpsRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsChangeAliasIpsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                          HCloud.Common.SecurityScheme s) =>
-                                            GHC.Integer.Type.Integer ->
-                                            GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody ->
-                                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                               m
-                                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                   (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsChangeAliasIpsRawM id
-                                         body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postServers_Id_ActionsChangeAliasIpsRequestBody
+postServers_Id_ActionsChangeAliasIps :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsChangeAliasIpsResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeAliasIps id
+                                     body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeAliasIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeAliasIpsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                           PostServersIdActionsChangeAliasIpsResponseBody201)
+                                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_alias_ips.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeAliasIpsRequestBody = PostServersIdActionsChangeAliasIpsRequestBody {
   -- | alias_ips: New alias IPs to set for this Server
-  postServersIdActionsChangeAliasIpsRequestBodyAliasIps :: ([] Data.Text.Internal.Text)
+  postServersIdActionsChangeAliasIpsRequestBodyAliasIps :: ([Data.Text.Internal.Text])
   -- | network: ID of an existing Network already attached to the Server
-  , postServersIdActionsChangeAliasIpsRequestBodyNetwork :: GHC.Integer.Type.Integer
+  , postServersIdActionsChangeAliasIpsRequestBodyNetwork :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeAliasIpsRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "alias_ips" (postServersIdActionsChangeAliasIpsRequestBodyAliasIps obj) : (Data.Aeson..=) "network" (postServersIdActionsChangeAliasIpsRequestBodyNetwork obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "alias_ips" (postServersIdActionsChangeAliasIpsRequestBodyAliasIps obj) GHC.Base.<> (Data.Aeson..=) "network" (postServersIdActionsChangeAliasIpsRequestBodyNetwork obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeAliasIpsRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("alias_ips" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsRequestBodyAliasIps obj : "network" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsRequestBodyNetwork obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("alias_ips" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsRequestBodyAliasIps obj) GHC.Base.<> ("network" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsRequestBodyNetwork obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeAliasIpsRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeAliasIpsRequestBody" (\obj -> (GHC.Base.pure PostServersIdActionsChangeAliasIpsRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "alias_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network"))
+-- | Create a new 'PostServersIdActionsChangeAliasIpsRequestBody' with all required fields.
+mkPostServersIdActionsChangeAliasIpsRequestBody :: [Data.Text.Internal.Text] -- ^ 'postServersIdActionsChangeAliasIpsRequestBodyAliasIps'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsChangeAliasIpsRequestBodyNetwork'
+  -> PostServersIdActionsChangeAliasIpsRequestBody
+mkPostServersIdActionsChangeAliasIpsRequestBody postServersIdActionsChangeAliasIpsRequestBodyAliasIps postServersIdActionsChangeAliasIpsRequestBodyNetwork = PostServersIdActionsChangeAliasIpsRequestBody{postServersIdActionsChangeAliasIpsRequestBodyAliasIps = postServersIdActionsChangeAliasIpsRequestBodyAliasIps,
+                                                                                                                                                                                                           postServersIdActionsChangeAliasIpsRequestBodyNetwork = postServersIdActionsChangeAliasIpsRequestBodyNetwork}
 -- | Represents a response of the operation 'postServers_Id_ActionsChangeAliasIps'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsChangeAliasIpsResponseError' is used.
-data PostServersIdActionsChangeAliasIpsResponse =                                                    
-   PostServersIdActionsChangeAliasIpsResponseError GHC.Base.String                                   -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsChangeAliasIpsResponse201 PostServersIdActionsChangeAliasIpsResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsChangeAliasIpsResponse =
+   PostServersIdActionsChangeAliasIpsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsChangeAliasIpsResponse201 PostServersIdActionsChangeAliasIpsResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsChangeAliasIpsResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_alias_ips.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeAliasIpsResponseBody201 = PostServersIdActionsChangeAliasIpsResponseBody201 {
@@ -125,39 +88,61 @@ data PostServersIdActionsChangeAliasIpsResponseBody201 = PostServersIdActionsCha
   postServersIdActionsChangeAliasIpsResponseBody201Action :: PostServersIdActionsChangeAliasIpsResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsChangeAliasIpsResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsChangeAliasIpsResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeAliasIpsResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeAliasIpsResponseBody201" (\obj -> GHC.Base.pure PostServersIdActionsChangeAliasIpsResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostServersIdActionsChangeAliasIpsResponseBody201Action
+-- | Create a new 'PostServersIdActionsChangeAliasIpsResponseBody201' with all required fields.
+mkPostServersIdActionsChangeAliasIpsResponseBody201 :: PostServersIdActionsChangeAliasIpsResponseBody201Action -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201Action'
+  -> PostServersIdActionsChangeAliasIpsResponseBody201
+mkPostServersIdActionsChangeAliasIpsResponseBody201 postServersIdActionsChangeAliasIpsResponseBody201Action = PostServersIdActionsChangeAliasIpsResponseBody201{postServersIdActionsChangeAliasIpsResponseBody201Action = postServersIdActionsChangeAliasIpsResponseBody201Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_alias_ips.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeAliasIpsResponseBody201Action = PostServersIdActionsChangeAliasIpsResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsChangeAliasIpsResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsChangeAliasIpsResponseBody201ActionError :: PostServersIdActionsChangeAliasIpsResponseBody201ActionError
+  , postServersIdActionsChangeAliasIpsResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsChangeAliasIpsResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsChangeAliasIpsResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsChangeAliasIpsResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsChangeAliasIpsResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsChangeAliasIpsResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsChangeAliasIpsResponseBody201ActionResources :: ([] PostServersIdActionsChangeAliasIpsResponseBody201ActionResources)
+  , postServersIdActionsChangeAliasIpsResponseBody201ActionResources :: ([PostServersIdActionsChangeAliasIpsResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsChangeAliasIpsResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsChangeAliasIpsResponseBody201ActionStatus :: PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsChangeAliasIpsResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsChangeAliasIpsResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsChangeAliasIpsResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsChangeAliasIpsResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsChangeAliasIpsResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsChangeAliasIpsResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsChangeAliasIpsResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsChangeAliasIpsResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsChangeAliasIpsResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsChangeAliasIpsResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsChangeAliasIpsResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsChangeAliasIpsResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsChangeAliasIpsResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsChangeAliasIpsResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsChangeAliasIpsResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsChangeAliasIpsResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeAliasIpsResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeAliasIpsResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsChangeAliasIpsResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsChangeAliasIpsResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsChangeAliasIpsResponseBody201Action' with all required fields.
+mkPostServersIdActionsChangeAliasIpsResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsResponseBody201ActionError -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionProgress'
+  -> [PostServersIdActionsChangeAliasIpsResponseBody201ActionResources] -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionStarted'
+  -> PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionStatus'
+  -> PostServersIdActionsChangeAliasIpsResponseBody201Action
+mkPostServersIdActionsChangeAliasIpsResponseBody201Action postServersIdActionsChangeAliasIpsResponseBody201ActionCommand postServersIdActionsChangeAliasIpsResponseBody201ActionError postServersIdActionsChangeAliasIpsResponseBody201ActionFinished postServersIdActionsChangeAliasIpsResponseBody201ActionId postServersIdActionsChangeAliasIpsResponseBody201ActionProgress postServersIdActionsChangeAliasIpsResponseBody201ActionResources postServersIdActionsChangeAliasIpsResponseBody201ActionStarted postServersIdActionsChangeAliasIpsResponseBody201ActionStatus = PostServersIdActionsChangeAliasIpsResponseBody201Action{postServersIdActionsChangeAliasIpsResponseBody201ActionCommand = postServersIdActionsChangeAliasIpsResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionError = postServersIdActionsChangeAliasIpsResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionFinished = postServersIdActionsChangeAliasIpsResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionId = postServersIdActionsChangeAliasIpsResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionProgress = postServersIdActionsChangeAliasIpsResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionResources = postServersIdActionsChangeAliasIpsResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionStarted = postServersIdActionsChangeAliasIpsResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postServersIdActionsChangeAliasIpsResponseBody201ActionStatus = postServersIdActionsChangeAliasIpsResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_alias_ips.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsChangeAliasIpsResponseBody201ActionError = PostServersIdActionsChangeAliasIpsResponseBody201ActionError {
@@ -167,47 +152,86 @@ data PostServersIdActionsChangeAliasIpsResponseBody201ActionError = PostServersI
   , postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeAliasIpsResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsChangeAliasIpsResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsChangeAliasIpsResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsChangeAliasIpsResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsChangeAliasIpsResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsChangeAliasIpsResponseBody201ActionError
+mkPostServersIdActionsChangeAliasIpsResponseBody201ActionError postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage = PostServersIdActionsChangeAliasIpsResponseBody201ActionError{postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode = postServersIdActionsChangeAliasIpsResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                   postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage = postServersIdActionsChangeAliasIpsResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_alias_ips.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeAliasIpsResponseBody201ActionResources = PostServersIdActionsChangeAliasIpsResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeAliasIpsResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsChangeAliasIpsResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsChangeAliasIpsResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsChangeAliasIpsResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType'
+  -> PostServersIdActionsChangeAliasIpsResponseBody201ActionResources
+mkPostServersIdActionsChangeAliasIpsResponseBody201ActionResources postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType = PostServersIdActionsChangeAliasIpsResponseBody201ActionResources{postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId = postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                              postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType = postServersIdActionsChangeAliasIpsResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/change_alias_ips.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
-    = PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus =
+   PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeAliasIpsResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsChangeAliasIpsResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/change_alias_ips
+-- 
+-- The same as 'postServers_Id_ActionsChangeAliasIps' but accepts an explicit configuration.
+postServers_Id_ActionsChangeAliasIpsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsChangeAliasIpsResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeAliasIpsWithConfiguration config
+                                                      id
+                                                      body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeAliasIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeAliasIpsResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            PostServersIdActionsChangeAliasIpsResponseBody201)
+                                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/change_alias_ips
+-- 
+-- The same as 'postServers_Id_ActionsChangeAliasIps' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsChangeAliasIpsRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeAliasIpsRaw id
+                                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/change_alias_ips
+-- 
+-- The same as 'postServers_Id_ActionsChangeAliasIps' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsChangeAliasIpsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeAliasIpsRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeAliasIpsWithConfigurationRaw config
+                                                         id
+                                                         body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_alias_ips"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

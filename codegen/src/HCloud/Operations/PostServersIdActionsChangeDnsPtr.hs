@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsChangeDnsPtr
 module HCloud.Operations.PostServersIdActionsChangeDnsPtr where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,79 +47,42 @@ import HCloud.Types
 -- Changes the hostname that will appear when getting the hostname belonging to the primary IPs (IPv4 and IPv6) of this Server.
 -- 
 -- Floating IPs assigned to the Server are not affected by this.
-postServers_Id_ActionsChangeDnsPtr :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                       -- ^ id: ID of the Server
-  -> GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsChangeDnsPtrResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsChangeDnsPtr config
-                                   id
-                                   body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeDnsPtrResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeDnsPtrResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostServersIdActionsChangeDnsPtrResponseBody201)
-                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/change_dns_ptr
--- 
--- The same as 'postServers_Id_ActionsChangeDnsPtr' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsChangeDnsPtrRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                       HCloud.Common.SecurityScheme s) =>
-                                         HCloud.Common.Configuration s ->
-                                         GHC.Integer.Type.Integer ->
-                                         GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody ->
-                                         m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsChangeDnsPtrRaw config
-                                      id
-                                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/change_dns_ptr
--- 
--- Monadic version of 'postServers_Id_ActionsChangeDnsPtr' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsChangeDnsPtrM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                     HCloud.Common.SecurityScheme s) =>
-                                       GHC.Integer.Type.Integer ->
-                                       GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody ->
-                                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                          m
-                                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                              (Network.HTTP.Client.Types.Response PostServersIdActionsChangeDnsPtrResponse))
-postServers_Id_ActionsChangeDnsPtrM id
-                                    body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeDnsPtrResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeDnsPtrResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostServersIdActionsChangeDnsPtrResponseBody201)
-                                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/change_dns_ptr
--- 
--- Monadic version of 'postServers_Id_ActionsChangeDnsPtrRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsChangeDnsPtrRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                        HCloud.Common.SecurityScheme s) =>
-                                          GHC.Integer.Type.Integer ->
-                                          GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody ->
-                                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                             m
-                                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsChangeDnsPtrRawM id
-                                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postServers_Id_ActionsChangeDnsPtrRequestBody
+postServers_Id_ActionsChangeDnsPtr :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsChangeDnsPtrResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeDnsPtr id
+                                   body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeDnsPtrResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeDnsPtrResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostServersIdActionsChangeDnsPtrResponseBody201)
+                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_dns_ptr.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeDnsPtrRequestBody = PostServersIdActionsChangeDnsPtrRequestBody {
   -- | dns_ptr: Hostname to set as a reverse DNS PTR entry, reset to original value if \`null\`
-  postServersIdActionsChangeDnsPtrRequestBodyDnsPtr :: Data.Text.Internal.Text
+  postServersIdActionsChangeDnsPtrRequestBodyDnsPtr :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | ip: Primary IP address for which the reverse DNS entry should be set
   , postServersIdActionsChangeDnsPtrRequestBodyIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeDnsPtrRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (postServersIdActionsChangeDnsPtrRequestBodyDnsPtr obj) : (Data.Aeson..=) "ip" (postServersIdActionsChangeDnsPtrRequestBodyIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (postServersIdActionsChangeDnsPtrRequestBodyDnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (postServersIdActionsChangeDnsPtrRequestBodyIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeDnsPtrRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrRequestBodyDnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrRequestBodyIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrRequestBodyDnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrRequestBodyIp obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeDnsPtrRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeDnsPtrRequestBody" (\obj -> (GHC.Base.pure PostServersIdActionsChangeDnsPtrRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
+-- | Create a new 'PostServersIdActionsChangeDnsPtrRequestBody' with all required fields.
+mkPostServersIdActionsChangeDnsPtrRequestBody :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrRequestBodyDnsPtr'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrRequestBodyIp'
+  -> PostServersIdActionsChangeDnsPtrRequestBody
+mkPostServersIdActionsChangeDnsPtrRequestBody postServersIdActionsChangeDnsPtrRequestBodyDnsPtr postServersIdActionsChangeDnsPtrRequestBodyIp = PostServersIdActionsChangeDnsPtrRequestBody{postServersIdActionsChangeDnsPtrRequestBodyDnsPtr = postServersIdActionsChangeDnsPtrRequestBodyDnsPtr,
+                                                                                                                                                                                            postServersIdActionsChangeDnsPtrRequestBodyIp = postServersIdActionsChangeDnsPtrRequestBodyIp}
 -- | Represents a response of the operation 'postServers_Id_ActionsChangeDnsPtr'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsChangeDnsPtrResponseError' is used.
-data PostServersIdActionsChangeDnsPtrResponse =                                                  
-   PostServersIdActionsChangeDnsPtrResponseError GHC.Base.String                                 -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsChangeDnsPtrResponse201 PostServersIdActionsChangeDnsPtrResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsChangeDnsPtrResponse =
+   PostServersIdActionsChangeDnsPtrResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsChangeDnsPtrResponse201 PostServersIdActionsChangeDnsPtrResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsChangeDnsPtrResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_dns_ptr.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeDnsPtrResponseBody201 = PostServersIdActionsChangeDnsPtrResponseBody201 {
@@ -127,39 +90,61 @@ data PostServersIdActionsChangeDnsPtrResponseBody201 = PostServersIdActionsChang
   postServersIdActionsChangeDnsPtrResponseBody201Action :: PostServersIdActionsChangeDnsPtrResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsChangeDnsPtrResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsChangeDnsPtrResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeDnsPtrResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeDnsPtrResponseBody201" (\obj -> GHC.Base.pure PostServersIdActionsChangeDnsPtrResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostServersIdActionsChangeDnsPtrResponseBody201Action
+-- | Create a new 'PostServersIdActionsChangeDnsPtrResponseBody201' with all required fields.
+mkPostServersIdActionsChangeDnsPtrResponseBody201 :: PostServersIdActionsChangeDnsPtrResponseBody201Action -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201Action'
+  -> PostServersIdActionsChangeDnsPtrResponseBody201
+mkPostServersIdActionsChangeDnsPtrResponseBody201 postServersIdActionsChangeDnsPtrResponseBody201Action = PostServersIdActionsChangeDnsPtrResponseBody201{postServersIdActionsChangeDnsPtrResponseBody201Action = postServersIdActionsChangeDnsPtrResponseBody201Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_dns_ptr.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeDnsPtrResponseBody201Action = PostServersIdActionsChangeDnsPtrResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsChangeDnsPtrResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsChangeDnsPtrResponseBody201ActionError :: PostServersIdActionsChangeDnsPtrResponseBody201ActionError
+  , postServersIdActionsChangeDnsPtrResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsChangeDnsPtrResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsChangeDnsPtrResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsChangeDnsPtrResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsChangeDnsPtrResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsChangeDnsPtrResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsChangeDnsPtrResponseBody201ActionResources :: ([] PostServersIdActionsChangeDnsPtrResponseBody201ActionResources)
+  , postServersIdActionsChangeDnsPtrResponseBody201ActionResources :: ([PostServersIdActionsChangeDnsPtrResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsChangeDnsPtrResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsChangeDnsPtrResponseBody201ActionStatus :: PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsChangeDnsPtrResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsChangeDnsPtrResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsChangeDnsPtrResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsChangeDnsPtrResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsChangeDnsPtrResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsChangeDnsPtrResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsChangeDnsPtrResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsChangeDnsPtrResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsChangeDnsPtrResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsChangeDnsPtrResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsChangeDnsPtrResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsChangeDnsPtrResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsChangeDnsPtrResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsChangeDnsPtrResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsChangeDnsPtrResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsChangeDnsPtrResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeDnsPtrResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeDnsPtrResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsChangeDnsPtrResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsChangeDnsPtrResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsChangeDnsPtrResponseBody201Action' with all required fields.
+mkPostServersIdActionsChangeDnsPtrResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrResponseBody201ActionError -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionProgress'
+  -> [PostServersIdActionsChangeDnsPtrResponseBody201ActionResources] -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionStarted'
+  -> PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionStatus'
+  -> PostServersIdActionsChangeDnsPtrResponseBody201Action
+mkPostServersIdActionsChangeDnsPtrResponseBody201Action postServersIdActionsChangeDnsPtrResponseBody201ActionCommand postServersIdActionsChangeDnsPtrResponseBody201ActionError postServersIdActionsChangeDnsPtrResponseBody201ActionFinished postServersIdActionsChangeDnsPtrResponseBody201ActionId postServersIdActionsChangeDnsPtrResponseBody201ActionProgress postServersIdActionsChangeDnsPtrResponseBody201ActionResources postServersIdActionsChangeDnsPtrResponseBody201ActionStarted postServersIdActionsChangeDnsPtrResponseBody201ActionStatus = PostServersIdActionsChangeDnsPtrResponseBody201Action{postServersIdActionsChangeDnsPtrResponseBody201ActionCommand = postServersIdActionsChangeDnsPtrResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionError = postServersIdActionsChangeDnsPtrResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionFinished = postServersIdActionsChangeDnsPtrResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionId = postServersIdActionsChangeDnsPtrResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionProgress = postServersIdActionsChangeDnsPtrResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionResources = postServersIdActionsChangeDnsPtrResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionStarted = postServersIdActionsChangeDnsPtrResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    postServersIdActionsChangeDnsPtrResponseBody201ActionStatus = postServersIdActionsChangeDnsPtrResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_dns_ptr.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsChangeDnsPtrResponseBody201ActionError = PostServersIdActionsChangeDnsPtrResponseBody201ActionError {
@@ -169,47 +154,86 @@ data PostServersIdActionsChangeDnsPtrResponseBody201ActionError = PostServersIdA
   , postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeDnsPtrResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsChangeDnsPtrResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsChangeDnsPtrResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsChangeDnsPtrResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsChangeDnsPtrResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsChangeDnsPtrResponseBody201ActionError
+mkPostServersIdActionsChangeDnsPtrResponseBody201ActionError postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage = PostServersIdActionsChangeDnsPtrResponseBody201ActionError{postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode = postServersIdActionsChangeDnsPtrResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                           postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage = postServersIdActionsChangeDnsPtrResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/change_dns_ptr.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsChangeDnsPtrResponseBody201ActionResources = PostServersIdActionsChangeDnsPtrResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsChangeDnsPtrResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsChangeDnsPtrResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsChangeDnsPtrResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsChangeDnsPtrResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType'
+  -> PostServersIdActionsChangeDnsPtrResponseBody201ActionResources
+mkPostServersIdActionsChangeDnsPtrResponseBody201ActionResources postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType = PostServersIdActionsChangeDnsPtrResponseBody201ActionResources{postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId = postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                      postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType = postServersIdActionsChangeDnsPtrResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/change_dns_ptr.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
-    = PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus =
+   PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsChangeDnsPtrResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsChangeDnsPtrResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/change_dns_ptr
+-- 
+-- The same as 'postServers_Id_ActionsChangeDnsPtr' but accepts an explicit configuration.
+postServers_Id_ActionsChangeDnsPtrWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsChangeDnsPtrResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeDnsPtrWithConfiguration config
+                                                    id
+                                                    body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsChangeDnsPtrResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsChangeDnsPtrResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsChangeDnsPtrResponseBody201)
+                                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/change_dns_ptr
+-- 
+-- The same as 'postServers_Id_ActionsChangeDnsPtr' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsChangeDnsPtrRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeDnsPtrRaw id
+                                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/change_dns_ptr
+-- 
+-- The same as 'postServers_Id_ActionsChangeDnsPtr' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsChangeDnsPtrWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsChangeDnsPtrRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsChangeDnsPtrWithConfigurationRaw config
+                                                       id
+                                                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_dns_ptr"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

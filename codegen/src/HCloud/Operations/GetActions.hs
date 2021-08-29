@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getActions
 module HCloud.Operations.GetActions where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,126 +45,205 @@ import HCloud.Types
 -- | > GET /actions
 -- 
 -- Returns all Action objects. You can \`sort\` the results by using the sort URI parameter, and filter them with the \`status\` parameter.
-getActions :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe GHC.Integer.Type.Integer                                                                               -- ^ id: Can be used multiple times, the response will contain only Actions with specified IDs
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                -- ^ status: Can be used multiple times, the response will contain only Actions with specified statuses
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetActionsResponse)) -- ^ Monad containing the result of the operation
-getActions config
-           id
-           sort
-           status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                  GetActionsResponseBody200)
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") ((Data.Text.pack "id",
-                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> id) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> status) : []))))
--- | > GET /actions
+getActions :: forall m . HCloud.Common.MonadHTTP m => GetActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getActions parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                       GetActionsResponseBody200)
+                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") [HCloud.Common.QueryParameter (Data.Text.pack "id") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryId parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/actions.GET.parameters@ in the specification.
 -- 
--- The same as 'getActions' but returns the raw 'Data.ByteString.Char8.ByteString'
-getActionsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                               HCloud.Common.SecurityScheme s) =>
-                 HCloud.Common.Configuration s ->
-                 GHC.Maybe.Maybe GHC.Integer.Type.Integer ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                       (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getActionsRaw config
-              id
-              sort
-              status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") ((Data.Text.pack "id",
-                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> id) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> status) : []))))
--- | > GET /actions
 -- 
--- Monadic version of 'getActions' (use with 'HCloud.Common.runWithConfiguration')
-getActionsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                             HCloud.Common.SecurityScheme s) =>
-               GHC.Maybe.Maybe GHC.Integer.Type.Integer ->
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                  m
-                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                      (Network.HTTP.Client.Types.Response GetActionsResponse))
-getActionsM id
-            sort
-            status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                   GetActionsResponseBody200)
-                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") ((Data.Text.pack "id",
-                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> id) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> status) : []))))
--- | > GET /actions
+data GetActionsParameters = GetActionsParameters {
+  -- | queryId: Represents the parameter named \'id\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified IDs
+  getActionsParametersQueryId :: (GHC.Maybe.Maybe GHC.Types.Int)
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getActionsParametersQuerySort :: (GHC.Maybe.Maybe GetActionsParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified statuses
+  , getActionsParametersQueryStatus :: (GHC.Maybe.Maybe GetActionsParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryId" Data.Aeson.Types.ToJSON..= getActionsParametersQueryId obj : "querySort" Data.Aeson.Types.ToJSON..= getActionsParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getActionsParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryId" Data.Aeson.Types.ToJSON..= getActionsParametersQueryId obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getActionsParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getActionsParametersQueryStatus obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetActionsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsParameters" (\obj -> ((GHC.Base.pure GetActionsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetActionsParameters' with all required fields.
+mkGetActionsParameters :: GetActionsParameters
+mkGetActionsParameters = GetActionsParameters{getActionsParametersQueryId = GHC.Maybe.Nothing,
+                                              getActionsParametersQuerySort = GHC.Maybe.Nothing,
+                                              getActionsParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/actions.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getActionsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getActionsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  GHC.Maybe.Maybe GHC.Integer.Type.Integer ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                     m
-                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getActionsRawM id
-               sort
-               status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") ((Data.Text.pack "id",
-                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> id) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> status) : []))))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetActionsParametersQuerySort =
+   GetActionsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetActionsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetActionsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetActionsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetActionsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetActionsParametersQuerySortEnumCommand -- ^ Represents the JSON value @"command"@
+  | GetActionsParametersQuerySortEnumCommandAsc -- ^ Represents the JSON value @"command:asc"@
+  | GetActionsParametersQuerySortEnumCommandDesc -- ^ Represents the JSON value @"command:desc"@
+  | GetActionsParametersQuerySortEnumStatus -- ^ Represents the JSON value @"status"@
+  | GetActionsParametersQuerySortEnumStatusAsc -- ^ Represents the JSON value @"status:asc"@
+  | GetActionsParametersQuerySortEnumStatusDesc -- ^ Represents the JSON value @"status:desc"@
+  | GetActionsParametersQuerySortEnumProgress -- ^ Represents the JSON value @"progress"@
+  | GetActionsParametersQuerySortEnumProgressAsc -- ^ Represents the JSON value @"progress:asc"@
+  | GetActionsParametersQuerySortEnumProgressDesc -- ^ Represents the JSON value @"progress:desc"@
+  | GetActionsParametersQuerySortEnumStarted -- ^ Represents the JSON value @"started"@
+  | GetActionsParametersQuerySortEnumStartedAsc -- ^ Represents the JSON value @"started:asc"@
+  | GetActionsParametersQuerySortEnumStartedDesc -- ^ Represents the JSON value @"started:desc"@
+  | GetActionsParametersQuerySortEnumFinished -- ^ Represents the JSON value @"finished"@
+  | GetActionsParametersQuerySortEnumFinishedAsc -- ^ Represents the JSON value @"finished:asc"@
+  | GetActionsParametersQuerySortEnumFinishedDesc -- ^ Represents the JSON value @"finished:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsParametersQuerySort
+    where toJSON (GetActionsParametersQuerySortOther val) = val
+          toJSON (GetActionsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetActionsParametersQuerySortEnumId) = "id"
+          toJSON (GetActionsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetActionsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetActionsParametersQuerySortEnumCommand) = "command"
+          toJSON (GetActionsParametersQuerySortEnumCommandAsc) = "command:asc"
+          toJSON (GetActionsParametersQuerySortEnumCommandDesc) = "command:desc"
+          toJSON (GetActionsParametersQuerySortEnumStatus) = "status"
+          toJSON (GetActionsParametersQuerySortEnumStatusAsc) = "status:asc"
+          toJSON (GetActionsParametersQuerySortEnumStatusDesc) = "status:desc"
+          toJSON (GetActionsParametersQuerySortEnumProgress) = "progress"
+          toJSON (GetActionsParametersQuerySortEnumProgressAsc) = "progress:asc"
+          toJSON (GetActionsParametersQuerySortEnumProgressDesc) = "progress:desc"
+          toJSON (GetActionsParametersQuerySortEnumStarted) = "started"
+          toJSON (GetActionsParametersQuerySortEnumStartedAsc) = "started:asc"
+          toJSON (GetActionsParametersQuerySortEnumStartedDesc) = "started:desc"
+          toJSON (GetActionsParametersQuerySortEnumFinished) = "finished"
+          toJSON (GetActionsParametersQuerySortEnumFinishedAsc) = "finished:asc"
+          toJSON (GetActionsParametersQuerySortEnumFinishedDesc) = "finished:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetActionsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetActionsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetActionsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetActionsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "command" -> GetActionsParametersQuerySortEnumCommand
+                                            | val GHC.Classes.== "command:asc" -> GetActionsParametersQuerySortEnumCommandAsc
+                                            | val GHC.Classes.== "command:desc" -> GetActionsParametersQuerySortEnumCommandDesc
+                                            | val GHC.Classes.== "status" -> GetActionsParametersQuerySortEnumStatus
+                                            | val GHC.Classes.== "status:asc" -> GetActionsParametersQuerySortEnumStatusAsc
+                                            | val GHC.Classes.== "status:desc" -> GetActionsParametersQuerySortEnumStatusDesc
+                                            | val GHC.Classes.== "progress" -> GetActionsParametersQuerySortEnumProgress
+                                            | val GHC.Classes.== "progress:asc" -> GetActionsParametersQuerySortEnumProgressAsc
+                                            | val GHC.Classes.== "progress:desc" -> GetActionsParametersQuerySortEnumProgressDesc
+                                            | val GHC.Classes.== "started" -> GetActionsParametersQuerySortEnumStarted
+                                            | val GHC.Classes.== "started:asc" -> GetActionsParametersQuerySortEnumStartedAsc
+                                            | val GHC.Classes.== "started:desc" -> GetActionsParametersQuerySortEnumStartedDesc
+                                            | val GHC.Classes.== "finished" -> GetActionsParametersQuerySortEnumFinished
+                                            | val GHC.Classes.== "finished:asc" -> GetActionsParametersQuerySortEnumFinishedAsc
+                                            | val GHC.Classes.== "finished:desc" -> GetActionsParametersQuerySortEnumFinishedDesc
+                                            | GHC.Base.otherwise -> GetActionsParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/actions.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times, the response will contain only Actions with specified statuses
+data GetActionsParametersQueryStatus =
+   GetActionsParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetActionsParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetActionsParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetActionsParametersQueryStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetActionsParametersQueryStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsParametersQueryStatus
+    where toJSON (GetActionsParametersQueryStatusOther val) = val
+          toJSON (GetActionsParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetActionsParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetActionsParametersQueryStatusEnumSuccess) = "success"
+          toJSON (GetActionsParametersQueryStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetActionsParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetActionsParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "success" -> GetActionsParametersQueryStatusEnumSuccess
+                                            | val GHC.Classes.== "error" -> GetActionsParametersQueryStatusEnumError
+                                            | GHC.Base.otherwise -> GetActionsParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getActions'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetActionsResponseError' is used.
-data GetActionsResponse =                            
-   GetActionsResponseError GHC.Base.String           -- ^ Means either no matching case available or a parse error
-  | GetActionsResponse200 GetActionsResponseBody200  -- ^ The \`actions\` key contains a list of Actions
+data GetActionsResponse =
+   GetActionsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetActionsResponse200 GetActionsResponseBody200 -- ^ The \`actions\` key contains a list of Actions
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetActionsResponseBody200
+-- | Defines the object schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetActionsResponseBody200 = GetActionsResponseBody200 {
   -- | actions
-  getActionsResponseBody200Actions :: ([] GetActionsResponseBody200Actions)
+  getActionsResponseBody200Actions :: ([GetActionsResponseBody200Actions])
   -- | meta
   , getActionsResponseBody200Meta :: (GHC.Maybe.Maybe GetActionsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (getActionsResponseBody200Actions obj) : (Data.Aeson..=) "meta" (getActionsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (getActionsResponseBody200Actions obj) GHC.Base.<> (Data.Aeson..=) "meta" (getActionsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= getActionsResponseBody200Actions obj : "meta" Data.Aeson.Types.ToJSON..= getActionsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("actions" Data.Aeson.Types.ToJSON..= getActionsResponseBody200Actions obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getActionsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsResponseBody200" (\obj -> (GHC.Base.pure GetActionsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetActionsResponseBody200Actions
+-- | Create a new 'GetActionsResponseBody200' with all required fields.
+mkGetActionsResponseBody200 :: [GetActionsResponseBody200Actions] -- ^ 'getActionsResponseBody200Actions'
+  -> GetActionsResponseBody200
+mkGetActionsResponseBody200 getActionsResponseBody200Actions = GetActionsResponseBody200{getActionsResponseBody200Actions = getActionsResponseBody200Actions,
+                                                                                         getActionsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data GetActionsResponseBody200Actions = GetActionsResponseBody200Actions {
   -- | command: Command executed in the Action
   getActionsResponseBody200ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getActionsResponseBody200ActionsError :: GetActionsResponseBody200ActionsError
+  , getActionsResponseBody200ActionsError :: (GHC.Maybe.Maybe GetActionsResponseBody200ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getActionsResponseBody200ActionsFinished :: Data.Text.Internal.Text
+  , getActionsResponseBody200ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getActionsResponseBody200ActionsId :: GHC.Integer.Type.Integer
+  , getActionsResponseBody200ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getActionsResponseBody200ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getActionsResponseBody200ActionsResources :: ([] GetActionsResponseBody200ActionsResources)
+  , getActionsResponseBody200ActionsResources :: ([GetActionsResponseBody200ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getActionsResponseBody200ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getActionsResponseBody200ActionsStatus :: GetActionsResponseBody200ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getActionsResponseBody200ActionsCommand obj) : (Data.Aeson..=) "error" (getActionsResponseBody200ActionsError obj) : (Data.Aeson..=) "finished" (getActionsResponseBody200ActionsFinished obj) : (Data.Aeson..=) "id" (getActionsResponseBody200ActionsId obj) : (Data.Aeson..=) "progress" (getActionsResponseBody200ActionsProgress obj) : (Data.Aeson..=) "resources" (getActionsResponseBody200ActionsResources obj) : (Data.Aeson..=) "started" (getActionsResponseBody200ActionsStarted obj) : (Data.Aeson..=) "status" (getActionsResponseBody200ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getActionsResponseBody200ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getActionsResponseBody200ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getActionsResponseBody200ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getActionsResponseBody200ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getActionsResponseBody200ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getActionsResponseBody200ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getActionsResponseBody200ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getActionsResponseBody200ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsResponseBody200Actions" (\obj -> (((((((GHC.Base.pure GetActionsResponseBody200Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetActionsResponseBody200ActionsError
+-- | Create a new 'GetActionsResponseBody200Actions' with all required fields.
+mkGetActionsResponseBody200Actions :: Data.Text.Internal.Text -- ^ 'getActionsResponseBody200ActionsCommand'
+  -> GHC.Maybe.Maybe GetActionsResponseBody200ActionsError -- ^ 'getActionsResponseBody200ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getActionsResponseBody200ActionsFinished'
+  -> GHC.Types.Int -- ^ 'getActionsResponseBody200ActionsId'
+  -> GHC.Types.Double -- ^ 'getActionsResponseBody200ActionsProgress'
+  -> [GetActionsResponseBody200ActionsResources] -- ^ 'getActionsResponseBody200ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'getActionsResponseBody200ActionsStarted'
+  -> GetActionsResponseBody200ActionsStatus -- ^ 'getActionsResponseBody200ActionsStatus'
+  -> GetActionsResponseBody200Actions
+mkGetActionsResponseBody200Actions getActionsResponseBody200ActionsCommand getActionsResponseBody200ActionsError getActionsResponseBody200ActionsFinished getActionsResponseBody200ActionsId getActionsResponseBody200ActionsProgress getActionsResponseBody200ActionsResources getActionsResponseBody200ActionsStarted getActionsResponseBody200ActionsStatus = GetActionsResponseBody200Actions{getActionsResponseBody200ActionsCommand = getActionsResponseBody200ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsError = getActionsResponseBody200ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsFinished = getActionsResponseBody200ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsId = getActionsResponseBody200ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsProgress = getActionsResponseBody200ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsResources = getActionsResponseBody200ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsStarted = getActionsResponseBody200ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                  getActionsResponseBody200ActionsStatus = getActionsResponseBody200ActionsStatus}
+-- | Defines the object schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetActionsResponseBody200ActionsError = GetActionsResponseBody200ActionsError {
@@ -174,51 +253,60 @@ data GetActionsResponseBody200ActionsError = GetActionsResponseBody200ActionsErr
   , getActionsResponseBody200ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getActionsResponseBody200ActionsErrorCode obj) : (Data.Aeson..=) "message" (getActionsResponseBody200ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getActionsResponseBody200ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsResponseBody200ActionsError" (\obj -> (GHC.Base.pure GetActionsResponseBody200ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetActionsResponseBody200ActionsResources
+-- | Create a new 'GetActionsResponseBody200ActionsError' with all required fields.
+mkGetActionsResponseBody200ActionsError :: Data.Text.Internal.Text -- ^ 'getActionsResponseBody200ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getActionsResponseBody200ActionsErrorMessage'
+  -> GetActionsResponseBody200ActionsError
+mkGetActionsResponseBody200ActionsError getActionsResponseBody200ActionsErrorCode getActionsResponseBody200ActionsErrorMessage = GetActionsResponseBody200ActionsError{getActionsResponseBody200ActionsErrorCode = getActionsResponseBody200ActionsErrorCode,
+                                                                                                                                                                       getActionsResponseBody200ActionsErrorMessage = getActionsResponseBody200ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetActionsResponseBody200ActionsResources = GetActionsResponseBody200ActionsResources {
   -- | id: ID of the Resource
-  getActionsResponseBody200ActionsResourcesId :: GHC.Integer.Type.Integer
+  getActionsResponseBody200ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getActionsResponseBody200ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getActionsResponseBody200ActionsResourcesId obj) : (Data.Aeson..=) "type" (getActionsResponseBody200ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getActionsResponseBody200ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getActionsResponseBody200ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsResponseBody200ActionsResources" (\obj -> (GHC.Base.pure GetActionsResponseBody200ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetActionsResponseBody200ActionsStatus
+-- | Create a new 'GetActionsResponseBody200ActionsResources' with all required fields.
+mkGetActionsResponseBody200ActionsResources :: GHC.Types.Int -- ^ 'getActionsResponseBody200ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getActionsResponseBody200ActionsResourcesType'
+  -> GetActionsResponseBody200ActionsResources
+mkGetActionsResponseBody200ActionsResources getActionsResponseBody200ActionsResourcesId getActionsResponseBody200ActionsResourcesType = GetActionsResponseBody200ActionsResources{getActionsResponseBody200ActionsResourcesId = getActionsResponseBody200ActionsResourcesId,
+                                                                                                                                                                                  getActionsResponseBody200ActionsResourcesType = getActionsResponseBody200ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetActionsResponseBody200ActionsStatus
-    = GetActionsResponseBody200ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetActionsResponseBody200ActionsStatusEnumTyped Data.Text.Internal.Text
-    | GetActionsResponseBody200ActionsStatusEnumStringError
-    | GetActionsResponseBody200ActionsStatusEnumStringRunning
-    | GetActionsResponseBody200ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200ActionsStatus
-    where toJSON (GetActionsResponseBody200ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetActionsResponseBody200ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetActionsResponseBody200ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetActionsResponseBody200ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetActionsResponseBody200ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetActionsResponseBody200ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetActionsResponseBody200ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetActionsResponseBody200ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetActionsResponseBody200ActionsStatusEnumStringSuccess
-                                                      else GetActionsResponseBody200ActionsStatusEnumOther val)
--- | Defines the data type for the schema GetActionsResponseBody200Meta
+data GetActionsResponseBody200ActionsStatus =
+   GetActionsResponseBody200ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetActionsResponseBody200ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetActionsResponseBody200ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetActionsResponseBody200ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetActionsResponseBody200ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200ActionsStatus
+    where toJSON (GetActionsResponseBody200ActionsStatusOther val) = val
+          toJSON (GetActionsResponseBody200ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetActionsResponseBody200ActionsStatusEnumSuccess) = "success"
+          toJSON (GetActionsResponseBody200ActionsStatusEnumRunning) = "running"
+          toJSON (GetActionsResponseBody200ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetActionsResponseBody200ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetActionsResponseBody200ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetActionsResponseBody200ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> GetActionsResponseBody200ActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetActionsResponseBody200Meta = GetActionsResponseBody200Meta {
@@ -226,31 +314,79 @@ data GetActionsResponseBody200Meta = GetActionsResponseBody200Meta {
   getActionsResponseBody200MetaPagination :: GetActionsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getActionsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getActionsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsResponseBody200Meta" (\obj -> GHC.Base.pure GetActionsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetActionsResponseBody200MetaPagination
+-- | Create a new 'GetActionsResponseBody200Meta' with all required fields.
+mkGetActionsResponseBody200Meta :: GetActionsResponseBody200MetaPagination -- ^ 'getActionsResponseBody200MetaPagination'
+  -> GetActionsResponseBody200Meta
+mkGetActionsResponseBody200Meta getActionsResponseBody200MetaPagination = GetActionsResponseBody200Meta{getActionsResponseBody200MetaPagination = getActionsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/actions.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetActionsResponseBody200MetaPagination = GetActionsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getActionsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getActionsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getActionsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getActionsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getActionsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getActionsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getActionsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getActionsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getActionsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getActionsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetActionsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getActionsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getActionsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getActionsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getActionsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getActionsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getActionsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getActionsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetActionsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getActionsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetActionsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetActionsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetActionsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetActionsResponseBody200MetaPagination' with all required fields.
+mkGetActionsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getActionsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getActionsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getActionsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getActionsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getActionsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getActionsResponseBody200MetaPaginationTotalEntries'
+  -> GetActionsResponseBody200MetaPagination
+mkGetActionsResponseBody200MetaPagination getActionsResponseBody200MetaPaginationLastPage getActionsResponseBody200MetaPaginationNextPage getActionsResponseBody200MetaPaginationPage getActionsResponseBody200MetaPaginationPerPage getActionsResponseBody200MetaPaginationPreviousPage getActionsResponseBody200MetaPaginationTotalEntries = GetActionsResponseBody200MetaPagination{getActionsResponseBody200MetaPaginationLastPage = getActionsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getActionsResponseBody200MetaPaginationNextPage = getActionsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getActionsResponseBody200MetaPaginationPage = getActionsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getActionsResponseBody200MetaPaginationPerPage = getActionsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getActionsResponseBody200MetaPaginationPreviousPage = getActionsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getActionsResponseBody200MetaPaginationTotalEntries = getActionsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /actions
+-- 
+-- The same as 'getActions' but accepts an explicit configuration.
+getActionsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getActionsWithConfiguration config
+                            parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                        GetActionsResponseBody200)
+                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") [HCloud.Common.QueryParameter (Data.Text.pack "id") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryId parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /actions
+-- 
+-- The same as 'getActions' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getActionsRaw :: forall m . HCloud.Common.MonadHTTP m => GetActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getActionsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") [HCloud.Common.QueryParameter (Data.Text.pack "id") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryId parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /actions
+-- 
+-- The same as 'getActions' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getActionsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getActionsWithConfigurationRaw config
+                               parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/actions") [HCloud.Common.QueryParameter (Data.Text.pack "id") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryId parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

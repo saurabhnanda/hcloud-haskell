@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getPricing
 module HCloud.Operations.GetPricing where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,50 +47,18 @@ import HCloud.Types
 -- Returns prices for all resources available on the platform. VAT and currency of the Project owner are used for calculations.
 -- 
 -- Both net and gross prices are included in the response.
-getPricing :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetPricingResponse)) -- ^ Monad containing the result of the operation
-getPricing config = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetPricingResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPricingResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                  GetPricingResponseBody200)
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") [])
--- | > GET /pricing
--- 
--- The same as 'getPricing' but returns the raw 'Data.ByteString.Char8.ByteString'
-getPricingRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                               HCloud.Common.SecurityScheme s) =>
-                 HCloud.Common.Configuration s ->
-                 m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                       (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getPricingRaw config = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") [])
--- | > GET /pricing
--- 
--- Monadic version of 'getPricing' (use with 'HCloud.Common.runWithConfiguration')
-getPricingM :: forall m s . (HCloud.Common.MonadHTTP m,
-                             HCloud.Common.SecurityScheme s) =>
-               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                  m
-                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                      (Network.HTTP.Client.Types.Response GetPricingResponse))
-getPricingM = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetPricingResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPricingResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                            GetPricingResponseBody200)
-                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") [])
--- | > GET /pricing
--- 
--- Monadic version of 'getPricingRaw' (use with 'HCloud.Common.runWithConfiguration')
-getPricingRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                     m
-                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getPricingRawM = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") [])
+getPricing :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetPricingResponse) -- ^ Monadic computation which returns the result of the operation
+getPricing = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetPricingResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPricingResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                            GetPricingResponseBody200)
+                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") GHC.Base.mempty)
 -- | Represents a response of the operation 'getPricing'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetPricingResponseError' is used.
-data GetPricingResponse =                            
-   GetPricingResponseError GHC.Base.String           -- ^ Means either no matching case available or a parse error
-  | GetPricingResponse200 GetPricingResponseBody200  -- ^ The \`pricing\` key in the reply contains an pricing object with this structure
+data GetPricingResponse =
+   GetPricingResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetPricingResponse200 GetPricingResponseBody200 -- ^ The \`pricing\` key in the reply contains an pricing object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetPricingResponseBody200
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200 = GetPricingResponseBody200 {
@@ -98,12 +66,16 @@ data GetPricingResponseBody200 = GetPricingResponseBody200 {
   getPricingResponseBody200Pricing :: GetPricingResponseBody200Pricing
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pricing" (getPricingResponseBody200Pricing obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pricing" (getPricingResponseBody200Pricing obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pricing" Data.Aeson.Types.ToJSON..= getPricingResponseBody200Pricing obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pricing" Data.Aeson.Types.ToJSON..= getPricingResponseBody200Pricing obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200" (\obj -> GHC.Base.pure GetPricingResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pricing"))
--- | Defines the data type for the schema GetPricingResponseBody200Pricing
+-- | Create a new 'GetPricingResponseBody200' with all required fields.
+mkGetPricingResponseBody200 :: GetPricingResponseBody200Pricing -- ^ 'getPricingResponseBody200Pricing'
+  -> GetPricingResponseBody200
+mkGetPricingResponseBody200 getPricingResponseBody200Pricing = GetPricingResponseBody200{getPricingResponseBody200Pricing = getPricingResponseBody200Pricing}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200Pricing = GetPricingResponseBody200Pricing {
@@ -112,15 +84,15 @@ data GetPricingResponseBody200Pricing = GetPricingResponseBody200Pricing {
   -- | floating_ip: The cost of one Floating IP per month
   , getPricingResponseBody200PricingFloatingIp :: GetPricingResponseBody200PricingFloatingIp
   -- | floating_ips: Costs of Floating IPs types per Location and type
-  , getPricingResponseBody200PricingFloatingIps :: ([] GetPricingResponseBody200PricingFloatingIps)
+  , getPricingResponseBody200PricingFloatingIps :: ([GetPricingResponseBody200PricingFloatingIps])
   -- | image: The cost of Image per GB\/month
   , getPricingResponseBody200PricingImage :: GetPricingResponseBody200PricingImage
   -- | load_balancer_types: Costs of Load Balancer types per Location and type
-  , getPricingResponseBody200PricingLoadBalancerTypes :: ([] GetPricingResponseBody200PricingLoadBalancerTypes)
+  , getPricingResponseBody200PricingLoadBalancerTypes :: ([GetPricingResponseBody200PricingLoadBalancerTypes])
   -- | server_backup: Will increase base Server costs by specific percentage
   , getPricingResponseBody200PricingServerBackup :: GetPricingResponseBody200PricingServerBackup
   -- | server_types: Costs of Server types per Location and type
-  , getPricingResponseBody200PricingServerTypes :: ([] GetPricingResponseBody200PricingServerTypes)
+  , getPricingResponseBody200PricingServerTypes :: ([GetPricingResponseBody200PricingServerTypes])
   -- | traffic: The cost of additional traffic per TB
   , getPricingResponseBody200PricingTraffic :: GetPricingResponseBody200PricingTraffic
   -- | vat_rate: The VAT rate used for calculating prices with VAT
@@ -129,12 +101,34 @@ data GetPricingResponseBody200Pricing = GetPricingResponseBody200Pricing {
   , getPricingResponseBody200PricingVolume :: GetPricingResponseBody200PricingVolume
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200Pricing
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "currency" (getPricingResponseBody200PricingCurrency obj) : (Data.Aeson..=) "floating_ip" (getPricingResponseBody200PricingFloatingIp obj) : (Data.Aeson..=) "floating_ips" (getPricingResponseBody200PricingFloatingIps obj) : (Data.Aeson..=) "image" (getPricingResponseBody200PricingImage obj) : (Data.Aeson..=) "load_balancer_types" (getPricingResponseBody200PricingLoadBalancerTypes obj) : (Data.Aeson..=) "server_backup" (getPricingResponseBody200PricingServerBackup obj) : (Data.Aeson..=) "server_types" (getPricingResponseBody200PricingServerTypes obj) : (Data.Aeson..=) "traffic" (getPricingResponseBody200PricingTraffic obj) : (Data.Aeson..=) "vat_rate" (getPricingResponseBody200PricingVatRate obj) : (Data.Aeson..=) "volume" (getPricingResponseBody200PricingVolume obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "currency" (getPricingResponseBody200PricingCurrency obj) GHC.Base.<> ((Data.Aeson..=) "floating_ip" (getPricingResponseBody200PricingFloatingIp obj) GHC.Base.<> ((Data.Aeson..=) "floating_ips" (getPricingResponseBody200PricingFloatingIps obj) GHC.Base.<> ((Data.Aeson..=) "image" (getPricingResponseBody200PricingImage obj) GHC.Base.<> ((Data.Aeson..=) "load_balancer_types" (getPricingResponseBody200PricingLoadBalancerTypes obj) GHC.Base.<> ((Data.Aeson..=) "server_backup" (getPricingResponseBody200PricingServerBackup obj) GHC.Base.<> ((Data.Aeson..=) "server_types" (getPricingResponseBody200PricingServerTypes obj) GHC.Base.<> ((Data.Aeson..=) "traffic" (getPricingResponseBody200PricingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "vat_rate" (getPricingResponseBody200PricingVatRate obj) GHC.Base.<> (Data.Aeson..=) "volume" (getPricingResponseBody200PricingVolume obj))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200Pricing
+    where toJSON obj = Data.Aeson.Types.Internal.object ("currency" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingCurrency obj : "floating_ip" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIp obj : "floating_ips" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIps obj : "image" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImage obj : "load_balancer_types" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypes obj : "server_backup" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerBackup obj : "server_types" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypes obj : "traffic" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTraffic obj : "vat_rate" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVatRate obj : "volume" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolume obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("currency" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingCurrency obj) GHC.Base.<> (("floating_ip" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIp obj) GHC.Base.<> (("floating_ips" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIps obj) GHC.Base.<> (("image" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImage obj) GHC.Base.<> (("load_balancer_types" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypes obj) GHC.Base.<> (("server_backup" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerBackup obj) GHC.Base.<> (("server_types" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypes obj) GHC.Base.<> (("traffic" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTraffic obj) GHC.Base.<> (("vat_rate" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVatRate obj) GHC.Base.<> ("volume" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolume obj))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200Pricing
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200Pricing" (\obj -> (((((((((GHC.Base.pure GetPricingResponseBody200Pricing GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "currency")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "floating_ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "floating_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "load_balancer_types")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server_backup")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server_types")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "vat_rate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "volume"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingFloating_ip
+-- | Create a new 'GetPricingResponseBody200Pricing' with all required fields.
+mkGetPricingResponseBody200Pricing :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingCurrency'
+  -> GetPricingResponseBody200PricingFloatingIp -- ^ 'getPricingResponseBody200PricingFloatingIp'
+  -> [GetPricingResponseBody200PricingFloatingIps] -- ^ 'getPricingResponseBody200PricingFloatingIps'
+  -> GetPricingResponseBody200PricingImage -- ^ 'getPricingResponseBody200PricingImage'
+  -> [GetPricingResponseBody200PricingLoadBalancerTypes] -- ^ 'getPricingResponseBody200PricingLoadBalancerTypes'
+  -> GetPricingResponseBody200PricingServerBackup -- ^ 'getPricingResponseBody200PricingServerBackup'
+  -> [GetPricingResponseBody200PricingServerTypes] -- ^ 'getPricingResponseBody200PricingServerTypes'
+  -> GetPricingResponseBody200PricingTraffic -- ^ 'getPricingResponseBody200PricingTraffic'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingVatRate'
+  -> GetPricingResponseBody200PricingVolume -- ^ 'getPricingResponseBody200PricingVolume'
+  -> GetPricingResponseBody200Pricing
+mkGetPricingResponseBody200Pricing getPricingResponseBody200PricingCurrency getPricingResponseBody200PricingFloatingIp getPricingResponseBody200PricingFloatingIps getPricingResponseBody200PricingImage getPricingResponseBody200PricingLoadBalancerTypes getPricingResponseBody200PricingServerBackup getPricingResponseBody200PricingServerTypes getPricingResponseBody200PricingTraffic getPricingResponseBody200PricingVatRate getPricingResponseBody200PricingVolume = GetPricingResponseBody200Pricing{getPricingResponseBody200PricingCurrency = getPricingResponseBody200PricingCurrency,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingFloatingIp = getPricingResponseBody200PricingFloatingIp,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingFloatingIps = getPricingResponseBody200PricingFloatingIps,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingImage = getPricingResponseBody200PricingImage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingLoadBalancerTypes = getPricingResponseBody200PricingLoadBalancerTypes,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingServerBackup = getPricingResponseBody200PricingServerBackup,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingServerTypes = getPricingResponseBody200PricingServerTypes,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingTraffic = getPricingResponseBody200PricingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingVatRate = getPricingResponseBody200PricingVatRate,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getPricingResponseBody200PricingVolume = getPricingResponseBody200PricingVolume}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.floating_ip@ in the specification.
 -- 
 -- The cost of one Floating IP per month
 data GetPricingResponseBody200PricingFloatingIp = GetPricingResponseBody200PricingFloatingIp {
@@ -142,12 +136,16 @@ data GetPricingResponseBody200PricingFloatingIp = GetPricingResponseBody200Prici
   getPricingResponseBody200PricingFloatingIpPriceMonthly :: GetPricingResponseBody200PricingFloatingIpPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingFloatingIp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingFloatingIpPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingFloatingIpPriceMonthly obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingFloatingIp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpPriceMonthly obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingFloatingIp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingFloatingIp" (\obj -> GHC.Base.pure GetPricingResponseBody200PricingFloatingIp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingFloating_ipPrice_monthly
+-- | Create a new 'GetPricingResponseBody200PricingFloatingIp' with all required fields.
+mkGetPricingResponseBody200PricingFloatingIp :: GetPricingResponseBody200PricingFloatingIpPriceMonthly -- ^ 'getPricingResponseBody200PricingFloatingIpPriceMonthly'
+  -> GetPricingResponseBody200PricingFloatingIp
+mkGetPricingResponseBody200PricingFloatingIp getPricingResponseBody200PricingFloatingIpPriceMonthly = GetPricingResponseBody200PricingFloatingIp{getPricingResponseBody200PricingFloatingIpPriceMonthly = getPricingResponseBody200PricingFloatingIpPriceMonthly}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.floating_ip.properties.price_monthly@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingFloatingIpPriceMonthly = GetPricingResponseBody200PricingFloatingIpPriceMonthly {
@@ -157,27 +155,39 @@ data GetPricingResponseBody200PricingFloatingIpPriceMonthly = GetPricingResponse
   , getPricingResponseBody200PricingFloatingIpPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingFloatingIpPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingFloatingIpPriceMonthlyGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingFloatingIpPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingFloatingIpPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingFloatingIpPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingFloatingIpPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingFloatingIpPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingFloatingIpPriceMonthly" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingFloatingIpPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingFloating_ips
+-- | Create a new 'GetPricingResponseBody200PricingFloatingIpPriceMonthly' with all required fields.
+mkGetPricingResponseBody200PricingFloatingIpPriceMonthly :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingFloatingIpPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingFloatingIpPriceMonthlyNet'
+  -> GetPricingResponseBody200PricingFloatingIpPriceMonthly
+mkGetPricingResponseBody200PricingFloatingIpPriceMonthly getPricingResponseBody200PricingFloatingIpPriceMonthlyGross getPricingResponseBody200PricingFloatingIpPriceMonthlyNet = GetPricingResponseBody200PricingFloatingIpPriceMonthly{getPricingResponseBody200PricingFloatingIpPriceMonthlyGross = getPricingResponseBody200PricingFloatingIpPriceMonthlyGross,
+                                                                                                                                                                                                                                        getPricingResponseBody200PricingFloatingIpPriceMonthlyNet = getPricingResponseBody200PricingFloatingIpPriceMonthlyNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.floating_ips.items@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingFloatingIps = GetPricingResponseBody200PricingFloatingIps {
   -- | prices: Floating IP type costs per Location
-  getPricingResponseBody200PricingFloatingIpsPrices :: ([] GetPricingResponseBody200PricingFloatingIpsPrices)
+  getPricingResponseBody200PricingFloatingIpsPrices :: ([GetPricingResponseBody200PricingFloatingIpsPrices])
   -- | type: The type of the Floating IP
   , getPricingResponseBody200PricingFloatingIpsType :: GetPricingResponseBody200PricingFloatingIpsType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingFloatingIps
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "prices" (getPricingResponseBody200PricingFloatingIpsPrices obj) : (Data.Aeson..=) "type" (getPricingResponseBody200PricingFloatingIpsType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "prices" (getPricingResponseBody200PricingFloatingIpsPrices obj) GHC.Base.<> (Data.Aeson..=) "type" (getPricingResponseBody200PricingFloatingIpsType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingFloatingIps
+    where toJSON obj = Data.Aeson.Types.Internal.object ("prices" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPrices obj : "type" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("prices" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPrices obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingFloatingIps
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingFloatingIps" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingFloatingIps GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingFloating_ipsPrices
+-- | Create a new 'GetPricingResponseBody200PricingFloatingIps' with all required fields.
+mkGetPricingResponseBody200PricingFloatingIps :: [GetPricingResponseBody200PricingFloatingIpsPrices] -- ^ 'getPricingResponseBody200PricingFloatingIpsPrices'
+  -> GetPricingResponseBody200PricingFloatingIpsType -- ^ 'getPricingResponseBody200PricingFloatingIpsType'
+  -> GetPricingResponseBody200PricingFloatingIps
+mkGetPricingResponseBody200PricingFloatingIps getPricingResponseBody200PricingFloatingIpsPrices getPricingResponseBody200PricingFloatingIpsType = GetPricingResponseBody200PricingFloatingIps{getPricingResponseBody200PricingFloatingIpsPrices = getPricingResponseBody200PricingFloatingIpsPrices,
+                                                                                                                                                                                              getPricingResponseBody200PricingFloatingIpsType = getPricingResponseBody200PricingFloatingIpsType}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.floating_ips.items.properties.prices.items@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingFloatingIpsPrices = GetPricingResponseBody200PricingFloatingIpsPrices {
@@ -187,12 +197,18 @@ data GetPricingResponseBody200PricingFloatingIpsPrices = GetPricingResponseBody2
   , getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly :: GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingFloatingIpsPrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (getPricingResponseBody200PricingFloatingIpsPricesLocation obj) : (Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (getPricingResponseBody200PricingFloatingIpsPricesLocation obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingFloatingIpsPrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesLocation obj : "price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesLocation obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingFloatingIpsPrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingFloatingIpsPrices" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingFloatingIpsPrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingFloating_ipsPricesPrice_monthly
+-- | Create a new 'GetPricingResponseBody200PricingFloatingIpsPrices' with all required fields.
+mkGetPricingResponseBody200PricingFloatingIpsPrices :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingFloatingIpsPricesLocation'
+  -> GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly -- ^ 'getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly'
+  -> GetPricingResponseBody200PricingFloatingIpsPrices
+mkGetPricingResponseBody200PricingFloatingIpsPrices getPricingResponseBody200PricingFloatingIpsPricesLocation getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly = GetPricingResponseBody200PricingFloatingIpsPrices{getPricingResponseBody200PricingFloatingIpsPricesLocation = getPricingResponseBody200PricingFloatingIpsPricesLocation,
+                                                                                                                                                                                                                                getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly = getPricingResponseBody200PricingFloatingIpsPricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.floating_ips.items.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Floating IP type in this Location
 data GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly = GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly {
@@ -202,32 +218,36 @@ data GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly = GetPricingR
   , getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the enum schema GetPricingResponseBody200PricingFloating_ipsType
+-- | Create a new 'GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly' with all required fields.
+mkGetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet'
+  -> GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly
+mkGetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet = GetPricingResponseBody200PricingFloatingIpsPricesPriceMonthly{getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross = getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                    getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet = getPricingResponseBody200PricingFloatingIpsPricesPriceMonthlyNet}
+-- | Defines the enum schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.floating_ips.items.properties.type@ in the specification.
 -- 
 -- The type of the Floating IP
-data GetPricingResponseBody200PricingFloatingIpsType
-    = GetPricingResponseBody200PricingFloatingIpsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetPricingResponseBody200PricingFloatingIpsTypeEnumTyped Data.Text.Internal.Text
-    | GetPricingResponseBody200PricingFloatingIpsTypeEnumStringIpv4
-    | GetPricingResponseBody200PricingFloatingIpsTypeEnumStringIpv6
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingFloatingIpsType
-    where toJSON (GetPricingResponseBody200PricingFloatingIpsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetPricingResponseBody200PricingFloatingIpsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetPricingResponseBody200PricingFloatingIpsTypeEnumStringIpv4) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv4"
-          toJSON (GetPricingResponseBody200PricingFloatingIpsTypeEnumStringIpv6) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv6"
-instance Data.Aeson.FromJSON GetPricingResponseBody200PricingFloatingIpsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv4")
-                                          then GetPricingResponseBody200PricingFloatingIpsTypeEnumStringIpv4
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv6")
-                                                then GetPricingResponseBody200PricingFloatingIpsTypeEnumStringIpv6
-                                                else GetPricingResponseBody200PricingFloatingIpsTypeEnumOther val)
--- | Defines the data type for the schema GetPricingResponseBody200PricingImage
+data GetPricingResponseBody200PricingFloatingIpsType =
+   GetPricingResponseBody200PricingFloatingIpsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetPricingResponseBody200PricingFloatingIpsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetPricingResponseBody200PricingFloatingIpsTypeEnumIpv4 -- ^ Represents the JSON value @"ipv4"@
+  | GetPricingResponseBody200PricingFloatingIpsTypeEnumIpv6 -- ^ Represents the JSON value @"ipv6"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingFloatingIpsType
+    where toJSON (GetPricingResponseBody200PricingFloatingIpsTypeOther val) = val
+          toJSON (GetPricingResponseBody200PricingFloatingIpsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetPricingResponseBody200PricingFloatingIpsTypeEnumIpv4) = "ipv4"
+          toJSON (GetPricingResponseBody200PricingFloatingIpsTypeEnumIpv6) = "ipv6"
+instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingFloatingIpsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ipv4" -> GetPricingResponseBody200PricingFloatingIpsTypeEnumIpv4
+                                            | val GHC.Classes.== "ipv6" -> GetPricingResponseBody200PricingFloatingIpsTypeEnumIpv6
+                                            | GHC.Base.otherwise -> GetPricingResponseBody200PricingFloatingIpsTypeOther val)
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.image@ in the specification.
 -- 
 -- The cost of Image per GB\/month
 data GetPricingResponseBody200PricingImage = GetPricingResponseBody200PricingImage {
@@ -235,12 +255,16 @@ data GetPricingResponseBody200PricingImage = GetPricingResponseBody200PricingIma
   getPricingResponseBody200PricingImagePricePerGbMonth :: GetPricingResponseBody200PricingImagePricePerGbMonth
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingImage
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "price_per_gb_month" (getPricingResponseBody200PricingImagePricePerGbMonth obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "price_per_gb_month" (getPricingResponseBody200PricingImagePricePerGbMonth obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingImage
+    where toJSON obj = Data.Aeson.Types.Internal.object ("price_per_gb_month" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImagePricePerGbMonth obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("price_per_gb_month" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImagePricePerGbMonth obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingImage
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingImage" (\obj -> GHC.Base.pure GetPricingResponseBody200PricingImage GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_per_gb_month"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingImagePrice_per_gb_month
+-- | Create a new 'GetPricingResponseBody200PricingImage' with all required fields.
+mkGetPricingResponseBody200PricingImage :: GetPricingResponseBody200PricingImagePricePerGbMonth -- ^ 'getPricingResponseBody200PricingImagePricePerGbMonth'
+  -> GetPricingResponseBody200PricingImage
+mkGetPricingResponseBody200PricingImage getPricingResponseBody200PricingImagePricePerGbMonth = GetPricingResponseBody200PricingImage{getPricingResponseBody200PricingImagePricePerGbMonth = getPricingResponseBody200PricingImagePricePerGbMonth}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.image.properties.price_per_gb_month@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingImagePricePerGbMonth = GetPricingResponseBody200PricingImagePricePerGbMonth {
@@ -250,12 +274,18 @@ data GetPricingResponseBody200PricingImagePricePerGbMonth = GetPricingResponseBo
   , getPricingResponseBody200PricingImagePricePerGbMonthNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingImagePricePerGbMonth
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingImagePricePerGbMonthGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingImagePricePerGbMonthNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingImagePricePerGbMonthGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingImagePricePerGbMonthNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingImagePricePerGbMonth
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImagePricePerGbMonthGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImagePricePerGbMonthNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImagePricePerGbMonthGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingImagePricePerGbMonthNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingImagePricePerGbMonth
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingImagePricePerGbMonth" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingImagePricePerGbMonth GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingLoad_balancer_types
+-- | Create a new 'GetPricingResponseBody200PricingImagePricePerGbMonth' with all required fields.
+mkGetPricingResponseBody200PricingImagePricePerGbMonth :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingImagePricePerGbMonthGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingImagePricePerGbMonthNet'
+  -> GetPricingResponseBody200PricingImagePricePerGbMonth
+mkGetPricingResponseBody200PricingImagePricePerGbMonth getPricingResponseBody200PricingImagePricePerGbMonthGross getPricingResponseBody200PricingImagePricePerGbMonthNet = GetPricingResponseBody200PricingImagePricePerGbMonth{getPricingResponseBody200PricingImagePricePerGbMonthGross = getPricingResponseBody200PricingImagePricePerGbMonthGross,
+                                                                                                                                                                                                                                getPricingResponseBody200PricingImagePricePerGbMonthNet = getPricingResponseBody200PricingImagePricePerGbMonthNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.load_balancer_types.items@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingLoadBalancerTypes = GetPricingResponseBody200PricingLoadBalancerTypes {
@@ -264,15 +294,23 @@ data GetPricingResponseBody200PricingLoadBalancerTypes = GetPricingResponseBody2
   -- | name: Name of the Load Balancer type the price is for
   , getPricingResponseBody200PricingLoadBalancerTypesName :: Data.Text.Internal.Text
   -- | prices: Load Balancer type costs per Location
-  , getPricingResponseBody200PricingLoadBalancerTypesPrices :: ([] GetPricingResponseBody200PricingLoadBalancerTypesPrices)
+  , getPricingResponseBody200PricingLoadBalancerTypesPrices :: ([GetPricingResponseBody200PricingLoadBalancerTypesPrices])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingLoadBalancerTypes
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getPricingResponseBody200PricingLoadBalancerTypesId obj) : (Data.Aeson..=) "name" (getPricingResponseBody200PricingLoadBalancerTypesName obj) : (Data.Aeson..=) "prices" (getPricingResponseBody200PricingLoadBalancerTypesPrices obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getPricingResponseBody200PricingLoadBalancerTypesId obj) GHC.Base.<> ((Data.Aeson..=) "name" (getPricingResponseBody200PricingLoadBalancerTypesName obj) GHC.Base.<> (Data.Aeson..=) "prices" (getPricingResponseBody200PricingLoadBalancerTypesPrices obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingLoadBalancerTypes
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesId obj : "name" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesName obj : "prices" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPrices obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesId obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesName obj) GHC.Base.<> ("prices" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPrices obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingLoadBalancerTypes
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingLoadBalancerTypes" (\obj -> ((GHC.Base.pure GetPricingResponseBody200PricingLoadBalancerTypes GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingLoad_balancer_typesPrices
+-- | Create a new 'GetPricingResponseBody200PricingLoadBalancerTypes' with all required fields.
+mkGetPricingResponseBody200PricingLoadBalancerTypes :: GHC.Types.Double -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesId'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesName'
+  -> [GetPricingResponseBody200PricingLoadBalancerTypesPrices] -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPrices'
+  -> GetPricingResponseBody200PricingLoadBalancerTypes
+mkGetPricingResponseBody200PricingLoadBalancerTypes getPricingResponseBody200PricingLoadBalancerTypesId getPricingResponseBody200PricingLoadBalancerTypesName getPricingResponseBody200PricingLoadBalancerTypesPrices = GetPricingResponseBody200PricingLoadBalancerTypes{getPricingResponseBody200PricingLoadBalancerTypesId = getPricingResponseBody200PricingLoadBalancerTypesId,
+                                                                                                                                                                                                                                                                          getPricingResponseBody200PricingLoadBalancerTypesName = getPricingResponseBody200PricingLoadBalancerTypesName,
+                                                                                                                                                                                                                                                                          getPricingResponseBody200PricingLoadBalancerTypesPrices = getPricingResponseBody200PricingLoadBalancerTypesPrices}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.load_balancer_types.items.properties.prices.items@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingLoadBalancerTypesPrices = GetPricingResponseBody200PricingLoadBalancerTypesPrices {
@@ -284,12 +322,20 @@ data GetPricingResponseBody200PricingLoadBalancerTypesPrices = GetPricingRespons
   , getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly :: GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingLoadBalancerTypesPrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (getPricingResponseBody200PricingLoadBalancerTypesPricesLocation obj) : (Data.Aeson..=) "price_hourly" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly obj) : (Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (getPricingResponseBody200PricingLoadBalancerTypesPricesLocation obj) GHC.Base.<> ((Data.Aeson..=) "price_hourly" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingLoadBalancerTypesPrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesLocation obj : "price_hourly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly obj : "price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesLocation obj) GHC.Base.<> (("price_hourly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingLoadBalancerTypesPrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingLoadBalancerTypesPrices" (\obj -> ((GHC.Base.pure GetPricingResponseBody200PricingLoadBalancerTypesPrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_hourly")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingLoad_balancer_typesPricesPrice_hourly
+-- | Create a new 'GetPricingResponseBody200PricingLoadBalancerTypesPrices' with all required fields.
+mkGetPricingResponseBody200PricingLoadBalancerTypesPrices :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesLocation'
+  -> GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly'
+  -> GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly'
+  -> GetPricingResponseBody200PricingLoadBalancerTypesPrices
+mkGetPricingResponseBody200PricingLoadBalancerTypesPrices getPricingResponseBody200PricingLoadBalancerTypesPricesLocation getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly = GetPricingResponseBody200PricingLoadBalancerTypesPrices{getPricingResponseBody200PricingLoadBalancerTypesPricesLocation = getPricingResponseBody200PricingLoadBalancerTypesPricesLocation,
+                                                                                                                                                                                                                                                                                                                           getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly = getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly,
+                                                                                                                                                                                                                                                                                                                           getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly = getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.load_balancer_types.items.properties.prices.items.properties.price_hourly@ in the specification.
 -- 
 -- Hourly costs for a Load Balancer type in this network zone
 data GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly = GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly {
@@ -299,12 +345,18 @@ data GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly = GetPri
   , getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingLoad_balancer_typesPricesPrice_monthly
+-- | Create a new 'GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly' with all required fields.
+mkGetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet'
+  -> GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly
+mkGetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet = GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourly{getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross = getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyGross,
+                                                                                                                                                                                                                                                                                        getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet = getPricingResponseBody200PricingLoadBalancerTypesPricesPriceHourlyNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.load_balancer_types.items.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Load Balancer type in this network zone
 data GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly = GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly {
@@ -314,12 +366,18 @@ data GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly = GetPr
   , getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingServer_backup
+-- | Create a new 'GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly' with all required fields.
+mkGetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet'
+  -> GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly
+mkGetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet = GetPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthly{getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross = getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                                            getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet = getPricingResponseBody200PricingLoadBalancerTypesPricesPriceMonthlyNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.server_backup@ in the specification.
 -- 
 -- Will increase base Server costs by specific percentage
 data GetPricingResponseBody200PricingServerBackup = GetPricingResponseBody200PricingServerBackup {
@@ -327,12 +385,16 @@ data GetPricingResponseBody200PricingServerBackup = GetPricingResponseBody200Pri
   getPricingResponseBody200PricingServerBackupPercentage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingServerBackup
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "percentage" (getPricingResponseBody200PricingServerBackupPercentage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "percentage" (getPricingResponseBody200PricingServerBackupPercentage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingServerBackup
+    where toJSON obj = Data.Aeson.Types.Internal.object ("percentage" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerBackupPercentage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("percentage" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerBackupPercentage obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingServerBackup
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingServerBackup" (\obj -> GHC.Base.pure GetPricingResponseBody200PricingServerBackup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "percentage"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingServer_types
+-- | Create a new 'GetPricingResponseBody200PricingServerBackup' with all required fields.
+mkGetPricingResponseBody200PricingServerBackup :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerBackupPercentage'
+  -> GetPricingResponseBody200PricingServerBackup
+mkGetPricingResponseBody200PricingServerBackup getPricingResponseBody200PricingServerBackupPercentage = GetPricingResponseBody200PricingServerBackup{getPricingResponseBody200PricingServerBackupPercentage = getPricingResponseBody200PricingServerBackupPercentage}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.server_types.items@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingServerTypes = GetPricingResponseBody200PricingServerTypes {
@@ -341,15 +403,23 @@ data GetPricingResponseBody200PricingServerTypes = GetPricingResponseBody200Pric
   -- | name: Name of the Server type the price is for
   , getPricingResponseBody200PricingServerTypesName :: Data.Text.Internal.Text
   -- | prices: Server type costs per Location
-  , getPricingResponseBody200PricingServerTypesPrices :: ([] GetPricingResponseBody200PricingServerTypesPrices)
+  , getPricingResponseBody200PricingServerTypesPrices :: ([GetPricingResponseBody200PricingServerTypesPrices])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingServerTypes
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getPricingResponseBody200PricingServerTypesId obj) : (Data.Aeson..=) "name" (getPricingResponseBody200PricingServerTypesName obj) : (Data.Aeson..=) "prices" (getPricingResponseBody200PricingServerTypesPrices obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getPricingResponseBody200PricingServerTypesId obj) GHC.Base.<> ((Data.Aeson..=) "name" (getPricingResponseBody200PricingServerTypesName obj) GHC.Base.<> (Data.Aeson..=) "prices" (getPricingResponseBody200PricingServerTypesPrices obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingServerTypes
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesId obj : "name" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesName obj : "prices" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPrices obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesId obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesName obj) GHC.Base.<> ("prices" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPrices obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingServerTypes
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingServerTypes" (\obj -> ((GHC.Base.pure GetPricingResponseBody200PricingServerTypes GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingServer_typesPrices
+-- | Create a new 'GetPricingResponseBody200PricingServerTypes' with all required fields.
+mkGetPricingResponseBody200PricingServerTypes :: GHC.Types.Double -- ^ 'getPricingResponseBody200PricingServerTypesId'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerTypesName'
+  -> [GetPricingResponseBody200PricingServerTypesPrices] -- ^ 'getPricingResponseBody200PricingServerTypesPrices'
+  -> GetPricingResponseBody200PricingServerTypes
+mkGetPricingResponseBody200PricingServerTypes getPricingResponseBody200PricingServerTypesId getPricingResponseBody200PricingServerTypesName getPricingResponseBody200PricingServerTypesPrices = GetPricingResponseBody200PricingServerTypes{getPricingResponseBody200PricingServerTypesId = getPricingResponseBody200PricingServerTypesId,
+                                                                                                                                                                                                                                            getPricingResponseBody200PricingServerTypesName = getPricingResponseBody200PricingServerTypesName,
+                                                                                                                                                                                                                                            getPricingResponseBody200PricingServerTypesPrices = getPricingResponseBody200PricingServerTypesPrices}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.server_types.items.properties.prices.items@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingServerTypesPrices = GetPricingResponseBody200PricingServerTypesPrices {
@@ -361,12 +431,20 @@ data GetPricingResponseBody200PricingServerTypesPrices = GetPricingResponseBody2
   , getPricingResponseBody200PricingServerTypesPricesPriceMonthly :: GetPricingResponseBody200PricingServerTypesPricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingServerTypesPrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (getPricingResponseBody200PricingServerTypesPricesLocation obj) : (Data.Aeson..=) "price_hourly" (getPricingResponseBody200PricingServerTypesPricesPriceHourly obj) : (Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingServerTypesPricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (getPricingResponseBody200PricingServerTypesPricesLocation obj) GHC.Base.<> ((Data.Aeson..=) "price_hourly" (getPricingResponseBody200PricingServerTypesPricesPriceHourly obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (getPricingResponseBody200PricingServerTypesPricesPriceMonthly obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingServerTypesPrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesLocation obj : "price_hourly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceHourly obj : "price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesLocation obj) GHC.Base.<> (("price_hourly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceHourly obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceMonthly obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingServerTypesPrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingServerTypesPrices" (\obj -> ((GHC.Base.pure GetPricingResponseBody200PricingServerTypesPrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_hourly")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingServer_typesPricesPrice_hourly
+-- | Create a new 'GetPricingResponseBody200PricingServerTypesPrices' with all required fields.
+mkGetPricingResponseBody200PricingServerTypesPrices :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerTypesPricesLocation'
+  -> GetPricingResponseBody200PricingServerTypesPricesPriceHourly -- ^ 'getPricingResponseBody200PricingServerTypesPricesPriceHourly'
+  -> GetPricingResponseBody200PricingServerTypesPricesPriceMonthly -- ^ 'getPricingResponseBody200PricingServerTypesPricesPriceMonthly'
+  -> GetPricingResponseBody200PricingServerTypesPrices
+mkGetPricingResponseBody200PricingServerTypesPrices getPricingResponseBody200PricingServerTypesPricesLocation getPricingResponseBody200PricingServerTypesPricesPriceHourly getPricingResponseBody200PricingServerTypesPricesPriceMonthly = GetPricingResponseBody200PricingServerTypesPrices{getPricingResponseBody200PricingServerTypesPricesLocation = getPricingResponseBody200PricingServerTypesPricesLocation,
+                                                                                                                                                                                                                                                                                             getPricingResponseBody200PricingServerTypesPricesPriceHourly = getPricingResponseBody200PricingServerTypesPricesPriceHourly,
+                                                                                                                                                                                                                                                                                             getPricingResponseBody200PricingServerTypesPricesPriceMonthly = getPricingResponseBody200PricingServerTypesPricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.server_types.items.properties.prices.items.properties.price_hourly@ in the specification.
 -- 
 -- Hourly costs for a Server type in this Location
 data GetPricingResponseBody200PricingServerTypesPricesPriceHourly = GetPricingResponseBody200PricingServerTypesPricesPriceHourly {
@@ -376,12 +454,18 @@ data GetPricingResponseBody200PricingServerTypesPricesPriceHourly = GetPricingRe
   , getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingServerTypesPricesPriceHourly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingServerTypesPricesPriceHourly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingServerTypesPricesPriceHourly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingServerTypesPricesPriceHourly" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingServerTypesPricesPriceHourly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingServer_typesPricesPrice_monthly
+-- | Create a new 'GetPricingResponseBody200PricingServerTypesPricesPriceHourly' with all required fields.
+mkGetPricingResponseBody200PricingServerTypesPricesPriceHourly :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet'
+  -> GetPricingResponseBody200PricingServerTypesPricesPriceHourly
+mkGetPricingResponseBody200PricingServerTypesPricesPriceHourly getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet = GetPricingResponseBody200PricingServerTypesPricesPriceHourly{getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross = getPricingResponseBody200PricingServerTypesPricesPriceHourlyGross,
+                                                                                                                                                                                                                                                                getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet = getPricingResponseBody200PricingServerTypesPricesPriceHourlyNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.server_types.items.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Server type in this Location
 data GetPricingResponseBody200PricingServerTypesPricesPriceMonthly = GetPricingResponseBody200PricingServerTypesPricesPriceMonthly {
@@ -391,12 +475,18 @@ data GetPricingResponseBody200PricingServerTypesPricesPriceMonthly = GetPricingR
   , getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingServerTypesPricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingServerTypesPricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingServerTypesPricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingServerTypesPricesPriceMonthly" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingServerTypesPricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingTraffic
+-- | Create a new 'GetPricingResponseBody200PricingServerTypesPricesPriceMonthly' with all required fields.
+mkGetPricingResponseBody200PricingServerTypesPricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet'
+  -> GetPricingResponseBody200PricingServerTypesPricesPriceMonthly
+mkGetPricingResponseBody200PricingServerTypesPricesPriceMonthly getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet = GetPricingResponseBody200PricingServerTypesPricesPriceMonthly{getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross = getPricingResponseBody200PricingServerTypesPricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                    getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet = getPricingResponseBody200PricingServerTypesPricesPriceMonthlyNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.traffic@ in the specification.
 -- 
 -- The cost of additional traffic per TB
 data GetPricingResponseBody200PricingTraffic = GetPricingResponseBody200PricingTraffic {
@@ -404,12 +494,16 @@ data GetPricingResponseBody200PricingTraffic = GetPricingResponseBody200PricingT
   getPricingResponseBody200PricingTrafficPricePerTb :: GetPricingResponseBody200PricingTrafficPricePerTb
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingTraffic
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "price_per_tb" (getPricingResponseBody200PricingTrafficPricePerTb obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "price_per_tb" (getPricingResponseBody200PricingTrafficPricePerTb obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingTraffic
+    where toJSON obj = Data.Aeson.Types.Internal.object ("price_per_tb" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTrafficPricePerTb obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("price_per_tb" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTrafficPricePerTb obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingTraffic
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingTraffic" (\obj -> GHC.Base.pure GetPricingResponseBody200PricingTraffic GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_per_tb"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingTrafficPrice_per_tb
+-- | Create a new 'GetPricingResponseBody200PricingTraffic' with all required fields.
+mkGetPricingResponseBody200PricingTraffic :: GetPricingResponseBody200PricingTrafficPricePerTb -- ^ 'getPricingResponseBody200PricingTrafficPricePerTb'
+  -> GetPricingResponseBody200PricingTraffic
+mkGetPricingResponseBody200PricingTraffic getPricingResponseBody200PricingTrafficPricePerTb = GetPricingResponseBody200PricingTraffic{getPricingResponseBody200PricingTrafficPricePerTb = getPricingResponseBody200PricingTrafficPricePerTb}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.traffic.properties.price_per_tb@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingTrafficPricePerTb = GetPricingResponseBody200PricingTrafficPricePerTb {
@@ -419,12 +513,18 @@ data GetPricingResponseBody200PricingTrafficPricePerTb = GetPricingResponseBody2
   , getPricingResponseBody200PricingTrafficPricePerTbNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingTrafficPricePerTb
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingTrafficPricePerTbGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingTrafficPricePerTbNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingTrafficPricePerTbGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingTrafficPricePerTbNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingTrafficPricePerTb
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTrafficPricePerTbGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTrafficPricePerTbNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTrafficPricePerTbGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingTrafficPricePerTbNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingTrafficPricePerTb
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingTrafficPricePerTb" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingTrafficPricePerTb GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingVolume
+-- | Create a new 'GetPricingResponseBody200PricingTrafficPricePerTb' with all required fields.
+mkGetPricingResponseBody200PricingTrafficPricePerTb :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingTrafficPricePerTbGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingTrafficPricePerTbNet'
+  -> GetPricingResponseBody200PricingTrafficPricePerTb
+mkGetPricingResponseBody200PricingTrafficPricePerTb getPricingResponseBody200PricingTrafficPricePerTbGross getPricingResponseBody200PricingTrafficPricePerTbNet = GetPricingResponseBody200PricingTrafficPricePerTb{getPricingResponseBody200PricingTrafficPricePerTbGross = getPricingResponseBody200PricingTrafficPricePerTbGross,
+                                                                                                                                                                                                                    getPricingResponseBody200PricingTrafficPricePerTbNet = getPricingResponseBody200PricingTrafficPricePerTbNet}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.volume@ in the specification.
 -- 
 -- The cost of Volume per GB\/month
 data GetPricingResponseBody200PricingVolume = GetPricingResponseBody200PricingVolume {
@@ -432,12 +532,16 @@ data GetPricingResponseBody200PricingVolume = GetPricingResponseBody200PricingVo
   getPricingResponseBody200PricingVolumePricePerGbMonth :: GetPricingResponseBody200PricingVolumePricePerGbMonth
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingVolume
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "price_per_gb_month" (getPricingResponseBody200PricingVolumePricePerGbMonth obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "price_per_gb_month" (getPricingResponseBody200PricingVolumePricePerGbMonth obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingVolume
+    where toJSON obj = Data.Aeson.Types.Internal.object ("price_per_gb_month" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolumePricePerGbMonth obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("price_per_gb_month" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolumePricePerGbMonth obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingVolume
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingVolume" (\obj -> GHC.Base.pure GetPricingResponseBody200PricingVolume GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_per_gb_month"))
--- | Defines the data type for the schema GetPricingResponseBody200PricingVolumePrice_per_gb_month
+-- | Create a new 'GetPricingResponseBody200PricingVolume' with all required fields.
+mkGetPricingResponseBody200PricingVolume :: GetPricingResponseBody200PricingVolumePricePerGbMonth -- ^ 'getPricingResponseBody200PricingVolumePricePerGbMonth'
+  -> GetPricingResponseBody200PricingVolume
+mkGetPricingResponseBody200PricingVolume getPricingResponseBody200PricingVolumePricePerGbMonth = GetPricingResponseBody200PricingVolume{getPricingResponseBody200PricingVolumePricePerGbMonth = getPricingResponseBody200PricingVolumePricePerGbMonth}
+-- | Defines the object schema located at @paths.\/pricing.GET.responses.200.content.application\/json.schema.properties.pricing.properties.volume.properties.price_per_gb_month@ in the specification.
 -- 
 -- 
 data GetPricingResponseBody200PricingVolumePricePerGbMonth = GetPricingResponseBody200PricingVolumePricePerGbMonth {
@@ -447,8 +551,33 @@ data GetPricingResponseBody200PricingVolumePricePerGbMonth = GetPricingResponseB
   , getPricingResponseBody200PricingVolumePricePerGbMonthNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPricingResponseBody200PricingVolumePricePerGbMonth
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingVolumePricePerGbMonthGross obj) : (Data.Aeson..=) "net" (getPricingResponseBody200PricingVolumePricePerGbMonthNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getPricingResponseBody200PricingVolumePricePerGbMonthGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getPricingResponseBody200PricingVolumePricePerGbMonthNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetPricingResponseBody200PricingVolumePricePerGbMonth
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolumePricePerGbMonthGross obj : "net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolumePricePerGbMonthNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolumePricePerGbMonthGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getPricingResponseBody200PricingVolumePricePerGbMonthNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetPricingResponseBody200PricingVolumePricePerGbMonth
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPricingResponseBody200PricingVolumePricePerGbMonth" (\obj -> (GHC.Base.pure GetPricingResponseBody200PricingVolumePricePerGbMonth GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
+-- | Create a new 'GetPricingResponseBody200PricingVolumePricePerGbMonth' with all required fields.
+mkGetPricingResponseBody200PricingVolumePricePerGbMonth :: Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingVolumePricePerGbMonthGross'
+  -> Data.Text.Internal.Text -- ^ 'getPricingResponseBody200PricingVolumePricePerGbMonthNet'
+  -> GetPricingResponseBody200PricingVolumePricePerGbMonth
+mkGetPricingResponseBody200PricingVolumePricePerGbMonth getPricingResponseBody200PricingVolumePricePerGbMonthGross getPricingResponseBody200PricingVolumePricePerGbMonthNet = GetPricingResponseBody200PricingVolumePricePerGbMonth{getPricingResponseBody200PricingVolumePricePerGbMonthGross = getPricingResponseBody200PricingVolumePricePerGbMonthGross,
+                                                                                                                                                                                                                                    getPricingResponseBody200PricingVolumePricePerGbMonthNet = getPricingResponseBody200PricingVolumePricePerGbMonthNet}
+-- | > GET /pricing
+-- 
+-- The same as 'getPricing' but accepts an explicit configuration.
+getPricingWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> m (Network.HTTP.Client.Types.Response GetPricingResponse) -- ^ Monadic computation which returns the result of the operation
+getPricingWithConfiguration config = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetPricingResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPricingResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                    GetPricingResponseBody200)
+                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") GHC.Base.mempty)
+-- | > GET /pricing
+-- 
+-- The same as 'getPricing' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getPricingRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getPricingRaw = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") GHC.Base.mempty)
+-- | > GET /pricing
+-- 
+-- The same as 'getPricing' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getPricingWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getPricingWithConfigurationRaw config = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/pricing") GHC.Base.mempty)

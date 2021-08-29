@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getLoadBalancerTypes_Id_
 module HCloud.Operations.GetLoadBalancerTypesId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,56 +45,19 @@ import HCloud.Types
 -- | > GET /load_balancer_types/{id}
 -- 
 -- Gets a specific Load Balancer type object.
-getLoadBalancerTypes_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                             -- ^ id: ID of Load Balancer type
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetLoadBalancerTypesIdResponse))   -- ^ Monad containing the result of the operation
-getLoadBalancerTypes_Id_ config
-                         id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLoadBalancerTypesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancerTypesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                    GetLoadBalancerTypesIdResponseBody200)
-                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /load_balancer_types/{id}
--- 
--- The same as 'getLoadBalancerTypes_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-getLoadBalancerTypes_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                             HCloud.Common.SecurityScheme s) =>
-                               HCloud.Common.Configuration s ->
-                               GHC.Integer.Type.Integer ->
-                               m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                     (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLoadBalancerTypes_Id_Raw config
-                            id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /load_balancer_types/{id}
--- 
--- Monadic version of 'getLoadBalancerTypes_Id_' (use with 'HCloud.Common.runWithConfiguration')
-getLoadBalancerTypes_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                           HCloud.Common.SecurityScheme s) =>
-                             GHC.Integer.Type.Integer ->
-                             Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                m
-                                                                (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                    (Network.HTTP.Client.Types.Response GetLoadBalancerTypesIdResponse))
-getLoadBalancerTypes_Id_M id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLoadBalancerTypesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancerTypesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                     GetLoadBalancerTypesIdResponseBody200)
-                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /load_balancer_types/{id}
--- 
--- Monadic version of 'getLoadBalancerTypes_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-getLoadBalancerTypes_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                              HCloud.Common.SecurityScheme s) =>
-                                GHC.Integer.Type.Integer ->
-                                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                   m
-                                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                       (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLoadBalancerTypes_Id_RawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
+getLoadBalancerTypes_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of Load Balancer type
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetLoadBalancerTypesIdResponse) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancerTypes_Id_ id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLoadBalancerTypesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancerTypesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                     GetLoadBalancerTypesIdResponseBody200)
+                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
 -- | Represents a response of the operation 'getLoadBalancerTypes_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetLoadBalancerTypesIdResponseError' is used.
-data GetLoadBalancerTypesIdResponse =                                        
-   GetLoadBalancerTypesIdResponseError GHC.Base.String                       -- ^ Means either no matching case available or a parse error
-  | GetLoadBalancerTypesIdResponse200 GetLoadBalancerTypesIdResponseBody200  -- ^ The \`load_balancer_type\` key in the reply contains a Load Balancer type object with this structure
+data GetLoadBalancerTypesIdResponse =
+   GetLoadBalancerTypesIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetLoadBalancerTypesIdResponse200 GetLoadBalancerTypesIdResponseBody200 -- ^ The \`load_balancer_type\` key in the reply contains a Load Balancer type object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetLoadBalancerTypesIdResponseBody200
+-- | Defines the object schema located at @paths.\/load_balancer_types\/{id}.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetLoadBalancerTypesIdResponseBody200 = GetLoadBalancerTypesIdResponseBody200 {
@@ -102,17 +65,20 @@ data GetLoadBalancerTypesIdResponseBody200 = GetLoadBalancerTypesIdResponseBody2
   getLoadBalancerTypesIdResponseBody200LoadBalancerType :: (GHC.Maybe.Maybe GetLoadBalancerTypesIdResponseBody200LoadBalancerType)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancerTypesIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "load_balancer_type" (getLoadBalancerTypesIdResponseBody200LoadBalancerType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "load_balancer_type" (getLoadBalancerTypesIdResponseBody200LoadBalancerType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancerTypesIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("load_balancer_type" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("load_balancer_type" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerType obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancerTypesIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancerTypesIdResponseBody200" (\obj -> GHC.Base.pure GetLoadBalancerTypesIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "load_balancer_type"))
--- | Defines the data type for the schema GetLoadBalancerTypesIdResponseBody200Load_balancer_type
+-- | Create a new 'GetLoadBalancerTypesIdResponseBody200' with all required fields.
+mkGetLoadBalancerTypesIdResponseBody200 :: GetLoadBalancerTypesIdResponseBody200
+mkGetLoadBalancerTypesIdResponseBody200 = GetLoadBalancerTypesIdResponseBody200{getLoadBalancerTypesIdResponseBody200LoadBalancerType = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancer_types\/{id}.GET.responses.200.content.application\/json.schema.properties.load_balancer_type@ in the specification.
 -- 
 -- 
 data GetLoadBalancerTypesIdResponseBody200LoadBalancerType = GetLoadBalancerTypesIdResponseBody200LoadBalancerType {
   -- | deprecated: Point in time when the Load Balancer type is deprecated (in ISO-8601 format)
-  getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated :: Data.Text.Internal.Text
+  getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Load Balancer type
   , getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription :: Data.Text.Internal.Text
   -- | id: ID of the Load Balancer type
@@ -128,15 +94,35 @@ data GetLoadBalancerTypesIdResponseBody200LoadBalancerType = GetLoadBalancerType
   -- | name: Unique identifier of the Load Balancer type
   , getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName :: Data.Text.Internal.Text
   -- | prices: Prices in different network zones
-  , getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices :: ([] GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices)
+  , getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices :: ([GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerType
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "deprecated" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated obj) : (Data.Aeson..=) "description" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription obj) : (Data.Aeson..=) "id" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId obj) : (Data.Aeson..=) "max_assigned_certificates" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates obj) : (Data.Aeson..=) "max_connections" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections obj) : (Data.Aeson..=) "max_services" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices obj) : (Data.Aeson..=) "max_targets" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets obj) : (Data.Aeson..=) "name" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName obj) : (Data.Aeson..=) "prices" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "deprecated" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId obj) GHC.Base.<> ((Data.Aeson..=) "max_assigned_certificates" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates obj) GHC.Base.<> ((Data.Aeson..=) "max_connections" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections obj) GHC.Base.<> ((Data.Aeson..=) "max_services" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices obj) GHC.Base.<> ((Data.Aeson..=) "max_targets" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets obj) GHC.Base.<> ((Data.Aeson..=) "name" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName obj) GHC.Base.<> (Data.Aeson..=) "prices" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices obj)))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerType
+    where toJSON obj = Data.Aeson.Types.Internal.object ("deprecated" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription obj : "id" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId obj : "max_assigned_certificates" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates obj : "max_connections" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections obj : "max_services" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices obj : "max_targets" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets obj : "name" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName obj : "prices" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("deprecated" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId obj) GHC.Base.<> (("max_assigned_certificates" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates obj) GHC.Base.<> (("max_connections" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections obj) GHC.Base.<> (("max_services" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices obj) GHC.Base.<> (("max_targets" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName obj) GHC.Base.<> ("prices" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices obj)))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancerTypesIdResponseBody200LoadBalancerType" (\obj -> ((((((((GHC.Base.pure GetLoadBalancerTypesIdResponseBody200LoadBalancerType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_assigned_certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_connections")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_services")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_targets")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices"))
--- | Defines the data type for the schema GetLoadBalancerTypesIdResponseBody200Load_balancer_typePrices
+-- | Create a new 'GetLoadBalancerTypesIdResponseBody200LoadBalancerType' with all required fields.
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerType :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription'
+  -> GHC.Types.Double -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId'
+  -> GHC.Types.Double -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates'
+  -> GHC.Types.Double -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections'
+  -> GHC.Types.Double -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices'
+  -> GHC.Types.Double -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName'
+  -> [GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices] -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices'
+  -> GetLoadBalancerTypesIdResponseBody200LoadBalancerType
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerType getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices = GetLoadBalancerTypesIdResponseBody200LoadBalancerType{getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxAssignedCertificates,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxConnections,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxServices,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeMaxTargets,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName = getLoadBalancerTypesIdResponseBody200LoadBalancerTypeName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices}
+-- | Defines the object schema located at @paths.\/load_balancer_types\/{id}.GET.responses.200.content.application\/json.schema.properties.load_balancer_type.properties.prices.items@ in the specification.
 -- 
 -- 
 data GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices = GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices {
@@ -148,12 +134,20 @@ data GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices = GetLoadBalanc
   , getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly :: GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation obj) : (Data.Aeson..=) "price_hourly" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly obj) : (Data.Aeson..=) "price_monthly" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation obj) GHC.Base.<> ((Data.Aeson..=) "price_hourly" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation obj : "price_hourly" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly obj : "price_monthly" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation obj) GHC.Base.<> (("price_hourly" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices" (\obj -> ((GHC.Base.pure GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_hourly")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema GetLoadBalancerTypesIdResponseBody200Load_balancer_typePricesPrice_hourly
+-- | Create a new 'GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices' with all required fields.
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices :: Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation'
+  -> GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly'
+  -> GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly'
+  -> GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly = GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePrices{getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesLocation,
+                                                                                                                                                                                                                                                                                                                                               getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly,
+                                                                                                                                                                                                                                                                                                                                               getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/load_balancer_types\/{id}.GET.responses.200.content.application\/json.schema.properties.load_balancer_type.properties.prices.items.properties.price_hourly@ in the specification.
 -- 
 -- Hourly costs for a Resource in this Location
 data GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly = GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly {
@@ -163,12 +157,18 @@ data GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly = Ge
   , getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross obj) : (Data.Aeson..=) "net" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross obj : "net" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly" (\obj -> (GHC.Base.pure GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetLoadBalancerTypesIdResponseBody200Load_balancer_typePricesPrice_monthly
+-- | Create a new 'GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly' with all required fields.
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly :: Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet'
+  -> GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet = GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourly{getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyGross,
+                                                                                                                                                                                                                                                                                                        getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceHourlyNet}
+-- | Defines the object schema located at @paths.\/load_balancer_types\/{id}.GET.responses.200.content.application\/json.schema.properties.load_balancer_type.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Resource in this Location
 data GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly = GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly {
@@ -178,8 +178,38 @@ data GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly = G
   , getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly" (\obj -> (GHC.Base.pure GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
+-- | Create a new 'GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly' with all required fields.
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet'
+  -> GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly
+mkGetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet = GetLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthly{getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                                                            getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet = getLoadBalancerTypesIdResponseBody200LoadBalancerTypePricesPriceMonthlyNet}
+-- | > GET /load_balancer_types/{id}
+-- 
+-- The same as 'getLoadBalancerTypes_Id_' but accepts an explicit configuration.
+getLoadBalancerTypes_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of Load Balancer type
+  -> m (Network.HTTP.Client.Types.Response GetLoadBalancerTypesIdResponse) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancerTypes_Id_WithConfiguration config
+                                          id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLoadBalancerTypesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancerTypesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      GetLoadBalancerTypesIdResponseBody200)
+                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > GET /load_balancer_types/{id}
+-- 
+-- The same as 'getLoadBalancerTypes_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getLoadBalancerTypes_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of Load Balancer type
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancerTypes_Id_Raw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > GET /load_balancer_types/{id}
+-- 
+-- The same as 'getLoadBalancerTypes_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getLoadBalancerTypes_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of Load Balancer type
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancerTypes_Id_WithConfigurationRaw config
+                                             id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancer_types/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)

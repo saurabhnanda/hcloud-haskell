@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putFloatingIps_Id_
 module HCloud.Operations.PutFloatingIpsId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -46,93 +46,43 @@ import HCloud.Types
 -- 
 -- Updates the description or labels of a Floating IP.
 -- Also note that when updating labels, the Floating IP’s current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
-putFloatingIps_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                       -- ^ id: ID of the Floating IP
-  -> GHC.Maybe.Maybe PutFloatingIpsIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutFloatingIpsIdResponse))   -- ^ Monad containing the result of the operation
-putFloatingIps_Id_ config
-                   id
-                   body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutFloatingIpsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutFloatingIpsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                    PutFloatingIpsIdResponseBody200)
-                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /floating_ips/{id}
--- 
--- The same as 'putFloatingIps_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putFloatingIps_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                       HCloud.Common.SecurityScheme s) =>
-                         HCloud.Common.Configuration s ->
-                         GHC.Integer.Type.Integer ->
-                         GHC.Maybe.Maybe PutFloatingIpsIdRequestBody ->
-                         m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putFloatingIps_Id_Raw config
-                      id
-                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /floating_ips/{id}
--- 
--- Monadic version of 'putFloatingIps_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putFloatingIps_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                     HCloud.Common.SecurityScheme s) =>
-                       GHC.Integer.Type.Integer ->
-                       GHC.Maybe.Maybe PutFloatingIpsIdRequestBody ->
-                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                          m
-                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                              (Network.HTTP.Client.Types.Response PutFloatingIpsIdResponse))
-putFloatingIps_Id_M id
-                    body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutFloatingIpsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutFloatingIpsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                     PutFloatingIpsIdResponseBody200)
-                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /floating_ips/{id}
--- 
--- Monadic version of 'putFloatingIps_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putFloatingIps_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                        HCloud.Common.SecurityScheme s) =>
-                          GHC.Integer.Type.Integer ->
-                          GHC.Maybe.Maybe PutFloatingIpsIdRequestBody ->
-                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                             m
-                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putFloatingIps_Id_RawM id
-                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putFloatingIps_Id_RequestBody
+putFloatingIps_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PutFloatingIpsIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutFloatingIpsIdResponse) -- ^ Monadic computation which returns the result of the operation
+putFloatingIps_Id_ id
+                   body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutFloatingIpsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutFloatingIpsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                     PutFloatingIpsIdResponseBody200)
+                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutFloatingIpsIdRequestBody = PutFloatingIpsIdRequestBody {
   -- | description: New Description to set
   putFloatingIpsIdRequestBodyDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | labels: User-defined labels (key-value pairs)
-  , putFloatingIpsIdRequestBodyLabels :: (GHC.Maybe.Maybe PutFloatingIpsIdRequestBodyLabels)
+  , putFloatingIpsIdRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: New unique name to set
   , putFloatingIpsIdRequestBodyName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (putFloatingIpsIdRequestBodyDescription obj) : (Data.Aeson..=) "labels" (putFloatingIpsIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putFloatingIpsIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (putFloatingIpsIdRequestBodyDescription obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putFloatingIpsIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putFloatingIpsIdRequestBodyName obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= putFloatingIpsIdRequestBodyDescription obj : "labels" Data.Aeson.Types.ToJSON..= putFloatingIpsIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putFloatingIpsIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= putFloatingIpsIdRequestBodyDescription obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putFloatingIpsIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putFloatingIpsIdRequestBodyName obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdRequestBody" (\obj -> ((GHC.Base.pure PutFloatingIpsIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name"))
--- | Defines the data type for the schema putFloatingIps_Id_RequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PutFloatingIpsIdRequestBodyLabels = PutFloatingIpsIdRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdRequestBodyLabels" (\obj -> GHC.Base.pure PutFloatingIpsIdRequestBodyLabels)
+-- | Create a new 'PutFloatingIpsIdRequestBody' with all required fields.
+mkPutFloatingIpsIdRequestBody :: PutFloatingIpsIdRequestBody
+mkPutFloatingIpsIdRequestBody = PutFloatingIpsIdRequestBody{putFloatingIpsIdRequestBodyDescription = GHC.Maybe.Nothing,
+                                                            putFloatingIpsIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                            putFloatingIpsIdRequestBodyName = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putFloatingIps_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutFloatingIpsIdResponseError' is used.
-data PutFloatingIpsIdResponse =                                  
-   PutFloatingIpsIdResponseError GHC.Base.String                 -- ^ Means either no matching case available or a parse error
-  | PutFloatingIpsIdResponse200 PutFloatingIpsIdResponseBody200  -- ^ The \`floating_ip\` key in the reply contains the modified Floating IP object with the new description
+data PutFloatingIpsIdResponse =
+   PutFloatingIpsIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutFloatingIpsIdResponse200 PutFloatingIpsIdResponseBody200 -- ^ The \`floating_ip\` key in the reply contains the modified Floating IP object with the new description
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutFloatingIpsIdResponseBody200
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutFloatingIpsIdResponseBody200 = PutFloatingIpsIdResponseBody200 {
@@ -140,12 +90,16 @@ data PutFloatingIpsIdResponseBody200 = PutFloatingIpsIdResponseBody200 {
   putFloatingIpsIdResponseBody200FloatingIp :: PutFloatingIpsIdResponseBody200FloatingIp
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "floating_ip" (putFloatingIpsIdResponseBody200FloatingIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "floating_ip" (putFloatingIpsIdResponseBody200FloatingIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("floating_ip" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("floating_ip" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIp obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdResponseBody200" (\obj -> GHC.Base.pure PutFloatingIpsIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "floating_ip"))
--- | Defines the data type for the schema PutFloatingIpsIdResponseBody200Floating_ip
+-- | Create a new 'PutFloatingIpsIdResponseBody200' with all required fields.
+mkPutFloatingIpsIdResponseBody200 :: PutFloatingIpsIdResponseBody200FloatingIp -- ^ 'putFloatingIpsIdResponseBody200FloatingIp'
+  -> PutFloatingIpsIdResponseBody200
+mkPutFloatingIpsIdResponseBody200 putFloatingIpsIdResponseBody200FloatingIp = PutFloatingIpsIdResponseBody200{putFloatingIpsIdResponseBody200FloatingIp = putFloatingIpsIdResponseBody200FloatingIp}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}.PUT.responses.200.content.application\/json.schema.properties.floating_ip@ in the specification.
 -- 
 -- 
 data PutFloatingIpsIdResponseBody200FloatingIp = PutFloatingIpsIdResponseBody200FloatingIp {
@@ -154,33 +108,59 @@ data PutFloatingIpsIdResponseBody200FloatingIp = PutFloatingIpsIdResponseBody200
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , putFloatingIpsIdResponseBody200FloatingIpCreated :: Data.Text.Internal.Text
   -- | description: Description of the Resource
-  , putFloatingIpsIdResponseBody200FloatingIpDescription :: Data.Text.Internal.Text
+  , putFloatingIpsIdResponseBody200FloatingIpDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | dns_ptr: Array of reverse DNS entries
-  , putFloatingIpsIdResponseBody200FloatingIpDnsPtr :: ([] PutFloatingIpsIdResponseBody200FloatingIpDnsPtr)
+  , putFloatingIpsIdResponseBody200FloatingIpDnsPtr :: ([PutFloatingIpsIdResponseBody200FloatingIpDnsPtr])
   -- | home_location: Location the Floating IP was created in. Routing is optimized for this Location.
   , putFloatingIpsIdResponseBody200FloatingIpHomeLocation :: PutFloatingIpsIdResponseBody200FloatingIpHomeLocation
   -- | id: ID of the Resource
-  , putFloatingIpsIdResponseBody200FloatingIpId :: GHC.Integer.Type.Integer
+  , putFloatingIpsIdResponseBody200FloatingIpId :: GHC.Types.Int
   -- | ip: IP address
   , putFloatingIpsIdResponseBody200FloatingIpIp :: Data.Text.Internal.Text
   -- | labels: User-defined labels (key-value pairs)
-  , putFloatingIpsIdResponseBody200FloatingIpLabels :: PutFloatingIpsIdResponseBody200FloatingIpLabels
+  , putFloatingIpsIdResponseBody200FloatingIpLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , putFloatingIpsIdResponseBody200FloatingIpName :: Data.Text.Internal.Text
   -- | protection: Protection configuration for the Resource
   , putFloatingIpsIdResponseBody200FloatingIpProtection :: PutFloatingIpsIdResponseBody200FloatingIpProtection
   -- | server: ID of the Server the Floating IP is assigned to, null if it is not assigned at all
-  , putFloatingIpsIdResponseBody200FloatingIpServer :: GHC.Integer.Type.Integer
+  , putFloatingIpsIdResponseBody200FloatingIpServer :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | type: Type of the Floating IP
   , putFloatingIpsIdResponseBody200FloatingIpType :: PutFloatingIpsIdResponseBody200FloatingIpType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200FloatingIp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "blocked" (putFloatingIpsIdResponseBody200FloatingIpBlocked obj) : (Data.Aeson..=) "created" (putFloatingIpsIdResponseBody200FloatingIpCreated obj) : (Data.Aeson..=) "description" (putFloatingIpsIdResponseBody200FloatingIpDescription obj) : (Data.Aeson..=) "dns_ptr" (putFloatingIpsIdResponseBody200FloatingIpDnsPtr obj) : (Data.Aeson..=) "home_location" (putFloatingIpsIdResponseBody200FloatingIpHomeLocation obj) : (Data.Aeson..=) "id" (putFloatingIpsIdResponseBody200FloatingIpId obj) : (Data.Aeson..=) "ip" (putFloatingIpsIdResponseBody200FloatingIpIp obj) : (Data.Aeson..=) "labels" (putFloatingIpsIdResponseBody200FloatingIpLabels obj) : (Data.Aeson..=) "name" (putFloatingIpsIdResponseBody200FloatingIpName obj) : (Data.Aeson..=) "protection" (putFloatingIpsIdResponseBody200FloatingIpProtection obj) : (Data.Aeson..=) "server" (putFloatingIpsIdResponseBody200FloatingIpServer obj) : (Data.Aeson..=) "type" (putFloatingIpsIdResponseBody200FloatingIpType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "blocked" (putFloatingIpsIdResponseBody200FloatingIpBlocked obj) GHC.Base.<> ((Data.Aeson..=) "created" (putFloatingIpsIdResponseBody200FloatingIpCreated obj) GHC.Base.<> ((Data.Aeson..=) "description" (putFloatingIpsIdResponseBody200FloatingIpDescription obj) GHC.Base.<> ((Data.Aeson..=) "dns_ptr" (putFloatingIpsIdResponseBody200FloatingIpDnsPtr obj) GHC.Base.<> ((Data.Aeson..=) "home_location" (putFloatingIpsIdResponseBody200FloatingIpHomeLocation obj) GHC.Base.<> ((Data.Aeson..=) "id" (putFloatingIpsIdResponseBody200FloatingIpId obj) GHC.Base.<> ((Data.Aeson..=) "ip" (putFloatingIpsIdResponseBody200FloatingIpIp obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putFloatingIpsIdResponseBody200FloatingIpLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (putFloatingIpsIdResponseBody200FloatingIpName obj) GHC.Base.<> ((Data.Aeson..=) "protection" (putFloatingIpsIdResponseBody200FloatingIpProtection obj) GHC.Base.<> ((Data.Aeson..=) "server" (putFloatingIpsIdResponseBody200FloatingIpServer obj) GHC.Base.<> (Data.Aeson..=) "type" (putFloatingIpsIdResponseBody200FloatingIpType obj))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdResponseBody200FloatingIp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("blocked" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpBlocked obj : "created" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpCreated obj : "description" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDescription obj : "dns_ptr" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDnsPtr obj : "home_location" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocation obj : "id" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpId obj : "ip" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpIp obj : "labels" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpLabels obj : "name" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpName obj : "protection" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpProtection obj : "server" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpServer obj : "type" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("blocked" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpBlocked obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpCreated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDescription obj) GHC.Base.<> (("dns_ptr" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDnsPtr obj) GHC.Base.<> (("home_location" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocation obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpId obj) GHC.Base.<> (("ip" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpIp obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpName obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpProtection obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpType obj))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200FloatingIp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdResponseBody200FloatingIp" (\obj -> (((((((((((GHC.Base.pure PutFloatingIpsIdResponseBody200FloatingIp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "blocked")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "home_location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema PutFloatingIpsIdResponseBody200Floating_ipDns_ptr
+-- | Create a new 'PutFloatingIpsIdResponseBody200FloatingIp' with all required fields.
+mkPutFloatingIpsIdResponseBody200FloatingIp :: GHC.Types.Bool -- ^ 'putFloatingIpsIdResponseBody200FloatingIpBlocked'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpCreated'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpDescription'
+  -> [PutFloatingIpsIdResponseBody200FloatingIpDnsPtr] -- ^ 'putFloatingIpsIdResponseBody200FloatingIpDnsPtr'
+  -> PutFloatingIpsIdResponseBody200FloatingIpHomeLocation -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocation'
+  -> GHC.Types.Int -- ^ 'putFloatingIpsIdResponseBody200FloatingIpId'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpIp'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putFloatingIpsIdResponseBody200FloatingIpLabels'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpName'
+  -> PutFloatingIpsIdResponseBody200FloatingIpProtection -- ^ 'putFloatingIpsIdResponseBody200FloatingIpProtection'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'putFloatingIpsIdResponseBody200FloatingIpServer'
+  -> PutFloatingIpsIdResponseBody200FloatingIpType -- ^ 'putFloatingIpsIdResponseBody200FloatingIpType'
+  -> PutFloatingIpsIdResponseBody200FloatingIp
+mkPutFloatingIpsIdResponseBody200FloatingIp putFloatingIpsIdResponseBody200FloatingIpBlocked putFloatingIpsIdResponseBody200FloatingIpCreated putFloatingIpsIdResponseBody200FloatingIpDescription putFloatingIpsIdResponseBody200FloatingIpDnsPtr putFloatingIpsIdResponseBody200FloatingIpHomeLocation putFloatingIpsIdResponseBody200FloatingIpId putFloatingIpsIdResponseBody200FloatingIpIp putFloatingIpsIdResponseBody200FloatingIpLabels putFloatingIpsIdResponseBody200FloatingIpName putFloatingIpsIdResponseBody200FloatingIpProtection putFloatingIpsIdResponseBody200FloatingIpServer putFloatingIpsIdResponseBody200FloatingIpType = PutFloatingIpsIdResponseBody200FloatingIp{putFloatingIpsIdResponseBody200FloatingIpBlocked = putFloatingIpsIdResponseBody200FloatingIpBlocked,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpCreated = putFloatingIpsIdResponseBody200FloatingIpCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpDescription = putFloatingIpsIdResponseBody200FloatingIpDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpDnsPtr = putFloatingIpsIdResponseBody200FloatingIpDnsPtr,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpHomeLocation = putFloatingIpsIdResponseBody200FloatingIpHomeLocation,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpId = putFloatingIpsIdResponseBody200FloatingIpId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpIp = putFloatingIpsIdResponseBody200FloatingIpIp,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpLabels = putFloatingIpsIdResponseBody200FloatingIpLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpName = putFloatingIpsIdResponseBody200FloatingIpName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpProtection = putFloatingIpsIdResponseBody200FloatingIpProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpServer = putFloatingIpsIdResponseBody200FloatingIpServer,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putFloatingIpsIdResponseBody200FloatingIpType = putFloatingIpsIdResponseBody200FloatingIpType}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}.PUT.responses.200.content.application\/json.schema.properties.floating_ip.properties.dns_ptr.items@ in the specification.
 -- 
 -- 
 data PutFloatingIpsIdResponseBody200FloatingIpDnsPtr = PutFloatingIpsIdResponseBody200FloatingIpDnsPtr {
@@ -190,12 +170,18 @@ data PutFloatingIpsIdResponseBody200FloatingIpDnsPtr = PutFloatingIpsIdResponseB
   , putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200FloatingIpDnsPtr
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr obj) : (Data.Aeson..=) "ip" (putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdResponseBody200FloatingIpDnsPtr
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200FloatingIpDnsPtr
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdResponseBody200FloatingIpDnsPtr" (\obj -> (GHC.Base.pure PutFloatingIpsIdResponseBody200FloatingIpDnsPtr GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema PutFloatingIpsIdResponseBody200Floating_ipHome_location
+-- | Create a new 'PutFloatingIpsIdResponseBody200FloatingIpDnsPtr' with all required fields.
+mkPutFloatingIpsIdResponseBody200FloatingIpDnsPtr :: Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp'
+  -> PutFloatingIpsIdResponseBody200FloatingIpDnsPtr
+mkPutFloatingIpsIdResponseBody200FloatingIpDnsPtr putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp = PutFloatingIpsIdResponseBody200FloatingIpDnsPtr{putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr = putFloatingIpsIdResponseBody200FloatingIpDnsPtrDnsPtr,
+                                                                                                                                                                                                            putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp = putFloatingIpsIdResponseBody200FloatingIpDnsPtrIp}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}.PUT.responses.200.content.application\/json.schema.properties.floating_ip.properties.home_location@ in the specification.
 -- 
 -- Location the Floating IP was created in. Routing is optimized for this Location.
 data PutFloatingIpsIdResponseBody200FloatingIpHomeLocation = PutFloatingIpsIdResponseBody200FloatingIpHomeLocation {
@@ -217,24 +203,30 @@ data PutFloatingIpsIdResponseBody200FloatingIpHomeLocation = PutFloatingIpsIdRes
   , putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200FloatingIpHomeLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity obj) : (Data.Aeson..=) "country" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry obj) : (Data.Aeson..=) "description" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription obj) : (Data.Aeson..=) "id" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationId obj) : (Data.Aeson..=) "latitude" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude obj) : (Data.Aeson..=) "longitude" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude obj) : (Data.Aeson..=) "name" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationName obj) : (Data.Aeson..=) "network_zone" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdResponseBody200FloatingIpHomeLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity obj : "country" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200FloatingIpHomeLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdResponseBody200FloatingIpHomeLocation" (\obj -> (((((((GHC.Base.pure PutFloatingIpsIdResponseBody200FloatingIpHomeLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema PutFloatingIpsIdResponseBody200Floating_ipLabels
--- 
--- User-defined labels (key-value pairs)
-data PutFloatingIpsIdResponseBody200FloatingIpLabels = PutFloatingIpsIdResponseBody200FloatingIpLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200FloatingIpLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200FloatingIpLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdResponseBody200FloatingIpLabels" (\obj -> GHC.Base.pure PutFloatingIpsIdResponseBody200FloatingIpLabels)
--- | Defines the data type for the schema PutFloatingIpsIdResponseBody200Floating_ipProtection
+-- | Create a new 'PutFloatingIpsIdResponseBody200FloatingIpHomeLocation' with all required fields.
+mkPutFloatingIpsIdResponseBody200FloatingIpHomeLocation :: Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription'
+  -> GHC.Types.Double -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationId'
+  -> GHC.Types.Double -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude'
+  -> GHC.Types.Double -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationName'
+  -> Data.Text.Internal.Text -- ^ 'putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone'
+  -> PutFloatingIpsIdResponseBody200FloatingIpHomeLocation
+mkPutFloatingIpsIdResponseBody200FloatingIpHomeLocation putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription putFloatingIpsIdResponseBody200FloatingIpHomeLocationId putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude putFloatingIpsIdResponseBody200FloatingIpHomeLocationName putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone = PutFloatingIpsIdResponseBody200FloatingIpHomeLocation{putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity = putFloatingIpsIdResponseBody200FloatingIpHomeLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry = putFloatingIpsIdResponseBody200FloatingIpHomeLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription = putFloatingIpsIdResponseBody200FloatingIpHomeLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationId = putFloatingIpsIdResponseBody200FloatingIpHomeLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude = putFloatingIpsIdResponseBody200FloatingIpHomeLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude = putFloatingIpsIdResponseBody200FloatingIpHomeLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationName = putFloatingIpsIdResponseBody200FloatingIpHomeLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone = putFloatingIpsIdResponseBody200FloatingIpHomeLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}.PUT.responses.200.content.application\/json.schema.properties.floating_ip.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PutFloatingIpsIdResponseBody200FloatingIpProtection = PutFloatingIpsIdResponseBody200FloatingIpProtection {
@@ -242,28 +234,60 @@ data PutFloatingIpsIdResponseBody200FloatingIpProtection = PutFloatingIpsIdRespo
   putFloatingIpsIdResponseBody200FloatingIpProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200FloatingIpProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (putFloatingIpsIdResponseBody200FloatingIpProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (putFloatingIpsIdResponseBody200FloatingIpProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdResponseBody200FloatingIpProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= putFloatingIpsIdResponseBody200FloatingIpProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200FloatingIpProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutFloatingIpsIdResponseBody200FloatingIpProtection" (\obj -> GHC.Base.pure PutFloatingIpsIdResponseBody200FloatingIpProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema PutFloatingIpsIdResponseBody200Floating_ipType
+-- | Create a new 'PutFloatingIpsIdResponseBody200FloatingIpProtection' with all required fields.
+mkPutFloatingIpsIdResponseBody200FloatingIpProtection :: GHC.Types.Bool -- ^ 'putFloatingIpsIdResponseBody200FloatingIpProtectionDelete'
+  -> PutFloatingIpsIdResponseBody200FloatingIpProtection
+mkPutFloatingIpsIdResponseBody200FloatingIpProtection putFloatingIpsIdResponseBody200FloatingIpProtectionDelete = PutFloatingIpsIdResponseBody200FloatingIpProtection{putFloatingIpsIdResponseBody200FloatingIpProtectionDelete = putFloatingIpsIdResponseBody200FloatingIpProtectionDelete}
+-- | Defines the enum schema located at @paths.\/floating_ips\/{id}.PUT.responses.200.content.application\/json.schema.properties.floating_ip.properties.type@ in the specification.
 -- 
 -- Type of the Floating IP
-data PutFloatingIpsIdResponseBody200FloatingIpType
-    = PutFloatingIpsIdResponseBody200FloatingIpTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutFloatingIpsIdResponseBody200FloatingIpTypeEnumTyped Data.Text.Internal.Text
-    | PutFloatingIpsIdResponseBody200FloatingIpTypeEnumStringIpv4
-    | PutFloatingIpsIdResponseBody200FloatingIpTypeEnumStringIpv6
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutFloatingIpsIdResponseBody200FloatingIpType
-    where toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeEnumStringIpv4) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv4"
-          toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeEnumStringIpv6) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv6"
-instance Data.Aeson.FromJSON PutFloatingIpsIdResponseBody200FloatingIpType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv4")
-                                          then PutFloatingIpsIdResponseBody200FloatingIpTypeEnumStringIpv4
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv6")
-                                                then PutFloatingIpsIdResponseBody200FloatingIpTypeEnumStringIpv6
-                                                else PutFloatingIpsIdResponseBody200FloatingIpTypeEnumOther val)
+data PutFloatingIpsIdResponseBody200FloatingIpType =
+   PutFloatingIpsIdResponseBody200FloatingIpTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutFloatingIpsIdResponseBody200FloatingIpTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutFloatingIpsIdResponseBody200FloatingIpTypeEnumIpv4 -- ^ Represents the JSON value @"ipv4"@
+  | PutFloatingIpsIdResponseBody200FloatingIpTypeEnumIpv6 -- ^ Represents the JSON value @"ipv6"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutFloatingIpsIdResponseBody200FloatingIpType
+    where toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeOther val) = val
+          toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeEnumIpv4) = "ipv4"
+          toJSON (PutFloatingIpsIdResponseBody200FloatingIpTypeEnumIpv6) = "ipv6"
+instance Data.Aeson.Types.FromJSON.FromJSON PutFloatingIpsIdResponseBody200FloatingIpType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ipv4" -> PutFloatingIpsIdResponseBody200FloatingIpTypeEnumIpv4
+                                            | val GHC.Classes.== "ipv6" -> PutFloatingIpsIdResponseBody200FloatingIpTypeEnumIpv6
+                                            | GHC.Base.otherwise -> PutFloatingIpsIdResponseBody200FloatingIpTypeOther val)
+-- | > PUT /floating_ips/{id}
+-- 
+-- The same as 'putFloatingIps_Id_' but accepts an explicit configuration.
+putFloatingIps_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PutFloatingIpsIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutFloatingIpsIdResponse) -- ^ Monadic computation which returns the result of the operation
+putFloatingIps_Id_WithConfiguration config
+                                    id
+                                    body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutFloatingIpsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutFloatingIpsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                      PutFloatingIpsIdResponseBody200)
+                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /floating_ips/{id}
+-- 
+-- The same as 'putFloatingIps_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putFloatingIps_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PutFloatingIpsIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putFloatingIps_Id_Raw id
+                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /floating_ips/{id}
+-- 
+-- The same as 'putFloatingIps_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putFloatingIps_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Floating IP
+  -> GHC.Maybe.Maybe PutFloatingIpsIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putFloatingIps_Id_WithConfigurationRaw config
+                                       id
+                                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

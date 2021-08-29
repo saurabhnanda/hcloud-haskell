@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsDetachFromNetwork
 module HCloud.Operations.PostServersIdActionsDetachFromNetwork where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,77 +45,38 @@ import HCloud.Types
 -- | > POST /servers/{id}/actions/detach_from_network
 -- 
 -- Detaches a Server from a network. The interface for this network will vanish.
-postServers_Id_ActionsDetachFromNetwork :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                            -- ^ id: ID of the Server
-  -> GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsDetachFromNetworkResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsDetachFromNetwork config
-                                        id
-                                        body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDetachFromNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDetachFromNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostServersIdActionsDetachFromNetworkResponseBody201)
-                                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/detach_from_network
--- 
--- The same as 'postServers_Id_ActionsDetachFromNetwork' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsDetachFromNetworkRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                            HCloud.Common.SecurityScheme s) =>
-                                              HCloud.Common.Configuration s ->
-                                              GHC.Integer.Type.Integer ->
-                                              GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody ->
-                                              m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsDetachFromNetworkRaw config
-                                           id
-                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/detach_from_network
--- 
--- Monadic version of 'postServers_Id_ActionsDetachFromNetwork' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsDetachFromNetworkM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                          HCloud.Common.SecurityScheme s) =>
-                                            GHC.Integer.Type.Integer ->
-                                            GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody ->
-                                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                               m
-                                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                   (Network.HTTP.Client.Types.Response PostServersIdActionsDetachFromNetworkResponse))
-postServers_Id_ActionsDetachFromNetworkM id
-                                         body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDetachFromNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDetachFromNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostServersIdActionsDetachFromNetworkResponseBody201)
-                                                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/detach_from_network
--- 
--- Monadic version of 'postServers_Id_ActionsDetachFromNetworkRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsDetachFromNetworkRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                             HCloud.Common.SecurityScheme s) =>
-                                               GHC.Integer.Type.Integer ->
-                                               GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody ->
-                                               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                  m
-                                                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsDetachFromNetworkRawM id
-                                            body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postServers_Id_ActionsDetachFromNetworkRequestBody
+postServers_Id_ActionsDetachFromNetwork :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsDetachFromNetworkResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDetachFromNetwork id
+                                        body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDetachFromNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDetachFromNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostServersIdActionsDetachFromNetworkResponseBody201)
+                                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/detach_from_network.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDetachFromNetworkRequestBody = PostServersIdActionsDetachFromNetworkRequestBody {
   -- | network: ID of an existing network to detach the Server from
-  postServersIdActionsDetachFromNetworkRequestBodyNetwork :: GHC.Integer.Type.Integer
+  postServersIdActionsDetachFromNetworkRequestBodyNetwork :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDetachFromNetworkRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "network" (postServersIdActionsDetachFromNetworkRequestBodyNetwork obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "network" (postServersIdActionsDetachFromNetworkRequestBodyNetwork obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDetachFromNetworkRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("network" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkRequestBodyNetwork obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("network" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkRequestBodyNetwork obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDetachFromNetworkRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDetachFromNetworkRequestBody" (\obj -> GHC.Base.pure PostServersIdActionsDetachFromNetworkRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network"))
+-- | Create a new 'PostServersIdActionsDetachFromNetworkRequestBody' with all required fields.
+mkPostServersIdActionsDetachFromNetworkRequestBody :: GHC.Types.Int -- ^ 'postServersIdActionsDetachFromNetworkRequestBodyNetwork'
+  -> PostServersIdActionsDetachFromNetworkRequestBody
+mkPostServersIdActionsDetachFromNetworkRequestBody postServersIdActionsDetachFromNetworkRequestBodyNetwork = PostServersIdActionsDetachFromNetworkRequestBody{postServersIdActionsDetachFromNetworkRequestBodyNetwork = postServersIdActionsDetachFromNetworkRequestBodyNetwork}
 -- | Represents a response of the operation 'postServers_Id_ActionsDetachFromNetwork'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsDetachFromNetworkResponseError' is used.
-data PostServersIdActionsDetachFromNetworkResponse =                                                       
-   PostServersIdActionsDetachFromNetworkResponseError GHC.Base.String                                      -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsDetachFromNetworkResponse201 PostServersIdActionsDetachFromNetworkResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsDetachFromNetworkResponse =
+   PostServersIdActionsDetachFromNetworkResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsDetachFromNetworkResponse201 PostServersIdActionsDetachFromNetworkResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsDetachFromNetworkResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/detach_from_network.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDetachFromNetworkResponseBody201 = PostServersIdActionsDetachFromNetworkResponseBody201 {
@@ -123,39 +84,61 @@ data PostServersIdActionsDetachFromNetworkResponseBody201 = PostServersIdActions
   postServersIdActionsDetachFromNetworkResponseBody201Action :: PostServersIdActionsDetachFromNetworkResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsDetachFromNetworkResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsDetachFromNetworkResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDetachFromNetworkResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDetachFromNetworkResponseBody201" (\obj -> GHC.Base.pure PostServersIdActionsDetachFromNetworkResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostServersIdActionsDetachFromNetworkResponseBody201Action
+-- | Create a new 'PostServersIdActionsDetachFromNetworkResponseBody201' with all required fields.
+mkPostServersIdActionsDetachFromNetworkResponseBody201 :: PostServersIdActionsDetachFromNetworkResponseBody201Action -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201Action'
+  -> PostServersIdActionsDetachFromNetworkResponseBody201
+mkPostServersIdActionsDetachFromNetworkResponseBody201 postServersIdActionsDetachFromNetworkResponseBody201Action = PostServersIdActionsDetachFromNetworkResponseBody201{postServersIdActionsDetachFromNetworkResponseBody201Action = postServersIdActionsDetachFromNetworkResponseBody201Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/detach_from_network.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDetachFromNetworkResponseBody201Action = PostServersIdActionsDetachFromNetworkResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsDetachFromNetworkResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsDetachFromNetworkResponseBody201ActionError :: PostServersIdActionsDetachFromNetworkResponseBody201ActionError
+  , postServersIdActionsDetachFromNetworkResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsDetachFromNetworkResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsDetachFromNetworkResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsDetachFromNetworkResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsDetachFromNetworkResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsDetachFromNetworkResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsDetachFromNetworkResponseBody201ActionResources :: ([] PostServersIdActionsDetachFromNetworkResponseBody201ActionResources)
+  , postServersIdActionsDetachFromNetworkResponseBody201ActionResources :: ([PostServersIdActionsDetachFromNetworkResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsDetachFromNetworkResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsDetachFromNetworkResponseBody201ActionStatus :: PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsDetachFromNetworkResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsDetachFromNetworkResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsDetachFromNetworkResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsDetachFromNetworkResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsDetachFromNetworkResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsDetachFromNetworkResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsDetachFromNetworkResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsDetachFromNetworkResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsDetachFromNetworkResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsDetachFromNetworkResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsDetachFromNetworkResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsDetachFromNetworkResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsDetachFromNetworkResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsDetachFromNetworkResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsDetachFromNetworkResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsDetachFromNetworkResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDetachFromNetworkResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDetachFromNetworkResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsDetachFromNetworkResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsDetachFromNetworkResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsDetachFromNetworkResponseBody201Action' with all required fields.
+mkPostServersIdActionsDetachFromNetworkResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkResponseBody201ActionError -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionProgress'
+  -> [PostServersIdActionsDetachFromNetworkResponseBody201ActionResources] -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionStarted'
+  -> PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionStatus'
+  -> PostServersIdActionsDetachFromNetworkResponseBody201Action
+mkPostServersIdActionsDetachFromNetworkResponseBody201Action postServersIdActionsDetachFromNetworkResponseBody201ActionCommand postServersIdActionsDetachFromNetworkResponseBody201ActionError postServersIdActionsDetachFromNetworkResponseBody201ActionFinished postServersIdActionsDetachFromNetworkResponseBody201ActionId postServersIdActionsDetachFromNetworkResponseBody201ActionProgress postServersIdActionsDetachFromNetworkResponseBody201ActionResources postServersIdActionsDetachFromNetworkResponseBody201ActionStarted postServersIdActionsDetachFromNetworkResponseBody201ActionStatus = PostServersIdActionsDetachFromNetworkResponseBody201Action{postServersIdActionsDetachFromNetworkResponseBody201ActionCommand = postServersIdActionsDetachFromNetworkResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionError = postServersIdActionsDetachFromNetworkResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionFinished = postServersIdActionsDetachFromNetworkResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionId = postServersIdActionsDetachFromNetworkResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionProgress = postServersIdActionsDetachFromNetworkResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionResources = postServersIdActionsDetachFromNetworkResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionStarted = postServersIdActionsDetachFromNetworkResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postServersIdActionsDetachFromNetworkResponseBody201ActionStatus = postServersIdActionsDetachFromNetworkResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/detach_from_network.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsDetachFromNetworkResponseBody201ActionError = PostServersIdActionsDetachFromNetworkResponseBody201ActionError {
@@ -165,47 +148,86 @@ data PostServersIdActionsDetachFromNetworkResponseBody201ActionError = PostServe
   , postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDetachFromNetworkResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsDetachFromNetworkResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsDetachFromNetworkResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsDetachFromNetworkResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsDetachFromNetworkResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsDetachFromNetworkResponseBody201ActionError
+mkPostServersIdActionsDetachFromNetworkResponseBody201ActionError postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage = PostServersIdActionsDetachFromNetworkResponseBody201ActionError{postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode = postServersIdActionsDetachFromNetworkResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                               postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage = postServersIdActionsDetachFromNetworkResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/detach_from_network.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDetachFromNetworkResponseBody201ActionResources = PostServersIdActionsDetachFromNetworkResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDetachFromNetworkResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsDetachFromNetworkResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsDetachFromNetworkResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsDetachFromNetworkResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType'
+  -> PostServersIdActionsDetachFromNetworkResponseBody201ActionResources
+mkPostServersIdActionsDetachFromNetworkResponseBody201ActionResources postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType = PostServersIdActionsDetachFromNetworkResponseBody201ActionResources{postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId = postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                          postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType = postServersIdActionsDetachFromNetworkResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/detach_from_network.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
-    = PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus =
+   PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDetachFromNetworkResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsDetachFromNetworkResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/detach_from_network
+-- 
+-- The same as 'postServers_Id_ActionsDetachFromNetwork' but accepts an explicit configuration.
+postServers_Id_ActionsDetachFromNetworkWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsDetachFromNetworkResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDetachFromNetworkWithConfiguration config
+                                                         id
+                                                         body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDetachFromNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDetachFromNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostServersIdActionsDetachFromNetworkResponseBody201)
+                                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/detach_from_network
+-- 
+-- The same as 'postServers_Id_ActionsDetachFromNetwork' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsDetachFromNetworkRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDetachFromNetworkRaw id
+                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/detach_from_network
+-- 
+-- The same as 'postServers_Id_ActionsDetachFromNetwork' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsDetachFromNetworkWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsDetachFromNetworkRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDetachFromNetworkWithConfigurationRaw config
+                                                            id
+                                                            body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/detach_from_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

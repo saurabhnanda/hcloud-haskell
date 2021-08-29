@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postLoadBalancers_Id_ActionsChangeProtection
 module HCloud.Operations.PostLoadBalancersIdActionsChangeProtection where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,57 +45,14 @@ import HCloud.Types
 -- | > POST /load_balancers/{id}/actions/change_protection
 -- 
 -- Changes the protection configuration of a Load Balancer.
-postLoadBalancers_Id_ActionsChangeProtection :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                                 -- ^ id: ID of the Load Balancer
-  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsChangeProtectionResponse))   -- ^ Monad containing the result of the operation
-postLoadBalancers_Id_ActionsChangeProtection config
-                                             id
-                                             body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostLoadBalancersIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/change_protection
--- 
--- The same as 'postLoadBalancers_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'
-postLoadBalancers_Id_ActionsChangeProtectionRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                 HCloud.Common.SecurityScheme s) =>
-                                                   HCloud.Common.Configuration s ->
-                                                   GHC.Integer.Type.Integer ->
-                                                   GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody ->
-                                                   m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsChangeProtectionRaw config
-                                                id
-                                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/change_protection
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsChangeProtection' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsChangeProtectionM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                               HCloud.Common.SecurityScheme s) =>
-                                                 GHC.Integer.Type.Integer ->
-                                                 GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody ->
-                                                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                    m
-                                                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                        (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsChangeProtectionResponse))
-postLoadBalancers_Id_ActionsChangeProtectionM id
-                                              body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostLoadBalancersIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/change_protection
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsChangeProtectionRaw' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsChangeProtectionRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                  HCloud.Common.SecurityScheme s) =>
-                                                    GHC.Integer.Type.Integer ->
-                                                    GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody ->
-                                                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                       m
-                                                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsChangeProtectionRawM id
-                                                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsChangeProtectionRequestBody
+postLoadBalancers_Id_ActionsChangeProtection :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsChangeProtection id
+                                             body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostLoadBalancersIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/change_protection.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsChangeProtectionRequestBody = PostLoadBalancersIdActionsChangeProtectionRequestBody {
@@ -103,19 +60,22 @@ data PostLoadBalancersIdActionsChangeProtectionRequestBody = PostLoadBalancersId
   postLoadBalancersIdActionsChangeProtectionRequestBodyDelete :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsChangeProtectionRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postLoadBalancersIdActionsChangeProtectionRequestBodyDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postLoadBalancersIdActionsChangeProtectionRequestBodyDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsChangeProtectionRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionRequestBodyDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionRequestBodyDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsChangeProtectionRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsChangeProtectionRequestBody" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsChangeProtectionRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "delete"))
+-- | Create a new 'PostLoadBalancersIdActionsChangeProtectionRequestBody' with all required fields.
+mkPostLoadBalancersIdActionsChangeProtectionRequestBody :: PostLoadBalancersIdActionsChangeProtectionRequestBody
+mkPostLoadBalancersIdActionsChangeProtectionRequestBody = PostLoadBalancersIdActionsChangeProtectionRequestBody{postLoadBalancersIdActionsChangeProtectionRequestBodyDelete = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'postLoadBalancers_Id_ActionsChangeProtection'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostLoadBalancersIdActionsChangeProtectionResponseError' is used.
-data PostLoadBalancersIdActionsChangeProtectionResponse =                                                            
-   PostLoadBalancersIdActionsChangeProtectionResponseError GHC.Base.String                                           -- ^ Means either no matching case available or a parse error
-  | PostLoadBalancersIdActionsChangeProtectionResponse201 PostLoadBalancersIdActionsChangeProtectionResponseBody201  -- ^ The \`action\` key contains the \`change_protection\` Action
+data PostLoadBalancersIdActionsChangeProtectionResponse =
+   PostLoadBalancersIdActionsChangeProtectionResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostLoadBalancersIdActionsChangeProtectionResponse201 PostLoadBalancersIdActionsChangeProtectionResponseBody201 -- ^ The \`action\` key contains the \`change_protection\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostLoadBalancersIdActionsChangeProtectionResponseBody201
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsChangeProtectionResponseBody201 = PostLoadBalancersIdActionsChangeProtectionResponseBody201 {
@@ -123,39 +83,61 @@ data PostLoadBalancersIdActionsChangeProtectionResponseBody201 = PostLoadBalance
   postLoadBalancersIdActionsChangeProtectionResponseBody201Action :: PostLoadBalancersIdActionsChangeProtectionResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postLoadBalancersIdActionsChangeProtectionResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postLoadBalancersIdActionsChangeProtectionResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsChangeProtectionResponseBody201" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsChangeProtectionResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsChangeProtectionResponseBody201Action
+-- | Create a new 'PostLoadBalancersIdActionsChangeProtectionResponseBody201' with all required fields.
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201 :: PostLoadBalancersIdActionsChangeProtectionResponseBody201Action -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201Action'
+  -> PostLoadBalancersIdActionsChangeProtectionResponseBody201
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201 postLoadBalancersIdActionsChangeProtectionResponseBody201Action = PostLoadBalancersIdActionsChangeProtectionResponseBody201{postLoadBalancersIdActionsChangeProtectionResponseBody201Action = postLoadBalancersIdActionsChangeProtectionResponseBody201Action}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsChangeProtectionResponseBody201Action = PostLoadBalancersIdActionsChangeProtectionResponseBody201Action {
   -- | command: Command executed in the Action
   postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError :: PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError
+  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources :: ([] PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources)
+  , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources :: ([PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus :: PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsChangeProtectionResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostLoadBalancersIdActionsChangeProtectionResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError
+-- | Create a new 'PostLoadBalancersIdActionsChangeProtectionResponseBody201Action' with all required fields.
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress'
+  -> [PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources] -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted'
+  -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus'
+  -> PostLoadBalancersIdActionsChangeProtectionResponseBody201Action
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201Action postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus = PostLoadBalancersIdActionsChangeProtectionResponseBody201Action{postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError = PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError {
@@ -165,47 +147,86 @@ data PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError = Post
   , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources
+-- | Create a new 'PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError' with all required fields.
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage'
+  -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage = PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionError{postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources = PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
+-- | Create a new 'PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources' with all required fields.
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType'
+  -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources
+mkPostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType = PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionResources{postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType = postLoadBalancersIdActionsChangeProtectionResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
-    = PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-    | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-    | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
-    where toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumOther val)
+data PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus =
+   PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
+    where toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusOther val) = val
+          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsChangeProtectionResponseBody201ActionStatusOther val)
+-- | > POST /load_balancers/{id}/actions/change_protection
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsChangeProtection' but accepts an explicit configuration.
+postLoadBalancers_Id_ActionsChangeProtectionWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsChangeProtectionWithConfiguration config
+                                                              id
+                                                              body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostLoadBalancersIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/change_protection
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsChangeProtectionRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsChangeProtectionRaw id
+                                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/change_protection
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsChangeProtection' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsChangeProtectionWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsChangeProtectionWithConfigurationRaw config
+                                                                 id
+                                                                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

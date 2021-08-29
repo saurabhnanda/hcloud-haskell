@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postCertificates
 module HCloud.Operations.PostCertificates where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -51,58 +51,21 @@ import HCloud.Types
 -- In contrast, type **managed** requests a new Certificate from *Let\'s Encrypt* for the specified \`domain_names\`. Only domains managed by *Hetzner DNS* are supported. We handle renewal and timely alert the project owner via email if problems occur.
 -- 
 -- For type \`managed\` Certificates the \`action\` key of the response contains the Action that allows for tracking the issuance process. For type \`uploaded\` Certificates the \`action\` is always null.
-postCertificates :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe PostCertificatesRequestBody                                                                                  -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostCertificatesResponse)) -- ^ Monad containing the result of the operation
-postCertificates config
-                 body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostCertificatesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                  PostCertificatesResponseBody201)
-                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /certificates
--- 
--- The same as 'postCertificates' but returns the raw 'Data.ByteString.Char8.ByteString'
-postCertificatesRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                     HCloud.Common.SecurityScheme s) =>
-                       HCloud.Common.Configuration s ->
-                       GHC.Maybe.Maybe PostCertificatesRequestBody ->
-                       m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postCertificatesRaw config
-                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /certificates
--- 
--- Monadic version of 'postCertificates' (use with 'HCloud.Common.runWithConfiguration')
-postCertificatesM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     GHC.Maybe.Maybe PostCertificatesRequestBody ->
-                     Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                        m
-                                                        (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                            (Network.HTTP.Client.Types.Response PostCertificatesResponse))
-postCertificatesM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostCertificatesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                   PostCertificatesResponseBody201)
-                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /certificates
--- 
--- Monadic version of 'postCertificatesRaw' (use with 'HCloud.Common.runWithConfiguration')
-postCertificatesRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                      HCloud.Common.SecurityScheme s) =>
-                        GHC.Maybe.Maybe PostCertificatesRequestBody ->
-                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                           m
-                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postCertificatesRawM body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postCertificatesRequestBody
+postCertificates :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostCertificatesRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostCertificatesResponse) -- ^ Monadic computation which returns the result of the operation
+postCertificates body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostCertificatesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                   PostCertificatesResponseBody201)
+                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/certificates.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostCertificatesRequestBody = PostCertificatesRequestBody {
   -- | certificate: Certificate and chain in PEM format, in order so that each record directly certifies the one preceding. Required for type \`uploaded\` Certificates.
   postCertificatesRequestBodyCertificate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | domain_names: Domains and subdomains that should be contained in the Certificate issued by *Let\'s Encrypt*. Required for type \`managed\` Certificates.
-  , postCertificatesRequestBodyDomainNames :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postCertificatesRequestBodyDomainNames :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | labels: User-defined labels (key-value pairs)
-  , postCertificatesRequestBodyLabels :: (GHC.Maybe.Maybe PostCertificatesRequestBodyLabels)
+  , postCertificatesRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: Name of the Certificate
   , postCertificatesRequestBodyName :: Data.Text.Internal.Text
   -- | private_key: Certificate key in PEM format. Required for type \`uploaded\` Certificates.
@@ -111,51 +74,46 @@ data PostCertificatesRequestBody = PostCertificatesRequestBody {
   , postCertificatesRequestBodyType :: (GHC.Maybe.Maybe PostCertificatesRequestBodyType)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificate" (postCertificatesRequestBodyCertificate obj) : (Data.Aeson..=) "domain_names" (postCertificatesRequestBodyDomainNames obj) : (Data.Aeson..=) "labels" (postCertificatesRequestBodyLabels obj) : (Data.Aeson..=) "name" (postCertificatesRequestBodyName obj) : (Data.Aeson..=) "private_key" (postCertificatesRequestBodyPrivateKey obj) : (Data.Aeson..=) "type" (postCertificatesRequestBodyType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificate" (postCertificatesRequestBodyCertificate obj) GHC.Base.<> ((Data.Aeson..=) "domain_names" (postCertificatesRequestBodyDomainNames obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postCertificatesRequestBodyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postCertificatesRequestBodyName obj) GHC.Base.<> ((Data.Aeson..=) "private_key" (postCertificatesRequestBodyPrivateKey obj) GHC.Base.<> (Data.Aeson..=) "type" (postCertificatesRequestBodyType obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificate" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyCertificate obj : "domain_names" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyDomainNames obj : "labels" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyName obj : "private_key" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyPrivateKey obj : "type" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificate" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyCertificate obj) GHC.Base.<> (("domain_names" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyDomainNames obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyName obj) GHC.Base.<> (("private_key" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyPrivateKey obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postCertificatesRequestBodyType obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesRequestBody" (\obj -> (((((GHC.Base.pure PostCertificatesRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "certificate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "domain_names")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "private_key")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type"))
--- | Defines the data type for the schema postCertificatesRequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PostCertificatesRequestBodyLabels = PostCertificatesRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesRequestBodyLabels" (\obj -> GHC.Base.pure PostCertificatesRequestBodyLabels)
--- | Defines the enum schema postCertificatesRequestBodyType
+-- | Create a new 'PostCertificatesRequestBody' with all required fields.
+mkPostCertificatesRequestBody :: Data.Text.Internal.Text -- ^ 'postCertificatesRequestBodyName'
+  -> PostCertificatesRequestBody
+mkPostCertificatesRequestBody postCertificatesRequestBodyName = PostCertificatesRequestBody{postCertificatesRequestBodyCertificate = GHC.Maybe.Nothing,
+                                                                                            postCertificatesRequestBodyDomainNames = GHC.Maybe.Nothing,
+                                                                                            postCertificatesRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                            postCertificatesRequestBodyName = postCertificatesRequestBodyName,
+                                                                                            postCertificatesRequestBodyPrivateKey = GHC.Maybe.Nothing,
+                                                                                            postCertificatesRequestBodyType = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/certificates.POST.requestBody.content.application\/json.schema.properties.type@ in the specification.
 -- 
 -- Choose between uploading a Certificate in PEM format or requesting a managed *Let\'s Encrypt* Certificate. If omitted defaults to \`uploaded\`.
-data PostCertificatesRequestBodyType
-    = PostCertificatesRequestBodyTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostCertificatesRequestBodyTypeEnumTyped Data.Text.Internal.Text
-    | PostCertificatesRequestBodyTypeEnumStringManaged
-    | PostCertificatesRequestBodyTypeEnumStringUploaded
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesRequestBodyType
-    where toJSON (PostCertificatesRequestBodyTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesRequestBodyTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesRequestBodyTypeEnumStringManaged) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed"
-          toJSON (PostCertificatesRequestBodyTypeEnumStringUploaded) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded"
-instance Data.Aeson.FromJSON PostCertificatesRequestBodyType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed")
-                                          then PostCertificatesRequestBodyTypeEnumStringManaged
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded")
-                                                then PostCertificatesRequestBodyTypeEnumStringUploaded
-                                                else PostCertificatesRequestBodyTypeEnumOther val)
+data PostCertificatesRequestBodyType =
+   PostCertificatesRequestBodyTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostCertificatesRequestBodyTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostCertificatesRequestBodyTypeEnumUploaded -- ^ Represents the JSON value @"uploaded"@
+  | PostCertificatesRequestBodyTypeEnumManaged -- ^ Represents the JSON value @"managed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesRequestBodyType
+    where toJSON (PostCertificatesRequestBodyTypeOther val) = val
+          toJSON (PostCertificatesRequestBodyTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostCertificatesRequestBodyTypeEnumUploaded) = "uploaded"
+          toJSON (PostCertificatesRequestBodyTypeEnumManaged) = "managed"
+instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesRequestBodyType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "uploaded" -> PostCertificatesRequestBodyTypeEnumUploaded
+                                            | val GHC.Classes.== "managed" -> PostCertificatesRequestBodyTypeEnumManaged
+                                            | GHC.Base.otherwise -> PostCertificatesRequestBodyTypeOther val)
 -- | Represents a response of the operation 'postCertificates'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostCertificatesResponseError' is used.
-data PostCertificatesResponse =                                  
-   PostCertificatesResponseError GHC.Base.String                 -- ^ Means either no matching case available or a parse error
-  | PostCertificatesResponse201 PostCertificatesResponseBody201  -- ^ The \`certificate\` key contains the Certificate that was just created. For type \`managed\` Certificates the \`action\` key contains the Action that allows for tracking the issuance process. For type \`uploaded\` Certificates the \`action\` is always null.
+data PostCertificatesResponse =
+   PostCertificatesResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostCertificatesResponse201 PostCertificatesResponseBody201 -- ^ The \`certificate\` key contains the Certificate that was just created. For type \`managed\` Certificates the \`action\` key contains the Action that allows for tracking the issuance process. For type \`uploaded\` Certificates the \`action\` is always null.
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostCertificatesResponseBody201
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostCertificatesResponseBody201 = PostCertificatesResponseBody201 {
@@ -165,39 +123,62 @@ data PostCertificatesResponseBody201 = PostCertificatesResponseBody201 {
   , postCertificatesResponseBody201Certificate :: PostCertificatesResponseBody201Certificate
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postCertificatesResponseBody201Action obj) : (Data.Aeson..=) "certificate" (postCertificatesResponseBody201Certificate obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postCertificatesResponseBody201Action obj) GHC.Base.<> (Data.Aeson..=) "certificate" (postCertificatesResponseBody201Certificate obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201Action obj : "certificate" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201Certificate obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201Action obj) GHC.Base.<> ("certificate" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201Certificate obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201" (\obj -> (GHC.Base.pure PostCertificatesResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "certificate"))
--- | Defines the data type for the schema PostCertificatesResponseBody201Action
+-- | Create a new 'PostCertificatesResponseBody201' with all required fields.
+mkPostCertificatesResponseBody201 :: PostCertificatesResponseBody201Certificate -- ^ 'postCertificatesResponseBody201Certificate'
+  -> PostCertificatesResponseBody201
+mkPostCertificatesResponseBody201 postCertificatesResponseBody201Certificate = PostCertificatesResponseBody201{postCertificatesResponseBody201Action = GHC.Maybe.Nothing,
+                                                                                                               postCertificatesResponseBody201Certificate = postCertificatesResponseBody201Certificate}
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostCertificatesResponseBody201Action = PostCertificatesResponseBody201Action {
   -- | command: Command executed in the Action
   postCertificatesResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postCertificatesResponseBody201ActionError :: PostCertificatesResponseBody201ActionError
+  , postCertificatesResponseBody201ActionError :: (GHC.Maybe.Maybe PostCertificatesResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postCertificatesResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postCertificatesResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postCertificatesResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postCertificatesResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postCertificatesResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postCertificatesResponseBody201ActionResources :: ([] PostCertificatesResponseBody201ActionResources)
+  , postCertificatesResponseBody201ActionResources :: ([PostCertificatesResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postCertificatesResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postCertificatesResponseBody201ActionStatus :: PostCertificatesResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postCertificatesResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postCertificatesResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postCertificatesResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postCertificatesResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postCertificatesResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postCertificatesResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postCertificatesResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postCertificatesResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postCertificatesResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postCertificatesResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postCertificatesResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postCertificatesResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postCertificatesResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postCertificatesResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postCertificatesResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postCertificatesResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostCertificatesResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostCertificatesResponseBody201ActionError
+-- | Create a new 'PostCertificatesResponseBody201Action' with all required fields.
+mkPostCertificatesResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostCertificatesResponseBody201ActionError -- ^ 'postCertificatesResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postCertificatesResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postCertificatesResponseBody201ActionProgress'
+  -> [PostCertificatesResponseBody201ActionResources] -- ^ 'postCertificatesResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201ActionStarted'
+  -> PostCertificatesResponseBody201ActionStatus -- ^ 'postCertificatesResponseBody201ActionStatus'
+  -> PostCertificatesResponseBody201Action
+mkPostCertificatesResponseBody201Action postCertificatesResponseBody201ActionCommand postCertificatesResponseBody201ActionError postCertificatesResponseBody201ActionFinished postCertificatesResponseBody201ActionId postCertificatesResponseBody201ActionProgress postCertificatesResponseBody201ActionResources postCertificatesResponseBody201ActionStarted postCertificatesResponseBody201ActionStatus = PostCertificatesResponseBody201Action{postCertificatesResponseBody201ActionCommand = postCertificatesResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionError = postCertificatesResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionFinished = postCertificatesResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionId = postCertificatesResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionProgress = postCertificatesResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionResources = postCertificatesResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionStarted = postCertificatesResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                    postCertificatesResponseBody201ActionStatus = postCertificatesResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostCertificatesResponseBody201ActionError = PostCertificatesResponseBody201ActionError {
@@ -207,98 +188,119 @@ data PostCertificatesResponseBody201ActionError = PostCertificatesResponseBody20
   , postCertificatesResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postCertificatesResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postCertificatesResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postCertificatesResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postCertificatesResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201ActionError" (\obj -> (GHC.Base.pure PostCertificatesResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostCertificatesResponseBody201ActionResources
+-- | Create a new 'PostCertificatesResponseBody201ActionError' with all required fields.
+mkPostCertificatesResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201ActionErrorMessage'
+  -> PostCertificatesResponseBody201ActionError
+mkPostCertificatesResponseBody201ActionError postCertificatesResponseBody201ActionErrorCode postCertificatesResponseBody201ActionErrorMessage = PostCertificatesResponseBody201ActionError{postCertificatesResponseBody201ActionErrorCode = postCertificatesResponseBody201ActionErrorCode,
+                                                                                                                                                                                           postCertificatesResponseBody201ActionErrorMessage = postCertificatesResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostCertificatesResponseBody201ActionResources = PostCertificatesResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postCertificatesResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postCertificatesResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postCertificatesResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postCertificatesResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postCertificatesResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postCertificatesResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postCertificatesResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostCertificatesResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostCertificatesResponseBody201ActionStatus
+-- | Create a new 'PostCertificatesResponseBody201ActionResources' with all required fields.
+mkPostCertificatesResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postCertificatesResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201ActionResourcesType'
+  -> PostCertificatesResponseBody201ActionResources
+mkPostCertificatesResponseBody201ActionResources postCertificatesResponseBody201ActionResourcesId postCertificatesResponseBody201ActionResourcesType = PostCertificatesResponseBody201ActionResources{postCertificatesResponseBody201ActionResourcesId = postCertificatesResponseBody201ActionResourcesId,
+                                                                                                                                                                                                      postCertificatesResponseBody201ActionResourcesType = postCertificatesResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostCertificatesResponseBody201ActionStatus
-    = PostCertificatesResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostCertificatesResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostCertificatesResponseBody201ActionStatusEnumStringError
-    | PostCertificatesResponseBody201ActionStatusEnumStringRunning
-    | PostCertificatesResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201ActionStatus
-    where toJSON (PostCertificatesResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostCertificatesResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostCertificatesResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostCertificatesResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostCertificatesResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostCertificatesResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostCertificatesResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostCertificatesResponseBody201ActionStatusEnumOther val)
--- | Defines the data type for the schema PostCertificatesResponseBody201Certificate
+data PostCertificatesResponseBody201ActionStatus =
+   PostCertificatesResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostCertificatesResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostCertificatesResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostCertificatesResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostCertificatesResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201ActionStatus
+    where toJSON (PostCertificatesResponseBody201ActionStatusOther val) = val
+          toJSON (PostCertificatesResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostCertificatesResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostCertificatesResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostCertificatesResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostCertificatesResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostCertificatesResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostCertificatesResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostCertificatesResponseBody201ActionStatusOther val)
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate@ in the specification.
 -- 
 -- 
 data PostCertificatesResponseBody201Certificate = PostCertificatesResponseBody201Certificate {
   -- | certificate: Certificate and chain in PEM format, in order so that each record directly certifies the one preceding
-  postCertificatesResponseBody201CertificateCertificate :: Data.Text.Internal.Text
+  postCertificatesResponseBody201CertificateCertificate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , postCertificatesResponseBody201CertificateCreated :: Data.Text.Internal.Text
   -- | domain_names: Domains and subdomains covered by the Certificate
-  , postCertificatesResponseBody201CertificateDomainNames :: ([] Data.Text.Internal.Text)
+  , postCertificatesResponseBody201CertificateDomainNames :: ([Data.Text.Internal.Text])
   -- | fingerprint: SHA256 fingerprint of the Certificate
-  , postCertificatesResponseBody201CertificateFingerprint :: Data.Text.Internal.Text
+  , postCertificatesResponseBody201CertificateFingerprint :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postCertificatesResponseBody201CertificateId :: GHC.Integer.Type.Integer
+  , postCertificatesResponseBody201CertificateId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , postCertificatesResponseBody201CertificateLabels :: PostCertificatesResponseBody201CertificateLabels
+  , postCertificatesResponseBody201CertificateLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , postCertificatesResponseBody201CertificateName :: Data.Text.Internal.Text
   -- | not_valid_after: Point in time when the Certificate stops being valid (in ISO-8601 format)
-  , postCertificatesResponseBody201CertificateNotValidAfter :: Data.Text.Internal.Text
+  , postCertificatesResponseBody201CertificateNotValidAfter :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | not_valid_before: Point in time when the Certificate becomes valid (in ISO-8601 format)
-  , postCertificatesResponseBody201CertificateNotValidBefore :: Data.Text.Internal.Text
+  , postCertificatesResponseBody201CertificateNotValidBefore :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status: Current status of a type \`managed\` Certificate, always *null* for type \`uploaded\` Certificates
   , postCertificatesResponseBody201CertificateStatus :: (GHC.Maybe.Maybe PostCertificatesResponseBody201CertificateStatus)
   -- | type: Type of the Certificate
   , postCertificatesResponseBody201CertificateType :: (GHC.Maybe.Maybe PostCertificatesResponseBody201CertificateType)
   -- | used_by: Resources currently using the Certificate
-  , postCertificatesResponseBody201CertificateUsedBy :: ([] PostCertificatesResponseBody201CertificateUsedBy)
+  , postCertificatesResponseBody201CertificateUsedBy :: ([PostCertificatesResponseBody201CertificateUsedBy])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201Certificate
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificate" (postCertificatesResponseBody201CertificateCertificate obj) : (Data.Aeson..=) "created" (postCertificatesResponseBody201CertificateCreated obj) : (Data.Aeson..=) "domain_names" (postCertificatesResponseBody201CertificateDomainNames obj) : (Data.Aeson..=) "fingerprint" (postCertificatesResponseBody201CertificateFingerprint obj) : (Data.Aeson..=) "id" (postCertificatesResponseBody201CertificateId obj) : (Data.Aeson..=) "labels" (postCertificatesResponseBody201CertificateLabels obj) : (Data.Aeson..=) "name" (postCertificatesResponseBody201CertificateName obj) : (Data.Aeson..=) "not_valid_after" (postCertificatesResponseBody201CertificateNotValidAfter obj) : (Data.Aeson..=) "not_valid_before" (postCertificatesResponseBody201CertificateNotValidBefore obj) : (Data.Aeson..=) "status" (postCertificatesResponseBody201CertificateStatus obj) : (Data.Aeson..=) "type" (postCertificatesResponseBody201CertificateType obj) : (Data.Aeson..=) "used_by" (postCertificatesResponseBody201CertificateUsedBy obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificate" (postCertificatesResponseBody201CertificateCertificate obj) GHC.Base.<> ((Data.Aeson..=) "created" (postCertificatesResponseBody201CertificateCreated obj) GHC.Base.<> ((Data.Aeson..=) "domain_names" (postCertificatesResponseBody201CertificateDomainNames obj) GHC.Base.<> ((Data.Aeson..=) "fingerprint" (postCertificatesResponseBody201CertificateFingerprint obj) GHC.Base.<> ((Data.Aeson..=) "id" (postCertificatesResponseBody201CertificateId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postCertificatesResponseBody201CertificateLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postCertificatesResponseBody201CertificateName obj) GHC.Base.<> ((Data.Aeson..=) "not_valid_after" (postCertificatesResponseBody201CertificateNotValidAfter obj) GHC.Base.<> ((Data.Aeson..=) "not_valid_before" (postCertificatesResponseBody201CertificateNotValidBefore obj) GHC.Base.<> ((Data.Aeson..=) "status" (postCertificatesResponseBody201CertificateStatus obj) GHC.Base.<> ((Data.Aeson..=) "type" (postCertificatesResponseBody201CertificateType obj) GHC.Base.<> (Data.Aeson..=) "used_by" (postCertificatesResponseBody201CertificateUsedBy obj))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201Certificate
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificate" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateCertificate obj : "created" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateCreated obj : "domain_names" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateDomainNames obj : "fingerprint" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateFingerprint obj : "id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateId obj : "labels" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateLabels obj : "name" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateName obj : "not_valid_after" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateNotValidAfter obj : "not_valid_before" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateNotValidBefore obj : "status" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatus obj : "type" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateType obj : "used_by" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateUsedBy obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificate" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateCertificate obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateCreated obj) GHC.Base.<> (("domain_names" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateDomainNames obj) GHC.Base.<> (("fingerprint" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateFingerprint obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateName obj) GHC.Base.<> (("not_valid_after" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateNotValidAfter obj) GHC.Base.<> (("not_valid_before" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateNotValidBefore obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatus obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateType obj) GHC.Base.<> ("used_by" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateUsedBy obj))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201Certificate
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201Certificate" (\obj -> (((((((((((GHC.Base.pure PostCertificatesResponseBody201Certificate GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "certificate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain_names")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fingerprint")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "not_valid_after")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "not_valid_before")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "used_by"))
--- | Defines the data type for the schema PostCertificatesResponseBody201CertificateLabels
--- 
--- User-defined labels (key-value pairs)
-data PostCertificatesResponseBody201CertificateLabels = PostCertificatesResponseBody201CertificateLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201CertificateLabels" (\obj -> GHC.Base.pure PostCertificatesResponseBody201CertificateLabels)
--- | Defines the data type for the schema PostCertificatesResponseBody201CertificateStatus
+-- | Create a new 'PostCertificatesResponseBody201Certificate' with all required fields.
+mkPostCertificatesResponseBody201Certificate :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateCertificate'
+  -> Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateCreated'
+  -> [Data.Text.Internal.Text] -- ^ 'postCertificatesResponseBody201CertificateDomainNames'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateFingerprint'
+  -> GHC.Types.Int -- ^ 'postCertificatesResponseBody201CertificateId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'postCertificatesResponseBody201CertificateLabels'
+  -> Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateName'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateNotValidAfter'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateNotValidBefore'
+  -> [PostCertificatesResponseBody201CertificateUsedBy] -- ^ 'postCertificatesResponseBody201CertificateUsedBy'
+  -> PostCertificatesResponseBody201Certificate
+mkPostCertificatesResponseBody201Certificate postCertificatesResponseBody201CertificateCertificate postCertificatesResponseBody201CertificateCreated postCertificatesResponseBody201CertificateDomainNames postCertificatesResponseBody201CertificateFingerprint postCertificatesResponseBody201CertificateId postCertificatesResponseBody201CertificateLabels postCertificatesResponseBody201CertificateName postCertificatesResponseBody201CertificateNotValidAfter postCertificatesResponseBody201CertificateNotValidBefore postCertificatesResponseBody201CertificateUsedBy = PostCertificatesResponseBody201Certificate{postCertificatesResponseBody201CertificateCertificate = postCertificatesResponseBody201CertificateCertificate,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateCreated = postCertificatesResponseBody201CertificateCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateDomainNames = postCertificatesResponseBody201CertificateDomainNames,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateFingerprint = postCertificatesResponseBody201CertificateFingerprint,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateId = postCertificatesResponseBody201CertificateId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateLabels = postCertificatesResponseBody201CertificateLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateName = postCertificatesResponseBody201CertificateName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateNotValidAfter = postCertificatesResponseBody201CertificateNotValidAfter,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateNotValidBefore = postCertificatesResponseBody201CertificateNotValidBefore,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateStatus = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateType = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postCertificatesResponseBody201CertificateUsedBy = postCertificatesResponseBody201CertificateUsedBy}
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate.properties.status@ in the specification.
 -- 
 -- Current status of a type \`managed\` Certificate, always *null* for type \`uploaded\` Certificates
 data PostCertificatesResponseBody201CertificateStatus = PostCertificatesResponseBody201CertificateStatus {
@@ -310,12 +312,17 @@ data PostCertificatesResponseBody201CertificateStatus = PostCertificatesResponse
   , postCertificatesResponseBody201CertificateStatusRenewal :: (GHC.Maybe.Maybe PostCertificatesResponseBody201CertificateStatusRenewal)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "error" (postCertificatesResponseBody201CertificateStatusError obj) : (Data.Aeson..=) "issuance" (postCertificatesResponseBody201CertificateStatusIssuance obj) : (Data.Aeson..=) "renewal" (postCertificatesResponseBody201CertificateStatusRenewal obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "error" (postCertificatesResponseBody201CertificateStatusError obj) GHC.Base.<> ((Data.Aeson..=) "issuance" (postCertificatesResponseBody201CertificateStatusIssuance obj) GHC.Base.<> (Data.Aeson..=) "renewal" (postCertificatesResponseBody201CertificateStatusRenewal obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201CertificateStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("error" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusError obj : "issuance" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusIssuance obj : "renewal" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusRenewal obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("error" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusError obj) GHC.Base.<> (("issuance" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusIssuance obj) GHC.Base.<> ("renewal" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusRenewal obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201CertificateStatus" (\obj -> ((GHC.Base.pure PostCertificatesResponseBody201CertificateStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "issuance")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "renewal"))
--- | Defines the data type for the schema PostCertificatesResponseBody201CertificateStatusError
+-- | Create a new 'PostCertificatesResponseBody201CertificateStatus' with all required fields.
+mkPostCertificatesResponseBody201CertificateStatus :: PostCertificatesResponseBody201CertificateStatus
+mkPostCertificatesResponseBody201CertificateStatus = PostCertificatesResponseBody201CertificateStatus{postCertificatesResponseBody201CertificateStatusError = GHC.Maybe.Nothing,
+                                                                                                      postCertificatesResponseBody201CertificateStatusIssuance = GHC.Maybe.Nothing,
+                                                                                                      postCertificatesResponseBody201CertificateStatusRenewal = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate.properties.status.properties.error@ in the specification.
 -- 
 -- If issuance or renewal reports \`failed\`, this property contains information about what happened
 data PostCertificatesResponseBody201CertificateStatusError = PostCertificatesResponseBody201CertificateStatusError {
@@ -325,95 +332,120 @@ data PostCertificatesResponseBody201CertificateStatusError = PostCertificatesRes
   , postCertificatesResponseBody201CertificateStatusErrorMessage :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateStatusError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postCertificatesResponseBody201CertificateStatusErrorCode obj) : (Data.Aeson..=) "message" (postCertificatesResponseBody201CertificateStatusErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postCertificatesResponseBody201CertificateStatusErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postCertificatesResponseBody201CertificateStatusErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201CertificateStatusError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateStatusErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateStatusError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201CertificateStatusError" (\obj -> (GHC.Base.pure PostCertificatesResponseBody201CertificateStatusError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "message"))
--- | Defines the enum schema PostCertificatesResponseBody201CertificateStatusIssuance
+-- | Create a new 'PostCertificatesResponseBody201CertificateStatusError' with all required fields.
+mkPostCertificatesResponseBody201CertificateStatusError :: PostCertificatesResponseBody201CertificateStatusError
+mkPostCertificatesResponseBody201CertificateStatusError = PostCertificatesResponseBody201CertificateStatusError{postCertificatesResponseBody201CertificateStatusErrorCode = GHC.Maybe.Nothing,
+                                                                                                                postCertificatesResponseBody201CertificateStatusErrorMessage = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate.properties.status.properties.issuance@ in the specification.
 -- 
 -- Status of the issuance process of the Certificate
-data PostCertificatesResponseBody201CertificateStatusIssuance
-    = PostCertificatesResponseBody201CertificateStatusIssuanceEnumOther Data.Aeson.Types.Internal.Value
-    | PostCertificatesResponseBody201CertificateStatusIssuanceEnumTyped Data.Text.Internal.Text
-    | PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringCompleted
-    | PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringFailed
-    | PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringPending
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateStatusIssuance
-    where toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringCompleted) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "completed"
-          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringFailed) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed"
-          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-instance Data.Aeson.FromJSON PostCertificatesResponseBody201CertificateStatusIssuance
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "completed")
-                                          then PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringCompleted
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed")
-                                                then PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringFailed
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                      then PostCertificatesResponseBody201CertificateStatusIssuanceEnumStringPending
-                                                      else PostCertificatesResponseBody201CertificateStatusIssuanceEnumOther val)
--- | Defines the enum schema PostCertificatesResponseBody201CertificateStatusRenewal
+data PostCertificatesResponseBody201CertificateStatusIssuance =
+   PostCertificatesResponseBody201CertificateStatusIssuanceOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostCertificatesResponseBody201CertificateStatusIssuanceTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostCertificatesResponseBody201CertificateStatusIssuanceEnumPending -- ^ Represents the JSON value @"pending"@
+  | PostCertificatesResponseBody201CertificateStatusIssuanceEnumCompleted -- ^ Represents the JSON value @"completed"@
+  | PostCertificatesResponseBody201CertificateStatusIssuanceEnumFailed -- ^ Represents the JSON value @"failed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201CertificateStatusIssuance
+    where toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceOther val) = val
+          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumPending) = "pending"
+          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumCompleted) = "completed"
+          toJSON (PostCertificatesResponseBody201CertificateStatusIssuanceEnumFailed) = "failed"
+instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateStatusIssuance
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "pending" -> PostCertificatesResponseBody201CertificateStatusIssuanceEnumPending
+                                            | val GHC.Classes.== "completed" -> PostCertificatesResponseBody201CertificateStatusIssuanceEnumCompleted
+                                            | val GHC.Classes.== "failed" -> PostCertificatesResponseBody201CertificateStatusIssuanceEnumFailed
+                                            | GHC.Base.otherwise -> PostCertificatesResponseBody201CertificateStatusIssuanceOther val)
+-- | Defines the enum schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate.properties.status.properties.renewal@ in the specification.
 -- 
 -- Status of the renewal process of the Certificate.
-data PostCertificatesResponseBody201CertificateStatusRenewal
-    = PostCertificatesResponseBody201CertificateStatusRenewalEnumOther Data.Aeson.Types.Internal.Value
-    | PostCertificatesResponseBody201CertificateStatusRenewalEnumTyped Data.Text.Internal.Text
-    | PostCertificatesResponseBody201CertificateStatusRenewalEnumStringFailed
-    | PostCertificatesResponseBody201CertificateStatusRenewalEnumStringPending
-    | PostCertificatesResponseBody201CertificateStatusRenewalEnumStringScheduled
-    | PostCertificatesResponseBody201CertificateStatusRenewalEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateStatusRenewal
-    where toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumStringFailed) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed"
-          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumStringScheduled) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "scheduled"
-          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON PostCertificatesResponseBody201CertificateStatusRenewal
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed")
-                                          then PostCertificatesResponseBody201CertificateStatusRenewalEnumStringFailed
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                then PostCertificatesResponseBody201CertificateStatusRenewalEnumStringPending
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "scheduled")
-                                                      then PostCertificatesResponseBody201CertificateStatusRenewalEnumStringScheduled
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                            then PostCertificatesResponseBody201CertificateStatusRenewalEnumStringUnavailable
-                                                            else PostCertificatesResponseBody201CertificateStatusRenewalEnumOther val)
--- | Defines the enum schema PostCertificatesResponseBody201CertificateType
+data PostCertificatesResponseBody201CertificateStatusRenewal =
+   PostCertificatesResponseBody201CertificateStatusRenewalOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostCertificatesResponseBody201CertificateStatusRenewalTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostCertificatesResponseBody201CertificateStatusRenewalEnumScheduled -- ^ Represents the JSON value @"scheduled"@
+  | PostCertificatesResponseBody201CertificateStatusRenewalEnumPending -- ^ Represents the JSON value @"pending"@
+  | PostCertificatesResponseBody201CertificateStatusRenewalEnumFailed -- ^ Represents the JSON value @"failed"@
+  | PostCertificatesResponseBody201CertificateStatusRenewalEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201CertificateStatusRenewal
+    where toJSON (PostCertificatesResponseBody201CertificateStatusRenewalOther val) = val
+          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumScheduled) = "scheduled"
+          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumPending) = "pending"
+          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumFailed) = "failed"
+          toJSON (PostCertificatesResponseBody201CertificateStatusRenewalEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateStatusRenewal
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "scheduled" -> PostCertificatesResponseBody201CertificateStatusRenewalEnumScheduled
+                                            | val GHC.Classes.== "pending" -> PostCertificatesResponseBody201CertificateStatusRenewalEnumPending
+                                            | val GHC.Classes.== "failed" -> PostCertificatesResponseBody201CertificateStatusRenewalEnumFailed
+                                            | val GHC.Classes.== "unavailable" -> PostCertificatesResponseBody201CertificateStatusRenewalEnumUnavailable
+                                            | GHC.Base.otherwise -> PostCertificatesResponseBody201CertificateStatusRenewalOther val)
+-- | Defines the enum schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate.properties.type@ in the specification.
 -- 
 -- Type of the Certificate
-data PostCertificatesResponseBody201CertificateType
-    = PostCertificatesResponseBody201CertificateTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostCertificatesResponseBody201CertificateTypeEnumTyped Data.Text.Internal.Text
-    | PostCertificatesResponseBody201CertificateTypeEnumStringManaged
-    | PostCertificatesResponseBody201CertificateTypeEnumStringUploaded
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateType
-    where toJSON (PostCertificatesResponseBody201CertificateTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201CertificateTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostCertificatesResponseBody201CertificateTypeEnumStringManaged) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed"
-          toJSON (PostCertificatesResponseBody201CertificateTypeEnumStringUploaded) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded"
-instance Data.Aeson.FromJSON PostCertificatesResponseBody201CertificateType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed")
-                                          then PostCertificatesResponseBody201CertificateTypeEnumStringManaged
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded")
-                                                then PostCertificatesResponseBody201CertificateTypeEnumStringUploaded
-                                                else PostCertificatesResponseBody201CertificateTypeEnumOther val)
--- | Defines the data type for the schema PostCertificatesResponseBody201CertificateUsed_by
+data PostCertificatesResponseBody201CertificateType =
+   PostCertificatesResponseBody201CertificateTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostCertificatesResponseBody201CertificateTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostCertificatesResponseBody201CertificateTypeEnumUploaded -- ^ Represents the JSON value @"uploaded"@
+  | PostCertificatesResponseBody201CertificateTypeEnumManaged -- ^ Represents the JSON value @"managed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201CertificateType
+    where toJSON (PostCertificatesResponseBody201CertificateTypeOther val) = val
+          toJSON (PostCertificatesResponseBody201CertificateTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostCertificatesResponseBody201CertificateTypeEnumUploaded) = "uploaded"
+          toJSON (PostCertificatesResponseBody201CertificateTypeEnumManaged) = "managed"
+instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "uploaded" -> PostCertificatesResponseBody201CertificateTypeEnumUploaded
+                                            | val GHC.Classes.== "managed" -> PostCertificatesResponseBody201CertificateTypeEnumManaged
+                                            | GHC.Base.otherwise -> PostCertificatesResponseBody201CertificateTypeOther val)
+-- | Defines the object schema located at @paths.\/certificates.POST.responses.201.content.application\/json.schema.properties.certificate.properties.used_by.items@ in the specification.
 -- 
 -- 
 data PostCertificatesResponseBody201CertificateUsedBy = PostCertificatesResponseBody201CertificateUsedBy {
   -- | id: ID of resource referenced
-  postCertificatesResponseBody201CertificateUsedById :: GHC.Integer.Type.Integer
+  postCertificatesResponseBody201CertificateUsedById :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postCertificatesResponseBody201CertificateUsedByType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostCertificatesResponseBody201CertificateUsedBy
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postCertificatesResponseBody201CertificateUsedById obj) : (Data.Aeson..=) "type" (postCertificatesResponseBody201CertificateUsedByType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postCertificatesResponseBody201CertificateUsedById obj) GHC.Base.<> (Data.Aeson..=) "type" (postCertificatesResponseBody201CertificateUsedByType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostCertificatesResponseBody201CertificateUsedBy
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateUsedById obj : "type" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateUsedByType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateUsedById obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postCertificatesResponseBody201CertificateUsedByType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostCertificatesResponseBody201CertificateUsedBy
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostCertificatesResponseBody201CertificateUsedBy" (\obj -> (GHC.Base.pure PostCertificatesResponseBody201CertificateUsedBy GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
+-- | Create a new 'PostCertificatesResponseBody201CertificateUsedBy' with all required fields.
+mkPostCertificatesResponseBody201CertificateUsedBy :: GHC.Types.Int -- ^ 'postCertificatesResponseBody201CertificateUsedById'
+  -> Data.Text.Internal.Text -- ^ 'postCertificatesResponseBody201CertificateUsedByType'
+  -> PostCertificatesResponseBody201CertificateUsedBy
+mkPostCertificatesResponseBody201CertificateUsedBy postCertificatesResponseBody201CertificateUsedById postCertificatesResponseBody201CertificateUsedByType = PostCertificatesResponseBody201CertificateUsedBy{postCertificatesResponseBody201CertificateUsedById = postCertificatesResponseBody201CertificateUsedById,
+                                                                                                                                                                                                              postCertificatesResponseBody201CertificateUsedByType = postCertificatesResponseBody201CertificateUsedByType}
+-- | > POST /certificates
+-- 
+-- The same as 'postCertificates' but accepts an explicit configuration.
+postCertificatesWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostCertificatesRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostCertificatesResponse) -- ^ Monadic computation which returns the result of the operation
+postCertificatesWithConfiguration config
+                                  body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostCertificatesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostCertificatesResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                    PostCertificatesResponseBody201)
+                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /certificates
+-- 
+-- The same as 'postCertificates' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postCertificatesRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostCertificatesRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postCertificatesRaw body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /certificates
+-- 
+-- The same as 'postCertificates' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postCertificatesWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostCertificatesRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postCertificatesWithConfigurationRaw config
+                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/certificates") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

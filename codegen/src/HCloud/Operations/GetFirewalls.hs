@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getFirewalls
 module HCloud.Operations.GetFirewalls where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,127 +45,151 @@ import HCloud.Types
 -- | > GET /firewalls
 -- 
 -- Returns all Firewall objects.
-getFirewalls :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                  -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                  -- ^ name: Can be used to filter resources by their name. The response will only contain the resources matching the specified name
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                  -- ^ label_selector: Can be used to filter resources by labels. The response will only contain resources matching the label selector.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetFirewallsResponse)) -- ^ Monad containing the result of the operation
-getFirewalls config
-             sort
-             name
-             labelSelector = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                               GetFirewallsResponseBody200)
-                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))
--- | > GET /firewalls
+getFirewalls :: forall m . HCloud.Common.MonadHTTP m => GetFirewallsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetFirewallsResponse) -- ^ Monadic computation which returns the result of the operation
+getFirewalls parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                             GetFirewallsResponseBody200)
+                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/firewalls.GET.parameters@ in the specification.
 -- 
--- The same as 'getFirewalls' but returns the raw 'Data.ByteString.Char8.ByteString'
-getFirewallsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   HCloud.Common.Configuration s ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFirewallsRaw config
-                sort
-                name
-                labelSelector = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") ((Data.Text.pack "sort",
-                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))
--- | > GET /firewalls
 -- 
--- Monadic version of 'getFirewalls' (use with 'HCloud.Common.runWithConfiguration')
-getFirewallsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                               HCloud.Common.SecurityScheme s) =>
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                    m
-                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                        (Network.HTTP.Client.Types.Response GetFirewallsResponse))
-getFirewallsM sort
-              name
-              labelSelector = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                GetFirewallsResponseBody200)
-                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))
--- | > GET /firewalls
+data GetFirewallsParameters = GetFirewallsParameters {
+  -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+  -- 
+  -- Can be used to filter resources by labels. The response will only contain resources matching the label selector.
+  getFirewallsParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryName: Represents the parameter named \'name\'
+  -- 
+  -- Can be used to filter resources by their name. The response will only contain the resources matching the specified name
+  , getFirewallsParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getFirewallsParametersQuerySort :: (GHC.Maybe.Maybe GetFirewallsParametersQuerySort)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryLabel_selector" Data.Aeson.Types.ToJSON..= getFirewallsParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getFirewallsParametersQueryName obj : "querySort" Data.Aeson.Types.ToJSON..= getFirewallsParametersQuerySort obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getFirewallsParametersQueryLabelSelector obj) GHC.Base.<> (("queryName" Data.Aeson.Types.ToJSON..= getFirewallsParametersQueryName obj) GHC.Base.<> ("querySort" Data.Aeson.Types.ToJSON..= getFirewallsParametersQuerySort obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsParameters" (\obj -> ((GHC.Base.pure GetFirewallsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort"))
+-- | Create a new 'GetFirewallsParameters' with all required fields.
+mkGetFirewallsParameters :: GetFirewallsParameters
+mkGetFirewallsParameters = GetFirewallsParameters{getFirewallsParametersQueryLabelSelector = GHC.Maybe.Nothing,
+                                                  getFirewallsParametersQueryName = GHC.Maybe.Nothing,
+                                                  getFirewallsParametersQuerySort = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/firewalls.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getFirewallsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getFirewallsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                  HCloud.Common.SecurityScheme s) =>
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                       m
-                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFirewallsRawM sort
-                 name
-                 labelSelector = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") ((Data.Text.pack "sort",
-                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetFirewallsParametersQuerySort =
+   GetFirewallsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetFirewallsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetFirewallsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetFirewallsParametersQuerySortEnumName -- ^ Represents the JSON value @"name"@
+  | GetFirewallsParametersQuerySortEnumNameAsc -- ^ Represents the JSON value @"name:asc"@
+  | GetFirewallsParametersQuerySortEnumNameDesc -- ^ Represents the JSON value @"name:desc"@
+  | GetFirewallsParametersQuerySortEnumCreated -- ^ Represents the JSON value @"created"@
+  | GetFirewallsParametersQuerySortEnumCreatedAsc -- ^ Represents the JSON value @"created:asc"@
+  | GetFirewallsParametersQuerySortEnumCreatedDesc -- ^ Represents the JSON value @"created:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsParametersQuerySort
+    where toJSON (GetFirewallsParametersQuerySortOther val) = val
+          toJSON (GetFirewallsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsParametersQuerySortEnumId) = "id"
+          toJSON (GetFirewallsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetFirewallsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetFirewallsParametersQuerySortEnumName) = "name"
+          toJSON (GetFirewallsParametersQuerySortEnumNameAsc) = "name:asc"
+          toJSON (GetFirewallsParametersQuerySortEnumNameDesc) = "name:desc"
+          toJSON (GetFirewallsParametersQuerySortEnumCreated) = "created"
+          toJSON (GetFirewallsParametersQuerySortEnumCreatedAsc) = "created:asc"
+          toJSON (GetFirewallsParametersQuerySortEnumCreatedDesc) = "created:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetFirewallsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetFirewallsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetFirewallsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "name" -> GetFirewallsParametersQuerySortEnumName
+                                            | val GHC.Classes.== "name:asc" -> GetFirewallsParametersQuerySortEnumNameAsc
+                                            | val GHC.Classes.== "name:desc" -> GetFirewallsParametersQuerySortEnumNameDesc
+                                            | val GHC.Classes.== "created" -> GetFirewallsParametersQuerySortEnumCreated
+                                            | val GHC.Classes.== "created:asc" -> GetFirewallsParametersQuerySortEnumCreatedAsc
+                                            | val GHC.Classes.== "created:desc" -> GetFirewallsParametersQuerySortEnumCreatedDesc
+                                            | GHC.Base.otherwise -> GetFirewallsParametersQuerySortOther val)
 -- | Represents a response of the operation 'getFirewalls'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetFirewallsResponseError' is used.
-data GetFirewallsResponse =                              
-   GetFirewallsResponseError GHC.Base.String             -- ^ Means either no matching case available or a parse error
-  | GetFirewallsResponse200 GetFirewallsResponseBody200  -- ^ The \`firewalls\` key contains an array of Firewall objects
+data GetFirewallsResponse =
+   GetFirewallsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetFirewallsResponse200 GetFirewallsResponseBody200 -- ^ The \`firewalls\` key contains an array of Firewall objects
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetFirewallsResponseBody200
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200 = GetFirewallsResponseBody200 {
   -- | firewalls
-  getFirewallsResponseBody200Firewalls :: ([] GetFirewallsResponseBody200Firewalls)
+  getFirewallsResponseBody200Firewalls :: ([GetFirewallsResponseBody200Firewalls])
   -- | meta
   , getFirewallsResponseBody200Meta :: (GHC.Maybe.Maybe GetFirewallsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "firewalls" (getFirewallsResponseBody200Firewalls obj) : (Data.Aeson..=) "meta" (getFirewallsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "firewalls" (getFirewallsResponseBody200Firewalls obj) GHC.Base.<> (Data.Aeson..=) "meta" (getFirewallsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("firewalls" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200Firewalls obj : "meta" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("firewalls" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200Firewalls obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200" (\obj -> (GHC.Base.pure GetFirewallsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "firewalls")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetFirewallsResponseBody200Firewalls
+-- | Create a new 'GetFirewallsResponseBody200' with all required fields.
+mkGetFirewallsResponseBody200 :: [GetFirewallsResponseBody200Firewalls] -- ^ 'getFirewallsResponseBody200Firewalls'
+  -> GetFirewallsResponseBody200
+mkGetFirewallsResponseBody200 getFirewallsResponseBody200Firewalls = GetFirewallsResponseBody200{getFirewallsResponseBody200Firewalls = getFirewallsResponseBody200Firewalls,
+                                                                                                 getFirewallsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200Firewalls = GetFirewallsResponseBody200Firewalls {
   -- | applied_to
-  getFirewallsResponseBody200FirewallsAppliedTo :: ([] GetFirewallsResponseBody200FirewallsAppliedTo)
+  getFirewallsResponseBody200FirewallsAppliedTo :: ([GetFirewallsResponseBody200FirewallsAppliedTo])
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , getFirewallsResponseBody200FirewallsCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getFirewallsResponseBody200FirewallsId :: GHC.Integer.Type.Integer
+  , getFirewallsResponseBody200FirewallsId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , getFirewallsResponseBody200FirewallsLabels :: (GHC.Maybe.Maybe GetFirewallsResponseBody200FirewallsLabels)
+  , getFirewallsResponseBody200FirewallsLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: Name of the Resource. Must be unique per Project.
   , getFirewallsResponseBody200FirewallsName :: Data.Text.Internal.Text
   -- | rules
-  , getFirewallsResponseBody200FirewallsRules :: ([] GetFirewallsResponseBody200FirewallsRules)
+  , getFirewallsResponseBody200FirewallsRules :: ([GetFirewallsResponseBody200FirewallsRules])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200Firewalls
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "applied_to" (getFirewallsResponseBody200FirewallsAppliedTo obj) : (Data.Aeson..=) "created" (getFirewallsResponseBody200FirewallsCreated obj) : (Data.Aeson..=) "id" (getFirewallsResponseBody200FirewallsId obj) : (Data.Aeson..=) "labels" (getFirewallsResponseBody200FirewallsLabels obj) : (Data.Aeson..=) "name" (getFirewallsResponseBody200FirewallsName obj) : (Data.Aeson..=) "rules" (getFirewallsResponseBody200FirewallsRules obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "applied_to" (getFirewallsResponseBody200FirewallsAppliedTo obj) GHC.Base.<> ((Data.Aeson..=) "created" (getFirewallsResponseBody200FirewallsCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (getFirewallsResponseBody200FirewallsId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getFirewallsResponseBody200FirewallsLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getFirewallsResponseBody200FirewallsName obj) GHC.Base.<> (Data.Aeson..=) "rules" (getFirewallsResponseBody200FirewallsRules obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200Firewalls
+    where toJSON obj = Data.Aeson.Types.Internal.object ("applied_to" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedTo obj : "created" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsCreated obj : "id" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsId obj : "labels" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsLabels obj : "name" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsName obj : "rules" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRules obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("applied_to" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedTo obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsName obj) GHC.Base.<> ("rules" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRules obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200Firewalls
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200Firewalls" (\obj -> (((((GHC.Base.pure GetFirewallsResponseBody200Firewalls GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "applied_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "rules"))
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsApplied_to
+-- | Create a new 'GetFirewallsResponseBody200Firewalls' with all required fields.
+mkGetFirewallsResponseBody200Firewalls :: [GetFirewallsResponseBody200FirewallsAppliedTo] -- ^ 'getFirewallsResponseBody200FirewallsAppliedTo'
+  -> Data.Text.Internal.Text -- ^ 'getFirewallsResponseBody200FirewallsCreated'
+  -> GHC.Types.Int -- ^ 'getFirewallsResponseBody200FirewallsId'
+  -> Data.Text.Internal.Text -- ^ 'getFirewallsResponseBody200FirewallsName'
+  -> [GetFirewallsResponseBody200FirewallsRules] -- ^ 'getFirewallsResponseBody200FirewallsRules'
+  -> GetFirewallsResponseBody200Firewalls
+mkGetFirewallsResponseBody200Firewalls getFirewallsResponseBody200FirewallsAppliedTo getFirewallsResponseBody200FirewallsCreated getFirewallsResponseBody200FirewallsId getFirewallsResponseBody200FirewallsName getFirewallsResponseBody200FirewallsRules = GetFirewallsResponseBody200Firewalls{getFirewallsResponseBody200FirewallsAppliedTo = getFirewallsResponseBody200FirewallsAppliedTo,
+                                                                                                                                                                                                                                                                                                  getFirewallsResponseBody200FirewallsCreated = getFirewallsResponseBody200FirewallsCreated,
+                                                                                                                                                                                                                                                                                                  getFirewallsResponseBody200FirewallsId = getFirewallsResponseBody200FirewallsId,
+                                                                                                                                                                                                                                                                                                  getFirewallsResponseBody200FirewallsLabels = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                  getFirewallsResponseBody200FirewallsName = getFirewallsResponseBody200FirewallsName,
+                                                                                                                                                                                                                                                                                                  getFirewallsResponseBody200FirewallsRules = getFirewallsResponseBody200FirewallsRules}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.applied_to.items@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200FirewallsAppliedTo = GetFirewallsResponseBody200FirewallsAppliedTo {
   -- | applied_to_resources
-  getFirewallsResponseBody200FirewallsAppliedToAppliedToResources :: (GHC.Maybe.Maybe ([] GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources))
+  getFirewallsResponseBody200FirewallsAppliedToAppliedToResources :: (GHC.Maybe.Maybe ([GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources]))
   -- | label_selector
   , getFirewallsResponseBody200FirewallsAppliedToLabelSelector :: (GHC.Maybe.Maybe GetFirewallsResponseBody200FirewallsAppliedToLabelSelector)
   -- | server
@@ -174,56 +198,52 @@ data GetFirewallsResponseBody200FirewallsAppliedTo = GetFirewallsResponseBody200
   , getFirewallsResponseBody200FirewallsAppliedToType :: GetFirewallsResponseBody200FirewallsAppliedToType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedTo
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "applied_to_resources" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResources obj) : (Data.Aeson..=) "label_selector" (getFirewallsResponseBody200FirewallsAppliedToLabelSelector obj) : (Data.Aeson..=) "server" (getFirewallsResponseBody200FirewallsAppliedToServer obj) : (Data.Aeson..=) "type" (getFirewallsResponseBody200FirewallsAppliedToType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "applied_to_resources" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResources obj) GHC.Base.<> ((Data.Aeson..=) "label_selector" (getFirewallsResponseBody200FirewallsAppliedToLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (getFirewallsResponseBody200FirewallsAppliedToServer obj) GHC.Base.<> (Data.Aeson..=) "type" (getFirewallsResponseBody200FirewallsAppliedToType obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsAppliedTo
+    where toJSON obj = Data.Aeson.Types.Internal.object ("applied_to_resources" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToAppliedToResources obj : "label_selector" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToServer obj : "type" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("applied_to_resources" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToAppliedToResources obj) GHC.Base.<> (("label_selector" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToType obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsAppliedTo
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsAppliedTo" (\obj -> (((GHC.Base.pure GetFirewallsResponseBody200FirewallsAppliedTo GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "applied_to_resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsApplied_toApplied_to_resources
+-- | Create a new 'GetFirewallsResponseBody200FirewallsAppliedTo' with all required fields.
+mkGetFirewallsResponseBody200FirewallsAppliedTo :: GetFirewallsResponseBody200FirewallsAppliedToType -- ^ 'getFirewallsResponseBody200FirewallsAppliedToType'
+  -> GetFirewallsResponseBody200FirewallsAppliedTo
+mkGetFirewallsResponseBody200FirewallsAppliedTo getFirewallsResponseBody200FirewallsAppliedToType = GetFirewallsResponseBody200FirewallsAppliedTo{getFirewallsResponseBody200FirewallsAppliedToAppliedToResources = GHC.Maybe.Nothing,
+                                                                                                                                                  getFirewallsResponseBody200FirewallsAppliedToLabelSelector = GHC.Maybe.Nothing,
+                                                                                                                                                  getFirewallsResponseBody200FirewallsAppliedToServer = GHC.Maybe.Nothing,
+                                                                                                                                                  getFirewallsResponseBody200FirewallsAppliedToType = getFirewallsResponseBody200FirewallsAppliedToType}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.applied_to.items.properties.applied_to_resources.items@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources = GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources {
   -- | server
   getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer :: (GHC.Maybe.Maybe GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer)
-  -- | type: Type of resource referenced
-  , getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType :: (GHC.Maybe.Maybe GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "server" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer obj) : (Data.Aeson..=) "type" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "server" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer obj) GHC.Base.<> (Data.Aeson..=) "type" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("server" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "server" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("server" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "server"))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources" (\obj -> (GHC.Base.pure GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type"))
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsApplied_toApplied_to_resourcesServer
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources" (\obj -> GHC.Base.pure GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server"))
+-- | Create a new 'GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources' with all required fields.
+mkGetFirewallsResponseBody200FirewallsAppliedToAppliedToResources :: GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources
+mkGetFirewallsResponseBody200FirewallsAppliedToAppliedToResources = GetFirewallsResponseBody200FirewallsAppliedToAppliedToResources{getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.applied_to.items.properties.applied_to_resources.items.properties.server@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer = GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer {
   -- | id: ID of the Resource
-  getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId :: GHC.Integer.Type.Integer
+  getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer" (\obj -> GHC.Base.pure GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema GetFirewallsResponseBody200FirewallsApplied_toApplied_to_resourcesType
--- 
--- Type of resource referenced
-data GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType
-    = GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumTyped Data.Text.Internal.Text
-    | GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType
-    where toJSON (GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                          then GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumStringServer
-                                          else GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesTypeEnumOther val)
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsApplied_toLabel_selector
+-- | Create a new 'GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer' with all required fields.
+mkGetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer :: GHC.Types.Int -- ^ 'getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId'
+  -> GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer
+mkGetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId = GetFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServer{getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId = getFirewallsResponseBody200FirewallsAppliedToAppliedToResourcesServerId}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.applied_to.items.properties.label_selector@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200FirewallsAppliedToLabelSelector = GetFirewallsResponseBody200FirewallsAppliedToLabelSelector {
@@ -231,57 +251,51 @@ data GetFirewallsResponseBody200FirewallsAppliedToLabelSelector = GetFirewallsRe
   getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedToLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsAppliedToLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsAppliedToLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsAppliedToLabelSelector" (\obj -> GHC.Base.pure GetFirewallsResponseBody200FirewallsAppliedToLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsApplied_toServer
+-- | Create a new 'GetFirewallsResponseBody200FirewallsAppliedToLabelSelector' with all required fields.
+mkGetFirewallsResponseBody200FirewallsAppliedToLabelSelector :: Data.Text.Internal.Text -- ^ 'getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector'
+  -> GetFirewallsResponseBody200FirewallsAppliedToLabelSelector
+mkGetFirewallsResponseBody200FirewallsAppliedToLabelSelector getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector = GetFirewallsResponseBody200FirewallsAppliedToLabelSelector{getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector = getFirewallsResponseBody200FirewallsAppliedToLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.applied_to.items.properties.server@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200FirewallsAppliedToServer = GetFirewallsResponseBody200FirewallsAppliedToServer {
   -- | id: ID of the Resource
-  getFirewallsResponseBody200FirewallsAppliedToServerId :: GHC.Integer.Type.Integer
+  getFirewallsResponseBody200FirewallsAppliedToServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedToServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getFirewallsResponseBody200FirewallsAppliedToServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getFirewallsResponseBody200FirewallsAppliedToServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsAppliedToServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsAppliedToServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsAppliedToServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsAppliedToServer" (\obj -> GHC.Base.pure GetFirewallsResponseBody200FirewallsAppliedToServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema GetFirewallsResponseBody200FirewallsApplied_toType
+-- | Create a new 'GetFirewallsResponseBody200FirewallsAppliedToServer' with all required fields.
+mkGetFirewallsResponseBody200FirewallsAppliedToServer :: GHC.Types.Int -- ^ 'getFirewallsResponseBody200FirewallsAppliedToServerId'
+  -> GetFirewallsResponseBody200FirewallsAppliedToServer
+mkGetFirewallsResponseBody200FirewallsAppliedToServer getFirewallsResponseBody200FirewallsAppliedToServerId = GetFirewallsResponseBody200FirewallsAppliedToServer{getFirewallsResponseBody200FirewallsAppliedToServerId = getFirewallsResponseBody200FirewallsAppliedToServerId}
+-- | Defines the enum schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.applied_to.items.properties.type@ in the specification.
 -- 
 -- Type of resource referenced
-data GetFirewallsResponseBody200FirewallsAppliedToType
-    = GetFirewallsResponseBody200FirewallsAppliedToTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetFirewallsResponseBody200FirewallsAppliedToTypeEnumTyped Data.Text.Internal.Text
-    | GetFirewallsResponseBody200FirewallsAppliedToTypeEnumStringLabelSelector
-    | GetFirewallsResponseBody200FirewallsAppliedToTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsAppliedToType
-    where toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON GetFirewallsResponseBody200FirewallsAppliedToType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                          then GetFirewallsResponseBody200FirewallsAppliedToTypeEnumStringLabelSelector
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                then GetFirewallsResponseBody200FirewallsAppliedToTypeEnumStringServer
-                                                else GetFirewallsResponseBody200FirewallsAppliedToTypeEnumOther val)
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsLabels
--- 
--- User-defined labels (key-value pairs)
-data GetFirewallsResponseBody200FirewallsLabels = GetFirewallsResponseBody200FirewallsLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsLabels" (\obj -> GHC.Base.pure GetFirewallsResponseBody200FirewallsLabels)
--- | Defines the data type for the schema GetFirewallsResponseBody200FirewallsRules
+data GetFirewallsResponseBody200FirewallsAppliedToType =
+   GetFirewallsResponseBody200FirewallsAppliedToTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsResponseBody200FirewallsAppliedToTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsResponseBody200FirewallsAppliedToTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | GetFirewallsResponseBody200FirewallsAppliedToTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsAppliedToType
+    where toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeOther val) = val
+          toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeEnumServer) = "server"
+          toJSON (GetFirewallsResponseBody200FirewallsAppliedToTypeEnumLabelSelector) = "label_selector"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsAppliedToType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> GetFirewallsResponseBody200FirewallsAppliedToTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> GetFirewallsResponseBody200FirewallsAppliedToTypeEnumLabelSelector
+                                            | GHC.Base.otherwise -> GetFirewallsResponseBody200FirewallsAppliedToTypeOther val)
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.rules.items@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200FirewallsRules = GetFirewallsResponseBody200FirewallsRules {
@@ -292,7 +306,7 @@ data GetFirewallsResponseBody200FirewallsRules = GetFirewallsResponseBody200Fire
   -- * Maximum length of 255
   getFirewallsResponseBody200FirewallsRulesDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | destination_ips: List of permitted IPv4\/IPv6 addresses in CIDR notation. Use \`0.0.0.0\/0\` to allow all IPv4 addresses and \`::\/0\` to allow all IPv6 addresses. You can specify 100 CIDRs at most.
-  , getFirewallsResponseBody200FirewallsRulesDestinationIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , getFirewallsResponseBody200FirewallsRulesDestinationIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | direction: Select traffic direction on which rule should be applied. Use \`source_ips\` for direction \`in\` and \`destination_ips\` for direction \`out\`.
   , getFirewallsResponseBody200FirewallsRulesDirection :: GetFirewallsResponseBody200FirewallsRulesDirection
   -- | port: Port or port range to which traffic will be allowed, only applicable for protocols TCP and UDP. A port range can be specified by separating two ports with a dash, e.g \`1024-5000\`.
@@ -300,67 +314,70 @@ data GetFirewallsResponseBody200FirewallsRules = GetFirewallsResponseBody200Fire
   -- | protocol: Type of traffic to allow
   , getFirewallsResponseBody200FirewallsRulesProtocol :: GetFirewallsResponseBody200FirewallsRulesProtocol
   -- | source_ips: List of permitted IPv4\/IPv6 addresses in CIDR notation. Use \`0.0.0.0\/0\` to allow all IPv4 addresses and \`::\/0\` to allow all IPv6 addresses. You can specify 100 CIDRs at most.
-  , getFirewallsResponseBody200FirewallsRulesSourceIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , getFirewallsResponseBody200FirewallsRulesSourceIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsRules
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (getFirewallsResponseBody200FirewallsRulesDescription obj) : (Data.Aeson..=) "destination_ips" (getFirewallsResponseBody200FirewallsRulesDestinationIps obj) : (Data.Aeson..=) "direction" (getFirewallsResponseBody200FirewallsRulesDirection obj) : (Data.Aeson..=) "port" (getFirewallsResponseBody200FirewallsRulesPort obj) : (Data.Aeson..=) "protocol" (getFirewallsResponseBody200FirewallsRulesProtocol obj) : (Data.Aeson..=) "source_ips" (getFirewallsResponseBody200FirewallsRulesSourceIps obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (getFirewallsResponseBody200FirewallsRulesDescription obj) GHC.Base.<> ((Data.Aeson..=) "destination_ips" (getFirewallsResponseBody200FirewallsRulesDestinationIps obj) GHC.Base.<> ((Data.Aeson..=) "direction" (getFirewallsResponseBody200FirewallsRulesDirection obj) GHC.Base.<> ((Data.Aeson..=) "port" (getFirewallsResponseBody200FirewallsRulesPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (getFirewallsResponseBody200FirewallsRulesProtocol obj) GHC.Base.<> (Data.Aeson..=) "source_ips" (getFirewallsResponseBody200FirewallsRulesSourceIps obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsRules
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesDescription obj : "destination_ips" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesDestinationIps obj : "direction" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesDirection obj : "port" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesPort obj : "protocol" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesProtocol obj : "source_ips" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesSourceIps obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesDescription obj) GHC.Base.<> (("destination_ips" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesDestinationIps obj) GHC.Base.<> (("direction" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesDirection obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesProtocol obj) GHC.Base.<> ("source_ips" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200FirewallsRulesSourceIps obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsRules
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200FirewallsRules" (\obj -> (((((GHC.Base.pure GetFirewallsResponseBody200FirewallsRules GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "destination_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "direction")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "source_ips"))
--- | Defines the enum schema GetFirewallsResponseBody200FirewallsRulesDirection
+-- | Create a new 'GetFirewallsResponseBody200FirewallsRules' with all required fields.
+mkGetFirewallsResponseBody200FirewallsRules :: GetFirewallsResponseBody200FirewallsRulesDirection -- ^ 'getFirewallsResponseBody200FirewallsRulesDirection'
+  -> GetFirewallsResponseBody200FirewallsRulesProtocol -- ^ 'getFirewallsResponseBody200FirewallsRulesProtocol'
+  -> GetFirewallsResponseBody200FirewallsRules
+mkGetFirewallsResponseBody200FirewallsRules getFirewallsResponseBody200FirewallsRulesDirection getFirewallsResponseBody200FirewallsRulesProtocol = GetFirewallsResponseBody200FirewallsRules{getFirewallsResponseBody200FirewallsRulesDescription = GHC.Maybe.Nothing,
+                                                                                                                                                                                             getFirewallsResponseBody200FirewallsRulesDestinationIps = GHC.Maybe.Nothing,
+                                                                                                                                                                                             getFirewallsResponseBody200FirewallsRulesDirection = getFirewallsResponseBody200FirewallsRulesDirection,
+                                                                                                                                                                                             getFirewallsResponseBody200FirewallsRulesPort = GHC.Maybe.Nothing,
+                                                                                                                                                                                             getFirewallsResponseBody200FirewallsRulesProtocol = getFirewallsResponseBody200FirewallsRulesProtocol,
+                                                                                                                                                                                             getFirewallsResponseBody200FirewallsRulesSourceIps = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.rules.items.properties.direction@ in the specification.
 -- 
 -- Select traffic direction on which rule should be applied. Use \`source_ips\` for direction \`in\` and \`destination_ips\` for direction \`out\`.
-data GetFirewallsResponseBody200FirewallsRulesDirection
-    = GetFirewallsResponseBody200FirewallsRulesDirectionEnumOther Data.Aeson.Types.Internal.Value
-    | GetFirewallsResponseBody200FirewallsRulesDirectionEnumTyped Data.Text.Internal.Text
-    | GetFirewallsResponseBody200FirewallsRulesDirectionEnumStringIn
-    | GetFirewallsResponseBody200FirewallsRulesDirectionEnumStringOut
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsRulesDirection
-    where toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionEnumStringIn) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "in"
-          toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionEnumStringOut) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "out"
-instance Data.Aeson.FromJSON GetFirewallsResponseBody200FirewallsRulesDirection
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "in")
-                                          then GetFirewallsResponseBody200FirewallsRulesDirectionEnumStringIn
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "out")
-                                                then GetFirewallsResponseBody200FirewallsRulesDirectionEnumStringOut
-                                                else GetFirewallsResponseBody200FirewallsRulesDirectionEnumOther val)
--- | Defines the enum schema GetFirewallsResponseBody200FirewallsRulesProtocol
+data GetFirewallsResponseBody200FirewallsRulesDirection =
+   GetFirewallsResponseBody200FirewallsRulesDirectionOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsResponseBody200FirewallsRulesDirectionTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsResponseBody200FirewallsRulesDirectionEnumIn -- ^ Represents the JSON value @"in"@
+  | GetFirewallsResponseBody200FirewallsRulesDirectionEnumOut -- ^ Represents the JSON value @"out"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsRulesDirection
+    where toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionOther val) = val
+          toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionEnumIn) = "in"
+          toJSON (GetFirewallsResponseBody200FirewallsRulesDirectionEnumOut) = "out"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsRulesDirection
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "in" -> GetFirewallsResponseBody200FirewallsRulesDirectionEnumIn
+                                            | val GHC.Classes.== "out" -> GetFirewallsResponseBody200FirewallsRulesDirectionEnumOut
+                                            | GHC.Base.otherwise -> GetFirewallsResponseBody200FirewallsRulesDirectionOther val)
+-- | Defines the enum schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.firewalls.items.properties.rules.items.properties.protocol@ in the specification.
 -- 
 -- Type of traffic to allow
-data GetFirewallsResponseBody200FirewallsRulesProtocol
-    = GetFirewallsResponseBody200FirewallsRulesProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | GetFirewallsResponseBody200FirewallsRulesProtocolEnumTyped Data.Text.Internal.Text
-    | GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringEsp
-    | GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringGre
-    | GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringIcmp
-    | GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringTcp
-    | GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringUdp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200FirewallsRulesProtocol
-    where toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringEsp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "esp"
-          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringGre) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "gre"
-          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringIcmp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "icmp"
-          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringUdp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "udp"
-instance Data.Aeson.FromJSON GetFirewallsResponseBody200FirewallsRulesProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "esp")
-                                          then GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringEsp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "gre")
-                                                then GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringGre
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "icmp")
-                                                      then GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringIcmp
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                            then GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringTcp
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "udp")
-                                                                  then GetFirewallsResponseBody200FirewallsRulesProtocolEnumStringUdp
-                                                                  else GetFirewallsResponseBody200FirewallsRulesProtocolEnumOther val)
--- | Defines the data type for the schema GetFirewallsResponseBody200Meta
+data GetFirewallsResponseBody200FirewallsRulesProtocol =
+   GetFirewallsResponseBody200FirewallsRulesProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsResponseBody200FirewallsRulesProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsResponseBody200FirewallsRulesProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | GetFirewallsResponseBody200FirewallsRulesProtocolEnumUdp -- ^ Represents the JSON value @"udp"@
+  | GetFirewallsResponseBody200FirewallsRulesProtocolEnumIcmp -- ^ Represents the JSON value @"icmp"@
+  | GetFirewallsResponseBody200FirewallsRulesProtocolEnumEsp -- ^ Represents the JSON value @"esp"@
+  | GetFirewallsResponseBody200FirewallsRulesProtocolEnumGre -- ^ Represents the JSON value @"gre"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200FirewallsRulesProtocol
+    where toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolOther val) = val
+          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumTcp) = "tcp"
+          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumUdp) = "udp"
+          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumIcmp) = "icmp"
+          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumEsp) = "esp"
+          toJSON (GetFirewallsResponseBody200FirewallsRulesProtocolEnumGre) = "gre"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200FirewallsRulesProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> GetFirewallsResponseBody200FirewallsRulesProtocolEnumTcp
+                                            | val GHC.Classes.== "udp" -> GetFirewallsResponseBody200FirewallsRulesProtocolEnumUdp
+                                            | val GHC.Classes.== "icmp" -> GetFirewallsResponseBody200FirewallsRulesProtocolEnumIcmp
+                                            | val GHC.Classes.== "esp" -> GetFirewallsResponseBody200FirewallsRulesProtocolEnumEsp
+                                            | val GHC.Classes.== "gre" -> GetFirewallsResponseBody200FirewallsRulesProtocolEnumGre
+                                            | GHC.Base.otherwise -> GetFirewallsResponseBody200FirewallsRulesProtocolOther val)
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200Meta = GetFirewallsResponseBody200Meta {
@@ -368,31 +385,79 @@ data GetFirewallsResponseBody200Meta = GetFirewallsResponseBody200Meta {
   getFirewallsResponseBody200MetaPagination :: GetFirewallsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getFirewallsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getFirewallsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200Meta" (\obj -> GHC.Base.pure GetFirewallsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetFirewallsResponseBody200MetaPagination
+-- | Create a new 'GetFirewallsResponseBody200Meta' with all required fields.
+mkGetFirewallsResponseBody200Meta :: GetFirewallsResponseBody200MetaPagination -- ^ 'getFirewallsResponseBody200MetaPagination'
+  -> GetFirewallsResponseBody200Meta
+mkGetFirewallsResponseBody200Meta getFirewallsResponseBody200MetaPagination = GetFirewallsResponseBody200Meta{getFirewallsResponseBody200MetaPagination = getFirewallsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/firewalls.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetFirewallsResponseBody200MetaPagination = GetFirewallsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getFirewallsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getFirewallsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getFirewallsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getFirewallsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getFirewallsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getFirewallsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getFirewallsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getFirewallsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getFirewallsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getFirewallsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getFirewallsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getFirewallsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getFirewallsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getFirewallsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getFirewallsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getFirewallsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getFirewallsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getFirewallsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getFirewallsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getFirewallsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getFirewallsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getFirewallsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getFirewallsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetFirewallsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetFirewallsResponseBody200MetaPagination' with all required fields.
+mkGetFirewallsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getFirewallsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getFirewallsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsResponseBody200MetaPaginationTotalEntries'
+  -> GetFirewallsResponseBody200MetaPagination
+mkGetFirewallsResponseBody200MetaPagination getFirewallsResponseBody200MetaPaginationLastPage getFirewallsResponseBody200MetaPaginationNextPage getFirewallsResponseBody200MetaPaginationPage getFirewallsResponseBody200MetaPaginationPerPage getFirewallsResponseBody200MetaPaginationPreviousPage getFirewallsResponseBody200MetaPaginationTotalEntries = GetFirewallsResponseBody200MetaPagination{getFirewallsResponseBody200MetaPaginationLastPage = getFirewallsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                       getFirewallsResponseBody200MetaPaginationNextPage = getFirewallsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                       getFirewallsResponseBody200MetaPaginationPage = getFirewallsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                       getFirewallsResponseBody200MetaPaginationPerPage = getFirewallsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                       getFirewallsResponseBody200MetaPaginationPreviousPage = getFirewallsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                       getFirewallsResponseBody200MetaPaginationTotalEntries = getFirewallsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /firewalls
+-- 
+-- The same as 'getFirewalls' but accepts an explicit configuration.
+getFirewallsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFirewallsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetFirewallsResponse) -- ^ Monadic computation which returns the result of the operation
+getFirewallsWithConfiguration config
+                              parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFirewallsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                              GetFirewallsResponseBody200)
+                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /firewalls
+-- 
+-- The same as 'getFirewalls' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getFirewallsRaw :: forall m . HCloud.Common.MonadHTTP m => GetFirewallsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFirewallsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /firewalls
+-- 
+-- The same as 'getFirewalls' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getFirewallsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFirewallsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFirewallsWithConfigurationRaw config
+                                 parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/firewalls") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])

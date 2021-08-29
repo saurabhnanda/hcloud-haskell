@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postNetworks_Id_ActionsAddRoute
 module HCloud.Operations.PostNetworksIdActionsAddRoute where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,57 +47,14 @@ import HCloud.Types
 -- Adds a route entry to a Network.
 -- 
 -- Note: if the Network object changes during the request, the response will be a “conflict” error.
-postNetworks_Id_ActionsAddRoute :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                    -- ^ id: ID of the Network
-  -> GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddRouteResponse))   -- ^ Monad containing the result of the operation
-postNetworks_Id_ActionsAddRoute config
-                                id
-                                body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddRouteResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddRouteResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           PostNetworksIdActionsAddRouteResponseBody201)
-                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/add_route
--- 
--- The same as 'postNetworks_Id_ActionsAddRoute' but returns the raw 'Data.ByteString.Char8.ByteString'
-postNetworks_Id_ActionsAddRouteRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                    HCloud.Common.SecurityScheme s) =>
-                                      HCloud.Common.Configuration s ->
-                                      GHC.Integer.Type.Integer ->
-                                      GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody ->
-                                      m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postNetworks_Id_ActionsAddRouteRaw config
-                                   id
-                                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/add_route
--- 
--- Monadic version of 'postNetworks_Id_ActionsAddRoute' (use with 'HCloud.Common.runWithConfiguration')
-postNetworks_Id_ActionsAddRouteM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                  HCloud.Common.SecurityScheme s) =>
-                                    GHC.Integer.Type.Integer ->
-                                    GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody ->
-                                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                       m
-                                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                           (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddRouteResponse))
-postNetworks_Id_ActionsAddRouteM id
-                                 body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddRouteResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddRouteResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            PostNetworksIdActionsAddRouteResponseBody201)
-                                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/add_route
--- 
--- Monadic version of 'postNetworks_Id_ActionsAddRouteRaw' (use with 'HCloud.Common.runWithConfiguration')
-postNetworks_Id_ActionsAddRouteRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                     HCloud.Common.SecurityScheme s) =>
-                                       GHC.Integer.Type.Integer ->
-                                       GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody ->
-                                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                          m
-                                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postNetworks_Id_ActionsAddRouteRawM id
-                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postNetworks_Id_ActionsAddRouteRequestBody
+postNetworks_Id_ActionsAddRoute :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddRouteResponse) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddRoute id
+                                body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddRouteResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddRouteResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            PostNetworksIdActionsAddRouteResponseBody201)
+                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_route.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddRouteRequestBody = PostNetworksIdActionsAddRouteRequestBody {
@@ -107,19 +64,25 @@ data PostNetworksIdActionsAddRouteRequestBody = PostNetworksIdActionsAddRouteReq
   , postNetworksIdActionsAddRouteRequestBodyGateway :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddRouteRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination" (postNetworksIdActionsAddRouteRequestBodyDestination obj) : (Data.Aeson..=) "gateway" (postNetworksIdActionsAddRouteRequestBodyGateway obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination" (postNetworksIdActionsAddRouteRequestBodyDestination obj) GHC.Base.<> (Data.Aeson..=) "gateway" (postNetworksIdActionsAddRouteRequestBodyGateway obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddRouteRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteRequestBodyDestination obj : "gateway" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteRequestBodyGateway obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteRequestBodyDestination obj) GHC.Base.<> ("gateway" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteRequestBodyGateway obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddRouteRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddRouteRequestBody" (\obj -> (GHC.Base.pure PostNetworksIdActionsAddRouteRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gateway"))
+-- | Create a new 'PostNetworksIdActionsAddRouteRequestBody' with all required fields.
+mkPostNetworksIdActionsAddRouteRequestBody :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteRequestBodyDestination'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteRequestBodyGateway'
+  -> PostNetworksIdActionsAddRouteRequestBody
+mkPostNetworksIdActionsAddRouteRequestBody postNetworksIdActionsAddRouteRequestBodyDestination postNetworksIdActionsAddRouteRequestBodyGateway = PostNetworksIdActionsAddRouteRequestBody{postNetworksIdActionsAddRouteRequestBodyDestination = postNetworksIdActionsAddRouteRequestBodyDestination,
+                                                                                                                                                                                          postNetworksIdActionsAddRouteRequestBodyGateway = postNetworksIdActionsAddRouteRequestBodyGateway}
 -- | Represents a response of the operation 'postNetworks_Id_ActionsAddRoute'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostNetworksIdActionsAddRouteResponseError' is used.
-data PostNetworksIdActionsAddRouteResponse =                                               
-   PostNetworksIdActionsAddRouteResponseError GHC.Base.String                              -- ^ Means either no matching case available or a parse error
-  | PostNetworksIdActionsAddRouteResponse201 PostNetworksIdActionsAddRouteResponseBody201  -- ^ The \`action\` key contains the \`add_route\` Action
+data PostNetworksIdActionsAddRouteResponse =
+   PostNetworksIdActionsAddRouteResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostNetworksIdActionsAddRouteResponse201 PostNetworksIdActionsAddRouteResponseBody201 -- ^ The \`action\` key contains the \`add_route\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostNetworksIdActionsAddRouteResponseBody201
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_route.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddRouteResponseBody201 = PostNetworksIdActionsAddRouteResponseBody201 {
@@ -127,39 +90,61 @@ data PostNetworksIdActionsAddRouteResponseBody201 = PostNetworksIdActionsAddRout
   postNetworksIdActionsAddRouteResponseBody201Action :: PostNetworksIdActionsAddRouteResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddRouteResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postNetworksIdActionsAddRouteResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postNetworksIdActionsAddRouteResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddRouteResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddRouteResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddRouteResponseBody201" (\obj -> GHC.Base.pure PostNetworksIdActionsAddRouteResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostNetworksIdActionsAddRouteResponseBody201Action
+-- | Create a new 'PostNetworksIdActionsAddRouteResponseBody201' with all required fields.
+mkPostNetworksIdActionsAddRouteResponseBody201 :: PostNetworksIdActionsAddRouteResponseBody201Action -- ^ 'postNetworksIdActionsAddRouteResponseBody201Action'
+  -> PostNetworksIdActionsAddRouteResponseBody201
+mkPostNetworksIdActionsAddRouteResponseBody201 postNetworksIdActionsAddRouteResponseBody201Action = PostNetworksIdActionsAddRouteResponseBody201{postNetworksIdActionsAddRouteResponseBody201Action = postNetworksIdActionsAddRouteResponseBody201Action}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_route.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddRouteResponseBody201Action = PostNetworksIdActionsAddRouteResponseBody201Action {
   -- | command: Command executed in the Action
   postNetworksIdActionsAddRouteResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postNetworksIdActionsAddRouteResponseBody201ActionError :: PostNetworksIdActionsAddRouteResponseBody201ActionError
+  , postNetworksIdActionsAddRouteResponseBody201ActionError :: (GHC.Maybe.Maybe PostNetworksIdActionsAddRouteResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postNetworksIdActionsAddRouteResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postNetworksIdActionsAddRouteResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postNetworksIdActionsAddRouteResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postNetworksIdActionsAddRouteResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postNetworksIdActionsAddRouteResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postNetworksIdActionsAddRouteResponseBody201ActionResources :: ([] PostNetworksIdActionsAddRouteResponseBody201ActionResources)
+  , postNetworksIdActionsAddRouteResponseBody201ActionResources :: ([PostNetworksIdActionsAddRouteResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postNetworksIdActionsAddRouteResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postNetworksIdActionsAddRouteResponseBody201ActionStatus :: PostNetworksIdActionsAddRouteResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddRouteResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postNetworksIdActionsAddRouteResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postNetworksIdActionsAddRouteResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postNetworksIdActionsAddRouteResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postNetworksIdActionsAddRouteResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postNetworksIdActionsAddRouteResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postNetworksIdActionsAddRouteResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postNetworksIdActionsAddRouteResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postNetworksIdActionsAddRouteResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postNetworksIdActionsAddRouteResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postNetworksIdActionsAddRouteResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postNetworksIdActionsAddRouteResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postNetworksIdActionsAddRouteResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postNetworksIdActionsAddRouteResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postNetworksIdActionsAddRouteResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postNetworksIdActionsAddRouteResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postNetworksIdActionsAddRouteResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddRouteResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddRouteResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddRouteResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostNetworksIdActionsAddRouteResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostNetworksIdActionsAddRouteResponseBody201ActionError
+-- | Create a new 'PostNetworksIdActionsAddRouteResponseBody201Action' with all required fields.
+mkPostNetworksIdActionsAddRouteResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddRouteResponseBody201ActionError -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionProgress'
+  -> [PostNetworksIdActionsAddRouteResponseBody201ActionResources] -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionStarted'
+  -> PostNetworksIdActionsAddRouteResponseBody201ActionStatus -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionStatus'
+  -> PostNetworksIdActionsAddRouteResponseBody201Action
+mkPostNetworksIdActionsAddRouteResponseBody201Action postNetworksIdActionsAddRouteResponseBody201ActionCommand postNetworksIdActionsAddRouteResponseBody201ActionError postNetworksIdActionsAddRouteResponseBody201ActionFinished postNetworksIdActionsAddRouteResponseBody201ActionId postNetworksIdActionsAddRouteResponseBody201ActionProgress postNetworksIdActionsAddRouteResponseBody201ActionResources postNetworksIdActionsAddRouteResponseBody201ActionStarted postNetworksIdActionsAddRouteResponseBody201ActionStatus = PostNetworksIdActionsAddRouteResponseBody201Action{postNetworksIdActionsAddRouteResponseBody201ActionCommand = postNetworksIdActionsAddRouteResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionError = postNetworksIdActionsAddRouteResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionFinished = postNetworksIdActionsAddRouteResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionId = postNetworksIdActionsAddRouteResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionProgress = postNetworksIdActionsAddRouteResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionResources = postNetworksIdActionsAddRouteResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionStarted = postNetworksIdActionsAddRouteResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsAddRouteResponseBody201ActionStatus = postNetworksIdActionsAddRouteResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_route.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostNetworksIdActionsAddRouteResponseBody201ActionError = PostNetworksIdActionsAddRouteResponseBody201ActionError {
@@ -169,47 +154,86 @@ data PostNetworksIdActionsAddRouteResponseBody201ActionError = PostNetworksIdAct
   , postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddRouteResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postNetworksIdActionsAddRouteResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postNetworksIdActionsAddRouteResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddRouteResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddRouteResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddRouteResponseBody201ActionError" (\obj -> (GHC.Base.pure PostNetworksIdActionsAddRouteResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostNetworksIdActionsAddRouteResponseBody201ActionResources
+-- | Create a new 'PostNetworksIdActionsAddRouteResponseBody201ActionError' with all required fields.
+mkPostNetworksIdActionsAddRouteResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage'
+  -> PostNetworksIdActionsAddRouteResponseBody201ActionError
+mkPostNetworksIdActionsAddRouteResponseBody201ActionError postNetworksIdActionsAddRouteResponseBody201ActionErrorCode postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage = PostNetworksIdActionsAddRouteResponseBody201ActionError{postNetworksIdActionsAddRouteResponseBody201ActionErrorCode = postNetworksIdActionsAddRouteResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                               postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage = postNetworksIdActionsAddRouteResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/add_route.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsAddRouteResponseBody201ActionResources = PostNetworksIdActionsAddRouteResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postNetworksIdActionsAddRouteResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postNetworksIdActionsAddRouteResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postNetworksIdActionsAddRouteResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddRouteResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postNetworksIdActionsAddRouteResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postNetworksIdActionsAddRouteResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postNetworksIdActionsAddRouteResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postNetworksIdActionsAddRouteResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddRouteResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsAddRouteResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddRouteResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsAddRouteResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostNetworksIdActionsAddRouteResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostNetworksIdActionsAddRouteResponseBody201ActionStatus
+-- | Create a new 'PostNetworksIdActionsAddRouteResponseBody201ActionResources' with all required fields.
+mkPostNetworksIdActionsAddRouteResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsAddRouteResponseBody201ActionResourcesType'
+  -> PostNetworksIdActionsAddRouteResponseBody201ActionResources
+mkPostNetworksIdActionsAddRouteResponseBody201ActionResources postNetworksIdActionsAddRouteResponseBody201ActionResourcesId postNetworksIdActionsAddRouteResponseBody201ActionResourcesType = PostNetworksIdActionsAddRouteResponseBody201ActionResources{postNetworksIdActionsAddRouteResponseBody201ActionResourcesId = postNetworksIdActionsAddRouteResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                          postNetworksIdActionsAddRouteResponseBody201ActionResourcesType = postNetworksIdActionsAddRouteResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/networks\/{id}\/actions\/add_route.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostNetworksIdActionsAddRouteResponseBody201ActionStatus
-    = PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringError
-    | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringRunning
-    | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsAddRouteResponseBody201ActionStatus
-    where toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostNetworksIdActionsAddRouteResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumOther val)
+data PostNetworksIdActionsAddRouteResponseBody201ActionStatus =
+   PostNetworksIdActionsAddRouteResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostNetworksIdActionsAddRouteResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsAddRouteResponseBody201ActionStatus
+    where toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusOther val) = val
+          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsAddRouteResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostNetworksIdActionsAddRouteResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostNetworksIdActionsAddRouteResponseBody201ActionStatusOther val)
+-- | > POST /networks/{id}/actions/add_route
+-- 
+-- The same as 'postNetworks_Id_ActionsAddRoute' but accepts an explicit configuration.
+postNetworks_Id_ActionsAddRouteWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostNetworksIdActionsAddRouteResponse) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddRouteWithConfiguration config
+                                                 id
+                                                 body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsAddRouteResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsAddRouteResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                             PostNetworksIdActionsAddRouteResponseBody201)
+                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /networks/{id}/actions/add_route
+-- 
+-- The same as 'postNetworks_Id_ActionsAddRoute' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postNetworks_Id_ActionsAddRouteRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddRouteRaw id
+                                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /networks/{id}/actions/add_route
+-- 
+-- The same as 'postNetworks_Id_ActionsAddRoute' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postNetworks_Id_ActionsAddRouteWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsAddRouteRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsAddRouteWithConfigurationRaw config
+                                                    id
+                                                    body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_route"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

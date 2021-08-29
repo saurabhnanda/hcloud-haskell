@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getIsos_Id_
 module HCloud.Operations.GetIsosId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,56 +45,19 @@ import HCloud.Types
 -- | > GET /isos/{id}
 -- 
 -- Returns a specific ISO object.
-getIsos_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                -- ^ id: ID of the ISO
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetIsosIdResponse))   -- ^ Monad containing the result of the operation
-getIsos_Id_ config
-            id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetIsosIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                             GetIsosIdResponseBody200)
-                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /isos/{id}
--- 
--- The same as 'getIsos_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-getIsos_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  HCloud.Common.Configuration s ->
-                  GHC.Integer.Type.Integer ->
-                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getIsos_Id_Raw config
-               id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /isos/{id}
--- 
--- Monadic version of 'getIsos_Id_' (use with 'HCloud.Common.runWithConfiguration')
-getIsos_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                              HCloud.Common.SecurityScheme s) =>
-                GHC.Integer.Type.Integer ->
-                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                   m
-                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response GetIsosIdResponse))
-getIsos_Id_M id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetIsosIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                              GetIsosIdResponseBody200)
-                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > GET /isos/{id}
--- 
--- Monadic version of 'getIsos_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-getIsos_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Integer.Type.Integer ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getIsos_Id_RawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
+getIsos_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the ISO
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetIsosIdResponse) -- ^ Monadic computation which returns the result of the operation
+getIsos_Id_ id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetIsosIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                              GetIsosIdResponseBody200)
+                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
 -- | Represents a response of the operation 'getIsos_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetIsosIdResponseError' is used.
-data GetIsosIdResponse =                           
-   GetIsosIdResponseError GHC.Base.String          -- ^ Means either no matching case available or a parse error
-  | GetIsosIdResponse200 GetIsosIdResponseBody200  -- ^ The \`iso\` key in the reply contains an array of ISO objects with this structure
+data GetIsosIdResponse =
+   GetIsosIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetIsosIdResponse200 GetIsosIdResponseBody200 -- ^ The \`iso\` key in the reply contains an array of ISO objects with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetIsosIdResponseBody200
+-- | Defines the object schema located at @paths.\/isos\/{id}.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetIsosIdResponseBody200 = GetIsosIdResponseBody200 {
@@ -102,49 +65,87 @@ data GetIsosIdResponseBody200 = GetIsosIdResponseBody200 {
   getIsosIdResponseBody200Iso :: GetIsosIdResponseBody200Iso
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "iso" (getIsosIdResponseBody200Iso obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "iso" (getIsosIdResponseBody200Iso obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("iso" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200Iso obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("iso" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200Iso obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetIsosIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetIsosIdResponseBody200" (\obj -> GHC.Base.pure GetIsosIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "iso"))
--- | Defines the data type for the schema GetIsosIdResponseBody200Iso
+-- | Create a new 'GetIsosIdResponseBody200' with all required fields.
+mkGetIsosIdResponseBody200 :: GetIsosIdResponseBody200Iso -- ^ 'getIsosIdResponseBody200Iso'
+  -> GetIsosIdResponseBody200
+mkGetIsosIdResponseBody200 getIsosIdResponseBody200Iso = GetIsosIdResponseBody200{getIsosIdResponseBody200Iso = getIsosIdResponseBody200Iso}
+-- | Defines the object schema located at @paths.\/isos\/{id}.GET.responses.200.content.application\/json.schema.properties.iso@ in the specification.
 -- 
 -- 
 data GetIsosIdResponseBody200Iso = GetIsosIdResponseBody200Iso {
   -- | deprecated: ISO 8601 timestamp of deprecation, null if ISO is still available. After the deprecation time it will no longer be possible to attach the ISO to Servers.
-  getIsosIdResponseBody200IsoDeprecated :: Data.Text.Internal.Text
+  getIsosIdResponseBody200IsoDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the ISO
   , getIsosIdResponseBody200IsoDescription :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getIsosIdResponseBody200IsoId :: GHC.Integer.Type.Integer
+  , getIsosIdResponseBody200IsoId :: GHC.Types.Int
   -- | name: Unique identifier of the ISO. Only set for public ISOs
-  , getIsosIdResponseBody200IsoName :: Data.Text.Internal.Text
+  , getIsosIdResponseBody200IsoName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | type: Type of the ISO
   , getIsosIdResponseBody200IsoType :: GetIsosIdResponseBody200IsoType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosIdResponseBody200Iso
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "deprecated" (getIsosIdResponseBody200IsoDeprecated obj) : (Data.Aeson..=) "description" (getIsosIdResponseBody200IsoDescription obj) : (Data.Aeson..=) "id" (getIsosIdResponseBody200IsoId obj) : (Data.Aeson..=) "name" (getIsosIdResponseBody200IsoName obj) : (Data.Aeson..=) "type" (getIsosIdResponseBody200IsoType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "deprecated" (getIsosIdResponseBody200IsoDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getIsosIdResponseBody200IsoDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getIsosIdResponseBody200IsoId obj) GHC.Base.<> ((Data.Aeson..=) "name" (getIsosIdResponseBody200IsoName obj) GHC.Base.<> (Data.Aeson..=) "type" (getIsosIdResponseBody200IsoType obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosIdResponseBody200Iso
+    where toJSON obj = Data.Aeson.Types.Internal.object ("deprecated" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoDescription obj : "id" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoId obj : "name" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoName obj : "type" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("deprecated" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoId obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoName obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getIsosIdResponseBody200IsoType obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetIsosIdResponseBody200Iso
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetIsosIdResponseBody200Iso" (\obj -> ((((GHC.Base.pure GetIsosIdResponseBody200Iso GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetIsosIdResponseBody200IsoType
+-- | Create a new 'GetIsosIdResponseBody200Iso' with all required fields.
+mkGetIsosIdResponseBody200Iso :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getIsosIdResponseBody200IsoDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getIsosIdResponseBody200IsoDescription'
+  -> GHC.Types.Int -- ^ 'getIsosIdResponseBody200IsoId'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getIsosIdResponseBody200IsoName'
+  -> GetIsosIdResponseBody200IsoType -- ^ 'getIsosIdResponseBody200IsoType'
+  -> GetIsosIdResponseBody200Iso
+mkGetIsosIdResponseBody200Iso getIsosIdResponseBody200IsoDeprecated getIsosIdResponseBody200IsoDescription getIsosIdResponseBody200IsoId getIsosIdResponseBody200IsoName getIsosIdResponseBody200IsoType = GetIsosIdResponseBody200Iso{getIsosIdResponseBody200IsoDeprecated = getIsosIdResponseBody200IsoDeprecated,
+                                                                                                                                                                                                                                       getIsosIdResponseBody200IsoDescription = getIsosIdResponseBody200IsoDescription,
+                                                                                                                                                                                                                                       getIsosIdResponseBody200IsoId = getIsosIdResponseBody200IsoId,
+                                                                                                                                                                                                                                       getIsosIdResponseBody200IsoName = getIsosIdResponseBody200IsoName,
+                                                                                                                                                                                                                                       getIsosIdResponseBody200IsoType = getIsosIdResponseBody200IsoType}
+-- | Defines the enum schema located at @paths.\/isos\/{id}.GET.responses.200.content.application\/json.schema.properties.iso.properties.type@ in the specification.
 -- 
 -- Type of the ISO
-data GetIsosIdResponseBody200IsoType
-    = GetIsosIdResponseBody200IsoTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetIsosIdResponseBody200IsoTypeEnumTyped Data.Text.Internal.Text
-    | GetIsosIdResponseBody200IsoTypeEnumStringPrivate
-    | GetIsosIdResponseBody200IsoTypeEnumStringPublic
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosIdResponseBody200IsoType
-    where toJSON (GetIsosIdResponseBody200IsoTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetIsosIdResponseBody200IsoTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetIsosIdResponseBody200IsoTypeEnumStringPrivate) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "private"
-          toJSON (GetIsosIdResponseBody200IsoTypeEnumStringPublic) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "public"
-instance Data.Aeson.FromJSON GetIsosIdResponseBody200IsoType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "private")
-                                          then GetIsosIdResponseBody200IsoTypeEnumStringPrivate
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "public")
-                                                then GetIsosIdResponseBody200IsoTypeEnumStringPublic
-                                                else GetIsosIdResponseBody200IsoTypeEnumOther val)
+data GetIsosIdResponseBody200IsoType =
+   GetIsosIdResponseBody200IsoTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetIsosIdResponseBody200IsoTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetIsosIdResponseBody200IsoTypeEnumPublic -- ^ Represents the JSON value @"public"@
+  | GetIsosIdResponseBody200IsoTypeEnumPrivate -- ^ Represents the JSON value @"private"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosIdResponseBody200IsoType
+    where toJSON (GetIsosIdResponseBody200IsoTypeOther val) = val
+          toJSON (GetIsosIdResponseBody200IsoTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetIsosIdResponseBody200IsoTypeEnumPublic) = "public"
+          toJSON (GetIsosIdResponseBody200IsoTypeEnumPrivate) = "private"
+instance Data.Aeson.Types.FromJSON.FromJSON GetIsosIdResponseBody200IsoType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "public" -> GetIsosIdResponseBody200IsoTypeEnumPublic
+                                            | val GHC.Classes.== "private" -> GetIsosIdResponseBody200IsoTypeEnumPrivate
+                                            | GHC.Base.otherwise -> GetIsosIdResponseBody200IsoTypeOther val)
+-- | > GET /isos/{id}
+-- 
+-- The same as 'getIsos_Id_' but accepts an explicit configuration.
+getIsos_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the ISO
+  -> m (Network.HTTP.Client.Types.Response GetIsosIdResponse) -- ^ Monadic computation which returns the result of the operation
+getIsos_Id_WithConfiguration config
+                             id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetIsosIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                               GetIsosIdResponseBody200)
+                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > GET /isos/{id}
+-- 
+-- The same as 'getIsos_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getIsos_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the ISO
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getIsos_Id_Raw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > GET /isos/{id}
+-- 
+-- The same as 'getIsos_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getIsos_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the ISO
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getIsos_Id_WithConfigurationRaw config
+                                id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/isos/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)

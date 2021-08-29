@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postNetworks_Id_ActionsChangeProtection
 module HCloud.Operations.PostNetworksIdActionsChangeProtection where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,57 +47,14 @@ import HCloud.Types
 -- Changes the protection configuration of a Network.
 -- 
 -- Note: if the Network object changes during the request, the response will be a “conflict” error.
-postNetworks_Id_ActionsChangeProtection :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                            -- ^ id: ID of the Network
-  -> GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostNetworksIdActionsChangeProtectionResponse))   -- ^ Monad containing the result of the operation
-postNetworks_Id_ActionsChangeProtection config
-                                        id
-                                        body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostNetworksIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/change_protection
--- 
--- The same as 'postNetworks_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'
-postNetworks_Id_ActionsChangeProtectionRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                            HCloud.Common.SecurityScheme s) =>
-                                              HCloud.Common.Configuration s ->
-                                              GHC.Integer.Type.Integer ->
-                                              GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody ->
-                                              m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postNetworks_Id_ActionsChangeProtectionRaw config
-                                           id
-                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/change_protection
--- 
--- Monadic version of 'postNetworks_Id_ActionsChangeProtection' (use with 'HCloud.Common.runWithConfiguration')
-postNetworks_Id_ActionsChangeProtectionM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                          HCloud.Common.SecurityScheme s) =>
-                                            GHC.Integer.Type.Integer ->
-                                            GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody ->
-                                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                               m
-                                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                   (Network.HTTP.Client.Types.Response PostNetworksIdActionsChangeProtectionResponse))
-postNetworks_Id_ActionsChangeProtectionM id
-                                         body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostNetworksIdActionsChangeProtectionResponseBody201)
-                                                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /networks/{id}/actions/change_protection
--- 
--- Monadic version of 'postNetworks_Id_ActionsChangeProtectionRaw' (use with 'HCloud.Common.runWithConfiguration')
-postNetworks_Id_ActionsChangeProtectionRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                             HCloud.Common.SecurityScheme s) =>
-                                               GHC.Integer.Type.Integer ->
-                                               GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody ->
-                                               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                  m
-                                                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postNetworks_Id_ActionsChangeProtectionRawM id
-                                            body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postNetworks_Id_ActionsChangeProtectionRequestBody
+postNetworks_Id_ActionsChangeProtection :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostNetworksIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsChangeProtection id
+                                        body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostNetworksIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/change_protection.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsChangeProtectionRequestBody = PostNetworksIdActionsChangeProtectionRequestBody {
@@ -105,19 +62,22 @@ data PostNetworksIdActionsChangeProtectionRequestBody = PostNetworksIdActionsCha
   postNetworksIdActionsChangeProtectionRequestBodyDelete :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsChangeProtectionRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postNetworksIdActionsChangeProtectionRequestBodyDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postNetworksIdActionsChangeProtectionRequestBodyDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsChangeProtectionRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionRequestBodyDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionRequestBodyDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsChangeProtectionRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsChangeProtectionRequestBody" (\obj -> GHC.Base.pure PostNetworksIdActionsChangeProtectionRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "delete"))
+-- | Create a new 'PostNetworksIdActionsChangeProtectionRequestBody' with all required fields.
+mkPostNetworksIdActionsChangeProtectionRequestBody :: PostNetworksIdActionsChangeProtectionRequestBody
+mkPostNetworksIdActionsChangeProtectionRequestBody = PostNetworksIdActionsChangeProtectionRequestBody{postNetworksIdActionsChangeProtectionRequestBodyDelete = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'postNetworks_Id_ActionsChangeProtection'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostNetworksIdActionsChangeProtectionResponseError' is used.
-data PostNetworksIdActionsChangeProtectionResponse =                                                       
-   PostNetworksIdActionsChangeProtectionResponseError GHC.Base.String                                      -- ^ Means either no matching case available or a parse error
-  | PostNetworksIdActionsChangeProtectionResponse201 PostNetworksIdActionsChangeProtectionResponseBody201  -- ^ The \`action\` key contains the \`change_protection\` Action
+data PostNetworksIdActionsChangeProtectionResponse =
+   PostNetworksIdActionsChangeProtectionResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostNetworksIdActionsChangeProtectionResponse201 PostNetworksIdActionsChangeProtectionResponseBody201 -- ^ The \`action\` key contains the \`change_protection\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostNetworksIdActionsChangeProtectionResponseBody201
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsChangeProtectionResponseBody201 = PostNetworksIdActionsChangeProtectionResponseBody201 {
@@ -125,39 +85,61 @@ data PostNetworksIdActionsChangeProtectionResponseBody201 = PostNetworksIdAction
   postNetworksIdActionsChangeProtectionResponseBody201Action :: PostNetworksIdActionsChangeProtectionResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postNetworksIdActionsChangeProtectionResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postNetworksIdActionsChangeProtectionResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsChangeProtectionResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsChangeProtectionResponseBody201" (\obj -> GHC.Base.pure PostNetworksIdActionsChangeProtectionResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostNetworksIdActionsChangeProtectionResponseBody201Action
+-- | Create a new 'PostNetworksIdActionsChangeProtectionResponseBody201' with all required fields.
+mkPostNetworksIdActionsChangeProtectionResponseBody201 :: PostNetworksIdActionsChangeProtectionResponseBody201Action -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201Action'
+  -> PostNetworksIdActionsChangeProtectionResponseBody201
+mkPostNetworksIdActionsChangeProtectionResponseBody201 postNetworksIdActionsChangeProtectionResponseBody201Action = PostNetworksIdActionsChangeProtectionResponseBody201{postNetworksIdActionsChangeProtectionResponseBody201Action = postNetworksIdActionsChangeProtectionResponseBody201Action}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsChangeProtectionResponseBody201Action = PostNetworksIdActionsChangeProtectionResponseBody201Action {
   -- | command: Command executed in the Action
   postNetworksIdActionsChangeProtectionResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postNetworksIdActionsChangeProtectionResponseBody201ActionError :: PostNetworksIdActionsChangeProtectionResponseBody201ActionError
+  , postNetworksIdActionsChangeProtectionResponseBody201ActionError :: (GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postNetworksIdActionsChangeProtectionResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postNetworksIdActionsChangeProtectionResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postNetworksIdActionsChangeProtectionResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postNetworksIdActionsChangeProtectionResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postNetworksIdActionsChangeProtectionResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postNetworksIdActionsChangeProtectionResponseBody201ActionResources :: ([] PostNetworksIdActionsChangeProtectionResponseBody201ActionResources)
+  , postNetworksIdActionsChangeProtectionResponseBody201ActionResources :: ([PostNetworksIdActionsChangeProtectionResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postNetworksIdActionsChangeProtectionResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postNetworksIdActionsChangeProtectionResponseBody201ActionStatus :: PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postNetworksIdActionsChangeProtectionResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postNetworksIdActionsChangeProtectionResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postNetworksIdActionsChangeProtectionResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postNetworksIdActionsChangeProtectionResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postNetworksIdActionsChangeProtectionResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postNetworksIdActionsChangeProtectionResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postNetworksIdActionsChangeProtectionResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postNetworksIdActionsChangeProtectionResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postNetworksIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postNetworksIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postNetworksIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postNetworksIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postNetworksIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postNetworksIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postNetworksIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postNetworksIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsChangeProtectionResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsChangeProtectionResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostNetworksIdActionsChangeProtectionResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostNetworksIdActionsChangeProtectionResponseBody201ActionError
+-- | Create a new 'PostNetworksIdActionsChangeProtectionResponseBody201Action' with all required fields.
+mkPostNetworksIdActionsChangeProtectionResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionResponseBody201ActionError -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionProgress'
+  -> [PostNetworksIdActionsChangeProtectionResponseBody201ActionResources] -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionStarted'
+  -> PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionStatus'
+  -> PostNetworksIdActionsChangeProtectionResponseBody201Action
+mkPostNetworksIdActionsChangeProtectionResponseBody201Action postNetworksIdActionsChangeProtectionResponseBody201ActionCommand postNetworksIdActionsChangeProtectionResponseBody201ActionError postNetworksIdActionsChangeProtectionResponseBody201ActionFinished postNetworksIdActionsChangeProtectionResponseBody201ActionId postNetworksIdActionsChangeProtectionResponseBody201ActionProgress postNetworksIdActionsChangeProtectionResponseBody201ActionResources postNetworksIdActionsChangeProtectionResponseBody201ActionStarted postNetworksIdActionsChangeProtectionResponseBody201ActionStatus = PostNetworksIdActionsChangeProtectionResponseBody201Action{postNetworksIdActionsChangeProtectionResponseBody201ActionCommand = postNetworksIdActionsChangeProtectionResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionError = postNetworksIdActionsChangeProtectionResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionFinished = postNetworksIdActionsChangeProtectionResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionId = postNetworksIdActionsChangeProtectionResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionProgress = postNetworksIdActionsChangeProtectionResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionResources = postNetworksIdActionsChangeProtectionResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionStarted = postNetworksIdActionsChangeProtectionResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postNetworksIdActionsChangeProtectionResponseBody201ActionStatus = postNetworksIdActionsChangeProtectionResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostNetworksIdActionsChangeProtectionResponseBody201ActionError = PostNetworksIdActionsChangeProtectionResponseBody201ActionError {
@@ -167,47 +149,86 @@ data PostNetworksIdActionsChangeProtectionResponseBody201ActionError = PostNetwo
   , postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsChangeProtectionResponseBody201ActionError" (\obj -> (GHC.Base.pure PostNetworksIdActionsChangeProtectionResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostNetworksIdActionsChangeProtectionResponseBody201ActionResources
+-- | Create a new 'PostNetworksIdActionsChangeProtectionResponseBody201ActionError' with all required fields.
+mkPostNetworksIdActionsChangeProtectionResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage'
+  -> PostNetworksIdActionsChangeProtectionResponseBody201ActionError
+mkPostNetworksIdActionsChangeProtectionResponseBody201ActionError postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage = PostNetworksIdActionsChangeProtectionResponseBody201ActionError{postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode = postNetworksIdActionsChangeProtectionResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                               postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage = postNetworksIdActionsChangeProtectionResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/networks\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostNetworksIdActionsChangeProtectionResponseBody201ActionResources = PostNetworksIdActionsChangeProtectionResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostNetworksIdActionsChangeProtectionResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostNetworksIdActionsChangeProtectionResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
+-- | Create a new 'PostNetworksIdActionsChangeProtectionResponseBody201ActionResources' with all required fields.
+mkPostNetworksIdActionsChangeProtectionResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType'
+  -> PostNetworksIdActionsChangeProtectionResponseBody201ActionResources
+mkPostNetworksIdActionsChangeProtectionResponseBody201ActionResources postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType = PostNetworksIdActionsChangeProtectionResponseBody201ActionResources{postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId = postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                          postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType = postNetworksIdActionsChangeProtectionResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/networks\/{id}\/actions\/change_protection.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
-    = PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-    | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-    | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
-    where toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumOther val)
+data PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus =
+   PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
+    where toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusOther val) = val
+          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostNetworksIdActionsChangeProtectionResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostNetworksIdActionsChangeProtectionResponseBody201ActionStatusOther val)
+-- | > POST /networks/{id}/actions/change_protection
+-- 
+-- The same as 'postNetworks_Id_ActionsChangeProtection' but accepts an explicit configuration.
+postNetworks_Id_ActionsChangeProtectionWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostNetworksIdActionsChangeProtectionResponse) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsChangeProtectionWithConfiguration config
+                                                         id
+                                                         body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostNetworksIdActionsChangeProtectionResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostNetworksIdActionsChangeProtectionResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostNetworksIdActionsChangeProtectionResponseBody201)
+                                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /networks/{id}/actions/change_protection
+-- 
+-- The same as 'postNetworks_Id_ActionsChangeProtection' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postNetworks_Id_ActionsChangeProtectionRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsChangeProtectionRaw id
+                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /networks/{id}/actions/change_protection
+-- 
+-- The same as 'postNetworks_Id_ActionsChangeProtection' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postNetworks_Id_ActionsChangeProtectionWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Network
+  -> GHC.Maybe.Maybe PostNetworksIdActionsChangeProtectionRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postNetworks_Id_ActionsChangeProtectionWithConfigurationRaw config
+                                                            id
+                                                            body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/networks/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/change_protection"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

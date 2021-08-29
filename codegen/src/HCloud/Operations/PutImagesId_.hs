@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putImages_Id_
 module HCloud.Operations.PutImagesId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,109 +47,40 @@ import HCloud.Types
 -- Updates the Image. You may change the description, convert a Backup Image to a Snapshot Image or change the Image labels. Only Images of type \`snapshot\` and \`backup\` can be updated.
 -- 
 -- Note that when updating labels, the current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
-putImages_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                  -- ^ id: ID of the Image
-  -> GHC.Maybe.Maybe PutImagesIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutImagesIdResponse))   -- ^ Monad containing the result of the operation
-putImages_Id_ config
-              id
-              body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutImagesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutImagesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                     PutImagesIdResponseBody200)
-                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /images/{id}
--- 
--- The same as 'putImages_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putImages_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                  HCloud.Common.SecurityScheme s) =>
-                    HCloud.Common.Configuration s ->
-                    GHC.Integer.Type.Integer ->
-                    GHC.Maybe.Maybe PutImagesIdRequestBody ->
-                    m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putImages_Id_Raw config
-                 id
-                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /images/{id}
--- 
--- Monadic version of 'putImages_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putImages_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  GHC.Integer.Type.Integer ->
-                  GHC.Maybe.Maybe PutImagesIdRequestBody ->
-                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                     m
-                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                         (Network.HTTP.Client.Types.Response PutImagesIdResponse))
-putImages_Id_M id
-               body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutImagesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutImagesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                      PutImagesIdResponseBody200)
-                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /images/{id}
--- 
--- Monadic version of 'putImages_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putImages_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     GHC.Integer.Type.Integer ->
-                     GHC.Maybe.Maybe PutImagesIdRequestBody ->
-                     Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                        m
-                                                        (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putImages_Id_RawM id
-                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putImages_Id_RequestBody
+putImages_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PutImagesIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutImagesIdResponse) -- ^ Monadic computation which returns the result of the operation
+putImages_Id_ id
+              body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutImagesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutImagesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                      PutImagesIdResponseBody200)
+                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/images\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutImagesIdRequestBody = PutImagesIdRequestBody {
   -- | description: New description of Image
   putImagesIdRequestBodyDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | labels: User-defined labels (key-value pairs)
-  , putImagesIdRequestBodyLabels :: (GHC.Maybe.Maybe PutImagesIdRequestBodyLabels)
-  -- | type: Destination Image type to convert to
-  , putImagesIdRequestBodyType :: (GHC.Maybe.Maybe PutImagesIdRequestBodyType)
+  , putImagesIdRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (putImagesIdRequestBodyDescription obj) : (Data.Aeson..=) "labels" (putImagesIdRequestBodyLabels obj) : (Data.Aeson..=) "type" (putImagesIdRequestBodyType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (putImagesIdRequestBodyDescription obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putImagesIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "type" (putImagesIdRequestBodyType obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= putImagesIdRequestBodyDescription obj : "labels" Data.Aeson.Types.ToJSON..= putImagesIdRequestBodyLabels obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "snapshot" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= putImagesIdRequestBodyDescription obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putImagesIdRequestBodyLabels obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "snapshot")))
 instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdRequestBody
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdRequestBody" (\obj -> ((GHC.Base.pure PutImagesIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type"))
--- | Defines the data type for the schema putImages_Id_RequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PutImagesIdRequestBodyLabels = PutImagesIdRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdRequestBodyLabels" (\obj -> GHC.Base.pure PutImagesIdRequestBodyLabels)
--- | Defines the enum schema putImages_Id_RequestBodyType
--- 
--- Destination Image type to convert to
-data PutImagesIdRequestBodyType
-    = PutImagesIdRequestBodyTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutImagesIdRequestBodyTypeEnumTyped Data.Text.Internal.Text
-    | PutImagesIdRequestBodyTypeEnumStringSnapshot
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdRequestBodyType
-    where toJSON (PutImagesIdRequestBodyTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdRequestBodyTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdRequestBodyTypeEnumStringSnapshot) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot"
-instance Data.Aeson.FromJSON PutImagesIdRequestBodyType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot")
-                                          then PutImagesIdRequestBodyTypeEnumStringSnapshot
-                                          else PutImagesIdRequestBodyTypeEnumOther val)
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdRequestBody" (\obj -> (GHC.Base.pure PutImagesIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels"))
+-- | Create a new 'PutImagesIdRequestBody' with all required fields.
+mkPutImagesIdRequestBody :: PutImagesIdRequestBody
+mkPutImagesIdRequestBody = PutImagesIdRequestBody{putImagesIdRequestBodyDescription = GHC.Maybe.Nothing,
+                                                  putImagesIdRequestBodyLabels = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putImages_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutImagesIdResponseError' is used.
-data PutImagesIdResponse =                             
-   PutImagesIdResponseError GHC.Base.String            -- ^ Means either no matching case available or a parse error
-  | PutImagesIdResponse200 PutImagesIdResponseBody200  -- ^ The image key in the reply contains the modified Image object
+data PutImagesIdResponse =
+   PutImagesIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutImagesIdResponse200 PutImagesIdResponseBody200 -- ^ The image key in the reply contains the modified Image object
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutImagesIdResponseBody200
+-- | Defines the object schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutImagesIdResponseBody200 = PutImagesIdResponseBody200 {
@@ -157,43 +88,46 @@ data PutImagesIdResponseBody200 = PutImagesIdResponseBody200 {
   putImagesIdResponseBody200Image :: (GHC.Maybe.Maybe PutImagesIdResponseBody200Image)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "image" (putImagesIdResponseBody200Image obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "image" (putImagesIdResponseBody200Image obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("image" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200Image obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("image" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200Image obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdResponseBody200" (\obj -> GHC.Base.pure PutImagesIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "image"))
--- | Defines the data type for the schema PutImagesIdResponseBody200Image
+-- | Create a new 'PutImagesIdResponseBody200' with all required fields.
+mkPutImagesIdResponseBody200 :: PutImagesIdResponseBody200
+mkPutImagesIdResponseBody200 = PutImagesIdResponseBody200{putImagesIdResponseBody200Image = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema.properties.image@ in the specification.
 -- 
 -- 
 data PutImagesIdResponseBody200Image = PutImagesIdResponseBody200Image {
   -- | bound_to: ID of Server the Image is bound to. Only set for Images of type \`backup\`.
-  putImagesIdResponseBody200ImageBoundTo :: GHC.Integer.Type.Integer
+  putImagesIdResponseBody200ImageBoundTo :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | build_id: Build ID of the Image
   , putImagesIdResponseBody200ImageBuildId :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , putImagesIdResponseBody200ImageCreated :: Data.Text.Internal.Text
   -- | created_from: Information about the Server the Image was created from
-  , putImagesIdResponseBody200ImageCreatedFrom :: PutImagesIdResponseBody200ImageCreatedFrom
+  , putImagesIdResponseBody200ImageCreatedFrom :: (GHC.Maybe.Maybe PutImagesIdResponseBody200ImageCreatedFrom)
   -- | deleted: Point in time where the Image was deleted (in ISO-8601 format)
-  , putImagesIdResponseBody200ImageDeleted :: Data.Text.Internal.Text
+  , putImagesIdResponseBody200ImageDeleted :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | deprecated: Point in time when the Image is considered to be deprecated (in ISO-8601 format)
-  , putImagesIdResponseBody200ImageDeprecated :: Data.Text.Internal.Text
+  , putImagesIdResponseBody200ImageDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Image
   , putImagesIdResponseBody200ImageDescription :: Data.Text.Internal.Text
   -- | disk_size: Size of the disk contained in the Image in GB
   , putImagesIdResponseBody200ImageDiskSize :: GHC.Types.Double
   -- | id: ID of the Resource
-  , putImagesIdResponseBody200ImageId :: GHC.Integer.Type.Integer
+  , putImagesIdResponseBody200ImageId :: GHC.Types.Int
   -- | image_size: Size of the Image file in our storage in GB. For snapshot Images this is the value relevant for calculating costs for the Image.
-  , putImagesIdResponseBody200ImageImageSize :: GHC.Types.Double
+  , putImagesIdResponseBody200ImageImageSize :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | labels: User-defined labels (key-value pairs)
-  , putImagesIdResponseBody200ImageLabels :: PutImagesIdResponseBody200ImageLabels
+  , putImagesIdResponseBody200ImageLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Unique identifier of the Image. This value is only set for system Images.
-  , putImagesIdResponseBody200ImageName :: Data.Text.Internal.Text
+  , putImagesIdResponseBody200ImageName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | os_flavor: Flavor of operating system contained in the Image
   , putImagesIdResponseBody200ImageOsFlavor :: PutImagesIdResponseBody200ImageOsFlavor
   -- | os_version: Operating system version
-  , putImagesIdResponseBody200ImageOsVersion :: Data.Text.Internal.Text
+  , putImagesIdResponseBody200ImageOsVersion :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | protection: Protection configuration for the Resource
   , putImagesIdResponseBody200ImageProtection :: PutImagesIdResponseBody200ImageProtection
   -- | rapid_deploy: Indicates that rapid deploy of the Image is available
@@ -204,71 +138,96 @@ data PutImagesIdResponseBody200Image = PutImagesIdResponseBody200Image {
   , putImagesIdResponseBody200ImageType :: PutImagesIdResponseBody200ImageType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200Image
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "bound_to" (putImagesIdResponseBody200ImageBoundTo obj) : (Data.Aeson..=) "build_id" (putImagesIdResponseBody200ImageBuildId obj) : (Data.Aeson..=) "created" (putImagesIdResponseBody200ImageCreated obj) : (Data.Aeson..=) "created_from" (putImagesIdResponseBody200ImageCreatedFrom obj) : (Data.Aeson..=) "deleted" (putImagesIdResponseBody200ImageDeleted obj) : (Data.Aeson..=) "deprecated" (putImagesIdResponseBody200ImageDeprecated obj) : (Data.Aeson..=) "description" (putImagesIdResponseBody200ImageDescription obj) : (Data.Aeson..=) "disk_size" (putImagesIdResponseBody200ImageDiskSize obj) : (Data.Aeson..=) "id" (putImagesIdResponseBody200ImageId obj) : (Data.Aeson..=) "image_size" (putImagesIdResponseBody200ImageImageSize obj) : (Data.Aeson..=) "labels" (putImagesIdResponseBody200ImageLabels obj) : (Data.Aeson..=) "name" (putImagesIdResponseBody200ImageName obj) : (Data.Aeson..=) "os_flavor" (putImagesIdResponseBody200ImageOsFlavor obj) : (Data.Aeson..=) "os_version" (putImagesIdResponseBody200ImageOsVersion obj) : (Data.Aeson..=) "protection" (putImagesIdResponseBody200ImageProtection obj) : (Data.Aeson..=) "rapid_deploy" (putImagesIdResponseBody200ImageRapidDeploy obj) : (Data.Aeson..=) "status" (putImagesIdResponseBody200ImageStatus obj) : (Data.Aeson..=) "type" (putImagesIdResponseBody200ImageType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "bound_to" (putImagesIdResponseBody200ImageBoundTo obj) GHC.Base.<> ((Data.Aeson..=) "build_id" (putImagesIdResponseBody200ImageBuildId obj) GHC.Base.<> ((Data.Aeson..=) "created" (putImagesIdResponseBody200ImageCreated obj) GHC.Base.<> ((Data.Aeson..=) "created_from" (putImagesIdResponseBody200ImageCreatedFrom obj) GHC.Base.<> ((Data.Aeson..=) "deleted" (putImagesIdResponseBody200ImageDeleted obj) GHC.Base.<> ((Data.Aeson..=) "deprecated" (putImagesIdResponseBody200ImageDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (putImagesIdResponseBody200ImageDescription obj) GHC.Base.<> ((Data.Aeson..=) "disk_size" (putImagesIdResponseBody200ImageDiskSize obj) GHC.Base.<> ((Data.Aeson..=) "id" (putImagesIdResponseBody200ImageId obj) GHC.Base.<> ((Data.Aeson..=) "image_size" (putImagesIdResponseBody200ImageImageSize obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putImagesIdResponseBody200ImageLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (putImagesIdResponseBody200ImageName obj) GHC.Base.<> ((Data.Aeson..=) "os_flavor" (putImagesIdResponseBody200ImageOsFlavor obj) GHC.Base.<> ((Data.Aeson..=) "os_version" (putImagesIdResponseBody200ImageOsVersion obj) GHC.Base.<> ((Data.Aeson..=) "protection" (putImagesIdResponseBody200ImageProtection obj) GHC.Base.<> ((Data.Aeson..=) "rapid_deploy" (putImagesIdResponseBody200ImageRapidDeploy obj) GHC.Base.<> ((Data.Aeson..=) "status" (putImagesIdResponseBody200ImageStatus obj) GHC.Base.<> (Data.Aeson..=) "type" (putImagesIdResponseBody200ImageType obj))))))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200Image
+    where toJSON obj = Data.Aeson.Types.Internal.object ("bound_to" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageBoundTo obj : "build_id" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageBuildId obj : "created" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreated obj : "created_from" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreatedFrom obj : "deleted" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDeleted obj : "deprecated" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDeprecated obj : "description" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDescription obj : "disk_size" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDiskSize obj : "id" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageId obj : "image_size" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageImageSize obj : "labels" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageLabels obj : "name" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageName obj : "os_flavor" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageOsFlavor obj : "os_version" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageOsVersion obj : "protection" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageProtection obj : "rapid_deploy" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageRapidDeploy obj : "status" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageStatus obj : "type" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("bound_to" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageBoundTo obj) GHC.Base.<> (("build_id" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageBuildId obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreated obj) GHC.Base.<> (("created_from" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreatedFrom obj) GHC.Base.<> (("deleted" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDeleted obj) GHC.Base.<> (("deprecated" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDescription obj) GHC.Base.<> (("disk_size" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageDiskSize obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageId obj) GHC.Base.<> (("image_size" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageImageSize obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageName obj) GHC.Base.<> (("os_flavor" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageOsFlavor obj) GHC.Base.<> (("os_version" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageOsVersion obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageProtection obj) GHC.Base.<> (("rapid_deploy" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageRapidDeploy obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageStatus obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageType obj))))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200Image
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdResponseBody200Image" (\obj -> (((((((((((((((((GHC.Base.pure PutImagesIdResponseBody200Image GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "bound_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "build_id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created_from")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deleted")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "disk_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_flavor")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_version")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "rapid_deploy")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema PutImagesIdResponseBody200ImageCreated_from
+-- | Create a new 'PutImagesIdResponseBody200Image' with all required fields.
+mkPutImagesIdResponseBody200Image :: GHC.Maybe.Maybe GHC.Types.Int -- ^ 'putImagesIdResponseBody200ImageBoundTo'
+  -> Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageCreated'
+  -> GHC.Maybe.Maybe PutImagesIdResponseBody200ImageCreatedFrom -- ^ 'putImagesIdResponseBody200ImageCreatedFrom'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageDeleted'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageDescription'
+  -> GHC.Types.Double -- ^ 'putImagesIdResponseBody200ImageDiskSize'
+  -> GHC.Types.Int -- ^ 'putImagesIdResponseBody200ImageId'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'putImagesIdResponseBody200ImageImageSize'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putImagesIdResponseBody200ImageLabels'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageName'
+  -> PutImagesIdResponseBody200ImageOsFlavor -- ^ 'putImagesIdResponseBody200ImageOsFlavor'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageOsVersion'
+  -> PutImagesIdResponseBody200ImageProtection -- ^ 'putImagesIdResponseBody200ImageProtection'
+  -> PutImagesIdResponseBody200ImageStatus -- ^ 'putImagesIdResponseBody200ImageStatus'
+  -> PutImagesIdResponseBody200ImageType -- ^ 'putImagesIdResponseBody200ImageType'
+  -> PutImagesIdResponseBody200Image
+mkPutImagesIdResponseBody200Image putImagesIdResponseBody200ImageBoundTo putImagesIdResponseBody200ImageCreated putImagesIdResponseBody200ImageCreatedFrom putImagesIdResponseBody200ImageDeleted putImagesIdResponseBody200ImageDeprecated putImagesIdResponseBody200ImageDescription putImagesIdResponseBody200ImageDiskSize putImagesIdResponseBody200ImageId putImagesIdResponseBody200ImageImageSize putImagesIdResponseBody200ImageLabels putImagesIdResponseBody200ImageName putImagesIdResponseBody200ImageOsFlavor putImagesIdResponseBody200ImageOsVersion putImagesIdResponseBody200ImageProtection putImagesIdResponseBody200ImageStatus putImagesIdResponseBody200ImageType = PutImagesIdResponseBody200Image{putImagesIdResponseBody200ImageBoundTo = putImagesIdResponseBody200ImageBoundTo,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageBuildId = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageCreated = putImagesIdResponseBody200ImageCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageCreatedFrom = putImagesIdResponseBody200ImageCreatedFrom,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageDeleted = putImagesIdResponseBody200ImageDeleted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageDeprecated = putImagesIdResponseBody200ImageDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageDescription = putImagesIdResponseBody200ImageDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageDiskSize = putImagesIdResponseBody200ImageDiskSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageId = putImagesIdResponseBody200ImageId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageImageSize = putImagesIdResponseBody200ImageImageSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageLabels = putImagesIdResponseBody200ImageLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageName = putImagesIdResponseBody200ImageName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageOsFlavor = putImagesIdResponseBody200ImageOsFlavor,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageOsVersion = putImagesIdResponseBody200ImageOsVersion,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageProtection = putImagesIdResponseBody200ImageProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageRapidDeploy = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageStatus = putImagesIdResponseBody200ImageStatus,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           putImagesIdResponseBody200ImageType = putImagesIdResponseBody200ImageType}
+-- | Defines the object schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema.properties.image.properties.created_from@ in the specification.
 -- 
 -- Information about the Server the Image was created from
 data PutImagesIdResponseBody200ImageCreatedFrom = PutImagesIdResponseBody200ImageCreatedFrom {
   -- | id: ID of the Server the Image was created from
-  putImagesIdResponseBody200ImageCreatedFromId :: GHC.Integer.Type.Integer
+  putImagesIdResponseBody200ImageCreatedFromId :: GHC.Types.Int
   -- | name: Server name at the time the Image was created
   , putImagesIdResponseBody200ImageCreatedFromName :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200ImageCreatedFrom
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (putImagesIdResponseBody200ImageCreatedFromId obj) : (Data.Aeson..=) "name" (putImagesIdResponseBody200ImageCreatedFromName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (putImagesIdResponseBody200ImageCreatedFromId obj) GHC.Base.<> (Data.Aeson..=) "name" (putImagesIdResponseBody200ImageCreatedFromName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200ImageCreatedFrom
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreatedFromId obj : "name" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreatedFromName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreatedFromId obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageCreatedFromName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200ImageCreatedFrom
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdResponseBody200ImageCreatedFrom" (\obj -> (GHC.Base.pure PutImagesIdResponseBody200ImageCreatedFrom GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name"))
--- | Defines the data type for the schema PutImagesIdResponseBody200ImageLabels
--- 
--- User-defined labels (key-value pairs)
-data PutImagesIdResponseBody200ImageLabels = PutImagesIdResponseBody200ImageLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200ImageLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200ImageLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdResponseBody200ImageLabels" (\obj -> GHC.Base.pure PutImagesIdResponseBody200ImageLabels)
--- | Defines the enum schema PutImagesIdResponseBody200ImageOs_flavor
+-- | Create a new 'PutImagesIdResponseBody200ImageCreatedFrom' with all required fields.
+mkPutImagesIdResponseBody200ImageCreatedFrom :: GHC.Types.Int -- ^ 'putImagesIdResponseBody200ImageCreatedFromId'
+  -> Data.Text.Internal.Text -- ^ 'putImagesIdResponseBody200ImageCreatedFromName'
+  -> PutImagesIdResponseBody200ImageCreatedFrom
+mkPutImagesIdResponseBody200ImageCreatedFrom putImagesIdResponseBody200ImageCreatedFromId putImagesIdResponseBody200ImageCreatedFromName = PutImagesIdResponseBody200ImageCreatedFrom{putImagesIdResponseBody200ImageCreatedFromId = putImagesIdResponseBody200ImageCreatedFromId,
+                                                                                                                                                                                      putImagesIdResponseBody200ImageCreatedFromName = putImagesIdResponseBody200ImageCreatedFromName}
+-- | Defines the enum schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema.properties.image.properties.os_flavor@ in the specification.
 -- 
 -- Flavor of operating system contained in the Image
-data PutImagesIdResponseBody200ImageOsFlavor
-    = PutImagesIdResponseBody200ImageOsFlavorEnumOther Data.Aeson.Types.Internal.Value
-    | PutImagesIdResponseBody200ImageOsFlavorEnumTyped Data.Text.Internal.Text
-    | PutImagesIdResponseBody200ImageOsFlavorEnumStringCentos
-    | PutImagesIdResponseBody200ImageOsFlavorEnumStringDebian
-    | PutImagesIdResponseBody200ImageOsFlavorEnumStringFedora
-    | PutImagesIdResponseBody200ImageOsFlavorEnumStringUbuntu
-    | PutImagesIdResponseBody200ImageOsFlavorEnumStringUnknown
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200ImageOsFlavor
-    where toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumStringCentos) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos"
-          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumStringDebian) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian"
-          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumStringFedora) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora"
-          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumStringUbuntu) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu"
-          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumStringUnknown) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown"
-instance Data.Aeson.FromJSON PutImagesIdResponseBody200ImageOsFlavor
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos")
-                                          then PutImagesIdResponseBody200ImageOsFlavorEnumStringCentos
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian")
-                                                then PutImagesIdResponseBody200ImageOsFlavorEnumStringDebian
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora")
-                                                      then PutImagesIdResponseBody200ImageOsFlavorEnumStringFedora
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu")
-                                                            then PutImagesIdResponseBody200ImageOsFlavorEnumStringUbuntu
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown")
-                                                                  then PutImagesIdResponseBody200ImageOsFlavorEnumStringUnknown
-                                                                  else PutImagesIdResponseBody200ImageOsFlavorEnumOther val)
--- | Defines the data type for the schema PutImagesIdResponseBody200ImageProtection
+data PutImagesIdResponseBody200ImageOsFlavor =
+   PutImagesIdResponseBody200ImageOsFlavorOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutImagesIdResponseBody200ImageOsFlavorTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutImagesIdResponseBody200ImageOsFlavorEnumUbuntu -- ^ Represents the JSON value @"ubuntu"@
+  | PutImagesIdResponseBody200ImageOsFlavorEnumCentos -- ^ Represents the JSON value @"centos"@
+  | PutImagesIdResponseBody200ImageOsFlavorEnumDebian -- ^ Represents the JSON value @"debian"@
+  | PutImagesIdResponseBody200ImageOsFlavorEnumFedora -- ^ Represents the JSON value @"fedora"@
+  | PutImagesIdResponseBody200ImageOsFlavorEnumUnknown -- ^ Represents the JSON value @"unknown"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200ImageOsFlavor
+    where toJSON (PutImagesIdResponseBody200ImageOsFlavorOther val) = val
+          toJSON (PutImagesIdResponseBody200ImageOsFlavorTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumUbuntu) = "ubuntu"
+          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumCentos) = "centos"
+          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumDebian) = "debian"
+          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumFedora) = "fedora"
+          toJSON (PutImagesIdResponseBody200ImageOsFlavorEnumUnknown) = "unknown"
+instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200ImageOsFlavor
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ubuntu" -> PutImagesIdResponseBody200ImageOsFlavorEnumUbuntu
+                                            | val GHC.Classes.== "centos" -> PutImagesIdResponseBody200ImageOsFlavorEnumCentos
+                                            | val GHC.Classes.== "debian" -> PutImagesIdResponseBody200ImageOsFlavorEnumDebian
+                                            | val GHC.Classes.== "fedora" -> PutImagesIdResponseBody200ImageOsFlavorEnumFedora
+                                            | val GHC.Classes.== "unknown" -> PutImagesIdResponseBody200ImageOsFlavorEnumUnknown
+                                            | GHC.Base.otherwise -> PutImagesIdResponseBody200ImageOsFlavorOther val)
+-- | Defines the object schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema.properties.image.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PutImagesIdResponseBody200ImageProtection = PutImagesIdResponseBody200ImageProtection {
@@ -276,64 +235,90 @@ data PutImagesIdResponseBody200ImageProtection = PutImagesIdResponseBody200Image
   putImagesIdResponseBody200ImageProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200ImageProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (putImagesIdResponseBody200ImageProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (putImagesIdResponseBody200ImageProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200ImageProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= putImagesIdResponseBody200ImageProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200ImageProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutImagesIdResponseBody200ImageProtection" (\obj -> GHC.Base.pure PutImagesIdResponseBody200ImageProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema PutImagesIdResponseBody200ImageStatus
+-- | Create a new 'PutImagesIdResponseBody200ImageProtection' with all required fields.
+mkPutImagesIdResponseBody200ImageProtection :: GHC.Types.Bool -- ^ 'putImagesIdResponseBody200ImageProtectionDelete'
+  -> PutImagesIdResponseBody200ImageProtection
+mkPutImagesIdResponseBody200ImageProtection putImagesIdResponseBody200ImageProtectionDelete = PutImagesIdResponseBody200ImageProtection{putImagesIdResponseBody200ImageProtectionDelete = putImagesIdResponseBody200ImageProtectionDelete}
+-- | Defines the enum schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema.properties.image.properties.status@ in the specification.
 -- 
 -- Whether the Image can be used or if it\'s still being created or unavailable
-data PutImagesIdResponseBody200ImageStatus
-    = PutImagesIdResponseBody200ImageStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PutImagesIdResponseBody200ImageStatusEnumTyped Data.Text.Internal.Text
-    | PutImagesIdResponseBody200ImageStatusEnumStringAvailable
-    | PutImagesIdResponseBody200ImageStatusEnumStringCreating
-    | PutImagesIdResponseBody200ImageStatusEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200ImageStatus
-    where toJSON (PutImagesIdResponseBody200ImageStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdResponseBody200ImageStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdResponseBody200ImageStatusEnumStringAvailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (PutImagesIdResponseBody200ImageStatusEnumStringCreating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating"
-          toJSON (PutImagesIdResponseBody200ImageStatusEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON PutImagesIdResponseBody200ImageStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then PutImagesIdResponseBody200ImageStatusEnumStringAvailable
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating")
-                                                then PutImagesIdResponseBody200ImageStatusEnumStringCreating
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                      then PutImagesIdResponseBody200ImageStatusEnumStringUnavailable
-                                                      else PutImagesIdResponseBody200ImageStatusEnumOther val)
--- | Defines the enum schema PutImagesIdResponseBody200ImageType
+data PutImagesIdResponseBody200ImageStatus =
+   PutImagesIdResponseBody200ImageStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutImagesIdResponseBody200ImageStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutImagesIdResponseBody200ImageStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | PutImagesIdResponseBody200ImageStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  | PutImagesIdResponseBody200ImageStatusEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200ImageStatus
+    where toJSON (PutImagesIdResponseBody200ImageStatusOther val) = val
+          toJSON (PutImagesIdResponseBody200ImageStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutImagesIdResponseBody200ImageStatusEnumAvailable) = "available"
+          toJSON (PutImagesIdResponseBody200ImageStatusEnumCreating) = "creating"
+          toJSON (PutImagesIdResponseBody200ImageStatusEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200ImageStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> PutImagesIdResponseBody200ImageStatusEnumAvailable
+                                            | val GHC.Classes.== "creating" -> PutImagesIdResponseBody200ImageStatusEnumCreating
+                                            | val GHC.Classes.== "unavailable" -> PutImagesIdResponseBody200ImageStatusEnumUnavailable
+                                            | GHC.Base.otherwise -> PutImagesIdResponseBody200ImageStatusOther val)
+-- | Defines the enum schema located at @paths.\/images\/{id}.PUT.responses.200.content.application\/json.schema.properties.image.properties.type@ in the specification.
 -- 
 -- Type of the Image
-data PutImagesIdResponseBody200ImageType
-    = PutImagesIdResponseBody200ImageTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutImagesIdResponseBody200ImageTypeEnumTyped Data.Text.Internal.Text
-    | PutImagesIdResponseBody200ImageTypeEnumStringApp
-    | PutImagesIdResponseBody200ImageTypeEnumStringBackup
-    | PutImagesIdResponseBody200ImageTypeEnumStringSnapshot
-    | PutImagesIdResponseBody200ImageTypeEnumStringSystem
-    | PutImagesIdResponseBody200ImageTypeEnumStringTemporary
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutImagesIdResponseBody200ImageType
-    where toJSON (PutImagesIdResponseBody200ImageTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdResponseBody200ImageTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutImagesIdResponseBody200ImageTypeEnumStringApp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app"
-          toJSON (PutImagesIdResponseBody200ImageTypeEnumStringBackup) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup"
-          toJSON (PutImagesIdResponseBody200ImageTypeEnumStringSnapshot) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot"
-          toJSON (PutImagesIdResponseBody200ImageTypeEnumStringSystem) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system"
-          toJSON (PutImagesIdResponseBody200ImageTypeEnumStringTemporary) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary"
-instance Data.Aeson.FromJSON PutImagesIdResponseBody200ImageType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app")
-                                          then PutImagesIdResponseBody200ImageTypeEnumStringApp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup")
-                                                then PutImagesIdResponseBody200ImageTypeEnumStringBackup
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot")
-                                                      then PutImagesIdResponseBody200ImageTypeEnumStringSnapshot
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system")
-                                                            then PutImagesIdResponseBody200ImageTypeEnumStringSystem
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary")
-                                                                  then PutImagesIdResponseBody200ImageTypeEnumStringTemporary
-                                                                  else PutImagesIdResponseBody200ImageTypeEnumOther val)
+data PutImagesIdResponseBody200ImageType =
+   PutImagesIdResponseBody200ImageTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutImagesIdResponseBody200ImageTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutImagesIdResponseBody200ImageTypeEnumSystem -- ^ Represents the JSON value @"system"@
+  | PutImagesIdResponseBody200ImageTypeEnumApp -- ^ Represents the JSON value @"app"@
+  | PutImagesIdResponseBody200ImageTypeEnumSnapshot -- ^ Represents the JSON value @"snapshot"@
+  | PutImagesIdResponseBody200ImageTypeEnumBackup -- ^ Represents the JSON value @"backup"@
+  | PutImagesIdResponseBody200ImageTypeEnumTemporary -- ^ Represents the JSON value @"temporary"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutImagesIdResponseBody200ImageType
+    where toJSON (PutImagesIdResponseBody200ImageTypeOther val) = val
+          toJSON (PutImagesIdResponseBody200ImageTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutImagesIdResponseBody200ImageTypeEnumSystem) = "system"
+          toJSON (PutImagesIdResponseBody200ImageTypeEnumApp) = "app"
+          toJSON (PutImagesIdResponseBody200ImageTypeEnumSnapshot) = "snapshot"
+          toJSON (PutImagesIdResponseBody200ImageTypeEnumBackup) = "backup"
+          toJSON (PutImagesIdResponseBody200ImageTypeEnumTemporary) = "temporary"
+instance Data.Aeson.Types.FromJSON.FromJSON PutImagesIdResponseBody200ImageType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "system" -> PutImagesIdResponseBody200ImageTypeEnumSystem
+                                            | val GHC.Classes.== "app" -> PutImagesIdResponseBody200ImageTypeEnumApp
+                                            | val GHC.Classes.== "snapshot" -> PutImagesIdResponseBody200ImageTypeEnumSnapshot
+                                            | val GHC.Classes.== "backup" -> PutImagesIdResponseBody200ImageTypeEnumBackup
+                                            | val GHC.Classes.== "temporary" -> PutImagesIdResponseBody200ImageTypeEnumTemporary
+                                            | GHC.Base.otherwise -> PutImagesIdResponseBody200ImageTypeOther val)
+-- | > PUT /images/{id}
+-- 
+-- The same as 'putImages_Id_' but accepts an explicit configuration.
+putImages_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PutImagesIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutImagesIdResponse) -- ^ Monadic computation which returns the result of the operation
+putImages_Id_WithConfiguration config
+                               id
+                               body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutImagesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutImagesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                       PutImagesIdResponseBody200)
+                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /images/{id}
+-- 
+-- The same as 'putImages_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putImages_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PutImagesIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putImages_Id_Raw id
+                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /images/{id}
+-- 
+-- The same as 'putImages_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putImages_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Image
+  -> GHC.Maybe.Maybe PutImagesIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putImages_Id_WithConfigurationRaw config
+                                  id
+                                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/images/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

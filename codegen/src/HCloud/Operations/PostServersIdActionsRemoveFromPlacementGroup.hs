@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsRemoveFromPlacementGroup
 module HCloud.Operations.PostServersIdActionsRemoveFromPlacementGroup where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,56 +45,19 @@ import HCloud.Types
 -- | > POST /servers/{id}/actions/remove_from_placement_group
 -- 
 -- Removes a Server from a Placement Group.
-postServers_Id_ActionsRemoveFromPlacementGroup :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                                   -- ^ id: ID of the Server
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsRemoveFromPlacementGroupResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsRemoveFromPlacementGroup config
-                                               id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRemoveFromPlacementGroupResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRemoveFromPlacementGroupResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsRemoveFromPlacementGroupResponseBody201)
-                                                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) [])
--- | > POST /servers/{id}/actions/remove_from_placement_group
--- 
--- The same as 'postServers_Id_ActionsRemoveFromPlacementGroup' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsRemoveFromPlacementGroupRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                   HCloud.Common.SecurityScheme s) =>
-                                                     HCloud.Common.Configuration s ->
-                                                     GHC.Integer.Type.Integer ->
-                                                     m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsRemoveFromPlacementGroupRaw config
-                                                  id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) [])
--- | > POST /servers/{id}/actions/remove_from_placement_group
--- 
--- Monadic version of 'postServers_Id_ActionsRemoveFromPlacementGroup' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsRemoveFromPlacementGroupM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                 HCloud.Common.SecurityScheme s) =>
-                                                   GHC.Integer.Type.Integer ->
-                                                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                      m
-                                                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                          (Network.HTTP.Client.Types.Response PostServersIdActionsRemoveFromPlacementGroupResponse))
-postServers_Id_ActionsRemoveFromPlacementGroupM id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRemoveFromPlacementGroupResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRemoveFromPlacementGroupResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostServersIdActionsRemoveFromPlacementGroupResponseBody201)
-                                                                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) [])
--- | > POST /servers/{id}/actions/remove_from_placement_group
--- 
--- Monadic version of 'postServers_Id_ActionsRemoveFromPlacementGroupRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsRemoveFromPlacementGroupRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                    HCloud.Common.SecurityScheme s) =>
-                                                      GHC.Integer.Type.Integer ->
-                                                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                         m
-                                                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsRemoveFromPlacementGroupRawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) [])
+postServers_Id_ActionsRemoveFromPlacementGroup :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsRemoveFromPlacementGroupResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRemoveFromPlacementGroup id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRemoveFromPlacementGroupResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRemoveFromPlacementGroupResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostServersIdActionsRemoveFromPlacementGroupResponseBody201)
+                                                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) GHC.Base.mempty)
 -- | Represents a response of the operation 'postServers_Id_ActionsRemoveFromPlacementGroup'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsRemoveFromPlacementGroupResponseError' is used.
-data PostServersIdActionsRemoveFromPlacementGroupResponse =                                                              
-   PostServersIdActionsRemoveFromPlacementGroupResponseError GHC.Base.String                                             -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsRemoveFromPlacementGroupResponse201 PostServersIdActionsRemoveFromPlacementGroupResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsRemoveFromPlacementGroupResponse =
+   PostServersIdActionsRemoveFromPlacementGroupResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsRemoveFromPlacementGroupResponse201 PostServersIdActionsRemoveFromPlacementGroupResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsRemoveFromPlacementGroupResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/remove_from_placement_group.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRemoveFromPlacementGroupResponseBody201 = PostServersIdActionsRemoveFromPlacementGroupResponseBody201 {
@@ -102,39 +65,61 @@ data PostServersIdActionsRemoveFromPlacementGroupResponseBody201 = PostServersId
   postServersIdActionsRemoveFromPlacementGroupResponseBody201Action :: PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsRemoveFromPlacementGroupResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsRemoveFromPlacementGroupResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRemoveFromPlacementGroupResponseBody201" (\obj -> GHC.Base.pure PostServersIdActionsRemoveFromPlacementGroupResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action
+-- | Create a new 'PostServersIdActionsRemoveFromPlacementGroupResponseBody201' with all required fields.
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201 :: PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201Action'
+  -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201 postServersIdActionsRemoveFromPlacementGroupResponseBody201Action = PostServersIdActionsRemoveFromPlacementGroupResponseBody201{postServersIdActionsRemoveFromPlacementGroupResponseBody201Action = postServersIdActionsRemoveFromPlacementGroupResponseBody201Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/remove_from_placement_group.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action = PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError :: PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError
+  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources :: ([] PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources)
+  , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources :: ([PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus :: PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action' with all required fields.
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress'
+  -> [PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources] -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted'
+  -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus'
+  -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201Action postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus = PostServersIdActionsRemoveFromPlacementGroupResponseBody201Action{postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/remove_from_placement_group.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError = PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError {
@@ -144,47 +129,80 @@ data PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError = Po
   , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage = PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionError{postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                                                           postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/remove_from_placement_group.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources = PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType'
+  -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources
+mkPostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType = PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResources{postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                                                      postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType = postServersIdActionsRemoveFromPlacementGroupResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/remove_from_placement_group.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
-    = PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus =
+   PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsRemoveFromPlacementGroupResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/remove_from_placement_group
+-- 
+-- The same as 'postServers_Id_ActionsRemoveFromPlacementGroup' but accepts an explicit configuration.
+postServers_Id_ActionsRemoveFromPlacementGroupWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsRemoveFromPlacementGroupResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRemoveFromPlacementGroupWithConfiguration config
+                                                                id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsRemoveFromPlacementGroupResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsRemoveFromPlacementGroupResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        PostServersIdActionsRemoveFromPlacementGroupResponseBody201)
+                                                                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/remove_from_placement_group
+-- 
+-- The same as 'postServers_Id_ActionsRemoveFromPlacementGroup' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsRemoveFromPlacementGroupRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRemoveFromPlacementGroupRaw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/remove_from_placement_group
+-- 
+-- The same as 'postServers_Id_ActionsRemoveFromPlacementGroup' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsRemoveFromPlacementGroupWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsRemoveFromPlacementGroupWithConfigurationRaw config
+                                                                   id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_from_placement_group"))) GHC.Base.mempty)

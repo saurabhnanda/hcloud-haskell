@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getServers_Id_Actions_ActionId_
 module HCloud.Operations.GetServersIdActionsActionId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,64 +45,44 @@ import HCloud.Types
 -- | > GET /servers/{id}/actions/{action_id}
 -- 
 -- Returns a specific Action object for a Server.
-getServers_Id_Actions_ActionId_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                    -- ^ id: ID of the Server
-  -> GHC.Integer.Type.Integer                                                                                                                    -- ^ action_id: ID of the Action
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetServersIdActionsActionIdResponse))     -- ^ Monad containing the result of the operation
-getServers_Id_Actions_ActionId_ config
-                                id
-                                actionId = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetServersIdActionsActionIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdActionsActionIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           GetServersIdActionsActionIdResponseBody200)
-                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel actionId)) GHC.Base.++ ""))))) [])
--- | > GET /servers/{id}/actions/{action_id}
+getServers_Id_Actions_ActionId_ :: forall m . HCloud.Common.MonadHTTP m => GetServersIdActionsActionIdParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetServersIdActionsActionIdResponse) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_Actions_ActionId_ parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetServersIdActionsActionIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdActionsActionIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              GetServersIdActionsActionIdResponseBody200)
+                                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathId parameters))) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathActionId parameters))) GHC.Base.++ ""))))) GHC.Base.mempty)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/{action_id}.GET.parameters@ in the specification.
 -- 
--- The same as 'getServers_Id_Actions_ActionId_' but returns the raw 'Data.ByteString.Char8.ByteString'
-getServers_Id_Actions_ActionId_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                    HCloud.Common.SecurityScheme s) =>
-                                      HCloud.Common.Configuration s ->
-                                      GHC.Integer.Type.Integer ->
-                                      GHC.Integer.Type.Integer ->
-                                      m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                            (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getServers_Id_Actions_ActionId_Raw config
-                                   id
-                                   actionId = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel actionId)) GHC.Base.++ ""))))) [])
--- | > GET /servers/{id}/actions/{action_id}
 -- 
--- Monadic version of 'getServers_Id_Actions_ActionId_' (use with 'HCloud.Common.runWithConfiguration')
-getServers_Id_Actions_ActionId_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                  HCloud.Common.SecurityScheme s) =>
-                                    GHC.Integer.Type.Integer ->
-                                    GHC.Integer.Type.Integer ->
-                                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                       m
-                                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                           (Network.HTTP.Client.Types.Response GetServersIdActionsActionIdResponse))
-getServers_Id_Actions_ActionId_M id
-                                 actionId = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetServersIdActionsActionIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdActionsActionIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            GetServersIdActionsActionIdResponseBody200)
-                                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel actionId)) GHC.Base.++ ""))))) [])
--- | > GET /servers/{id}/actions/{action_id}
--- 
--- Monadic version of 'getServers_Id_Actions_ActionId_Raw' (use with 'HCloud.Common.runWithConfiguration')
-getServers_Id_Actions_ActionId_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                     HCloud.Common.SecurityScheme s) =>
-                                       GHC.Integer.Type.Integer ->
-                                       GHC.Integer.Type.Integer ->
-                                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                          m
-                                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getServers_Id_Actions_ActionId_RawM id
-                                    actionId = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel actionId)) GHC.Base.++ ""))))) [])
+data GetServersIdActionsActionIdParameters = GetServersIdActionsActionIdParameters {
+  -- | pathAction_id: Represents the parameter named \'action_id\'
+  -- 
+  -- ID of the Action
+  getServersIdActionsActionIdParametersPathActionId :: GHC.Types.Int
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Server
+  , getServersIdActionsActionIdParametersPathId :: GHC.Types.Int
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdActionsActionIdParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathAction_id" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdParametersPathActionId obj : "pathId" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdParametersPathId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathAction_id" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdParametersPathActionId obj) GHC.Base.<> ("pathId" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdParametersPathId obj))
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdActionsActionIdParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdActionsActionIdParameters" (\obj -> (GHC.Base.pure GetServersIdActionsActionIdParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathAction_id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId"))
+-- | Create a new 'GetServersIdActionsActionIdParameters' with all required fields.
+mkGetServersIdActionsActionIdParameters :: GHC.Types.Int -- ^ 'getServersIdActionsActionIdParametersPathActionId'
+  -> GHC.Types.Int -- ^ 'getServersIdActionsActionIdParametersPathId'
+  -> GetServersIdActionsActionIdParameters
+mkGetServersIdActionsActionIdParameters getServersIdActionsActionIdParametersPathActionId getServersIdActionsActionIdParametersPathId = GetServersIdActionsActionIdParameters{getServersIdActionsActionIdParametersPathActionId = getServersIdActionsActionIdParametersPathActionId,
+                                                                                                                                                                              getServersIdActionsActionIdParametersPathId = getServersIdActionsActionIdParametersPathId}
 -- | Represents a response of the operation 'getServers_Id_Actions_ActionId_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetServersIdActionsActionIdResponseError' is used.
-data GetServersIdActionsActionIdResponse =                                             
-   GetServersIdActionsActionIdResponseError GHC.Base.String                            -- ^ Means either no matching case available or a parse error
-  | GetServersIdActionsActionIdResponse200 GetServersIdActionsActionIdResponseBody200  -- ^ The \`action\` key in the reply has this structure
+data GetServersIdActionsActionIdResponse =
+   GetServersIdActionsActionIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetServersIdActionsActionIdResponse200 GetServersIdActionsActionIdResponseBody200 -- ^ The \`action\` key in the reply has this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetServersIdActionsActionIdResponseBody200
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/{action_id}.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetServersIdActionsActionIdResponseBody200 = GetServersIdActionsActionIdResponseBody200 {
@@ -110,39 +90,61 @@ data GetServersIdActionsActionIdResponseBody200 = GetServersIdActionsActionIdRes
   getServersIdActionsActionIdResponseBody200Action :: GetServersIdActionsActionIdResponseBody200Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdActionsActionIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (getServersIdActionsActionIdResponseBody200Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (getServersIdActionsActionIdResponseBody200Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdActionsActionIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdActionsActionIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdActionsActionIdResponseBody200" (\obj -> GHC.Base.pure GetServersIdActionsActionIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema GetServersIdActionsActionIdResponseBody200Action
+-- | Create a new 'GetServersIdActionsActionIdResponseBody200' with all required fields.
+mkGetServersIdActionsActionIdResponseBody200 :: GetServersIdActionsActionIdResponseBody200Action -- ^ 'getServersIdActionsActionIdResponseBody200Action'
+  -> GetServersIdActionsActionIdResponseBody200
+mkGetServersIdActionsActionIdResponseBody200 getServersIdActionsActionIdResponseBody200Action = GetServersIdActionsActionIdResponseBody200{getServersIdActionsActionIdResponseBody200Action = getServersIdActionsActionIdResponseBody200Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/{action_id}.GET.responses.200.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data GetServersIdActionsActionIdResponseBody200Action = GetServersIdActionsActionIdResponseBody200Action {
   -- | command: Command executed in the Action
   getServersIdActionsActionIdResponseBody200ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getServersIdActionsActionIdResponseBody200ActionError :: GetServersIdActionsActionIdResponseBody200ActionError
+  , getServersIdActionsActionIdResponseBody200ActionError :: (GHC.Maybe.Maybe GetServersIdActionsActionIdResponseBody200ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getServersIdActionsActionIdResponseBody200ActionFinished :: Data.Text.Internal.Text
+  , getServersIdActionsActionIdResponseBody200ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getServersIdActionsActionIdResponseBody200ActionId :: GHC.Integer.Type.Integer
+  , getServersIdActionsActionIdResponseBody200ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getServersIdActionsActionIdResponseBody200ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getServersIdActionsActionIdResponseBody200ActionResources :: ([] GetServersIdActionsActionIdResponseBody200ActionResources)
+  , getServersIdActionsActionIdResponseBody200ActionResources :: ([GetServersIdActionsActionIdResponseBody200ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getServersIdActionsActionIdResponseBody200ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getServersIdActionsActionIdResponseBody200ActionStatus :: GetServersIdActionsActionIdResponseBody200ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdActionsActionIdResponseBody200Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getServersIdActionsActionIdResponseBody200ActionCommand obj) : (Data.Aeson..=) "error" (getServersIdActionsActionIdResponseBody200ActionError obj) : (Data.Aeson..=) "finished" (getServersIdActionsActionIdResponseBody200ActionFinished obj) : (Data.Aeson..=) "id" (getServersIdActionsActionIdResponseBody200ActionId obj) : (Data.Aeson..=) "progress" (getServersIdActionsActionIdResponseBody200ActionProgress obj) : (Data.Aeson..=) "resources" (getServersIdActionsActionIdResponseBody200ActionResources obj) : (Data.Aeson..=) "started" (getServersIdActionsActionIdResponseBody200ActionStarted obj) : (Data.Aeson..=) "status" (getServersIdActionsActionIdResponseBody200ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getServersIdActionsActionIdResponseBody200ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getServersIdActionsActionIdResponseBody200ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getServersIdActionsActionIdResponseBody200ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersIdActionsActionIdResponseBody200ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getServersIdActionsActionIdResponseBody200ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getServersIdActionsActionIdResponseBody200ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getServersIdActionsActionIdResponseBody200ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getServersIdActionsActionIdResponseBody200ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdActionsActionIdResponseBody200Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionError obj : "finished" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionId obj : "progress" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionResources obj : "started" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdActionsActionIdResponseBody200Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdActionsActionIdResponseBody200Action" (\obj -> (((((((GHC.Base.pure GetServersIdActionsActionIdResponseBody200Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetServersIdActionsActionIdResponseBody200ActionError
+-- | Create a new 'GetServersIdActionsActionIdResponseBody200Action' with all required fields.
+mkGetServersIdActionsActionIdResponseBody200Action :: Data.Text.Internal.Text -- ^ 'getServersIdActionsActionIdResponseBody200ActionCommand'
+  -> GHC.Maybe.Maybe GetServersIdActionsActionIdResponseBody200ActionError -- ^ 'getServersIdActionsActionIdResponseBody200ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersIdActionsActionIdResponseBody200ActionFinished'
+  -> GHC.Types.Int -- ^ 'getServersIdActionsActionIdResponseBody200ActionId'
+  -> GHC.Types.Double -- ^ 'getServersIdActionsActionIdResponseBody200ActionProgress'
+  -> [GetServersIdActionsActionIdResponseBody200ActionResources] -- ^ 'getServersIdActionsActionIdResponseBody200ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'getServersIdActionsActionIdResponseBody200ActionStarted'
+  -> GetServersIdActionsActionIdResponseBody200ActionStatus -- ^ 'getServersIdActionsActionIdResponseBody200ActionStatus'
+  -> GetServersIdActionsActionIdResponseBody200Action
+mkGetServersIdActionsActionIdResponseBody200Action getServersIdActionsActionIdResponseBody200ActionCommand getServersIdActionsActionIdResponseBody200ActionError getServersIdActionsActionIdResponseBody200ActionFinished getServersIdActionsActionIdResponseBody200ActionId getServersIdActionsActionIdResponseBody200ActionProgress getServersIdActionsActionIdResponseBody200ActionResources getServersIdActionsActionIdResponseBody200ActionStarted getServersIdActionsActionIdResponseBody200ActionStatus = GetServersIdActionsActionIdResponseBody200Action{getServersIdActionsActionIdResponseBody200ActionCommand = getServersIdActionsActionIdResponseBody200ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionError = getServersIdActionsActionIdResponseBody200ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionFinished = getServersIdActionsActionIdResponseBody200ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionId = getServersIdActionsActionIdResponseBody200ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionProgress = getServersIdActionsActionIdResponseBody200ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionResources = getServersIdActionsActionIdResponseBody200ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionStarted = getServersIdActionsActionIdResponseBody200ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionStatus = getServersIdActionsActionIdResponseBody200ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/{action_id}.GET.responses.200.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetServersIdActionsActionIdResponseBody200ActionError = GetServersIdActionsActionIdResponseBody200ActionError {
@@ -152,47 +154,80 @@ data GetServersIdActionsActionIdResponseBody200ActionError = GetServersIdActions
   , getServersIdActionsActionIdResponseBody200ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdActionsActionIdResponseBody200ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getServersIdActionsActionIdResponseBody200ActionErrorCode obj) : (Data.Aeson..=) "message" (getServersIdActionsActionIdResponseBody200ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getServersIdActionsActionIdResponseBody200ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getServersIdActionsActionIdResponseBody200ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdActionsActionIdResponseBody200ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdActionsActionIdResponseBody200ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdActionsActionIdResponseBody200ActionError" (\obj -> (GHC.Base.pure GetServersIdActionsActionIdResponseBody200ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetServersIdActionsActionIdResponseBody200ActionResources
+-- | Create a new 'GetServersIdActionsActionIdResponseBody200ActionError' with all required fields.
+mkGetServersIdActionsActionIdResponseBody200ActionError :: Data.Text.Internal.Text -- ^ 'getServersIdActionsActionIdResponseBody200ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getServersIdActionsActionIdResponseBody200ActionErrorMessage'
+  -> GetServersIdActionsActionIdResponseBody200ActionError
+mkGetServersIdActionsActionIdResponseBody200ActionError getServersIdActionsActionIdResponseBody200ActionErrorCode getServersIdActionsActionIdResponseBody200ActionErrorMessage = GetServersIdActionsActionIdResponseBody200ActionError{getServersIdActionsActionIdResponseBody200ActionErrorCode = getServersIdActionsActionIdResponseBody200ActionErrorCode,
+                                                                                                                                                                                                                                       getServersIdActionsActionIdResponseBody200ActionErrorMessage = getServersIdActionsActionIdResponseBody200ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/{action_id}.GET.responses.200.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetServersIdActionsActionIdResponseBody200ActionResources = GetServersIdActionsActionIdResponseBody200ActionResources {
   -- | id: ID of the Resource
-  getServersIdActionsActionIdResponseBody200ActionResourcesId :: GHC.Integer.Type.Integer
+  getServersIdActionsActionIdResponseBody200ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getServersIdActionsActionIdResponseBody200ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdActionsActionIdResponseBody200ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getServersIdActionsActionIdResponseBody200ActionResourcesId obj) : (Data.Aeson..=) "type" (getServersIdActionsActionIdResponseBody200ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getServersIdActionsActionIdResponseBody200ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getServersIdActionsActionIdResponseBody200ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdActionsActionIdResponseBody200ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getServersIdActionsActionIdResponseBody200ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdActionsActionIdResponseBody200ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdActionsActionIdResponseBody200ActionResources" (\obj -> (GHC.Base.pure GetServersIdActionsActionIdResponseBody200ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetServersIdActionsActionIdResponseBody200ActionStatus
+-- | Create a new 'GetServersIdActionsActionIdResponseBody200ActionResources' with all required fields.
+mkGetServersIdActionsActionIdResponseBody200ActionResources :: GHC.Types.Int -- ^ 'getServersIdActionsActionIdResponseBody200ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getServersIdActionsActionIdResponseBody200ActionResourcesType'
+  -> GetServersIdActionsActionIdResponseBody200ActionResources
+mkGetServersIdActionsActionIdResponseBody200ActionResources getServersIdActionsActionIdResponseBody200ActionResourcesId getServersIdActionsActionIdResponseBody200ActionResourcesType = GetServersIdActionsActionIdResponseBody200ActionResources{getServersIdActionsActionIdResponseBody200ActionResourcesId = getServersIdActionsActionIdResponseBody200ActionResourcesId,
+                                                                                                                                                                                                                                                  getServersIdActionsActionIdResponseBody200ActionResourcesType = getServersIdActionsActionIdResponseBody200ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/{action_id}.GET.responses.200.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetServersIdActionsActionIdResponseBody200ActionStatus
-    = GetServersIdActionsActionIdResponseBody200ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersIdActionsActionIdResponseBody200ActionStatusEnumTyped Data.Text.Internal.Text
-    | GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringError
-    | GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringRunning
-    | GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdActionsActionIdResponseBody200ActionStatus
-    where toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetServersIdActionsActionIdResponseBody200ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetServersIdActionsActionIdResponseBody200ActionStatusEnumStringSuccess
-                                                      else GetServersIdActionsActionIdResponseBody200ActionStatusEnumOther val)
+data GetServersIdActionsActionIdResponseBody200ActionStatus =
+   GetServersIdActionsActionIdResponseBody200ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersIdActionsActionIdResponseBody200ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersIdActionsActionIdResponseBody200ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetServersIdActionsActionIdResponseBody200ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetServersIdActionsActionIdResponseBody200ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdActionsActionIdResponseBody200ActionStatus
+    where toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusOther val) = val
+          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumSuccess) = "success"
+          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumRunning) = "running"
+          toJSON (GetServersIdActionsActionIdResponseBody200ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdActionsActionIdResponseBody200ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetServersIdActionsActionIdResponseBody200ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetServersIdActionsActionIdResponseBody200ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetServersIdActionsActionIdResponseBody200ActionStatusEnumError
+                                            | GHC.Base.otherwise -> GetServersIdActionsActionIdResponseBody200ActionStatusOther val)
+-- | > GET /servers/{id}/actions/{action_id}
+-- 
+-- The same as 'getServers_Id_Actions_ActionId_' but accepts an explicit configuration.
+getServers_Id_Actions_ActionId_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetServersIdActionsActionIdParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetServersIdActionsActionIdResponse) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_Actions_ActionId_WithConfiguration config
+                                                 parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetServersIdActionsActionIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdActionsActionIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               GetServersIdActionsActionIdResponseBody200)
+                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathId parameters))) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathActionId parameters))) GHC.Base.++ ""))))) GHC.Base.mempty)
+-- | > GET /servers/{id}/actions/{action_id}
+-- 
+-- The same as 'getServers_Id_Actions_ActionId_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getServers_Id_Actions_ActionId_Raw :: forall m . HCloud.Common.MonadHTTP m => GetServersIdActionsActionIdParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_Actions_ActionId_Raw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathId parameters))) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathActionId parameters))) GHC.Base.++ ""))))) GHC.Base.mempty)
+-- | > GET /servers/{id}/actions/{action_id}
+-- 
+-- The same as 'getServers_Id_Actions_ActionId_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getServers_Id_Actions_ActionId_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetServersIdActionsActionIdParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_Actions_ActionId_WithConfigurationRaw config
+                                                    parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathId parameters))) GHC.Base.++ ("/actions/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdActionsActionIdParametersPathActionId parameters))) GHC.Base.++ ""))))) GHC.Base.mempty)

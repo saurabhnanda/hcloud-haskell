@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postVolumes_Id_ActionsAttach
 module HCloud.Operations.PostVolumesIdActionsAttach where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,79 +45,41 @@ import HCloud.Types
 -- | > POST /volumes/{id}/actions/attach
 -- 
 -- Attaches a Volume to a Server. Works only if the Server is in the same Location as the Volume.
-postVolumes_Id_ActionsAttach :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                 -- ^ id: ID of the Volume
-  -> GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostVolumesIdActionsAttachResponse))   -- ^ Monad containing the result of the operation
-postVolumes_Id_ActionsAttach config
-                             id
-                             body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsAttachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsAttachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostVolumesIdActionsAttachResponseBody201)
-                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /volumes/{id}/actions/attach
--- 
--- The same as 'postVolumes_Id_ActionsAttach' but returns the raw 'Data.ByteString.Char8.ByteString'
-postVolumes_Id_ActionsAttachRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                 HCloud.Common.SecurityScheme s) =>
-                                   HCloud.Common.Configuration s ->
-                                   GHC.Integer.Type.Integer ->
-                                   GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody ->
-                                   m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postVolumes_Id_ActionsAttachRaw config
-                                id
-                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /volumes/{id}/actions/attach
--- 
--- Monadic version of 'postVolumes_Id_ActionsAttach' (use with 'HCloud.Common.runWithConfiguration')
-postVolumes_Id_ActionsAttachM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                               HCloud.Common.SecurityScheme s) =>
-                                 GHC.Integer.Type.Integer ->
-                                 GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody ->
-                                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                    m
-                                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                        (Network.HTTP.Client.Types.Response PostVolumesIdActionsAttachResponse))
-postVolumes_Id_ActionsAttachM id
-                              body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsAttachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsAttachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostVolumesIdActionsAttachResponseBody201)
-                                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /volumes/{id}/actions/attach
--- 
--- Monadic version of 'postVolumes_Id_ActionsAttachRaw' (use with 'HCloud.Common.runWithConfiguration')
-postVolumes_Id_ActionsAttachRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                  HCloud.Common.SecurityScheme s) =>
-                                    GHC.Integer.Type.Integer ->
-                                    GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody ->
-                                    Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                       m
-                                                                       (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postVolumes_Id_ActionsAttachRawM id
-                                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postVolumes_Id_ActionsAttachRequestBody
+postVolumes_Id_ActionsAttach :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Volume
+  -> GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostVolumesIdActionsAttachResponse) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsAttach id
+                             body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsAttachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsAttachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostVolumesIdActionsAttachResponseBody201)
+                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/attach.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsAttachRequestBody = PostVolumesIdActionsAttachRequestBody {
   -- | automount: Auto-mount the Volume after attaching it
   postVolumesIdActionsAttachRequestBodyAutomount :: (GHC.Maybe.Maybe GHC.Types.Bool)
   -- | server: ID of the Server the Volume will be attached to
-  , postVolumesIdActionsAttachRequestBodyServer :: GHC.Integer.Type.Integer
+  , postVolumesIdActionsAttachRequestBodyServer :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsAttachRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "automount" (postVolumesIdActionsAttachRequestBodyAutomount obj) : (Data.Aeson..=) "server" (postVolumesIdActionsAttachRequestBodyServer obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "automount" (postVolumesIdActionsAttachRequestBodyAutomount obj) GHC.Base.<> (Data.Aeson..=) "server" (postVolumesIdActionsAttachRequestBodyServer obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsAttachRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("automount" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachRequestBodyAutomount obj : "server" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachRequestBodyServer obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("automount" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachRequestBodyAutomount obj) GHC.Base.<> ("server" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachRequestBodyServer obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsAttachRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsAttachRequestBody" (\obj -> (GHC.Base.pure PostVolumesIdActionsAttachRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "automount")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server"))
+-- | Create a new 'PostVolumesIdActionsAttachRequestBody' with all required fields.
+mkPostVolumesIdActionsAttachRequestBody :: GHC.Types.Int -- ^ 'postVolumesIdActionsAttachRequestBodyServer'
+  -> PostVolumesIdActionsAttachRequestBody
+mkPostVolumesIdActionsAttachRequestBody postVolumesIdActionsAttachRequestBodyServer = PostVolumesIdActionsAttachRequestBody{postVolumesIdActionsAttachRequestBodyAutomount = GHC.Maybe.Nothing,
+                                                                                                                            postVolumesIdActionsAttachRequestBodyServer = postVolumesIdActionsAttachRequestBodyServer}
 -- | Represents a response of the operation 'postVolumes_Id_ActionsAttach'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostVolumesIdActionsAttachResponseError' is used.
-data PostVolumesIdActionsAttachResponse =                                            
-   PostVolumesIdActionsAttachResponseError GHC.Base.String                           -- ^ Means either no matching case available or a parse error
-  | PostVolumesIdActionsAttachResponse201 PostVolumesIdActionsAttachResponseBody201  -- ^ The \`action\` key contains the \`attach_volume\` Action
+data PostVolumesIdActionsAttachResponse =
+   PostVolumesIdActionsAttachResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostVolumesIdActionsAttachResponse201 PostVolumesIdActionsAttachResponseBody201 -- ^ The \`action\` key contains the \`attach_volume\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostVolumesIdActionsAttachResponseBody201
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/attach.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsAttachResponseBody201 = PostVolumesIdActionsAttachResponseBody201 {
@@ -125,39 +87,61 @@ data PostVolumesIdActionsAttachResponseBody201 = PostVolumesIdActionsAttachRespo
   postVolumesIdActionsAttachResponseBody201Action :: PostVolumesIdActionsAttachResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsAttachResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postVolumesIdActionsAttachResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postVolumesIdActionsAttachResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsAttachResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsAttachResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsAttachResponseBody201" (\obj -> GHC.Base.pure PostVolumesIdActionsAttachResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostVolumesIdActionsAttachResponseBody201Action
+-- | Create a new 'PostVolumesIdActionsAttachResponseBody201' with all required fields.
+mkPostVolumesIdActionsAttachResponseBody201 :: PostVolumesIdActionsAttachResponseBody201Action -- ^ 'postVolumesIdActionsAttachResponseBody201Action'
+  -> PostVolumesIdActionsAttachResponseBody201
+mkPostVolumesIdActionsAttachResponseBody201 postVolumesIdActionsAttachResponseBody201Action = PostVolumesIdActionsAttachResponseBody201{postVolumesIdActionsAttachResponseBody201Action = postVolumesIdActionsAttachResponseBody201Action}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/attach.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsAttachResponseBody201Action = PostVolumesIdActionsAttachResponseBody201Action {
   -- | command: Command executed in the Action
   postVolumesIdActionsAttachResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postVolumesIdActionsAttachResponseBody201ActionError :: PostVolumesIdActionsAttachResponseBody201ActionError
+  , postVolumesIdActionsAttachResponseBody201ActionError :: (GHC.Maybe.Maybe PostVolumesIdActionsAttachResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postVolumesIdActionsAttachResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postVolumesIdActionsAttachResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postVolumesIdActionsAttachResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postVolumesIdActionsAttachResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postVolumesIdActionsAttachResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postVolumesIdActionsAttachResponseBody201ActionResources :: ([] PostVolumesIdActionsAttachResponseBody201ActionResources)
+  , postVolumesIdActionsAttachResponseBody201ActionResources :: ([PostVolumesIdActionsAttachResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postVolumesIdActionsAttachResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postVolumesIdActionsAttachResponseBody201ActionStatus :: PostVolumesIdActionsAttachResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsAttachResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postVolumesIdActionsAttachResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postVolumesIdActionsAttachResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postVolumesIdActionsAttachResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postVolumesIdActionsAttachResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postVolumesIdActionsAttachResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postVolumesIdActionsAttachResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postVolumesIdActionsAttachResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postVolumesIdActionsAttachResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postVolumesIdActionsAttachResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postVolumesIdActionsAttachResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postVolumesIdActionsAttachResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postVolumesIdActionsAttachResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postVolumesIdActionsAttachResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postVolumesIdActionsAttachResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postVolumesIdActionsAttachResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postVolumesIdActionsAttachResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsAttachResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsAttachResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsAttachResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostVolumesIdActionsAttachResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostVolumesIdActionsAttachResponseBody201ActionError
+-- | Create a new 'PostVolumesIdActionsAttachResponseBody201Action' with all required fields.
+mkPostVolumesIdActionsAttachResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postVolumesIdActionsAttachResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostVolumesIdActionsAttachResponseBody201ActionError -- ^ 'postVolumesIdActionsAttachResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postVolumesIdActionsAttachResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postVolumesIdActionsAttachResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postVolumesIdActionsAttachResponseBody201ActionProgress'
+  -> [PostVolumesIdActionsAttachResponseBody201ActionResources] -- ^ 'postVolumesIdActionsAttachResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesIdActionsAttachResponseBody201ActionStarted'
+  -> PostVolumesIdActionsAttachResponseBody201ActionStatus -- ^ 'postVolumesIdActionsAttachResponseBody201ActionStatus'
+  -> PostVolumesIdActionsAttachResponseBody201Action
+mkPostVolumesIdActionsAttachResponseBody201Action postVolumesIdActionsAttachResponseBody201ActionCommand postVolumesIdActionsAttachResponseBody201ActionError postVolumesIdActionsAttachResponseBody201ActionFinished postVolumesIdActionsAttachResponseBody201ActionId postVolumesIdActionsAttachResponseBody201ActionProgress postVolumesIdActionsAttachResponseBody201ActionResources postVolumesIdActionsAttachResponseBody201ActionStarted postVolumesIdActionsAttachResponseBody201ActionStatus = PostVolumesIdActionsAttachResponseBody201Action{postVolumesIdActionsAttachResponseBody201ActionCommand = postVolumesIdActionsAttachResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionError = postVolumesIdActionsAttachResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionFinished = postVolumesIdActionsAttachResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionId = postVolumesIdActionsAttachResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionProgress = postVolumesIdActionsAttachResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionResources = postVolumesIdActionsAttachResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionStarted = postVolumesIdActionsAttachResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        postVolumesIdActionsAttachResponseBody201ActionStatus = postVolumesIdActionsAttachResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/attach.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostVolumesIdActionsAttachResponseBody201ActionError = PostVolumesIdActionsAttachResponseBody201ActionError {
@@ -167,47 +151,86 @@ data PostVolumesIdActionsAttachResponseBody201ActionError = PostVolumesIdActions
   , postVolumesIdActionsAttachResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsAttachResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postVolumesIdActionsAttachResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postVolumesIdActionsAttachResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postVolumesIdActionsAttachResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postVolumesIdActionsAttachResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsAttachResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsAttachResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsAttachResponseBody201ActionError" (\obj -> (GHC.Base.pure PostVolumesIdActionsAttachResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostVolumesIdActionsAttachResponseBody201ActionResources
+-- | Create a new 'PostVolumesIdActionsAttachResponseBody201ActionError' with all required fields.
+mkPostVolumesIdActionsAttachResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postVolumesIdActionsAttachResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesIdActionsAttachResponseBody201ActionErrorMessage'
+  -> PostVolumesIdActionsAttachResponseBody201ActionError
+mkPostVolumesIdActionsAttachResponseBody201ActionError postVolumesIdActionsAttachResponseBody201ActionErrorCode postVolumesIdActionsAttachResponseBody201ActionErrorMessage = PostVolumesIdActionsAttachResponseBody201ActionError{postVolumesIdActionsAttachResponseBody201ActionErrorCode = postVolumesIdActionsAttachResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                   postVolumesIdActionsAttachResponseBody201ActionErrorMessage = postVolumesIdActionsAttachResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/volumes\/{id}\/actions\/attach.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostVolumesIdActionsAttachResponseBody201ActionResources = PostVolumesIdActionsAttachResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postVolumesIdActionsAttachResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postVolumesIdActionsAttachResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postVolumesIdActionsAttachResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsAttachResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postVolumesIdActionsAttachResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postVolumesIdActionsAttachResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postVolumesIdActionsAttachResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postVolumesIdActionsAttachResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsAttachResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postVolumesIdActionsAttachResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsAttachResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostVolumesIdActionsAttachResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostVolumesIdActionsAttachResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostVolumesIdActionsAttachResponseBody201ActionStatus
+-- | Create a new 'PostVolumesIdActionsAttachResponseBody201ActionResources' with all required fields.
+mkPostVolumesIdActionsAttachResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postVolumesIdActionsAttachResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postVolumesIdActionsAttachResponseBody201ActionResourcesType'
+  -> PostVolumesIdActionsAttachResponseBody201ActionResources
+mkPostVolumesIdActionsAttachResponseBody201ActionResources postVolumesIdActionsAttachResponseBody201ActionResourcesId postVolumesIdActionsAttachResponseBody201ActionResourcesType = PostVolumesIdActionsAttachResponseBody201ActionResources{postVolumesIdActionsAttachResponseBody201ActionResourcesId = postVolumesIdActionsAttachResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                              postVolumesIdActionsAttachResponseBody201ActionResourcesType = postVolumesIdActionsAttachResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/volumes\/{id}\/actions\/attach.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostVolumesIdActionsAttachResponseBody201ActionStatus
-    = PostVolumesIdActionsAttachResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringError
-    | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringRunning
-    | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostVolumesIdActionsAttachResponseBody201ActionStatus
-    where toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostVolumesIdActionsAttachResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostVolumesIdActionsAttachResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostVolumesIdActionsAttachResponseBody201ActionStatusEnumOther val)
+data PostVolumesIdActionsAttachResponseBody201ActionStatus =
+   PostVolumesIdActionsAttachResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostVolumesIdActionsAttachResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostVolumesIdActionsAttachResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostVolumesIdActionsAttachResponseBody201ActionStatus
+    where toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusOther val) = val
+          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostVolumesIdActionsAttachResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostVolumesIdActionsAttachResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostVolumesIdActionsAttachResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostVolumesIdActionsAttachResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostVolumesIdActionsAttachResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostVolumesIdActionsAttachResponseBody201ActionStatusOther val)
+-- | > POST /volumes/{id}/actions/attach
+-- 
+-- The same as 'postVolumes_Id_ActionsAttach' but accepts an explicit configuration.
+postVolumes_Id_ActionsAttachWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Volume
+  -> GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostVolumesIdActionsAttachResponse) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsAttachWithConfiguration config
+                                              id
+                                              body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostVolumesIdActionsAttachResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostVolumesIdActionsAttachResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    PostVolumesIdActionsAttachResponseBody201)
+                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /volumes/{id}/actions/attach
+-- 
+-- The same as 'postVolumes_Id_ActionsAttach' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postVolumes_Id_ActionsAttachRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Volume
+  -> GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsAttachRaw id
+                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /volumes/{id}/actions/attach
+-- 
+-- The same as 'postVolumes_Id_ActionsAttach' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postVolumes_Id_ActionsAttachWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Volume
+  -> GHC.Maybe.Maybe PostVolumesIdActionsAttachRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postVolumes_Id_ActionsAttachWithConfigurationRaw config
+                                                 id
+                                                 body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

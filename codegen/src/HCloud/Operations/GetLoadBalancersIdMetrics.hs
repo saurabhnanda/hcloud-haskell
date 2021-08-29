@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getLoadBalancers_Id_Metrics
 module HCloud.Operations.GetLoadBalancersIdMetrics where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -61,104 +61,90 @@ import HCloud.Types
 -- If you do not provide the step argument we will automatically adjust it so that 200 samples are returned.
 -- 
 -- We limit the number of samples to a maximum of 500 and will adjust the step parameter accordingly.
-getLoadBalancers_Id_Metrics :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                -- ^ id: ID of the Load Balancer
-  -> Data.Text.Internal.Text                                                                                                                 -- ^ type: Type of metrics to get
-  -> Data.Text.Internal.Text                                                                                                                 -- ^ start: Start of period to get Metrics for (in ISO-8601 format)
-  -> Data.Text.Internal.Text                                                                                                                 -- ^ end: End of period to get Metrics for (in ISO-8601 format)
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                                 -- ^ step: Resolution of results in seconds
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetLoadBalancersIdMetricsResponse))   -- ^ Monad containing the result of the operation
-getLoadBalancers_Id_Metrics config
-                            id
-                            type'
-                            start
-                            end
-                            step = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                               GetLoadBalancersIdMetricsResponseBody200)
-                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
--- | > GET /load_balancers/{id}/metrics
+getLoadBalancers_Id_Metrics :: forall m . HCloud.Common.MonadHTTP m => GetLoadBalancersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetLoadBalancersIdMetricsResponse) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_Metrics parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      GetLoadBalancersIdMetricsResponseBody200)
+                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/metrics.GET.parameters@ in the specification.
 -- 
--- The same as 'getLoadBalancers_Id_Metrics' but returns the raw 'Data.ByteString.Char8.ByteString'
-getLoadBalancers_Id_MetricsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                HCloud.Common.SecurityScheme s) =>
-                                  HCloud.Common.Configuration s ->
-                                  GHC.Integer.Type.Integer ->
-                                  Data.Text.Internal.Text ->
-                                  Data.Text.Internal.Text ->
-                                  Data.Text.Internal.Text ->
-                                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLoadBalancers_Id_MetricsRaw config
-                               id
-                               type'
-                               start
-                               end
-                               step = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                     GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
--- | > GET /load_balancers/{id}/metrics
 -- 
--- Monadic version of 'getLoadBalancers_Id_Metrics' (use with 'HCloud.Common.runWithConfiguration')
-getLoadBalancers_Id_MetricsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                              HCloud.Common.SecurityScheme s) =>
-                                GHC.Integer.Type.Integer ->
-                                Data.Text.Internal.Text ->
-                                Data.Text.Internal.Text ->
-                                Data.Text.Internal.Text ->
-                                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                   m
-                                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                       (Network.HTTP.Client.Types.Response GetLoadBalancersIdMetricsResponse))
-getLoadBalancers_Id_MetricsM id
-                             type'
-                             start
-                             end
-                             step = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                GetLoadBalancersIdMetricsResponseBody200)
-                                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
--- | > GET /load_balancers/{id}/metrics
+data GetLoadBalancersIdMetricsParameters = GetLoadBalancersIdMetricsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Load Balancer
+  getLoadBalancersIdMetricsParametersPathId :: GHC.Types.Int
+  -- | queryEnd: Represents the parameter named \'end\'
+  -- 
+  -- End of period to get Metrics for (in ISO-8601 format)
+  , getLoadBalancersIdMetricsParametersQueryEnd :: Data.Text.Internal.Text
+  -- | queryStart: Represents the parameter named \'start\'
+  -- 
+  -- Start of period to get Metrics for (in ISO-8601 format)
+  , getLoadBalancersIdMetricsParametersQueryStart :: Data.Text.Internal.Text
+  -- | queryStep: Represents the parameter named \'step\'
+  -- 
+  -- Resolution of results in seconds
+  , getLoadBalancersIdMetricsParametersQueryStep :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryType: Represents the parameter named \'type\'
+  -- 
+  -- Type of metrics to get
+  , getLoadBalancersIdMetricsParametersQueryType :: GetLoadBalancersIdMetricsParametersQueryType
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdMetricsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersPathId obj : "queryEnd" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryEnd obj : "queryStart" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryStart obj : "queryStep" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryStep obj : "queryType" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersPathId obj) GHC.Base.<> (("queryEnd" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryEnd obj) GHC.Base.<> (("queryStart" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryStart obj) GHC.Base.<> (("queryStep" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryStep obj) GHC.Base.<> ("queryType" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsParametersQueryType obj)))))
+instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdMetricsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdMetricsParameters" (\obj -> ((((GHC.Base.pure GetLoadBalancersIdMetricsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryEnd")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryStart")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStep")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryType"))
+-- | Create a new 'GetLoadBalancersIdMetricsParameters' with all required fields.
+mkGetLoadBalancersIdMetricsParameters :: GHC.Types.Int -- ^ 'getLoadBalancersIdMetricsParametersPathId'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancersIdMetricsParametersQueryEnd'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancersIdMetricsParametersQueryStart'
+  -> GetLoadBalancersIdMetricsParametersQueryType -- ^ 'getLoadBalancersIdMetricsParametersQueryType'
+  -> GetLoadBalancersIdMetricsParameters
+mkGetLoadBalancersIdMetricsParameters getLoadBalancersIdMetricsParametersPathId getLoadBalancersIdMetricsParametersQueryEnd getLoadBalancersIdMetricsParametersQueryStart getLoadBalancersIdMetricsParametersQueryType = GetLoadBalancersIdMetricsParameters{getLoadBalancersIdMetricsParametersPathId = getLoadBalancersIdMetricsParametersPathId,
+                                                                                                                                                                                                                                                             getLoadBalancersIdMetricsParametersQueryEnd = getLoadBalancersIdMetricsParametersQueryEnd,
+                                                                                                                                                                                                                                                             getLoadBalancersIdMetricsParametersQueryStart = getLoadBalancersIdMetricsParametersQueryStart,
+                                                                                                                                                                                                                                                             getLoadBalancersIdMetricsParametersQueryStep = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                             getLoadBalancersIdMetricsParametersQueryType = getLoadBalancersIdMetricsParametersQueryType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/metrics.GET.parameters.properties.queryType@ in the specification.
 -- 
--- Monadic version of 'getLoadBalancers_Id_MetricsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getLoadBalancers_Id_MetricsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                 HCloud.Common.SecurityScheme s) =>
-                                   GHC.Integer.Type.Integer ->
-                                   Data.Text.Internal.Text ->
-                                   Data.Text.Internal.Text ->
-                                   Data.Text.Internal.Text ->
-                                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                      m
-                                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLoadBalancers_Id_MetricsRawM id
-                                type'
-                                start
-                                end
-                                step = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                   GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
+-- Represents the parameter named \'type\'
+-- 
+-- Type of metrics to get
+data GetLoadBalancersIdMetricsParametersQueryType =
+   GetLoadBalancersIdMetricsParametersQueryTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetLoadBalancersIdMetricsParametersQueryTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetLoadBalancersIdMetricsParametersQueryTypeEnumOpenConnections -- ^ Represents the JSON value @"open_connections"@
+  | GetLoadBalancersIdMetricsParametersQueryTypeEnumConnectionsPerSecond -- ^ Represents the JSON value @"connections_per_second"@
+  | GetLoadBalancersIdMetricsParametersQueryTypeEnumRequestsPerSecond -- ^ Represents the JSON value @"requests_per_second"@
+  | GetLoadBalancersIdMetricsParametersQueryTypeEnumBandwidth -- ^ Represents the JSON value @"bandwidth"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdMetricsParametersQueryType
+    where toJSON (GetLoadBalancersIdMetricsParametersQueryTypeOther val) = val
+          toJSON (GetLoadBalancersIdMetricsParametersQueryTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetLoadBalancersIdMetricsParametersQueryTypeEnumOpenConnections) = "open_connections"
+          toJSON (GetLoadBalancersIdMetricsParametersQueryTypeEnumConnectionsPerSecond) = "connections_per_second"
+          toJSON (GetLoadBalancersIdMetricsParametersQueryTypeEnumRequestsPerSecond) = "requests_per_second"
+          toJSON (GetLoadBalancersIdMetricsParametersQueryTypeEnumBandwidth) = "bandwidth"
+instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdMetricsParametersQueryType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "open_connections" -> GetLoadBalancersIdMetricsParametersQueryTypeEnumOpenConnections
+                                            | val GHC.Classes.== "connections_per_second" -> GetLoadBalancersIdMetricsParametersQueryTypeEnumConnectionsPerSecond
+                                            | val GHC.Classes.== "requests_per_second" -> GetLoadBalancersIdMetricsParametersQueryTypeEnumRequestsPerSecond
+                                            | val GHC.Classes.== "bandwidth" -> GetLoadBalancersIdMetricsParametersQueryTypeEnumBandwidth
+                                            | GHC.Base.otherwise -> GetLoadBalancersIdMetricsParametersQueryTypeOther val)
 -- | Represents a response of the operation 'getLoadBalancers_Id_Metrics'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetLoadBalancersIdMetricsResponseError' is used.
-data GetLoadBalancersIdMetricsResponse =                                           
-   GetLoadBalancersIdMetricsResponseError GHC.Base.String                          -- ^ Means either no matching case available or a parse error
-  | GetLoadBalancersIdMetricsResponse200 GetLoadBalancersIdMetricsResponseBody200  -- ^ The \`metrics\` key in the reply contains a metrics object with this structure
+data GetLoadBalancersIdMetricsResponse =
+   GetLoadBalancersIdMetricsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetLoadBalancersIdMetricsResponse200 GetLoadBalancersIdMetricsResponseBody200 -- ^ The \`metrics\` key in the reply contains a metrics object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetLoadBalancersIdMetricsResponseBody200
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/metrics.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdMetricsResponseBody200 = GetLoadBalancersIdMetricsResponseBody200 {
@@ -166,12 +152,16 @@ data GetLoadBalancersIdMetricsResponseBody200 = GetLoadBalancersIdMetricsRespons
   getLoadBalancersIdMetricsResponseBody200Metrics :: GetLoadBalancersIdMetricsResponseBody200Metrics
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdMetricsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "metrics" (getLoadBalancersIdMetricsResponseBody200Metrics obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "metrics" (getLoadBalancersIdMetricsResponseBody200Metrics obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdMetricsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("metrics" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200Metrics obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("metrics" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200Metrics obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdMetricsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdMetricsResponseBody200" (\obj -> GHC.Base.pure GetLoadBalancersIdMetricsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "metrics"))
--- | Defines the data type for the schema GetLoadBalancersIdMetricsResponseBody200Metrics
+-- | Create a new 'GetLoadBalancersIdMetricsResponseBody200' with all required fields.
+mkGetLoadBalancersIdMetricsResponseBody200 :: GetLoadBalancersIdMetricsResponseBody200Metrics -- ^ 'getLoadBalancersIdMetricsResponseBody200Metrics'
+  -> GetLoadBalancersIdMetricsResponseBody200
+mkGetLoadBalancersIdMetricsResponseBody200 getLoadBalancersIdMetricsResponseBody200Metrics = GetLoadBalancersIdMetricsResponseBody200{getLoadBalancersIdMetricsResponseBody200Metrics = getLoadBalancersIdMetricsResponseBody200Metrics}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/metrics.GET.responses.200.content.application\/json.schema.properties.metrics@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdMetricsResponseBody200Metrics = GetLoadBalancersIdMetricsResponseBody200Metrics {
@@ -182,23 +172,54 @@ data GetLoadBalancersIdMetricsResponseBody200Metrics = GetLoadBalancersIdMetrics
   -- | step: Resolution of results in seconds.
   , getLoadBalancersIdMetricsResponseBody200MetricsStep :: GHC.Types.Double
   -- | time_series: Hash with timeseries information, containing the name of timeseries as key
-  , getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries :: GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries
+  , getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries :: Data.Aeson.Types.Internal.Object
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdMetricsResponseBody200Metrics
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "end" (getLoadBalancersIdMetricsResponseBody200MetricsEnd obj) : (Data.Aeson..=) "start" (getLoadBalancersIdMetricsResponseBody200MetricsStart obj) : (Data.Aeson..=) "step" (getLoadBalancersIdMetricsResponseBody200MetricsStep obj) : (Data.Aeson..=) "time_series" (getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "end" (getLoadBalancersIdMetricsResponseBody200MetricsEnd obj) GHC.Base.<> ((Data.Aeson..=) "start" (getLoadBalancersIdMetricsResponseBody200MetricsStart obj) GHC.Base.<> ((Data.Aeson..=) "step" (getLoadBalancersIdMetricsResponseBody200MetricsStep obj) GHC.Base.<> (Data.Aeson..=) "time_series" (getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdMetricsResponseBody200Metrics
+    where toJSON obj = Data.Aeson.Types.Internal.object ("end" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsEnd obj : "start" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsStart obj : "step" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsStep obj : "time_series" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("end" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsEnd obj) GHC.Base.<> (("start" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsStart obj) GHC.Base.<> (("step" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsStep obj) GHC.Base.<> ("time_series" Data.Aeson.Types.ToJSON..= getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdMetricsResponseBody200Metrics
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdMetricsResponseBody200Metrics" (\obj -> (((GHC.Base.pure GetLoadBalancersIdMetricsResponseBody200Metrics GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "end")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "start")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "step")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "time_series"))
--- | Defines the data type for the schema GetLoadBalancersIdMetricsResponseBody200MetricsTime_series
+-- | Create a new 'GetLoadBalancersIdMetricsResponseBody200Metrics' with all required fields.
+mkGetLoadBalancersIdMetricsResponseBody200Metrics :: Data.Text.Internal.Text -- ^ 'getLoadBalancersIdMetricsResponseBody200MetricsEnd'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancersIdMetricsResponseBody200MetricsStart'
+  -> GHC.Types.Double -- ^ 'getLoadBalancersIdMetricsResponseBody200MetricsStep'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries'
+  -> GetLoadBalancersIdMetricsResponseBody200Metrics
+mkGetLoadBalancersIdMetricsResponseBody200Metrics getLoadBalancersIdMetricsResponseBody200MetricsEnd getLoadBalancersIdMetricsResponseBody200MetricsStart getLoadBalancersIdMetricsResponseBody200MetricsStep getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries = GetLoadBalancersIdMetricsResponseBody200Metrics{getLoadBalancersIdMetricsResponseBody200MetricsEnd = getLoadBalancersIdMetricsResponseBody200MetricsEnd,
+                                                                                                                                                                                                                                                                                                                          getLoadBalancersIdMetricsResponseBody200MetricsStart = getLoadBalancersIdMetricsResponseBody200MetricsStart,
+                                                                                                                                                                                                                                                                                                                          getLoadBalancersIdMetricsResponseBody200MetricsStep = getLoadBalancersIdMetricsResponseBody200MetricsStep,
+                                                                                                                                                                                                                                                                                                                          getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries = getLoadBalancersIdMetricsResponseBody200MetricsTimeSeries}
+-- | > GET /load_balancers/{id}/metrics
 -- 
--- Hash with timeseries information, containing the name of timeseries as key
-data GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries = GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries" (\obj -> GHC.Base.pure GetLoadBalancersIdMetricsResponseBody200MetricsTimeSeries)
+-- The same as 'getLoadBalancers_Id_Metrics' but accepts an explicit configuration.
+getLoadBalancers_Id_MetricsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetLoadBalancersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetLoadBalancersIdMetricsResponse) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_MetricsWithConfiguration config
+                                             parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       GetLoadBalancersIdMetricsResponseBody200)
+                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /load_balancers/{id}/metrics
+-- 
+-- The same as 'getLoadBalancers_Id_Metrics' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getLoadBalancers_Id_MetricsRaw :: forall m . HCloud.Common.MonadHTTP m => GetLoadBalancersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_MetricsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /load_balancers/{id}/metrics
+-- 
+-- The same as 'getLoadBalancers_Id_Metrics' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getLoadBalancers_Id_MetricsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetLoadBalancersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_MetricsWithConfigurationRaw config
+                                                parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getLoadBalancersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])

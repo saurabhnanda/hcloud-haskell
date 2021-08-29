@@ -138,7 +138,7 @@ module HCloud (
   module HCloud.Operations.PostVolumesIdActionsResize,
   module HCloud.Operations.GetVolumesIdActionsActionId_,
   module HCloud.Types,
-  module HCloud.CyclicTypes,
+  module HCloud.TypeAlias,
   module HCloud.Configuration,
   module HCloud.SecuritySchemes,
   module HCloud.Common,
@@ -280,7 +280,7 @@ import HCloud.Operations.PostVolumesIdActionsDetach
 import HCloud.Operations.PostVolumesIdActionsResize
 import HCloud.Operations.GetVolumesIdActionsActionId_
 import HCloud.Types
-import HCloud.CyclicTypes
+import HCloud.TypeAlias
 import HCloud.Configuration
 import HCloud.SecuritySchemes
 import HCloud.Common

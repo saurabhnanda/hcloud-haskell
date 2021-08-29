@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postLoadBalancers_Id_ActionsAttachToNetwork
 module HCloud.Operations.PostLoadBalancersIdActionsAttachToNetwork where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -53,57 +53,14 @@ import HCloud.Types
 -- | \`load_balancer_already_attached\` | The Load Balancer is already attached to a network                    |
 -- | \`ip_not_available\`               | The provided Network IP is not available                              |
 -- | \`no_subnet_available\`            | No Subnet or IP is available for the Load Balancer within the network |
-postLoadBalancers_Id_ActionsAttachToNetwork :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                                -- ^ id: ID of the Load Balancer
-  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAttachToNetworkResponse))   -- ^ Monad containing the result of the operation
-postLoadBalancers_Id_ActionsAttachToNetwork config
-                                            id
-                                            body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAttachToNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAttachToNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               PostLoadBalancersIdActionsAttachToNetworkResponseBody201)
-                                                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/attach_to_network
--- 
--- The same as 'postLoadBalancers_Id_ActionsAttachToNetwork' but returns the raw 'Data.ByteString.Char8.ByteString'
-postLoadBalancers_Id_ActionsAttachToNetworkRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                HCloud.Common.SecurityScheme s) =>
-                                                  HCloud.Common.Configuration s ->
-                                                  GHC.Integer.Type.Integer ->
-                                                  GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody ->
-                                                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsAttachToNetworkRaw config
-                                               id
-                                               body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/attach_to_network
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsAttachToNetwork' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsAttachToNetworkM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                              HCloud.Common.SecurityScheme s) =>
-                                                GHC.Integer.Type.Integer ->
-                                                GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody ->
-                                                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                   m
-                                                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                       (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAttachToNetworkResponse))
-postLoadBalancers_Id_ActionsAttachToNetworkM id
-                                             body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAttachToNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAttachToNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                PostLoadBalancersIdActionsAttachToNetworkResponseBody201)
-                                                                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/attach_to_network
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsAttachToNetworkRaw' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsAttachToNetworkRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                                 HCloud.Common.SecurityScheme s) =>
-                                                   GHC.Integer.Type.Integer ->
-                                                   GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody ->
-                                                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                      m
-                                                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsAttachToNetworkRawM id
-                                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsAttachToNetworkRequestBody
+postLoadBalancers_Id_ActionsAttachToNetwork :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAttachToNetworkResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAttachToNetwork id
+                                            body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAttachToNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAttachToNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                PostLoadBalancersIdActionsAttachToNetworkResponseBody201)
+                                                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/attach_to_network.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAttachToNetworkRequestBody = PostLoadBalancersIdActionsAttachToNetworkRequestBody {
@@ -113,19 +70,24 @@ data PostLoadBalancersIdActionsAttachToNetworkRequestBody = PostLoadBalancersIdA
   , postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork :: GHC.Types.Double
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAttachToNetworkRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (postLoadBalancersIdActionsAttachToNetworkRequestBodyIp obj) : (Data.Aeson..=) "network" (postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (postLoadBalancersIdActionsAttachToNetworkRequestBodyIp obj) GHC.Base.<> (Data.Aeson..=) "network" (postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAttachToNetworkRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkRequestBodyIp obj : "network" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkRequestBodyIp obj) GHC.Base.<> ("network" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAttachToNetworkRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAttachToNetworkRequestBody" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsAttachToNetworkRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network"))
+-- | Create a new 'PostLoadBalancersIdActionsAttachToNetworkRequestBody' with all required fields.
+mkPostLoadBalancersIdActionsAttachToNetworkRequestBody :: GHC.Types.Double -- ^ 'postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork'
+  -> PostLoadBalancersIdActionsAttachToNetworkRequestBody
+mkPostLoadBalancersIdActionsAttachToNetworkRequestBody postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork = PostLoadBalancersIdActionsAttachToNetworkRequestBody{postLoadBalancersIdActionsAttachToNetworkRequestBodyIp = GHC.Maybe.Nothing,
+                                                                                                                                                                          postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork = postLoadBalancersIdActionsAttachToNetworkRequestBodyNetwork}
 -- | Represents a response of the operation 'postLoadBalancers_Id_ActionsAttachToNetwork'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostLoadBalancersIdActionsAttachToNetworkResponseError' is used.
-data PostLoadBalancersIdActionsAttachToNetworkResponse =                                                           
-   PostLoadBalancersIdActionsAttachToNetworkResponseError GHC.Base.String                                          -- ^ Means either no matching case available or a parse error
-  | PostLoadBalancersIdActionsAttachToNetworkResponse201 PostLoadBalancersIdActionsAttachToNetworkResponseBody201  -- ^ The \`action\` key contains the \`attach_to_network\` Action
+data PostLoadBalancersIdActionsAttachToNetworkResponse =
+   PostLoadBalancersIdActionsAttachToNetworkResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostLoadBalancersIdActionsAttachToNetworkResponse201 PostLoadBalancersIdActionsAttachToNetworkResponseBody201 -- ^ The \`action\` key contains the \`attach_to_network\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostLoadBalancersIdActionsAttachToNetworkResponseBody201
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/attach_to_network.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAttachToNetworkResponseBody201 = PostLoadBalancersIdActionsAttachToNetworkResponseBody201 {
@@ -133,39 +95,61 @@ data PostLoadBalancersIdActionsAttachToNetworkResponseBody201 = PostLoadBalancer
   postLoadBalancersIdActionsAttachToNetworkResponseBody201Action :: PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postLoadBalancersIdActionsAttachToNetworkResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postLoadBalancersIdActionsAttachToNetworkResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAttachToNetworkResponseBody201" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsAttachToNetworkResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action
+-- | Create a new 'PostLoadBalancersIdActionsAttachToNetworkResponseBody201' with all required fields.
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201 :: PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201Action'
+  -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201 postLoadBalancersIdActionsAttachToNetworkResponseBody201Action = PostLoadBalancersIdActionsAttachToNetworkResponseBody201{postLoadBalancersIdActionsAttachToNetworkResponseBody201Action = postLoadBalancersIdActionsAttachToNetworkResponseBody201Action}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/attach_to_network.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action = PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action {
   -- | command: Command executed in the Action
   postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError :: PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError
+  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources :: ([] PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources)
+  , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources :: ([PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus :: PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError
+-- | Create a new 'PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action' with all required fields.
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress'
+  -> [PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources] -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted'
+  -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus'
+  -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201Action postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus = PostLoadBalancersIdActionsAttachToNetworkResponseBody201Action{postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/attach_to_network.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError = PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError {
@@ -175,47 +159,86 @@ data PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError = PostL
   , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources
+-- | Create a new 'PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError' with all required fields.
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage'
+  -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage = PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionError{postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                                               postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/attach_to_network.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources = PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
+-- | Create a new 'PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources' with all required fields.
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType'
+  -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources
+mkPostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType = PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResources{postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                                          postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType = postLoadBalancersIdActionsAttachToNetworkResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/attach_to_network.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
-    = PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringError
-    | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringRunning
-    | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
-    where toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumOther val)
+data PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus =
+   PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
+    where toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusOther val) = val
+          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsAttachToNetworkResponseBody201ActionStatusOther val)
+-- | > POST /load_balancers/{id}/actions/attach_to_network
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsAttachToNetwork' but accepts an explicit configuration.
+postLoadBalancers_Id_ActionsAttachToNetworkWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAttachToNetworkResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAttachToNetworkWithConfiguration config
+                                                             id
+                                                             body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAttachToNetworkResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAttachToNetworkResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 PostLoadBalancersIdActionsAttachToNetworkResponseBody201)
+                                                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/attach_to_network
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsAttachToNetwork' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsAttachToNetworkRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAttachToNetworkRaw id
+                                               body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/attach_to_network
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsAttachToNetwork' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsAttachToNetworkWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAttachToNetworkRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAttachToNetworkWithConfigurationRaw config
+                                                                id
+                                                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/attach_to_network"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

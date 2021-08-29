@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postLoadBalancers_Id_ActionsRemoveTarget
 module HCloud.Operations.PostLoadBalancersIdActionsRemoveTarget where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,57 +45,14 @@ import HCloud.Types
 -- | > POST /load_balancers/{id}/actions/remove_target
 -- 
 -- Removes a target from a Load Balancer.
-postLoadBalancers_Id_ActionsRemoveTarget :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                             -- ^ id: ID of the Load Balancer
-  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsRemoveTargetResponse))   -- ^ Monad containing the result of the operation
-postLoadBalancers_Id_ActionsRemoveTarget config
-                                         id
-                                         body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsRemoveTargetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsRemoveTargetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostLoadBalancersIdActionsRemoveTargetResponseBody201)
-                                                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/remove_target
--- 
--- The same as 'postLoadBalancers_Id_ActionsRemoveTarget' but returns the raw 'Data.ByteString.Char8.ByteString'
-postLoadBalancers_Id_ActionsRemoveTargetRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                             HCloud.Common.SecurityScheme s) =>
-                                               HCloud.Common.Configuration s ->
-                                               GHC.Integer.Type.Integer ->
-                                               GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody ->
-                                               m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                     (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsRemoveTargetRaw config
-                                            id
-                                            body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/remove_target
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsRemoveTarget' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsRemoveTargetM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                           HCloud.Common.SecurityScheme s) =>
-                                             GHC.Integer.Type.Integer ->
-                                             GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody ->
-                                             Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                m
-                                                                                (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                    (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsRemoveTargetResponse))
-postLoadBalancers_Id_ActionsRemoveTargetM id
-                                          body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsRemoveTargetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsRemoveTargetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostLoadBalancersIdActionsRemoveTargetResponseBody201)
-                                                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/remove_target
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsRemoveTargetRaw' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsRemoveTargetRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                              HCloud.Common.SecurityScheme s) =>
-                                                GHC.Integer.Type.Integer ->
-                                                GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody ->
-                                                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                   m
-                                                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                       (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsRemoveTargetRawM id
-                                             body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsRemoveTargetRequestBody
+postLoadBalancers_Id_ActionsRemoveTarget :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsRemoveTargetResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsRemoveTarget id
+                                         body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsRemoveTargetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsRemoveTargetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostLoadBalancersIdActionsRemoveTargetResponseBody201)
+                                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsRemoveTargetRequestBody = PostLoadBalancersIdActionsRemoveTargetRequestBody {
@@ -109,12 +66,19 @@ data PostLoadBalancersIdActionsRemoveTargetRequestBody = PostLoadBalancersIdActi
   , postLoadBalancersIdActionsRemoveTargetRequestBodyType :: PostLoadBalancersIdActionsRemoveTargetRequestBodyType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (postLoadBalancersIdActionsRemoveTargetRequestBodyIp obj) : (Data.Aeson..=) "label_selector" (postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector obj) : (Data.Aeson..=) "server" (postLoadBalancersIdActionsRemoveTargetRequestBodyServer obj) : (Data.Aeson..=) "type" (postLoadBalancersIdActionsRemoveTargetRequestBodyType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (postLoadBalancersIdActionsRemoveTargetRequestBodyIp obj) GHC.Base.<> ((Data.Aeson..=) "label_selector" (postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (postLoadBalancersIdActionsRemoveTargetRequestBodyServer obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersIdActionsRemoveTargetRequestBodyType obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyIp obj : "label_selector" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyServer obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyIp obj) GHC.Base.<> (("label_selector" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyType obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetRequestBody" (\obj -> (((GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsRemoveTargetRequestBodyIp
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetRequestBody' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetRequestBody :: PostLoadBalancersIdActionsRemoveTargetRequestBodyType -- ^ 'postLoadBalancersIdActionsRemoveTargetRequestBodyType'
+  -> PostLoadBalancersIdActionsRemoveTargetRequestBody
+mkPostLoadBalancersIdActionsRemoveTargetRequestBody postLoadBalancersIdActionsRemoveTargetRequestBodyType = PostLoadBalancersIdActionsRemoveTargetRequestBody{postLoadBalancersIdActionsRemoveTargetRequestBodyIp = GHC.Maybe.Nothing,
+                                                                                                                                                              postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector = GHC.Maybe.Nothing,
+                                                                                                                                                              postLoadBalancersIdActionsRemoveTargetRequestBodyServer = GHC.Maybe.Nothing,
+                                                                                                                                                              postLoadBalancersIdActionsRemoveTargetRequestBodyType = postLoadBalancersIdActionsRemoveTargetRequestBodyType}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.requestBody.content.application\/json.schema.properties.ip@ in the specification.
 -- 
 -- IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
 data PostLoadBalancersIdActionsRemoveTargetRequestBodyIp = PostLoadBalancersIdActionsRemoveTargetRequestBodyIp {
@@ -122,12 +86,16 @@ data PostLoadBalancersIdActionsRemoveTargetRequestBodyIp = PostLoadBalancersIdAc
   postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyIp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyIp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyIp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetRequestBodyIp" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetRequestBodyIp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsRemoveTargetRequestBodyLabel_selector
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetRequestBodyIp' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetRequestBodyIp :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp'
+  -> PostLoadBalancersIdActionsRemoveTargetRequestBodyIp
+mkPostLoadBalancersIdActionsRemoveTargetRequestBodyIp postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp = PostLoadBalancersIdActionsRemoveTargetRequestBodyIp{postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp = postLoadBalancersIdActionsRemoveTargetRequestBodyIpIp}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.requestBody.content.application\/json.schema.properties.label_selector@ in the specification.
 -- 
 -- Configuration for label selector targets, required if type is \`label_selector\`
 data PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector = PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector {
@@ -135,12 +103,16 @@ data PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector = PostLoadBa
   postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsRemoveTargetRequestBodyServer
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector'
+  -> PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector
+mkPostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector = PostLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelector{postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector = postLoadBalancersIdActionsRemoveTargetRequestBodyLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.requestBody.content.application\/json.schema.properties.server@ in the specification.
 -- 
 -- Configuration for type Server, required if type is \`server\`
 data PostLoadBalancersIdActionsRemoveTargetRequestBodyServer = PostLoadBalancersIdActionsRemoveTargetRequestBodyServer {
@@ -148,43 +120,44 @@ data PostLoadBalancersIdActionsRemoveTargetRequestBodyServer = PostLoadBalancers
   postLoadBalancersIdActionsRemoveTargetRequestBodyServerId :: GHC.Types.Double
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersIdActionsRemoveTargetRequestBodyServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersIdActionsRemoveTargetRequestBodyServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetRequestBodyServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetRequestBodyServer" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetRequestBodyServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema postLoadBalancers_Id_ActionsRemoveTargetRequestBodyType
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetRequestBodyServer' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetRequestBodyServer :: GHC.Types.Double -- ^ 'postLoadBalancersIdActionsRemoveTargetRequestBodyServerId'
+  -> PostLoadBalancersIdActionsRemoveTargetRequestBodyServer
+mkPostLoadBalancersIdActionsRemoveTargetRequestBodyServer postLoadBalancersIdActionsRemoveTargetRequestBodyServerId = PostLoadBalancersIdActionsRemoveTargetRequestBodyServer{postLoadBalancersIdActionsRemoveTargetRequestBodyServerId = postLoadBalancersIdActionsRemoveTargetRequestBodyServerId}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.requestBody.content.application\/json.schema.properties.type@ in the specification.
 -- 
 -- Type of the resource
-data PostLoadBalancersIdActionsRemoveTargetRequestBodyType
-    = PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringIp
-    | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringLabelSelector
-    | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyType
-    where toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringIp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip"
-          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip")
-                                          then PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringIp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                                then PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringLabelSelector
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                      then PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumStringServer
-                                                      else PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumOther val)
+data PostLoadBalancersIdActionsRemoveTargetRequestBodyType =
+   PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  | PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumIp -- ^ Represents the JSON value @"ip"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyType
+    where toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeOther val) = val
+          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumServer) = "server"
+          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumLabelSelector) = "label_selector"
+          toJSON (PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumIp) = "ip"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetRequestBodyType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumLabelSelector
+                                            | val GHC.Classes.== "ip" -> PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeEnumIp
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsRemoveTargetRequestBodyTypeOther val)
 -- | Represents a response of the operation 'postLoadBalancers_Id_ActionsRemoveTarget'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostLoadBalancersIdActionsRemoveTargetResponseError' is used.
-data PostLoadBalancersIdActionsRemoveTargetResponse =                                                        
-   PostLoadBalancersIdActionsRemoveTargetResponseError GHC.Base.String                                       -- ^ Means either no matching case available or a parse error
-  | PostLoadBalancersIdActionsRemoveTargetResponse201 PostLoadBalancersIdActionsRemoveTargetResponseBody201  -- ^ The \`action\` key contains the \`remove_target\` Action
+data PostLoadBalancersIdActionsRemoveTargetResponse =
+   PostLoadBalancersIdActionsRemoveTargetResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostLoadBalancersIdActionsRemoveTargetResponse201 PostLoadBalancersIdActionsRemoveTargetResponseBody201 -- ^ The \`action\` key contains the \`remove_target\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostLoadBalancersIdActionsRemoveTargetResponseBody201
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsRemoveTargetResponseBody201 = PostLoadBalancersIdActionsRemoveTargetResponseBody201 {
@@ -192,39 +165,61 @@ data PostLoadBalancersIdActionsRemoveTargetResponseBody201 = PostLoadBalancersId
   postLoadBalancersIdActionsRemoveTargetResponseBody201Action :: PostLoadBalancersIdActionsRemoveTargetResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postLoadBalancersIdActionsRemoveTargetResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postLoadBalancersIdActionsRemoveTargetResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetResponseBody201" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsRemoveTargetResponseBody201Action
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetResponseBody201' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201 :: PostLoadBalancersIdActionsRemoveTargetResponseBody201Action -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201Action'
+  -> PostLoadBalancersIdActionsRemoveTargetResponseBody201
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201 postLoadBalancersIdActionsRemoveTargetResponseBody201Action = PostLoadBalancersIdActionsRemoveTargetResponseBody201{postLoadBalancersIdActionsRemoveTargetResponseBody201Action = postLoadBalancersIdActionsRemoveTargetResponseBody201Action}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsRemoveTargetResponseBody201Action = PostLoadBalancersIdActionsRemoveTargetResponseBody201Action {
   -- | command: Command executed in the Action
   postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError :: PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError
+  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources :: ([] PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources)
+  , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources :: ([PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus :: PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetResponseBody201Action' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress'
+  -> [PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources] -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted'
+  -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus'
+  -> PostLoadBalancersIdActionsRemoveTargetResponseBody201Action
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201Action postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus = PostLoadBalancersIdActionsRemoveTargetResponseBody201Action{postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError = PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError {
@@ -234,47 +229,86 @@ data PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError = PostLoad
   , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage'
+  -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage = PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionError{postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources = PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
+-- | Create a new 'PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources' with all required fields.
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType'
+  -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources
+mkPostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType = PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionResources{postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                              postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType = postLoadBalancersIdActionsRemoveTargetResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/remove_target.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
-    = PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringError
-    | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringRunning
-    | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
-    where toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumOther val)
+data PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus =
+   PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
+    where toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusOther val) = val
+          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsRemoveTargetResponseBody201ActionStatusOther val)
+-- | > POST /load_balancers/{id}/actions/remove_target
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsRemoveTarget' but accepts an explicit configuration.
+postLoadBalancers_Id_ActionsRemoveTargetWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsRemoveTargetResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsRemoveTargetWithConfiguration config
+                                                          id
+                                                          body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsRemoveTargetResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsRemoveTargetResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        PostLoadBalancersIdActionsRemoveTargetResponseBody201)
+                                                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/remove_target
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsRemoveTarget' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsRemoveTargetRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsRemoveTargetRaw id
+                                            body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/remove_target
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsRemoveTarget' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsRemoveTargetWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsRemoveTargetRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsRemoveTargetWithConfigurationRaw config
+                                                             id
+                                                             body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/remove_target"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

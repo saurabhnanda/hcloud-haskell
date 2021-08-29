@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getImages
 module HCloud.Operations.GetImages where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,178 +45,211 @@ import HCloud.Types
 -- | > GET /images
 -- 
 -- Returns all Image objects. You can select specific Image types only and sort the results by using URI parameters.
-getImages :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                               -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                               -- ^ type: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                               -- ^ status: Can be used multiple times. The response will only contain Images matching the status.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                               -- ^ bound_to: Can be used multiple times. Server ID linked to the Image. Only available for Images of type \`backup\`
-  -> GHC.Maybe.Maybe GHC.Types.Bool                                                                                        -- ^ include_deprecated: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                               -- ^ name: Can be used to filter resources by their name. The response will only contain the resources matching the specified name
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                               -- ^ label_selector: Can be used to filter resources by labels. The response will only contain resources matching the label selector.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetImagesResponse)) -- ^ Monad containing the result of the operation
-getImages config
-          sort
-          type'
-          status
-          boundTo
-          includeDeprecated
-          name
-          labelSelector = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetImagesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                      GetImagesResponseBody200)
-                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> type') : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> status) : ((Data.Text.pack "bound_to",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> boundTo) : ((Data.Text.pack "include_deprecated",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> includeDeprecated) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))))))
--- | > GET /images
+getImages :: forall m . HCloud.Common.MonadHTTP m => GetImagesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetImagesResponse) -- ^ Monadic computation which returns the result of the operation
+getImages parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetImagesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                    GetImagesResponseBody200)
+                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "bound_to") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryBoundTo parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "include_deprecated") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryIncludeDeprecated parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/images.GET.parameters@ in the specification.
 -- 
--- The same as 'getImages' but returns the raw 'Data.ByteString.Char8.ByteString'
-getImagesRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                              HCloud.Common.SecurityScheme s) =>
-                HCloud.Common.Configuration s ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                GHC.Maybe.Maybe GHC.Types.Bool ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getImagesRaw config
-             sort
-             type'
-             status
-             boundTo
-             includeDeprecated
-             name
-             labelSelector = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") ((Data.Text.pack "sort",
-                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> type') : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> status) : ((Data.Text.pack "bound_to",
-                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> boundTo) : ((Data.Text.pack "include_deprecated",
-                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> includeDeprecated) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))))))
--- | > GET /images
 -- 
--- Monadic version of 'getImages' (use with 'HCloud.Common.runWithConfiguration')
-getImagesM :: forall m s . (HCloud.Common.MonadHTTP m,
-                            HCloud.Common.SecurityScheme s) =>
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              GHC.Maybe.Maybe GHC.Types.Bool ->
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                 m
-                                                 (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                     (Network.HTTP.Client.Types.Response GetImagesResponse))
-getImagesM sort
-           type'
-           status
-           boundTo
-           includeDeprecated
-           name
-           labelSelector = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetImagesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                       GetImagesResponseBody200)
-                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> type') : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> status) : ((Data.Text.pack "bound_to",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> boundTo) : ((Data.Text.pack "include_deprecated",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.stringifyModel Data.Functor.<$> includeDeprecated) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))))))
--- | > GET /images
+data GetImagesParameters = GetImagesParameters {
+  -- | queryBound_to: Represents the parameter named \'bound_to\'
+  -- 
+  -- Can be used multiple times. Server ID linked to the Image. Only available for Images of type \`backup\`
+  getImagesParametersQueryBoundTo :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryInclude_deprecated: Represents the parameter named \'include_deprecated\'
+  -- 
+  -- Can be used multiple times.
+  , getImagesParametersQueryIncludeDeprecated :: (GHC.Maybe.Maybe GHC.Types.Bool)
+  -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+  -- 
+  -- Can be used to filter resources by labels. The response will only contain resources matching the label selector.
+  , getImagesParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryName: Represents the parameter named \'name\'
+  -- 
+  -- Can be used to filter resources by their name. The response will only contain the resources matching the specified name
+  , getImagesParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getImagesParametersQuerySort :: (GHC.Maybe.Maybe GetImagesParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times. The response will only contain Images matching the status.
+  , getImagesParametersQueryStatus :: (GHC.Maybe.Maybe GetImagesParametersQueryStatus)
+  -- | queryType: Represents the parameter named \'type\'
+  -- 
+  -- Can be used multiple times.
+  , getImagesParametersQueryType :: (GHC.Maybe.Maybe GetImagesParametersQueryType)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryBound_to" Data.Aeson.Types.ToJSON..= getImagesParametersQueryBoundTo obj : "queryInclude_deprecated" Data.Aeson.Types.ToJSON..= getImagesParametersQueryIncludeDeprecated obj : "queryLabel_selector" Data.Aeson.Types.ToJSON..= getImagesParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getImagesParametersQueryName obj : "querySort" Data.Aeson.Types.ToJSON..= getImagesParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getImagesParametersQueryStatus obj : "queryType" Data.Aeson.Types.ToJSON..= getImagesParametersQueryType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryBound_to" Data.Aeson.Types.ToJSON..= getImagesParametersQueryBoundTo obj) GHC.Base.<> (("queryInclude_deprecated" Data.Aeson.Types.ToJSON..= getImagesParametersQueryIncludeDeprecated obj) GHC.Base.<> (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getImagesParametersQueryLabelSelector obj) GHC.Base.<> (("queryName" Data.Aeson.Types.ToJSON..= getImagesParametersQueryName obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getImagesParametersQuerySort obj) GHC.Base.<> (("queryStatus" Data.Aeson.Types.ToJSON..= getImagesParametersQueryStatus obj) GHC.Base.<> ("queryType" Data.Aeson.Types.ToJSON..= getImagesParametersQueryType obj)))))))
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesParameters" (\obj -> ((((((GHC.Base.pure GetImagesParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryBound_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryInclude_deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryType"))
+-- | Create a new 'GetImagesParameters' with all required fields.
+mkGetImagesParameters :: GetImagesParameters
+mkGetImagesParameters = GetImagesParameters{getImagesParametersQueryBoundTo = GHC.Maybe.Nothing,
+                                            getImagesParametersQueryIncludeDeprecated = GHC.Maybe.Nothing,
+                                            getImagesParametersQueryLabelSelector = GHC.Maybe.Nothing,
+                                            getImagesParametersQueryName = GHC.Maybe.Nothing,
+                                            getImagesParametersQuerySort = GHC.Maybe.Nothing,
+                                            getImagesParametersQueryStatus = GHC.Maybe.Nothing,
+                                            getImagesParametersQueryType = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/images.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getImagesRaw' (use with 'HCloud.Common.runWithConfiguration')
-getImagesRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                               HCloud.Common.SecurityScheme s) =>
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe GHC.Types.Bool ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                    m
-                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getImagesRawM sort
-              type'
-              status
-              boundTo
-              includeDeprecated
-              name
-              labelSelector = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") ((Data.Text.pack "sort",
-                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> type') : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> status) : ((Data.Text.pack "bound_to",
-                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> boundTo) : ((Data.Text.pack "include_deprecated",
-                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> includeDeprecated) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : []))))))))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetImagesParametersQuerySort =
+   GetImagesParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetImagesParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetImagesParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetImagesParametersQuerySortEnumName -- ^ Represents the JSON value @"name"@
+  | GetImagesParametersQuerySortEnumNameAsc -- ^ Represents the JSON value @"name:asc"@
+  | GetImagesParametersQuerySortEnumNameDesc -- ^ Represents the JSON value @"name:desc"@
+  | GetImagesParametersQuerySortEnumCreated -- ^ Represents the JSON value @"created"@
+  | GetImagesParametersQuerySortEnumCreatedAsc -- ^ Represents the JSON value @"created:asc"@
+  | GetImagesParametersQuerySortEnumCreatedDesc -- ^ Represents the JSON value @"created:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesParametersQuerySort
+    where toJSON (GetImagesParametersQuerySortOther val) = val
+          toJSON (GetImagesParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesParametersQuerySortEnumId) = "id"
+          toJSON (GetImagesParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetImagesParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetImagesParametersQuerySortEnumName) = "name"
+          toJSON (GetImagesParametersQuerySortEnumNameAsc) = "name:asc"
+          toJSON (GetImagesParametersQuerySortEnumNameDesc) = "name:desc"
+          toJSON (GetImagesParametersQuerySortEnumCreated) = "created"
+          toJSON (GetImagesParametersQuerySortEnumCreatedAsc) = "created:asc"
+          toJSON (GetImagesParametersQuerySortEnumCreatedDesc) = "created:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetImagesParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetImagesParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetImagesParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "name" -> GetImagesParametersQuerySortEnumName
+                                            | val GHC.Classes.== "name:asc" -> GetImagesParametersQuerySortEnumNameAsc
+                                            | val GHC.Classes.== "name:desc" -> GetImagesParametersQuerySortEnumNameDesc
+                                            | val GHC.Classes.== "created" -> GetImagesParametersQuerySortEnumCreated
+                                            | val GHC.Classes.== "created:asc" -> GetImagesParametersQuerySortEnumCreatedAsc
+                                            | val GHC.Classes.== "created:desc" -> GetImagesParametersQuerySortEnumCreatedDesc
+                                            | GHC.Base.otherwise -> GetImagesParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/images.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times. The response will only contain Images matching the status.
+data GetImagesParametersQueryStatus =
+   GetImagesParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesParametersQueryStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | GetImagesParametersQueryStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesParametersQueryStatus
+    where toJSON (GetImagesParametersQueryStatusOther val) = val
+          toJSON (GetImagesParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesParametersQueryStatusEnumAvailable) = "available"
+          toJSON (GetImagesParametersQueryStatusEnumCreating) = "creating"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> GetImagesParametersQueryStatusEnumAvailable
+                                            | val GHC.Classes.== "creating" -> GetImagesParametersQueryStatusEnumCreating
+                                            | GHC.Base.otherwise -> GetImagesParametersQueryStatusOther val)
+-- | Defines the enum schema located at @paths.\/images.GET.parameters.properties.queryType@ in the specification.
+-- 
+-- Represents the parameter named \'type\'
+-- 
+-- Can be used multiple times.
+data GetImagesParametersQueryType =
+   GetImagesParametersQueryTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesParametersQueryTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesParametersQueryTypeEnumSystem -- ^ Represents the JSON value @"system"@
+  | GetImagesParametersQueryTypeEnumSnapshot -- ^ Represents the JSON value @"snapshot"@
+  | GetImagesParametersQueryTypeEnumBackup -- ^ Represents the JSON value @"backup"@
+  | GetImagesParametersQueryTypeEnumApp -- ^ Represents the JSON value @"app"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesParametersQueryType
+    where toJSON (GetImagesParametersQueryTypeOther val) = val
+          toJSON (GetImagesParametersQueryTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesParametersQueryTypeEnumSystem) = "system"
+          toJSON (GetImagesParametersQueryTypeEnumSnapshot) = "snapshot"
+          toJSON (GetImagesParametersQueryTypeEnumBackup) = "backup"
+          toJSON (GetImagesParametersQueryTypeEnumApp) = "app"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesParametersQueryType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "system" -> GetImagesParametersQueryTypeEnumSystem
+                                            | val GHC.Classes.== "snapshot" -> GetImagesParametersQueryTypeEnumSnapshot
+                                            | val GHC.Classes.== "backup" -> GetImagesParametersQueryTypeEnumBackup
+                                            | val GHC.Classes.== "app" -> GetImagesParametersQueryTypeEnumApp
+                                            | GHC.Base.otherwise -> GetImagesParametersQueryTypeOther val)
 -- | Represents a response of the operation 'getImages'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetImagesResponseError' is used.
-data GetImagesResponse =                           
-   GetImagesResponseError GHC.Base.String          -- ^ Means either no matching case available or a parse error
-  | GetImagesResponse200 GetImagesResponseBody200  -- ^ The \`images\` key in the reply contains an array of Image objects with this structure
+data GetImagesResponse =
+   GetImagesResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetImagesResponse200 GetImagesResponseBody200 -- ^ The \`images\` key in the reply contains an array of Image objects with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetImagesResponseBody200
+-- | Defines the object schema located at @paths.\/images.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetImagesResponseBody200 = GetImagesResponseBody200 {
   -- | images
-  getImagesResponseBody200Images :: ([] GetImagesResponseBody200Images)
+  getImagesResponseBody200Images :: ([GetImagesResponseBody200Images])
   -- | meta
   , getImagesResponseBody200Meta :: (GHC.Maybe.Maybe GetImagesResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "images" (getImagesResponseBody200Images obj) : (Data.Aeson..=) "meta" (getImagesResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "images" (getImagesResponseBody200Images obj) GHC.Base.<> (Data.Aeson..=) "meta" (getImagesResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("images" Data.Aeson.Types.ToJSON..= getImagesResponseBody200Images obj : "meta" Data.Aeson.Types.ToJSON..= getImagesResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("images" Data.Aeson.Types.ToJSON..= getImagesResponseBody200Images obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getImagesResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200" (\obj -> (GHC.Base.pure GetImagesResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "images")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetImagesResponseBody200Images
+-- | Create a new 'GetImagesResponseBody200' with all required fields.
+mkGetImagesResponseBody200 :: [GetImagesResponseBody200Images] -- ^ 'getImagesResponseBody200Images'
+  -> GetImagesResponseBody200
+mkGetImagesResponseBody200 getImagesResponseBody200Images = GetImagesResponseBody200{getImagesResponseBody200Images = getImagesResponseBody200Images,
+                                                                                     getImagesResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.images.items@ in the specification.
 -- 
 -- 
 data GetImagesResponseBody200Images = GetImagesResponseBody200Images {
   -- | bound_to: ID of Server the Image is bound to. Only set for Images of type \`backup\`.
-  getImagesResponseBody200ImagesBoundTo :: GHC.Integer.Type.Integer
+  getImagesResponseBody200ImagesBoundTo :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | build_id: Build ID of the Image
   , getImagesResponseBody200ImagesBuildId :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , getImagesResponseBody200ImagesCreated :: Data.Text.Internal.Text
   -- | created_from: Information about the Server the Image was created from
-  , getImagesResponseBody200ImagesCreatedFrom :: GetImagesResponseBody200ImagesCreatedFrom
+  , getImagesResponseBody200ImagesCreatedFrom :: (GHC.Maybe.Maybe GetImagesResponseBody200ImagesCreatedFrom)
   -- | deleted: Point in time where the Image was deleted (in ISO-8601 format)
-  , getImagesResponseBody200ImagesDeleted :: Data.Text.Internal.Text
+  , getImagesResponseBody200ImagesDeleted :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | deprecated: Point in time when the Image is considered to be deprecated (in ISO-8601 format)
-  , getImagesResponseBody200ImagesDeprecated :: Data.Text.Internal.Text
+  , getImagesResponseBody200ImagesDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Image
   , getImagesResponseBody200ImagesDescription :: Data.Text.Internal.Text
   -- | disk_size: Size of the disk contained in the Image in GB
   , getImagesResponseBody200ImagesDiskSize :: GHC.Types.Double
   -- | id: ID of the Resource
-  , getImagesResponseBody200ImagesId :: GHC.Integer.Type.Integer
+  , getImagesResponseBody200ImagesId :: GHC.Types.Int
   -- | image_size: Size of the Image file in our storage in GB. For snapshot Images this is the value relevant for calculating costs for the Image.
-  , getImagesResponseBody200ImagesImageSize :: GHC.Types.Double
+  , getImagesResponseBody200ImagesImageSize :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | labels: User-defined labels (key-value pairs)
-  , getImagesResponseBody200ImagesLabels :: GetImagesResponseBody200ImagesLabels
+  , getImagesResponseBody200ImagesLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Unique identifier of the Image. This value is only set for system Images.
-  , getImagesResponseBody200ImagesName :: Data.Text.Internal.Text
+  , getImagesResponseBody200ImagesName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | os_flavor: Flavor of operating system contained in the Image
   , getImagesResponseBody200ImagesOsFlavor :: GetImagesResponseBody200ImagesOsFlavor
   -- | os_version: Operating system version
-  , getImagesResponseBody200ImagesOsVersion :: Data.Text.Internal.Text
+  , getImagesResponseBody200ImagesOsVersion :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | protection: Protection configuration for the Resource
   , getImagesResponseBody200ImagesProtection :: GetImagesResponseBody200ImagesProtection
   -- | rapid_deploy: Indicates that rapid deploy of the Image is available
@@ -227,71 +260,96 @@ data GetImagesResponseBody200Images = GetImagesResponseBody200Images {
   , getImagesResponseBody200ImagesType :: GetImagesResponseBody200ImagesType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200Images
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "bound_to" (getImagesResponseBody200ImagesBoundTo obj) : (Data.Aeson..=) "build_id" (getImagesResponseBody200ImagesBuildId obj) : (Data.Aeson..=) "created" (getImagesResponseBody200ImagesCreated obj) : (Data.Aeson..=) "created_from" (getImagesResponseBody200ImagesCreatedFrom obj) : (Data.Aeson..=) "deleted" (getImagesResponseBody200ImagesDeleted obj) : (Data.Aeson..=) "deprecated" (getImagesResponseBody200ImagesDeprecated obj) : (Data.Aeson..=) "description" (getImagesResponseBody200ImagesDescription obj) : (Data.Aeson..=) "disk_size" (getImagesResponseBody200ImagesDiskSize obj) : (Data.Aeson..=) "id" (getImagesResponseBody200ImagesId obj) : (Data.Aeson..=) "image_size" (getImagesResponseBody200ImagesImageSize obj) : (Data.Aeson..=) "labels" (getImagesResponseBody200ImagesLabels obj) : (Data.Aeson..=) "name" (getImagesResponseBody200ImagesName obj) : (Data.Aeson..=) "os_flavor" (getImagesResponseBody200ImagesOsFlavor obj) : (Data.Aeson..=) "os_version" (getImagesResponseBody200ImagesOsVersion obj) : (Data.Aeson..=) "protection" (getImagesResponseBody200ImagesProtection obj) : (Data.Aeson..=) "rapid_deploy" (getImagesResponseBody200ImagesRapidDeploy obj) : (Data.Aeson..=) "status" (getImagesResponseBody200ImagesStatus obj) : (Data.Aeson..=) "type" (getImagesResponseBody200ImagesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "bound_to" (getImagesResponseBody200ImagesBoundTo obj) GHC.Base.<> ((Data.Aeson..=) "build_id" (getImagesResponseBody200ImagesBuildId obj) GHC.Base.<> ((Data.Aeson..=) "created" (getImagesResponseBody200ImagesCreated obj) GHC.Base.<> ((Data.Aeson..=) "created_from" (getImagesResponseBody200ImagesCreatedFrom obj) GHC.Base.<> ((Data.Aeson..=) "deleted" (getImagesResponseBody200ImagesDeleted obj) GHC.Base.<> ((Data.Aeson..=) "deprecated" (getImagesResponseBody200ImagesDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getImagesResponseBody200ImagesDescription obj) GHC.Base.<> ((Data.Aeson..=) "disk_size" (getImagesResponseBody200ImagesDiskSize obj) GHC.Base.<> ((Data.Aeson..=) "id" (getImagesResponseBody200ImagesId obj) GHC.Base.<> ((Data.Aeson..=) "image_size" (getImagesResponseBody200ImagesImageSize obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getImagesResponseBody200ImagesLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getImagesResponseBody200ImagesName obj) GHC.Base.<> ((Data.Aeson..=) "os_flavor" (getImagesResponseBody200ImagesOsFlavor obj) GHC.Base.<> ((Data.Aeson..=) "os_version" (getImagesResponseBody200ImagesOsVersion obj) GHC.Base.<> ((Data.Aeson..=) "protection" (getImagesResponseBody200ImagesProtection obj) GHC.Base.<> ((Data.Aeson..=) "rapid_deploy" (getImagesResponseBody200ImagesRapidDeploy obj) GHC.Base.<> ((Data.Aeson..=) "status" (getImagesResponseBody200ImagesStatus obj) GHC.Base.<> (Data.Aeson..=) "type" (getImagesResponseBody200ImagesType obj))))))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200Images
+    where toJSON obj = Data.Aeson.Types.Internal.object ("bound_to" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesBoundTo obj : "build_id" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesBuildId obj : "created" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreated obj : "created_from" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreatedFrom obj : "deleted" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDeleted obj : "deprecated" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDescription obj : "disk_size" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDiskSize obj : "id" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesId obj : "image_size" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesImageSize obj : "labels" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesLabels obj : "name" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesName obj : "os_flavor" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesOsFlavor obj : "os_version" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesOsVersion obj : "protection" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesProtection obj : "rapid_deploy" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesRapidDeploy obj : "status" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesStatus obj : "type" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("bound_to" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesBoundTo obj) GHC.Base.<> (("build_id" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesBuildId obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreated obj) GHC.Base.<> (("created_from" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreatedFrom obj) GHC.Base.<> (("deleted" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDeleted obj) GHC.Base.<> (("deprecated" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDescription obj) GHC.Base.<> (("disk_size" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesDiskSize obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesId obj) GHC.Base.<> (("image_size" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesImageSize obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesName obj) GHC.Base.<> (("os_flavor" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesOsFlavor obj) GHC.Base.<> (("os_version" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesOsVersion obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesProtection obj) GHC.Base.<> (("rapid_deploy" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesRapidDeploy obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesStatus obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesType obj))))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200Images
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200Images" (\obj -> (((((((((((((((((GHC.Base.pure GetImagesResponseBody200Images GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "bound_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "build_id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created_from")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deleted")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "disk_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_flavor")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_version")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "rapid_deploy")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetImagesResponseBody200ImagesCreated_from
+-- | Create a new 'GetImagesResponseBody200Images' with all required fields.
+mkGetImagesResponseBody200Images :: GHC.Maybe.Maybe GHC.Types.Int -- ^ 'getImagesResponseBody200ImagesBoundTo'
+  -> Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesCreated'
+  -> GHC.Maybe.Maybe GetImagesResponseBody200ImagesCreatedFrom -- ^ 'getImagesResponseBody200ImagesCreatedFrom'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesDeleted'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesDescription'
+  -> GHC.Types.Double -- ^ 'getImagesResponseBody200ImagesDiskSize'
+  -> GHC.Types.Int -- ^ 'getImagesResponseBody200ImagesId'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesResponseBody200ImagesImageSize'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getImagesResponseBody200ImagesLabels'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesName'
+  -> GetImagesResponseBody200ImagesOsFlavor -- ^ 'getImagesResponseBody200ImagesOsFlavor'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesOsVersion'
+  -> GetImagesResponseBody200ImagesProtection -- ^ 'getImagesResponseBody200ImagesProtection'
+  -> GetImagesResponseBody200ImagesStatus -- ^ 'getImagesResponseBody200ImagesStatus'
+  -> GetImagesResponseBody200ImagesType -- ^ 'getImagesResponseBody200ImagesType'
+  -> GetImagesResponseBody200Images
+mkGetImagesResponseBody200Images getImagesResponseBody200ImagesBoundTo getImagesResponseBody200ImagesCreated getImagesResponseBody200ImagesCreatedFrom getImagesResponseBody200ImagesDeleted getImagesResponseBody200ImagesDeprecated getImagesResponseBody200ImagesDescription getImagesResponseBody200ImagesDiskSize getImagesResponseBody200ImagesId getImagesResponseBody200ImagesImageSize getImagesResponseBody200ImagesLabels getImagesResponseBody200ImagesName getImagesResponseBody200ImagesOsFlavor getImagesResponseBody200ImagesOsVersion getImagesResponseBody200ImagesProtection getImagesResponseBody200ImagesStatus getImagesResponseBody200ImagesType = GetImagesResponseBody200Images{getImagesResponseBody200ImagesBoundTo = getImagesResponseBody200ImagesBoundTo,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesBuildId = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesCreated = getImagesResponseBody200ImagesCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesCreatedFrom = getImagesResponseBody200ImagesCreatedFrom,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesDeleted = getImagesResponseBody200ImagesDeleted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesDeprecated = getImagesResponseBody200ImagesDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesDescription = getImagesResponseBody200ImagesDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesDiskSize = getImagesResponseBody200ImagesDiskSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesId = getImagesResponseBody200ImagesId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesImageSize = getImagesResponseBody200ImagesImageSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesLabels = getImagesResponseBody200ImagesLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesName = getImagesResponseBody200ImagesName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesOsFlavor = getImagesResponseBody200ImagesOsFlavor,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesOsVersion = getImagesResponseBody200ImagesOsVersion,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesProtection = getImagesResponseBody200ImagesProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesRapidDeploy = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesStatus = getImagesResponseBody200ImagesStatus,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         getImagesResponseBody200ImagesType = getImagesResponseBody200ImagesType}
+-- | Defines the object schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.images.items.properties.created_from@ in the specification.
 -- 
 -- Information about the Server the Image was created from
 data GetImagesResponseBody200ImagesCreatedFrom = GetImagesResponseBody200ImagesCreatedFrom {
   -- | id: ID of the Server the Image was created from
-  getImagesResponseBody200ImagesCreatedFromId :: GHC.Integer.Type.Integer
+  getImagesResponseBody200ImagesCreatedFromId :: GHC.Types.Int
   -- | name: Server name at the time the Image was created
   , getImagesResponseBody200ImagesCreatedFromName :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200ImagesCreatedFrom
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getImagesResponseBody200ImagesCreatedFromId obj) : (Data.Aeson..=) "name" (getImagesResponseBody200ImagesCreatedFromName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getImagesResponseBody200ImagesCreatedFromId obj) GHC.Base.<> (Data.Aeson..=) "name" (getImagesResponseBody200ImagesCreatedFromName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200ImagesCreatedFrom
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreatedFromId obj : "name" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreatedFromName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreatedFromId obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesCreatedFromName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200ImagesCreatedFrom
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200ImagesCreatedFrom" (\obj -> (GHC.Base.pure GetImagesResponseBody200ImagesCreatedFrom GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name"))
--- | Defines the data type for the schema GetImagesResponseBody200ImagesLabels
--- 
--- User-defined labels (key-value pairs)
-data GetImagesResponseBody200ImagesLabels = GetImagesResponseBody200ImagesLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200ImagesLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200ImagesLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200ImagesLabels" (\obj -> GHC.Base.pure GetImagesResponseBody200ImagesLabels)
--- | Defines the enum schema GetImagesResponseBody200ImagesOs_flavor
+-- | Create a new 'GetImagesResponseBody200ImagesCreatedFrom' with all required fields.
+mkGetImagesResponseBody200ImagesCreatedFrom :: GHC.Types.Int -- ^ 'getImagesResponseBody200ImagesCreatedFromId'
+  -> Data.Text.Internal.Text -- ^ 'getImagesResponseBody200ImagesCreatedFromName'
+  -> GetImagesResponseBody200ImagesCreatedFrom
+mkGetImagesResponseBody200ImagesCreatedFrom getImagesResponseBody200ImagesCreatedFromId getImagesResponseBody200ImagesCreatedFromName = GetImagesResponseBody200ImagesCreatedFrom{getImagesResponseBody200ImagesCreatedFromId = getImagesResponseBody200ImagesCreatedFromId,
+                                                                                                                                                                                  getImagesResponseBody200ImagesCreatedFromName = getImagesResponseBody200ImagesCreatedFromName}
+-- | Defines the enum schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.images.items.properties.os_flavor@ in the specification.
 -- 
 -- Flavor of operating system contained in the Image
-data GetImagesResponseBody200ImagesOsFlavor
-    = GetImagesResponseBody200ImagesOsFlavorEnumOther Data.Aeson.Types.Internal.Value
-    | GetImagesResponseBody200ImagesOsFlavorEnumTyped Data.Text.Internal.Text
-    | GetImagesResponseBody200ImagesOsFlavorEnumStringCentos
-    | GetImagesResponseBody200ImagesOsFlavorEnumStringDebian
-    | GetImagesResponseBody200ImagesOsFlavorEnumStringFedora
-    | GetImagesResponseBody200ImagesOsFlavorEnumStringUbuntu
-    | GetImagesResponseBody200ImagesOsFlavorEnumStringUnknown
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200ImagesOsFlavor
-    where toJSON (GetImagesResponseBody200ImagesOsFlavorEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumStringCentos) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos"
-          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumStringDebian) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian"
-          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumStringFedora) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora"
-          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumStringUbuntu) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu"
-          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumStringUnknown) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown"
-instance Data.Aeson.FromJSON GetImagesResponseBody200ImagesOsFlavor
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos")
-                                          then GetImagesResponseBody200ImagesOsFlavorEnumStringCentos
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian")
-                                                then GetImagesResponseBody200ImagesOsFlavorEnumStringDebian
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora")
-                                                      then GetImagesResponseBody200ImagesOsFlavorEnumStringFedora
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu")
-                                                            then GetImagesResponseBody200ImagesOsFlavorEnumStringUbuntu
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown")
-                                                                  then GetImagesResponseBody200ImagesOsFlavorEnumStringUnknown
-                                                                  else GetImagesResponseBody200ImagesOsFlavorEnumOther val)
--- | Defines the data type for the schema GetImagesResponseBody200ImagesProtection
+data GetImagesResponseBody200ImagesOsFlavor =
+   GetImagesResponseBody200ImagesOsFlavorOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesResponseBody200ImagesOsFlavorTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesResponseBody200ImagesOsFlavorEnumUbuntu -- ^ Represents the JSON value @"ubuntu"@
+  | GetImagesResponseBody200ImagesOsFlavorEnumCentos -- ^ Represents the JSON value @"centos"@
+  | GetImagesResponseBody200ImagesOsFlavorEnumDebian -- ^ Represents the JSON value @"debian"@
+  | GetImagesResponseBody200ImagesOsFlavorEnumFedora -- ^ Represents the JSON value @"fedora"@
+  | GetImagesResponseBody200ImagesOsFlavorEnumUnknown -- ^ Represents the JSON value @"unknown"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200ImagesOsFlavor
+    where toJSON (GetImagesResponseBody200ImagesOsFlavorOther val) = val
+          toJSON (GetImagesResponseBody200ImagesOsFlavorTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumUbuntu) = "ubuntu"
+          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumCentos) = "centos"
+          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumDebian) = "debian"
+          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumFedora) = "fedora"
+          toJSON (GetImagesResponseBody200ImagesOsFlavorEnumUnknown) = "unknown"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200ImagesOsFlavor
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ubuntu" -> GetImagesResponseBody200ImagesOsFlavorEnumUbuntu
+                                            | val GHC.Classes.== "centos" -> GetImagesResponseBody200ImagesOsFlavorEnumCentos
+                                            | val GHC.Classes.== "debian" -> GetImagesResponseBody200ImagesOsFlavorEnumDebian
+                                            | val GHC.Classes.== "fedora" -> GetImagesResponseBody200ImagesOsFlavorEnumFedora
+                                            | val GHC.Classes.== "unknown" -> GetImagesResponseBody200ImagesOsFlavorEnumUnknown
+                                            | GHC.Base.otherwise -> GetImagesResponseBody200ImagesOsFlavorOther val)
+-- | Defines the object schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.images.items.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data GetImagesResponseBody200ImagesProtection = GetImagesResponseBody200ImagesProtection {
@@ -299,68 +357,64 @@ data GetImagesResponseBody200ImagesProtection = GetImagesResponseBody200ImagesPr
   getImagesResponseBody200ImagesProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200ImagesProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (getImagesResponseBody200ImagesProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (getImagesResponseBody200ImagesProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200ImagesProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= getImagesResponseBody200ImagesProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200ImagesProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200ImagesProtection" (\obj -> GHC.Base.pure GetImagesResponseBody200ImagesProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema GetImagesResponseBody200ImagesStatus
+-- | Create a new 'GetImagesResponseBody200ImagesProtection' with all required fields.
+mkGetImagesResponseBody200ImagesProtection :: GHC.Types.Bool -- ^ 'getImagesResponseBody200ImagesProtectionDelete'
+  -> GetImagesResponseBody200ImagesProtection
+mkGetImagesResponseBody200ImagesProtection getImagesResponseBody200ImagesProtectionDelete = GetImagesResponseBody200ImagesProtection{getImagesResponseBody200ImagesProtectionDelete = getImagesResponseBody200ImagesProtectionDelete}
+-- | Defines the enum schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.images.items.properties.status@ in the specification.
 -- 
 -- Whether the Image can be used or if it\'s still being created or unavailable
-data GetImagesResponseBody200ImagesStatus
-    = GetImagesResponseBody200ImagesStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetImagesResponseBody200ImagesStatusEnumTyped Data.Text.Internal.Text
-    | GetImagesResponseBody200ImagesStatusEnumStringAvailable
-    | GetImagesResponseBody200ImagesStatusEnumStringCreating
-    | GetImagesResponseBody200ImagesStatusEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200ImagesStatus
-    where toJSON (GetImagesResponseBody200ImagesStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesResponseBody200ImagesStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesResponseBody200ImagesStatusEnumStringAvailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (GetImagesResponseBody200ImagesStatusEnumStringCreating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating"
-          toJSON (GetImagesResponseBody200ImagesStatusEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON GetImagesResponseBody200ImagesStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then GetImagesResponseBody200ImagesStatusEnumStringAvailable
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating")
-                                                then GetImagesResponseBody200ImagesStatusEnumStringCreating
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                      then GetImagesResponseBody200ImagesStatusEnumStringUnavailable
-                                                      else GetImagesResponseBody200ImagesStatusEnumOther val)
--- | Defines the enum schema GetImagesResponseBody200ImagesType
+data GetImagesResponseBody200ImagesStatus =
+   GetImagesResponseBody200ImagesStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesResponseBody200ImagesStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesResponseBody200ImagesStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | GetImagesResponseBody200ImagesStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  | GetImagesResponseBody200ImagesStatusEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200ImagesStatus
+    where toJSON (GetImagesResponseBody200ImagesStatusOther val) = val
+          toJSON (GetImagesResponseBody200ImagesStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesResponseBody200ImagesStatusEnumAvailable) = "available"
+          toJSON (GetImagesResponseBody200ImagesStatusEnumCreating) = "creating"
+          toJSON (GetImagesResponseBody200ImagesStatusEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200ImagesStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> GetImagesResponseBody200ImagesStatusEnumAvailable
+                                            | val GHC.Classes.== "creating" -> GetImagesResponseBody200ImagesStatusEnumCreating
+                                            | val GHC.Classes.== "unavailable" -> GetImagesResponseBody200ImagesStatusEnumUnavailable
+                                            | GHC.Base.otherwise -> GetImagesResponseBody200ImagesStatusOther val)
+-- | Defines the enum schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.images.items.properties.type@ in the specification.
 -- 
 -- Type of the Image
-data GetImagesResponseBody200ImagesType
-    = GetImagesResponseBody200ImagesTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetImagesResponseBody200ImagesTypeEnumTyped Data.Text.Internal.Text
-    | GetImagesResponseBody200ImagesTypeEnumStringApp
-    | GetImagesResponseBody200ImagesTypeEnumStringBackup
-    | GetImagesResponseBody200ImagesTypeEnumStringSnapshot
-    | GetImagesResponseBody200ImagesTypeEnumStringSystem
-    | GetImagesResponseBody200ImagesTypeEnumStringTemporary
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200ImagesType
-    where toJSON (GetImagesResponseBody200ImagesTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesResponseBody200ImagesTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetImagesResponseBody200ImagesTypeEnumStringApp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app"
-          toJSON (GetImagesResponseBody200ImagesTypeEnumStringBackup) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup"
-          toJSON (GetImagesResponseBody200ImagesTypeEnumStringSnapshot) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot"
-          toJSON (GetImagesResponseBody200ImagesTypeEnumStringSystem) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system"
-          toJSON (GetImagesResponseBody200ImagesTypeEnumStringTemporary) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary"
-instance Data.Aeson.FromJSON GetImagesResponseBody200ImagesType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app")
-                                          then GetImagesResponseBody200ImagesTypeEnumStringApp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup")
-                                                then GetImagesResponseBody200ImagesTypeEnumStringBackup
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot")
-                                                      then GetImagesResponseBody200ImagesTypeEnumStringSnapshot
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system")
-                                                            then GetImagesResponseBody200ImagesTypeEnumStringSystem
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary")
-                                                                  then GetImagesResponseBody200ImagesTypeEnumStringTemporary
-                                                                  else GetImagesResponseBody200ImagesTypeEnumOther val)
--- | Defines the data type for the schema GetImagesResponseBody200Meta
+data GetImagesResponseBody200ImagesType =
+   GetImagesResponseBody200ImagesTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetImagesResponseBody200ImagesTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetImagesResponseBody200ImagesTypeEnumSystem -- ^ Represents the JSON value @"system"@
+  | GetImagesResponseBody200ImagesTypeEnumApp -- ^ Represents the JSON value @"app"@
+  | GetImagesResponseBody200ImagesTypeEnumSnapshot -- ^ Represents the JSON value @"snapshot"@
+  | GetImagesResponseBody200ImagesTypeEnumBackup -- ^ Represents the JSON value @"backup"@
+  | GetImagesResponseBody200ImagesTypeEnumTemporary -- ^ Represents the JSON value @"temporary"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200ImagesType
+    where toJSON (GetImagesResponseBody200ImagesTypeOther val) = val
+          toJSON (GetImagesResponseBody200ImagesTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetImagesResponseBody200ImagesTypeEnumSystem) = "system"
+          toJSON (GetImagesResponseBody200ImagesTypeEnumApp) = "app"
+          toJSON (GetImagesResponseBody200ImagesTypeEnumSnapshot) = "snapshot"
+          toJSON (GetImagesResponseBody200ImagesTypeEnumBackup) = "backup"
+          toJSON (GetImagesResponseBody200ImagesTypeEnumTemporary) = "temporary"
+instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200ImagesType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "system" -> GetImagesResponseBody200ImagesTypeEnumSystem
+                                            | val GHC.Classes.== "app" -> GetImagesResponseBody200ImagesTypeEnumApp
+                                            | val GHC.Classes.== "snapshot" -> GetImagesResponseBody200ImagesTypeEnumSnapshot
+                                            | val GHC.Classes.== "backup" -> GetImagesResponseBody200ImagesTypeEnumBackup
+                                            | val GHC.Classes.== "temporary" -> GetImagesResponseBody200ImagesTypeEnumTemporary
+                                            | GHC.Base.otherwise -> GetImagesResponseBody200ImagesTypeOther val)
+-- | Defines the object schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetImagesResponseBody200Meta = GetImagesResponseBody200Meta {
@@ -368,31 +422,91 @@ data GetImagesResponseBody200Meta = GetImagesResponseBody200Meta {
   getImagesResponseBody200MetaPagination :: GetImagesResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getImagesResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getImagesResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200Meta" (\obj -> GHC.Base.pure GetImagesResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetImagesResponseBody200MetaPagination
+-- | Create a new 'GetImagesResponseBody200Meta' with all required fields.
+mkGetImagesResponseBody200Meta :: GetImagesResponseBody200MetaPagination -- ^ 'getImagesResponseBody200MetaPagination'
+  -> GetImagesResponseBody200Meta
+mkGetImagesResponseBody200Meta getImagesResponseBody200MetaPagination = GetImagesResponseBody200Meta{getImagesResponseBody200MetaPagination = getImagesResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/images.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetImagesResponseBody200MetaPagination = GetImagesResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getImagesResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getImagesResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getImagesResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getImagesResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getImagesResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getImagesResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getImagesResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getImagesResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getImagesResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getImagesResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetImagesResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getImagesResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getImagesResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getImagesResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getImagesResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getImagesResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getImagesResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getImagesResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getImagesResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getImagesResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getImagesResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getImagesResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getImagesResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetImagesResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getImagesResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetImagesResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetImagesResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetImagesResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetImagesResponseBody200MetaPagination' with all required fields.
+mkGetImagesResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getImagesResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getImagesResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getImagesResponseBody200MetaPaginationTotalEntries'
+  -> GetImagesResponseBody200MetaPagination
+mkGetImagesResponseBody200MetaPagination getImagesResponseBody200MetaPaginationLastPage getImagesResponseBody200MetaPaginationNextPage getImagesResponseBody200MetaPaginationPage getImagesResponseBody200MetaPaginationPerPage getImagesResponseBody200MetaPaginationPreviousPage getImagesResponseBody200MetaPaginationTotalEntries = GetImagesResponseBody200MetaPagination{getImagesResponseBody200MetaPaginationLastPage = getImagesResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                               getImagesResponseBody200MetaPaginationNextPage = getImagesResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                               getImagesResponseBody200MetaPaginationPage = getImagesResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                               getImagesResponseBody200MetaPaginationPerPage = getImagesResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                               getImagesResponseBody200MetaPaginationPreviousPage = getImagesResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                               getImagesResponseBody200MetaPaginationTotalEntries = getImagesResponseBody200MetaPaginationTotalEntries}
+-- | > GET /images
+-- 
+-- The same as 'getImages' but accepts an explicit configuration.
+getImagesWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetImagesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetImagesResponse) -- ^ Monadic computation which returns the result of the operation
+getImagesWithConfiguration config
+                           parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetImagesResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetImagesResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                     GetImagesResponseBody200)
+                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "bound_to") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryBoundTo parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "include_deprecated") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryIncludeDeprecated parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /images
+-- 
+-- The same as 'getImages' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getImagesRaw :: forall m . HCloud.Common.MonadHTTP m => GetImagesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getImagesRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "bound_to") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryBoundTo parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "include_deprecated") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryIncludeDeprecated parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /images
+-- 
+-- The same as 'getImages' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getImagesWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetImagesParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getImagesWithConfigurationRaw config
+                              parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/images") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "bound_to") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryBoundTo parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "include_deprecated") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryIncludeDeprecated parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getImagesParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False])

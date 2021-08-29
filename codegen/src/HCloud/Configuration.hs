@@ -13,4 +13,4 @@ import qualified HCloud.Common
 -- @https://api.hetzner.cloud/v1@
 defaultURL = Data.Text.pack "https://api.hetzner.cloud/v1"
 -- | The default configuration containing the 'defaultURL' and no authorization
-defaultConfiguration = HCloud.Common.Configuration defaultURL HCloud.Common.AnonymousSecurityScheme
+defaultConfiguration = HCloud.Common.Configuration defaultURL HCloud.Common.anonymousSecurityScheme

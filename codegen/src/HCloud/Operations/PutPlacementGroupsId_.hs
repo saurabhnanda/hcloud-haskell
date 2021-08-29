@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putPlacementGroups_Id_
 module HCloud.Operations.PutPlacementGroupsId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,91 +49,40 @@ import HCloud.Types
 -- Note that when updating labels, the PlacementGroup’s current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
 -- 
 -- Note: if the PlacementGroup object changes during the request, the response will be a “conflict” error.
-putPlacementGroups_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                           -- ^ id: ID of the resource
-  -> GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutPlacementGroupsIdResponse))   -- ^ Monad containing the result of the operation
-putPlacementGroups_Id_ config
-                       id
-                       body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutPlacementGroupsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutPlacementGroupsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                PutPlacementGroupsIdResponseBody200)
-                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /placement_groups/{id}
--- 
--- The same as 'putPlacementGroups_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putPlacementGroups_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                           HCloud.Common.SecurityScheme s) =>
-                             HCloud.Common.Configuration s ->
-                             GHC.Integer.Type.Integer ->
-                             GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody ->
-                             m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                   (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putPlacementGroups_Id_Raw config
-                          id
-                          body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /placement_groups/{id}
--- 
--- Monadic version of 'putPlacementGroups_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putPlacementGroups_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                         HCloud.Common.SecurityScheme s) =>
-                           GHC.Integer.Type.Integer ->
-                           GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody ->
-                           Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                              m
-                                                              (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                  (Network.HTTP.Client.Types.Response PutPlacementGroupsIdResponse))
-putPlacementGroups_Id_M id
-                        body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutPlacementGroupsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutPlacementGroupsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                 PutPlacementGroupsIdResponseBody200)
-                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /placement_groups/{id}
--- 
--- Monadic version of 'putPlacementGroups_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putPlacementGroups_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                            HCloud.Common.SecurityScheme s) =>
-                              GHC.Integer.Type.Integer ->
-                              GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody ->
-                              Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                 m
-                                                                 (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                     (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putPlacementGroups_Id_RawM id
-                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putPlacementGroups_Id_RequestBody
+putPlacementGroups_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutPlacementGroupsIdResponse) -- ^ Monadic computation which returns the result of the operation
+putPlacementGroups_Id_ id
+                       body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutPlacementGroupsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutPlacementGroupsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                 PutPlacementGroupsIdResponseBody200)
+                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/placement_groups\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutPlacementGroupsIdRequestBody = PutPlacementGroupsIdRequestBody {
   -- | labels: User-defined labels (key-value pairs)
-  putPlacementGroupsIdRequestBodyLabels :: (GHC.Maybe.Maybe PutPlacementGroupsIdRequestBodyLabels)
+  putPlacementGroupsIdRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: New PlacementGroup name
   , putPlacementGroupsIdRequestBodyName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutPlacementGroupsIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (putPlacementGroupsIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putPlacementGroupsIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (putPlacementGroupsIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putPlacementGroupsIdRequestBodyName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutPlacementGroupsIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdRequestBodyName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutPlacementGroupsIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutPlacementGroupsIdRequestBody" (\obj -> (GHC.Base.pure PutPlacementGroupsIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name"))
--- | Defines the data type for the schema putPlacementGroups_Id_RequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PutPlacementGroupsIdRequestBodyLabels = PutPlacementGroupsIdRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutPlacementGroupsIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutPlacementGroupsIdRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutPlacementGroupsIdRequestBodyLabels" (\obj -> GHC.Base.pure PutPlacementGroupsIdRequestBodyLabels)
+-- | Create a new 'PutPlacementGroupsIdRequestBody' with all required fields.
+mkPutPlacementGroupsIdRequestBody :: PutPlacementGroupsIdRequestBody
+mkPutPlacementGroupsIdRequestBody = PutPlacementGroupsIdRequestBody{putPlacementGroupsIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                    putPlacementGroupsIdRequestBodyName = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putPlacementGroups_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutPlacementGroupsIdResponseError' is used.
-data PutPlacementGroupsIdResponse =                                      
-   PutPlacementGroupsIdResponseError GHC.Base.String                     -- ^ Means either no matching case available or a parse error
-  | PutPlacementGroupsIdResponse200 PutPlacementGroupsIdResponseBody200  -- ^ The \`certificate\` key contains the PlacementGroup that was just updated
+data PutPlacementGroupsIdResponse =
+   PutPlacementGroupsIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutPlacementGroupsIdResponse200 PutPlacementGroupsIdResponseBody200 -- ^ The \`certificate\` key contains the PlacementGroup that was just updated
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutPlacementGroupsIdResponseBody200
+-- | Defines the object schema located at @paths.\/placement_groups\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutPlacementGroupsIdResponseBody200 = PutPlacementGroupsIdResponseBody200 {
@@ -141,59 +90,75 @@ data PutPlacementGroupsIdResponseBody200 = PutPlacementGroupsIdResponseBody200 {
   putPlacementGroupsIdResponseBody200PlacementGroup :: PutPlacementGroupsIdResponseBody200PlacementGroup
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutPlacementGroupsIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "placement_group" (putPlacementGroupsIdResponseBody200PlacementGroup obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "placement_group" (putPlacementGroupsIdResponseBody200PlacementGroup obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutPlacementGroupsIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("placement_group" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroup obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("placement_group" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroup obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutPlacementGroupsIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutPlacementGroupsIdResponseBody200" (\obj -> GHC.Base.pure PutPlacementGroupsIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "placement_group"))
--- | Defines the data type for the schema PutPlacementGroupsIdResponseBody200Placement_group
+-- | Create a new 'PutPlacementGroupsIdResponseBody200' with all required fields.
+mkPutPlacementGroupsIdResponseBody200 :: PutPlacementGroupsIdResponseBody200PlacementGroup -- ^ 'putPlacementGroupsIdResponseBody200PlacementGroup'
+  -> PutPlacementGroupsIdResponseBody200
+mkPutPlacementGroupsIdResponseBody200 putPlacementGroupsIdResponseBody200PlacementGroup = PutPlacementGroupsIdResponseBody200{putPlacementGroupsIdResponseBody200PlacementGroup = putPlacementGroupsIdResponseBody200PlacementGroup}
+-- | Defines the object schema located at @paths.\/placement_groups\/{id}.PUT.responses.200.content.application\/json.schema.properties.placement_group@ in the specification.
 -- 
 -- 
 data PutPlacementGroupsIdResponseBody200PlacementGroup = PutPlacementGroupsIdResponseBody200PlacementGroup {
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   putPlacementGroupsIdResponseBody200PlacementGroupCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , putPlacementGroupsIdResponseBody200PlacementGroupId :: GHC.Integer.Type.Integer
+  , putPlacementGroupsIdResponseBody200PlacementGroupId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , putPlacementGroupsIdResponseBody200PlacementGroupLabels :: PutPlacementGroupsIdResponseBody200PlacementGroupLabels
+  , putPlacementGroupsIdResponseBody200PlacementGroupLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , putPlacementGroupsIdResponseBody200PlacementGroupName :: Data.Text.Internal.Text
   -- | servers: Array of IDs of Servers that are part of this Placement Group
-  , putPlacementGroupsIdResponseBody200PlacementGroupServers :: ([] GHC.Integer.Type.Integer)
-  -- | type: Type of the Placement Group
-  , putPlacementGroupsIdResponseBody200PlacementGroupType :: PutPlacementGroupsIdResponseBody200PlacementGroupType
+  , putPlacementGroupsIdResponseBody200PlacementGroupServers :: ([GHC.Types.Int])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutPlacementGroupsIdResponseBody200PlacementGroup
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (putPlacementGroupsIdResponseBody200PlacementGroupCreated obj) : (Data.Aeson..=) "id" (putPlacementGroupsIdResponseBody200PlacementGroupId obj) : (Data.Aeson..=) "labels" (putPlacementGroupsIdResponseBody200PlacementGroupLabels obj) : (Data.Aeson..=) "name" (putPlacementGroupsIdResponseBody200PlacementGroupName obj) : (Data.Aeson..=) "servers" (putPlacementGroupsIdResponseBody200PlacementGroupServers obj) : (Data.Aeson..=) "type" (putPlacementGroupsIdResponseBody200PlacementGroupType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (putPlacementGroupsIdResponseBody200PlacementGroupCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (putPlacementGroupsIdResponseBody200PlacementGroupId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putPlacementGroupsIdResponseBody200PlacementGroupLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (putPlacementGroupsIdResponseBody200PlacementGroupName obj) GHC.Base.<> ((Data.Aeson..=) "servers" (putPlacementGroupsIdResponseBody200PlacementGroupServers obj) GHC.Base.<> (Data.Aeson..=) "type" (putPlacementGroupsIdResponseBody200PlacementGroupType obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutPlacementGroupsIdResponseBody200PlacementGroup
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupCreated obj : "id" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupId obj : "labels" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupLabels obj : "name" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupName obj : "servers" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupServers obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupName obj) GHC.Base.<> (("servers" Data.Aeson.Types.ToJSON..= putPlacementGroupsIdResponseBody200PlacementGroupServers obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread"))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutPlacementGroupsIdResponseBody200PlacementGroup
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutPlacementGroupsIdResponseBody200PlacementGroup" (\obj -> (((((GHC.Base.pure PutPlacementGroupsIdResponseBody200PlacementGroup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema PutPlacementGroupsIdResponseBody200Placement_groupLabels
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutPlacementGroupsIdResponseBody200PlacementGroup" (\obj -> ((((GHC.Base.pure PutPlacementGroupsIdResponseBody200PlacementGroup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers"))
+-- | Create a new 'PutPlacementGroupsIdResponseBody200PlacementGroup' with all required fields.
+mkPutPlacementGroupsIdResponseBody200PlacementGroup :: Data.Text.Internal.Text -- ^ 'putPlacementGroupsIdResponseBody200PlacementGroupCreated'
+  -> GHC.Types.Int -- ^ 'putPlacementGroupsIdResponseBody200PlacementGroupId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putPlacementGroupsIdResponseBody200PlacementGroupLabels'
+  -> Data.Text.Internal.Text -- ^ 'putPlacementGroupsIdResponseBody200PlacementGroupName'
+  -> [GHC.Types.Int] -- ^ 'putPlacementGroupsIdResponseBody200PlacementGroupServers'
+  -> PutPlacementGroupsIdResponseBody200PlacementGroup
+mkPutPlacementGroupsIdResponseBody200PlacementGroup putPlacementGroupsIdResponseBody200PlacementGroupCreated putPlacementGroupsIdResponseBody200PlacementGroupId putPlacementGroupsIdResponseBody200PlacementGroupLabels putPlacementGroupsIdResponseBody200PlacementGroupName putPlacementGroupsIdResponseBody200PlacementGroupServers = PutPlacementGroupsIdResponseBody200PlacementGroup{putPlacementGroupsIdResponseBody200PlacementGroupCreated = putPlacementGroupsIdResponseBody200PlacementGroupCreated,
+                                                                                                                                                                                                                                                                                                                                                                                            putPlacementGroupsIdResponseBody200PlacementGroupId = putPlacementGroupsIdResponseBody200PlacementGroupId,
+                                                                                                                                                                                                                                                                                                                                                                                            putPlacementGroupsIdResponseBody200PlacementGroupLabels = putPlacementGroupsIdResponseBody200PlacementGroupLabels,
+                                                                                                                                                                                                                                                                                                                                                                                            putPlacementGroupsIdResponseBody200PlacementGroupName = putPlacementGroupsIdResponseBody200PlacementGroupName,
+                                                                                                                                                                                                                                                                                                                                                                                            putPlacementGroupsIdResponseBody200PlacementGroupServers = putPlacementGroupsIdResponseBody200PlacementGroupServers}
+-- | > PUT /placement_groups/{id}
 -- 
--- User-defined labels (key-value pairs)
-data PutPlacementGroupsIdResponseBody200PlacementGroupLabels = PutPlacementGroupsIdResponseBody200PlacementGroupLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutPlacementGroupsIdResponseBody200PlacementGroupLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutPlacementGroupsIdResponseBody200PlacementGroupLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutPlacementGroupsIdResponseBody200PlacementGroupLabels" (\obj -> GHC.Base.pure PutPlacementGroupsIdResponseBody200PlacementGroupLabels)
--- | Defines the enum schema PutPlacementGroupsIdResponseBody200Placement_groupType
+-- The same as 'putPlacementGroups_Id_' but accepts an explicit configuration.
+putPlacementGroups_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutPlacementGroupsIdResponse) -- ^ Monadic computation which returns the result of the operation
+putPlacementGroups_Id_WithConfiguration config
+                                        id
+                                        body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutPlacementGroupsIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutPlacementGroupsIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  PutPlacementGroupsIdResponseBody200)
+                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /placement_groups/{id}
 -- 
--- Type of the Placement Group
-data PutPlacementGroupsIdResponseBody200PlacementGroupType
-    = PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumTyped Data.Text.Internal.Text
-    | PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumStringSpread
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutPlacementGroupsIdResponseBody200PlacementGroupType
-    where toJSON (PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumStringSpread) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread"
-instance Data.Aeson.FromJSON PutPlacementGroupsIdResponseBody200PlacementGroupType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread")
-                                          then PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumStringSpread
-                                          else PutPlacementGroupsIdResponseBody200PlacementGroupTypeEnumOther val)
+-- The same as 'putPlacementGroups_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putPlacementGroups_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putPlacementGroups_Id_Raw id
+                          body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /placement_groups/{id}
+-- 
+-- The same as 'putPlacementGroups_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putPlacementGroups_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutPlacementGroupsIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putPlacementGroups_Id_WithConfigurationRaw config
+                                           id
+                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/placement_groups/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

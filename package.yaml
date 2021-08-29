@@ -35,7 +35,6 @@ library:
     - HCloud
     - HCloud.Common
     - HCloud.Configuration
-    - HCloud.CyclicTypes
     - HCloud.Operations.DeleteCertificatesId_
     - HCloud.Operations.DeleteFirewallsId_
     - HCloud.Operations.DeleteFloatingIpsId_
@@ -81,8 +80,8 @@ library:
     - HCloud.Operations.GetNetworksId_
     - HCloud.Operations.GetNetworksIdActions
     - HCloud.Operations.GetNetworksIdActionsActionId_
-    - HCloud.Operations.GetPlacementGroups
-    - HCloud.Operations.GetPlacementGroupsId_
+    # - HCloud.Operations.GetPlacementGroups
+    # - HCloud.Operations.GetPlacementGroupsId_
     - HCloud.Operations.GetPricing
     - HCloud.Operations.GetServers
     - HCloud.Operations.GetServersId_
@@ -173,3 +172,5 @@ library:
     - HCloud.Operations.PutVolumesId_
     - HCloud.SecuritySchemes
     - HCloud.Types
+    - HCloud.TypeAlias
+    - HCloud.Overrides

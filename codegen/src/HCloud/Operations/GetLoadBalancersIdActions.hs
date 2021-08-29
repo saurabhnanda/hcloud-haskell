@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getLoadBalancers_Id_Actions
 module HCloud.Operations.GetLoadBalancersIdActions where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,122 +45,205 @@ import HCloud.Types
 -- | > GET /load_balancers/{id}/actions
 -- 
 -- Returns all Action objects for a Load Balancer. You can sort the results by using the \`sort\` URI parameter, and filter them with the \`status\` parameter.
-getLoadBalancers_Id_Actions :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                -- ^ id: ID of the Load Balancer
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                                 -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                                 -- ^ status: Can be used multiple times, the response will contain only Actions with specified statuses
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetLoadBalancersIdActionsResponse))   -- ^ Monad containing the result of the operation
-getLoadBalancers_Id_Actions config
-                            id
-                            sort
-                            status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                 GetLoadBalancersIdActionsResponseBody200)
-                                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /load_balancers/{id}/actions
+getLoadBalancers_Id_Actions :: forall m . HCloud.Common.MonadHTTP m => GetLoadBalancersIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetLoadBalancersIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_Actions parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      GetLoadBalancersIdActionsResponseBody200)
+                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.parameters@ in the specification.
 -- 
--- The same as 'getLoadBalancers_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'
-getLoadBalancers_Id_ActionsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                HCloud.Common.SecurityScheme s) =>
-                                  HCloud.Common.Configuration s ->
-                                  GHC.Integer.Type.Integer ->
-                                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLoadBalancers_Id_ActionsRaw config
-                               id
-                               sort
-                               status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /load_balancers/{id}/actions
 -- 
--- Monadic version of 'getLoadBalancers_Id_Actions' (use with 'HCloud.Common.runWithConfiguration')
-getLoadBalancers_Id_ActionsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                              HCloud.Common.SecurityScheme s) =>
-                                GHC.Integer.Type.Integer ->
-                                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                   m
-                                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                       (Network.HTTP.Client.Types.Response GetLoadBalancersIdActionsResponse))
-getLoadBalancers_Id_ActionsM id
-                             sort
-                             status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                  GetLoadBalancersIdActionsResponseBody200)
-                                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /load_balancers/{id}/actions
+data GetLoadBalancersIdActionsParameters = GetLoadBalancersIdActionsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Load Balancer
+  getLoadBalancersIdActionsParametersPathId :: GHC.Types.Int
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getLoadBalancersIdActionsParametersQuerySort :: (GHC.Maybe.Maybe GetLoadBalancersIdActionsParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified statuses
+  , getLoadBalancersIdActionsParametersQueryStatus :: (GHC.Maybe.Maybe GetLoadBalancersIdActionsParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsParametersPathId obj : "querySort" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsParametersPathId obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsParametersQueryStatus obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsParameters" (\obj -> ((GHC.Base.pure GetLoadBalancersIdActionsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetLoadBalancersIdActionsParameters' with all required fields.
+mkGetLoadBalancersIdActionsParameters :: GHC.Types.Int -- ^ 'getLoadBalancersIdActionsParametersPathId'
+  -> GetLoadBalancersIdActionsParameters
+mkGetLoadBalancersIdActionsParameters getLoadBalancersIdActionsParametersPathId = GetLoadBalancersIdActionsParameters{getLoadBalancersIdActionsParametersPathId = getLoadBalancersIdActionsParametersPathId,
+                                                                                                                      getLoadBalancersIdActionsParametersQuerySort = GHC.Maybe.Nothing,
+                                                                                                                      getLoadBalancersIdActionsParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getLoadBalancers_Id_ActionsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getLoadBalancers_Id_ActionsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                 HCloud.Common.SecurityScheme s) =>
-                                   GHC.Integer.Type.Integer ->
-                                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                      m
-                                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getLoadBalancers_Id_ActionsRawM id
-                                sort
-                                status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetLoadBalancersIdActionsParametersQuerySort =
+   GetLoadBalancersIdActionsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetLoadBalancersIdActionsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetLoadBalancersIdActionsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumCommand -- ^ Represents the JSON value @"command"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumCommandAsc -- ^ Represents the JSON value @"command:asc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumCommandDesc -- ^ Represents the JSON value @"command:desc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumStatus -- ^ Represents the JSON value @"status"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumStatusAsc -- ^ Represents the JSON value @"status:asc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumStatusDesc -- ^ Represents the JSON value @"status:desc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumProgress -- ^ Represents the JSON value @"progress"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumProgressAsc -- ^ Represents the JSON value @"progress:asc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumProgressDesc -- ^ Represents the JSON value @"progress:desc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumStarted -- ^ Represents the JSON value @"started"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumStartedAsc -- ^ Represents the JSON value @"started:asc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumStartedDesc -- ^ Represents the JSON value @"started:desc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumFinished -- ^ Represents the JSON value @"finished"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumFinishedAsc -- ^ Represents the JSON value @"finished:asc"@
+  | GetLoadBalancersIdActionsParametersQuerySortEnumFinishedDesc -- ^ Represents the JSON value @"finished:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsParametersQuerySort
+    where toJSON (GetLoadBalancersIdActionsParametersQuerySortOther val) = val
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumId) = "id"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumCommand) = "command"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumCommandAsc) = "command:asc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumCommandDesc) = "command:desc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumStatus) = "status"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumStatusAsc) = "status:asc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumStatusDesc) = "status:desc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumProgress) = "progress"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumProgressAsc) = "progress:asc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumProgressDesc) = "progress:desc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumStarted) = "started"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumStartedAsc) = "started:asc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumStartedDesc) = "started:desc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumFinished) = "finished"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumFinishedAsc) = "finished:asc"
+          toJSON (GetLoadBalancersIdActionsParametersQuerySortEnumFinishedDesc) = "finished:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetLoadBalancersIdActionsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetLoadBalancersIdActionsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetLoadBalancersIdActionsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "command" -> GetLoadBalancersIdActionsParametersQuerySortEnumCommand
+                                            | val GHC.Classes.== "command:asc" -> GetLoadBalancersIdActionsParametersQuerySortEnumCommandAsc
+                                            | val GHC.Classes.== "command:desc" -> GetLoadBalancersIdActionsParametersQuerySortEnumCommandDesc
+                                            | val GHC.Classes.== "status" -> GetLoadBalancersIdActionsParametersQuerySortEnumStatus
+                                            | val GHC.Classes.== "status:asc" -> GetLoadBalancersIdActionsParametersQuerySortEnumStatusAsc
+                                            | val GHC.Classes.== "status:desc" -> GetLoadBalancersIdActionsParametersQuerySortEnumStatusDesc
+                                            | val GHC.Classes.== "progress" -> GetLoadBalancersIdActionsParametersQuerySortEnumProgress
+                                            | val GHC.Classes.== "progress:asc" -> GetLoadBalancersIdActionsParametersQuerySortEnumProgressAsc
+                                            | val GHC.Classes.== "progress:desc" -> GetLoadBalancersIdActionsParametersQuerySortEnumProgressDesc
+                                            | val GHC.Classes.== "started" -> GetLoadBalancersIdActionsParametersQuerySortEnumStarted
+                                            | val GHC.Classes.== "started:asc" -> GetLoadBalancersIdActionsParametersQuerySortEnumStartedAsc
+                                            | val GHC.Classes.== "started:desc" -> GetLoadBalancersIdActionsParametersQuerySortEnumStartedDesc
+                                            | val GHC.Classes.== "finished" -> GetLoadBalancersIdActionsParametersQuerySortEnumFinished
+                                            | val GHC.Classes.== "finished:asc" -> GetLoadBalancersIdActionsParametersQuerySortEnumFinishedAsc
+                                            | val GHC.Classes.== "finished:desc" -> GetLoadBalancersIdActionsParametersQuerySortEnumFinishedDesc
+                                            | GHC.Base.otherwise -> GetLoadBalancersIdActionsParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times, the response will contain only Actions with specified statuses
+data GetLoadBalancersIdActionsParametersQueryStatus =
+   GetLoadBalancersIdActionsParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetLoadBalancersIdActionsParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetLoadBalancersIdActionsParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetLoadBalancersIdActionsParametersQueryStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetLoadBalancersIdActionsParametersQueryStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsParametersQueryStatus
+    where toJSON (GetLoadBalancersIdActionsParametersQueryStatusOther val) = val
+          toJSON (GetLoadBalancersIdActionsParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetLoadBalancersIdActionsParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetLoadBalancersIdActionsParametersQueryStatusEnumSuccess) = "success"
+          toJSON (GetLoadBalancersIdActionsParametersQueryStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetLoadBalancersIdActionsParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "success" -> GetLoadBalancersIdActionsParametersQueryStatusEnumSuccess
+                                            | val GHC.Classes.== "error" -> GetLoadBalancersIdActionsParametersQueryStatusEnumError
+                                            | GHC.Base.otherwise -> GetLoadBalancersIdActionsParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getLoadBalancers_Id_Actions'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetLoadBalancersIdActionsResponseError' is used.
-data GetLoadBalancersIdActionsResponse =                                           
-   GetLoadBalancersIdActionsResponseError GHC.Base.String                          -- ^ Means either no matching case available or a parse error
-  | GetLoadBalancersIdActionsResponse200 GetLoadBalancersIdActionsResponseBody200  -- ^ The \`actions\` key contains a list of Actions
+data GetLoadBalancersIdActionsResponse =
+   GetLoadBalancersIdActionsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetLoadBalancersIdActionsResponse200 GetLoadBalancersIdActionsResponseBody200 -- ^ The \`actions\` key contains a list of Actions
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetLoadBalancersIdActionsResponseBody200
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdActionsResponseBody200 = GetLoadBalancersIdActionsResponseBody200 {
   -- | actions
-  getLoadBalancersIdActionsResponseBody200Actions :: ([] GetLoadBalancersIdActionsResponseBody200Actions)
+  getLoadBalancersIdActionsResponseBody200Actions :: ([GetLoadBalancersIdActionsResponseBody200Actions])
   -- | meta
   , getLoadBalancersIdActionsResponseBody200Meta :: (GHC.Maybe.Maybe GetLoadBalancersIdActionsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (getLoadBalancersIdActionsResponseBody200Actions obj) : (Data.Aeson..=) "meta" (getLoadBalancersIdActionsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (getLoadBalancersIdActionsResponseBody200Actions obj) GHC.Base.<> (Data.Aeson..=) "meta" (getLoadBalancersIdActionsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200Actions obj : "meta" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("actions" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200Actions obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsResponseBody200" (\obj -> (GHC.Base.pure GetLoadBalancersIdActionsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetLoadBalancersIdActionsResponseBody200Actions
+-- | Create a new 'GetLoadBalancersIdActionsResponseBody200' with all required fields.
+mkGetLoadBalancersIdActionsResponseBody200 :: [GetLoadBalancersIdActionsResponseBody200Actions] -- ^ 'getLoadBalancersIdActionsResponseBody200Actions'
+  -> GetLoadBalancersIdActionsResponseBody200
+mkGetLoadBalancersIdActionsResponseBody200 getLoadBalancersIdActionsResponseBody200Actions = GetLoadBalancersIdActionsResponseBody200{getLoadBalancersIdActionsResponseBody200Actions = getLoadBalancersIdActionsResponseBody200Actions,
+                                                                                                                                      getLoadBalancersIdActionsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdActionsResponseBody200Actions = GetLoadBalancersIdActionsResponseBody200Actions {
   -- | command: Command executed in the Action
   getLoadBalancersIdActionsResponseBody200ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getLoadBalancersIdActionsResponseBody200ActionsError :: GetLoadBalancersIdActionsResponseBody200ActionsError
+  , getLoadBalancersIdActionsResponseBody200ActionsError :: (GHC.Maybe.Maybe GetLoadBalancersIdActionsResponseBody200ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getLoadBalancersIdActionsResponseBody200ActionsFinished :: Data.Text.Internal.Text
+  , getLoadBalancersIdActionsResponseBody200ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getLoadBalancersIdActionsResponseBody200ActionsId :: GHC.Integer.Type.Integer
+  , getLoadBalancersIdActionsResponseBody200ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getLoadBalancersIdActionsResponseBody200ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getLoadBalancersIdActionsResponseBody200ActionsResources :: ([] GetLoadBalancersIdActionsResponseBody200ActionsResources)
+  , getLoadBalancersIdActionsResponseBody200ActionsResources :: ([GetLoadBalancersIdActionsResponseBody200ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getLoadBalancersIdActionsResponseBody200ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getLoadBalancersIdActionsResponseBody200ActionsStatus :: GetLoadBalancersIdActionsResponseBody200ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getLoadBalancersIdActionsResponseBody200ActionsCommand obj) : (Data.Aeson..=) "error" (getLoadBalancersIdActionsResponseBody200ActionsError obj) : (Data.Aeson..=) "finished" (getLoadBalancersIdActionsResponseBody200ActionsFinished obj) : (Data.Aeson..=) "id" (getLoadBalancersIdActionsResponseBody200ActionsId obj) : (Data.Aeson..=) "progress" (getLoadBalancersIdActionsResponseBody200ActionsProgress obj) : (Data.Aeson..=) "resources" (getLoadBalancersIdActionsResponseBody200ActionsResources obj) : (Data.Aeson..=) "started" (getLoadBalancersIdActionsResponseBody200ActionsStarted obj) : (Data.Aeson..=) "status" (getLoadBalancersIdActionsResponseBody200ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getLoadBalancersIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getLoadBalancersIdActionsResponseBody200ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getLoadBalancersIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getLoadBalancersIdActionsResponseBody200ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getLoadBalancersIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getLoadBalancersIdActionsResponseBody200ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getLoadBalancersIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getLoadBalancersIdActionsResponseBody200ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsResponseBody200Actions" (\obj -> (((((((GHC.Base.pure GetLoadBalancersIdActionsResponseBody200Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetLoadBalancersIdActionsResponseBody200ActionsError
+-- | Create a new 'GetLoadBalancersIdActionsResponseBody200Actions' with all required fields.
+mkGetLoadBalancersIdActionsResponseBody200Actions :: Data.Text.Internal.Text -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsCommand'
+  -> GHC.Maybe.Maybe GetLoadBalancersIdActionsResponseBody200ActionsError -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsFinished'
+  -> GHC.Types.Int -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsId'
+  -> GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsProgress'
+  -> [GetLoadBalancersIdActionsResponseBody200ActionsResources] -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsStarted'
+  -> GetLoadBalancersIdActionsResponseBody200ActionsStatus -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsStatus'
+  -> GetLoadBalancersIdActionsResponseBody200Actions
+mkGetLoadBalancersIdActionsResponseBody200Actions getLoadBalancersIdActionsResponseBody200ActionsCommand getLoadBalancersIdActionsResponseBody200ActionsError getLoadBalancersIdActionsResponseBody200ActionsFinished getLoadBalancersIdActionsResponseBody200ActionsId getLoadBalancersIdActionsResponseBody200ActionsProgress getLoadBalancersIdActionsResponseBody200ActionsResources getLoadBalancersIdActionsResponseBody200ActionsStarted getLoadBalancersIdActionsResponseBody200ActionsStatus = GetLoadBalancersIdActionsResponseBody200Actions{getLoadBalancersIdActionsResponseBody200ActionsCommand = getLoadBalancersIdActionsResponseBody200ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsError = getLoadBalancersIdActionsResponseBody200ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsFinished = getLoadBalancersIdActionsResponseBody200ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsId = getLoadBalancersIdActionsResponseBody200ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsProgress = getLoadBalancersIdActionsResponseBody200ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsResources = getLoadBalancersIdActionsResponseBody200ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsStarted = getLoadBalancersIdActionsResponseBody200ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        getLoadBalancersIdActionsResponseBody200ActionsStatus = getLoadBalancersIdActionsResponseBody200ActionsStatus}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetLoadBalancersIdActionsResponseBody200ActionsError = GetLoadBalancersIdActionsResponseBody200ActionsError {
@@ -170,51 +253,60 @@ data GetLoadBalancersIdActionsResponseBody200ActionsError = GetLoadBalancersIdAc
   , getLoadBalancersIdActionsResponseBody200ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getLoadBalancersIdActionsResponseBody200ActionsErrorCode obj) : (Data.Aeson..=) "message" (getLoadBalancersIdActionsResponseBody200ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getLoadBalancersIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getLoadBalancersIdActionsResponseBody200ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsResponseBody200ActionsError" (\obj -> (GHC.Base.pure GetLoadBalancersIdActionsResponseBody200ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetLoadBalancersIdActionsResponseBody200ActionsResources
+-- | Create a new 'GetLoadBalancersIdActionsResponseBody200ActionsError' with all required fields.
+mkGetLoadBalancersIdActionsResponseBody200ActionsError :: Data.Text.Internal.Text -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsErrorMessage'
+  -> GetLoadBalancersIdActionsResponseBody200ActionsError
+mkGetLoadBalancersIdActionsResponseBody200ActionsError getLoadBalancersIdActionsResponseBody200ActionsErrorCode getLoadBalancersIdActionsResponseBody200ActionsErrorMessage = GetLoadBalancersIdActionsResponseBody200ActionsError{getLoadBalancersIdActionsResponseBody200ActionsErrorCode = getLoadBalancersIdActionsResponseBody200ActionsErrorCode,
+                                                                                                                                                                                                                                   getLoadBalancersIdActionsResponseBody200ActionsErrorMessage = getLoadBalancersIdActionsResponseBody200ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdActionsResponseBody200ActionsResources = GetLoadBalancersIdActionsResponseBody200ActionsResources {
   -- | id: ID of the Resource
-  getLoadBalancersIdActionsResponseBody200ActionsResourcesId :: GHC.Integer.Type.Integer
+  getLoadBalancersIdActionsResponseBody200ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getLoadBalancersIdActionsResponseBody200ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getLoadBalancersIdActionsResponseBody200ActionsResourcesId obj) : (Data.Aeson..=) "type" (getLoadBalancersIdActionsResponseBody200ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getLoadBalancersIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getLoadBalancersIdActionsResponseBody200ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsResponseBody200ActionsResources" (\obj -> (GHC.Base.pure GetLoadBalancersIdActionsResponseBody200ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetLoadBalancersIdActionsResponseBody200ActionsStatus
+-- | Create a new 'GetLoadBalancersIdActionsResponseBody200ActionsResources' with all required fields.
+mkGetLoadBalancersIdActionsResponseBody200ActionsResources :: GHC.Types.Int -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getLoadBalancersIdActionsResponseBody200ActionsResourcesType'
+  -> GetLoadBalancersIdActionsResponseBody200ActionsResources
+mkGetLoadBalancersIdActionsResponseBody200ActionsResources getLoadBalancersIdActionsResponseBody200ActionsResourcesId getLoadBalancersIdActionsResponseBody200ActionsResourcesType = GetLoadBalancersIdActionsResponseBody200ActionsResources{getLoadBalancersIdActionsResponseBody200ActionsResourcesId = getLoadBalancersIdActionsResponseBody200ActionsResourcesId,
+                                                                                                                                                                                                                                              getLoadBalancersIdActionsResponseBody200ActionsResourcesType = getLoadBalancersIdActionsResponseBody200ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetLoadBalancersIdActionsResponseBody200ActionsStatus
-    = GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumTyped Data.Text.Internal.Text
-    | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringError
-    | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringRunning
-    | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200ActionsStatus
-    where toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetLoadBalancersIdActionsResponseBody200ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumStringSuccess
-                                                      else GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumOther val)
--- | Defines the data type for the schema GetLoadBalancersIdActionsResponseBody200Meta
+data GetLoadBalancersIdActionsResponseBody200ActionsStatus =
+   GetLoadBalancersIdActionsResponseBody200ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetLoadBalancersIdActionsResponseBody200ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200ActionsStatus
+    where toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusOther val) = val
+          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumSuccess) = "success"
+          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumRunning) = "running"
+          toJSON (GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetLoadBalancersIdActionsResponseBody200ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> GetLoadBalancersIdActionsResponseBody200ActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdActionsResponseBody200Meta = GetLoadBalancersIdActionsResponseBody200Meta {
@@ -222,31 +314,76 @@ data GetLoadBalancersIdActionsResponseBody200Meta = GetLoadBalancersIdActionsRes
   getLoadBalancersIdActionsResponseBody200MetaPagination :: GetLoadBalancersIdActionsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getLoadBalancersIdActionsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getLoadBalancersIdActionsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsResponseBody200Meta" (\obj -> GHC.Base.pure GetLoadBalancersIdActionsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetLoadBalancersIdActionsResponseBody200MetaPagination
+-- | Create a new 'GetLoadBalancersIdActionsResponseBody200Meta' with all required fields.
+mkGetLoadBalancersIdActionsResponseBody200Meta :: GetLoadBalancersIdActionsResponseBody200MetaPagination -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPagination'
+  -> GetLoadBalancersIdActionsResponseBody200Meta
+mkGetLoadBalancersIdActionsResponseBody200Meta getLoadBalancersIdActionsResponseBody200MetaPagination = GetLoadBalancersIdActionsResponseBody200Meta{getLoadBalancersIdActionsResponseBody200MetaPagination = getLoadBalancersIdActionsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetLoadBalancersIdActionsResponseBody200MetaPagination = GetLoadBalancersIdActionsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getLoadBalancersIdActionsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetLoadBalancersIdActionsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getLoadBalancersIdActionsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getLoadBalancersIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetLoadBalancersIdActionsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetLoadBalancersIdActionsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetLoadBalancersIdActionsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetLoadBalancersIdActionsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetLoadBalancersIdActionsResponseBody200MetaPagination' with all required fields.
+mkGetLoadBalancersIdActionsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries'
+  -> GetLoadBalancersIdActionsResponseBody200MetaPagination
+mkGetLoadBalancersIdActionsResponseBody200MetaPagination getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage getLoadBalancersIdActionsResponseBody200MetaPaginationPage getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries = GetLoadBalancersIdActionsResponseBody200MetaPagination{getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage = getLoadBalancersIdActionsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage = getLoadBalancersIdActionsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getLoadBalancersIdActionsResponseBody200MetaPaginationPage = getLoadBalancersIdActionsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage = getLoadBalancersIdActionsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage = getLoadBalancersIdActionsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries = getLoadBalancersIdActionsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /load_balancers/{id}/actions
+-- 
+-- The same as 'getLoadBalancers_Id_Actions' but accepts an explicit configuration.
+getLoadBalancers_Id_ActionsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetLoadBalancersIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetLoadBalancersIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_ActionsWithConfiguration config
+                                             parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetLoadBalancersIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetLoadBalancersIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                       GetLoadBalancersIdActionsResponseBody200)
+                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /load_balancers/{id}/actions
+-- 
+-- The same as 'getLoadBalancers_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getLoadBalancers_Id_ActionsRaw :: forall m . HCloud.Common.MonadHTTP m => GetLoadBalancersIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_ActionsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /load_balancers/{id}/actions
+-- 
+-- The same as 'getLoadBalancers_Id_Actions' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getLoadBalancers_Id_ActionsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetLoadBalancersIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getLoadBalancers_Id_ActionsWithConfigurationRaw config
+                                                parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getLoadBalancersIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getLoadBalancersIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

@@ -8,9 +8,11 @@ import Network.HTTP.Client
 import Network.HTTP.Types
 import Network.HTTP.Types.Header (hAuthorization)
 
-newtype BearerAuthenticationSecurityScheme = BearerAuthenticationSecurityScheme { rawToken :: BS.ByteString } deriving (Eq, Show)
+-- newtype BearerAuthenticationSecurityScheme = BearerAuthenticationSecurityScheme { rawToken :: BS.ByteString } deriving (Eq, Show)
 
-instance SecurityScheme BearerAuthenticationSecurityScheme where
-  authenticateRequest BearerAuthenticationSecurityScheme{rawToken} req =
-    req { requestHeaders = (hAuthorization, "Bearer " <> rawToken):(requestHeaders req) }
+-- instance SecurityScheme BearerAuthenticationSecurityScheme where
+--   authenticateRequest BearerAuthenticationSecurityScheme{rawToken} req =
+--     req { requestHeaders = (hAuthorization, "Bearer " <> rawToken):(requestHeaders req) }
 
+bearerAuthenticationSecurityScheme :: BS.ByteString -> Request -> Request
+bearerAuthenticationSecurityScheme rawToken req = req { requestHeaders = (hAuthorization, "Bearer " <> rawToken):(requestHeaders req) }

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postLoadBalancers_Id_ActionsAddService
 module HCloud.Operations.PostLoadBalancersIdActionsAddService where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -51,151 +51,141 @@ import HCloud.Types
 -- | Code                       | Description                                             |
 -- |----------------------------|---------------------------------------------------------|
 -- | \`source_port_already_used\` | The source port you are trying to add is already in use |
-postLoadBalancers_Id_ActionsAddService :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                           -- ^ id: ID of the Load Balancer
-  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAddServiceResponse))   -- ^ Monad containing the result of the operation
-postLoadBalancers_Id_ActionsAddService config
-                                       id
-                                       body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAddServiceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAddServiceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                PostLoadBalancersIdActionsAddServiceResponseBody201)
-                                                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/add_service
--- 
--- The same as 'postLoadBalancers_Id_ActionsAddService' but returns the raw 'Data.ByteString.Char8.ByteString'
-postLoadBalancers_Id_ActionsAddServiceRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                           HCloud.Common.SecurityScheme s) =>
-                                             HCloud.Common.Configuration s ->
-                                             GHC.Integer.Type.Integer ->
-                                             GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody ->
-                                             m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                   (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsAddServiceRaw config
-                                          id
-                                          body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/add_service
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsAddService' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsAddServiceM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                         HCloud.Common.SecurityScheme s) =>
-                                           GHC.Integer.Type.Integer ->
-                                           GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody ->
-                                           Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                              m
-                                                                              (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                  (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAddServiceResponse))
-postLoadBalancers_Id_ActionsAddServiceM id
-                                        body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAddServiceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAddServiceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 PostLoadBalancersIdActionsAddServiceResponseBody201)
-                                                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers/{id}/actions/add_service
--- 
--- Monadic version of 'postLoadBalancers_Id_ActionsAddServiceRaw' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancers_Id_ActionsAddServiceRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                            HCloud.Common.SecurityScheme s) =>
-                                              GHC.Integer.Type.Integer ->
-                                              GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody ->
-                                              Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                                 m
-                                                                                 (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                     (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancers_Id_ActionsAddServiceRawM id
-                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsAddServiceRequestBody
+postLoadBalancers_Id_ActionsAddService :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAddServiceResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAddService id
+                                       body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAddServiceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAddServiceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 PostLoadBalancersIdActionsAddServiceResponseBody201)
+                                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAddServiceRequestBody = PostLoadBalancersIdActionsAddServiceRequestBody {
   -- | destination_port: Port the Load Balancer will balance to
-  postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort :: GHC.Integer.Type.Integer
+  postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort :: GHC.Types.Int
   -- | health_check: Service health check
   , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck :: PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck
   -- | http: Configuration option for protocols http and https
   , postLoadBalancersIdActionsAddServiceRequestBodyHttp :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBodyHttp)
   -- | listen_port: Port the Load Balancer listens on
-  , postLoadBalancersIdActionsAddServiceRequestBodyListenPort :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceRequestBodyListenPort :: GHC.Types.Int
   -- | protocol: Protocol of the Load Balancer
   , postLoadBalancersIdActionsAddServiceRequestBodyProtocol :: PostLoadBalancersIdActionsAddServiceRequestBodyProtocol
   -- | proxyprotocol: Is Proxyprotocol enabled or not
   , postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination_port" (postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort obj) : (Data.Aeson..=) "health_check" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck obj) : (Data.Aeson..=) "http" (postLoadBalancersIdActionsAddServiceRequestBodyHttp obj) : (Data.Aeson..=) "listen_port" (postLoadBalancersIdActionsAddServiceRequestBodyListenPort obj) : (Data.Aeson..=) "protocol" (postLoadBalancersIdActionsAddServiceRequestBodyProtocol obj) : (Data.Aeson..=) "proxyprotocol" (postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination_port" (postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort obj) GHC.Base.<> ((Data.Aeson..=) "health_check" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck obj) GHC.Base.<> ((Data.Aeson..=) "http" (postLoadBalancersIdActionsAddServiceRequestBodyHttp obj) GHC.Base.<> ((Data.Aeson..=) "listen_port" (postLoadBalancersIdActionsAddServiceRequestBodyListenPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postLoadBalancersIdActionsAddServiceRequestBodyProtocol obj) GHC.Base.<> (Data.Aeson..=) "proxyprotocol" (postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination_port" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort obj : "health_check" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck obj : "http" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttp obj : "listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyListenPort obj : "protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyProtocol obj : "proxyprotocol" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination_port" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort obj) GHC.Base.<> (("health_check" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck obj) GHC.Base.<> (("http" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttp obj) GHC.Base.<> (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyListenPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyProtocol obj) GHC.Base.<> ("proxyprotocol" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceRequestBody" (\obj -> (((((GHC.Base.pure PostLoadBalancersIdActionsAddServiceRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "health_check")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "proxyprotocol"))
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsAddServiceRequestBodyHealth_check
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceRequestBody' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceRequestBody :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort'
+  -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyListenPort'
+  -> PostLoadBalancersIdActionsAddServiceRequestBodyProtocol -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyProtocol'
+  -> GHC.Types.Bool -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol'
+  -> PostLoadBalancersIdActionsAddServiceRequestBody
+mkPostLoadBalancersIdActionsAddServiceRequestBody postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck postLoadBalancersIdActionsAddServiceRequestBodyListenPort postLoadBalancersIdActionsAddServiceRequestBodyProtocol postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol = PostLoadBalancersIdActionsAddServiceRequestBody{postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort = postLoadBalancersIdActionsAddServiceRequestBodyDestinationPort,
+                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheck,
+                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersIdActionsAddServiceRequestBodyHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersIdActionsAddServiceRequestBodyListenPort = postLoadBalancersIdActionsAddServiceRequestBodyListenPort,
+                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersIdActionsAddServiceRequestBodyProtocol = postLoadBalancersIdActionsAddServiceRequestBodyProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol = postLoadBalancersIdActionsAddServiceRequestBodyProxyprotocol}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.requestBody.content.application\/json.schema.properties.health_check@ in the specification.
 -- 
 -- Service health check
 data PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck = PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck {
   -- | http: Additional configuration for protocol http
   postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp)
   -- | interval: Time interval in seconds health checks are performed
-  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval :: GHC.Types.Int
   -- | port: Port the health check will be performed on
-  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort :: GHC.Types.Int
   -- | protocol: Type of the health check
   , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol :: PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol
   -- | retries: Unsuccessful retries needed until a target is considered unhealthy; an unhealthy target needs the same number of successful retries to become healthy again
-  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries :: GHC.Types.Int
   -- | timeout: Time in seconds after an attempt is considered a timeout
-  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "http" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp obj) : (Data.Aeson..=) "interval" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval obj) : (Data.Aeson..=) "port" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort obj) : (Data.Aeson..=) "protocol" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol obj) : (Data.Aeson..=) "retries" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries obj) : (Data.Aeson..=) "timeout" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "http" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp obj) GHC.Base.<> ((Data.Aeson..=) "interval" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval obj) GHC.Base.<> ((Data.Aeson..=) "port" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol obj) GHC.Base.<> ((Data.Aeson..=) "retries" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries obj) GHC.Base.<> (Data.Aeson..=) "timeout" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck
+    where toJSON obj = Data.Aeson.Types.Internal.object ("http" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp obj : "interval" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval obj : "port" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort obj : "protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol obj : "retries" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries obj : "timeout" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("http" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp obj) GHC.Base.<> (("interval" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol obj) GHC.Base.<> (("retries" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries obj) GHC.Base.<> ("timeout" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck" (\obj -> (((((GHC.Base.pure PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "interval")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "retries")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "timeout"))
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsAddServiceRequestBodyHealth_checkHttp
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort'
+  -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout'
+  -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck
+mkPostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout = PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheck{postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckInterval,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckRetries,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckTimeout}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.requestBody.content.application\/json.schema.properties.health_check.properties.http@ in the specification.
 -- 
 -- Additional configuration for protocol http
 data PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp = PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp {
   -- | domain: Host header to send in the HTTP request. May not contain spaces, percent or backslash symbols. Can be null, in that case no host header is sent.
-  postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain :: Data.Text.Internal.Text
+  postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | path: HTTP path to use for health checks
   , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath :: Data.Text.Internal.Text
   -- | response: String that must be contained in HTTP response in order to pass the health check
   , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpResponse :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status_codes: List of returned HTTP status codes in order to pass the health check. Supports the wildcards \`?\` for exactly one character and \`*\` for multiple ones. The default is to pass the health check for any status code between 2?? and 3??.
-  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | tls: Use HTTPS for health check
   , postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpTls :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "domain" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain obj) : (Data.Aeson..=) "path" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath obj) : (Data.Aeson..=) "response" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpResponse obj) : (Data.Aeson..=) "status_codes" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes obj) : (Data.Aeson..=) "tls" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpTls obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "domain" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain obj) GHC.Base.<> ((Data.Aeson..=) "path" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath obj) GHC.Base.<> ((Data.Aeson..=) "response" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpResponse obj) GHC.Base.<> ((Data.Aeson..=) "status_codes" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes obj) GHC.Base.<> (Data.Aeson..=) "tls" (postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpTls obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("domain" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain obj : "path" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath obj : "response" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpResponse obj : "status_codes" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes obj : "tls" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpTls obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("domain" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain obj) GHC.Base.<> (("path" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath obj) GHC.Base.<> (("response" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpResponse obj) GHC.Base.<> (("status_codes" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes obj) GHC.Base.<> ("tls" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpTls obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp" (\obj -> ((((GHC.Base.pure PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "path")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "response")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status_codes")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tls"))
--- | Defines the enum schema postLoadBalancers_Id_ActionsAddServiceRequestBodyHealth_checkProtocol
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath'
+  -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp
+mkPostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath = PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttp{postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpDomain,
+                                                                                                                                                                                                                                                                          postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath = postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpPath,
+                                                                                                                                                                                                                                                                          postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpResponse = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                          postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpStatusCodes = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                          postLoadBalancersIdActionsAddServiceRequestBodyHealthCheckHttpTls = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.requestBody.content.application\/json.schema.properties.health_check.properties.protocol@ in the specification.
 -- 
 -- Type of the health check
-data PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol
-    = PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumStringHttp
-    | PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol
-    where toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                then PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumStringTcp
-                                                else PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumOther val)
--- | Defines the data type for the schema postLoadBalancers_Id_ActionsAddServiceRequestBodyHttp
+data PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol =
+   PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol
+    where toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolOther val) = val
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumTcp) = "tcp"
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumHttp) = "http"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolEnumHttp
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsAddServiceRequestBodyHealthCheckProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.requestBody.content.application\/json.schema.properties.http@ in the specification.
 -- 
 -- Configuration option for protocols http and https
 data PostLoadBalancersIdActionsAddServiceRequestBodyHttp = PostLoadBalancersIdActionsAddServiceRequestBodyHttp {
   -- | certificates: IDs of the Certificates to use for TLS\/SSL termination by the Load Balancer; empty for TLS\/SSL passthrough or if \`protocol\` is \"http\"
-  postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | cookie_lifetime: Lifetime of the cookie used for sticky sessions
-  , postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime :: GHC.Types.Int
   -- | cookie_name: Name of the cookie used for sticky sessions
   , postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName :: Data.Text.Internal.Text
   -- | redirect_http: Redirect HTTP requests to HTTPS. Only available if protocol is \"https\". Default \`false\`
@@ -204,43 +194,49 @@ data PostLoadBalancersIdActionsAddServiceRequestBodyHttp = PostLoadBalancersIdAc
   , postLoadBalancersIdActionsAddServiceRequestBodyHttpStickySessions :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificates" (postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates obj) : (Data.Aeson..=) "cookie_lifetime" (postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime obj) : (Data.Aeson..=) "cookie_name" (postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName obj) : (Data.Aeson..=) "redirect_http" (postLoadBalancersIdActionsAddServiceRequestBodyHttpRedirectHttp obj) : (Data.Aeson..=) "sticky_sessions" (postLoadBalancersIdActionsAddServiceRequestBodyHttpStickySessions obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificates" (postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates obj) GHC.Base.<> ((Data.Aeson..=) "cookie_lifetime" (postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime obj) GHC.Base.<> ((Data.Aeson..=) "cookie_name" (postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName obj) GHC.Base.<> ((Data.Aeson..=) "redirect_http" (postLoadBalancersIdActionsAddServiceRequestBodyHttpRedirectHttp obj) GHC.Base.<> (Data.Aeson..=) "sticky_sessions" (postLoadBalancersIdActionsAddServiceRequestBodyHttpStickySessions obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates obj : "cookie_lifetime" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime obj : "cookie_name" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName obj : "redirect_http" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpRedirectHttp obj : "sticky_sessions" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpStickySessions obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates obj) GHC.Base.<> (("cookie_lifetime" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime obj) GHC.Base.<> (("cookie_name" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName obj) GHC.Base.<> (("redirect_http" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpRedirectHttp obj) GHC.Base.<> ("sticky_sessions" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceRequestBodyHttpStickySessions obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceRequestBodyHttp" (\obj -> ((((GHC.Base.pure PostLoadBalancersIdActionsAddServiceRequestBodyHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_lifetime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "redirect_http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "sticky_sessions"))
--- | Defines the enum schema postLoadBalancers_Id_ActionsAddServiceRequestBodyProtocol
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceRequestBodyHttp' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceRequestBodyHttp :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName'
+  -> PostLoadBalancersIdActionsAddServiceRequestBodyHttp
+mkPostLoadBalancersIdActionsAddServiceRequestBodyHttp postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName = PostLoadBalancersIdActionsAddServiceRequestBodyHttp{postLoadBalancersIdActionsAddServiceRequestBodyHttpCertificates = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime = postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieLifetime,
+                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName = postLoadBalancersIdActionsAddServiceRequestBodyHttpCookieName,
+                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceRequestBodyHttpRedirectHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceRequestBodyHttpStickySessions = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.requestBody.content.application\/json.schema.properties.protocol@ in the specification.
 -- 
 -- Protocol of the Load Balancer
-data PostLoadBalancersIdActionsAddServiceRequestBodyProtocol
-    = PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringHttp
-    | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringHttps
-    | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyProtocol
-    where toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringHttps) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https"
-          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https")
-                                                then PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringHttps
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                      then PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumStringTcp
-                                                      else PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumOther val)
+data PostLoadBalancersIdActionsAddServiceRequestBodyProtocol =
+   PostLoadBalancersIdActionsAddServiceRequestBodyProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  | PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumHttps -- ^ Represents the JSON value @"https"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceRequestBodyProtocol
+    where toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolOther val) = val
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumTcp) = "tcp"
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumHttp) = "http"
+          toJSON (PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumHttps) = "https"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceRequestBodyProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumHttp
+                                            | val GHC.Classes.== "https" -> PostLoadBalancersIdActionsAddServiceRequestBodyProtocolEnumHttps
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsAddServiceRequestBodyProtocolOther val)
 -- | Represents a response of the operation 'postLoadBalancers_Id_ActionsAddService'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostLoadBalancersIdActionsAddServiceResponseError' is used.
-data PostLoadBalancersIdActionsAddServiceResponse =                                                      
-   PostLoadBalancersIdActionsAddServiceResponseError GHC.Base.String                                     -- ^ Means either no matching case available or a parse error
-  | PostLoadBalancersIdActionsAddServiceResponse201 PostLoadBalancersIdActionsAddServiceResponseBody201  -- ^ The \`action\` key contains the \`add_service\` Action
+data PostLoadBalancersIdActionsAddServiceResponse =
+   PostLoadBalancersIdActionsAddServiceResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostLoadBalancersIdActionsAddServiceResponse201 PostLoadBalancersIdActionsAddServiceResponseBody201 -- ^ The \`action\` key contains the \`add_service\` Action
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostLoadBalancersIdActionsAddServiceResponseBody201
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAddServiceResponseBody201 = PostLoadBalancersIdActionsAddServiceResponseBody201 {
@@ -248,39 +244,61 @@ data PostLoadBalancersIdActionsAddServiceResponseBody201 = PostLoadBalancersIdAc
   postLoadBalancersIdActionsAddServiceResponseBody201Action :: PostLoadBalancersIdActionsAddServiceResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postLoadBalancersIdActionsAddServiceResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postLoadBalancersIdActionsAddServiceResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceResponseBody201" (\obj -> GHC.Base.pure PostLoadBalancersIdActionsAddServiceResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsAddServiceResponseBody201Action
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceResponseBody201' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceResponseBody201 :: PostLoadBalancersIdActionsAddServiceResponseBody201Action -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201Action'
+  -> PostLoadBalancersIdActionsAddServiceResponseBody201
+mkPostLoadBalancersIdActionsAddServiceResponseBody201 postLoadBalancersIdActionsAddServiceResponseBody201Action = PostLoadBalancersIdActionsAddServiceResponseBody201{postLoadBalancersIdActionsAddServiceResponseBody201Action = postLoadBalancersIdActionsAddServiceResponseBody201Action}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAddServiceResponseBody201Action = PostLoadBalancersIdActionsAddServiceResponseBody201Action {
   -- | command: Command executed in the Action
   postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postLoadBalancersIdActionsAddServiceResponseBody201ActionError :: PostLoadBalancersIdActionsAddServiceResponseBody201ActionError
+  , postLoadBalancersIdActionsAddServiceResponseBody201ActionError :: (GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postLoadBalancersIdActionsAddServiceResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postLoadBalancersIdActionsAddServiceResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postLoadBalancersIdActionsAddServiceResponseBody201ActionResources :: ([] PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources)
+  , postLoadBalancersIdActionsAddServiceResponseBody201ActionResources :: ([PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus :: PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postLoadBalancersIdActionsAddServiceResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postLoadBalancersIdActionsAddServiceResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postLoadBalancersIdActionsAddServiceResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postLoadBalancersIdActionsAddServiceResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersIdActionsAddServiceResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postLoadBalancersIdActionsAddServiceResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostLoadBalancersIdActionsAddServiceResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsAddServiceResponseBody201ActionError
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceResponseBody201Action' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceResponseBody201ActionError -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress'
+  -> [PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources] -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted'
+  -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus'
+  -> PostLoadBalancersIdActionsAddServiceResponseBody201Action
+mkPostLoadBalancersIdActionsAddServiceResponseBody201Action postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand postLoadBalancersIdActionsAddServiceResponseBody201ActionError postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished postLoadBalancersIdActionsAddServiceResponseBody201ActionId postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress postLoadBalancersIdActionsAddServiceResponseBody201ActionResources postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus = PostLoadBalancersIdActionsAddServiceResponseBody201Action{postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand = postLoadBalancersIdActionsAddServiceResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionError = postLoadBalancersIdActionsAddServiceResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished = postLoadBalancersIdActionsAddServiceResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionId = postLoadBalancersIdActionsAddServiceResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress = postLoadBalancersIdActionsAddServiceResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionResources = postLoadBalancersIdActionsAddServiceResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted = postLoadBalancersIdActionsAddServiceResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus = postLoadBalancersIdActionsAddServiceResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostLoadBalancersIdActionsAddServiceResponseBody201ActionError = PostLoadBalancersIdActionsAddServiceResponseBody201ActionError {
@@ -290,47 +308,86 @@ data PostLoadBalancersIdActionsAddServiceResponseBody201ActionError = PostLoadBa
   , postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceResponseBody201ActionError" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsAddServiceResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceResponseBody201ActionError' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage'
+  -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionError
+mkPostLoadBalancersIdActionsAddServiceResponseBody201ActionError postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage = PostLoadBalancersIdActionsAddServiceResponseBody201ActionError{postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode = postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                                           postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage = postLoadBalancersIdActionsAddServiceResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources = PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
+-- | Create a new 'PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources' with all required fields.
+mkPostLoadBalancersIdActionsAddServiceResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType'
+  -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources
+mkPostLoadBalancersIdActionsAddServiceResponseBody201ActionResources postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType = PostLoadBalancersIdActionsAddServiceResponseBody201ActionResources{postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId = postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                                      postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType = postLoadBalancersIdActionsAddServiceResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}\/actions\/add_service.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
-    = PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringError
-    | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringRunning
-    | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
-    where toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumOther val)
+data PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus =
+   PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
+    where toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusOther val) = val
+          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostLoadBalancersIdActionsAddServiceResponseBody201ActionStatusOther val)
+-- | > POST /load_balancers/{id}/actions/add_service
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsAddService' but accepts an explicit configuration.
+postLoadBalancers_Id_ActionsAddServiceWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostLoadBalancersIdActionsAddServiceResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAddServiceWithConfiguration config
+                                                        id
+                                                        body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersIdActionsAddServiceResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersIdActionsAddServiceResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostLoadBalancersIdActionsAddServiceResponseBody201)
+                                                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/add_service
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsAddService' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsAddServiceRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAddServiceRaw id
+                                          body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers/{id}/actions/add_service
+-- 
+-- The same as 'postLoadBalancers_Id_ActionsAddService' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancers_Id_ActionsAddServiceWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PostLoadBalancersIdActionsAddServiceRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers_Id_ActionsAddServiceWithConfigurationRaw config
+                                                           id
+                                                           body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/add_service"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsCreateImage
 module HCloud.Operations.PostServersIdActionsCreateImage where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,57 +49,14 @@ import HCloud.Types
 -- To make sure disk content is consistent, we recommend to shut down the Server prior to creating an Image.
 -- 
 -- You can either create a \`backup\` Image that is bound to the Server and therefore will be deleted when the Server is deleted, or you can create an \`snapshot\` Image which is completely independent of the Server it was created from and will survive Server deletion. Backup Images are only available when the backup option is enabled for the Server. Snapshot Images are billed on a per GB basis.
-postServers_Id_ActionsCreateImage :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                      -- ^ id: ID of the Server
-  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsCreateImageResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsCreateImage config
-                                  id
-                                  body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsCreateImageResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsCreateImageResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 PostServersIdActionsCreateImageResponseBody201)
-                                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/create_image
--- 
--- The same as 'postServers_Id_ActionsCreateImage' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsCreateImageRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                      HCloud.Common.SecurityScheme s) =>
-                                        HCloud.Common.Configuration s ->
-                                        GHC.Integer.Type.Integer ->
-                                        GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody ->
-                                        m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsCreateImageRaw config
-                                     id
-                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/create_image
--- 
--- Monadic version of 'postServers_Id_ActionsCreateImage' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsCreateImageM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                    HCloud.Common.SecurityScheme s) =>
-                                      GHC.Integer.Type.Integer ->
-                                      GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody ->
-                                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                         m
-                                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                             (Network.HTTP.Client.Types.Response PostServersIdActionsCreateImageResponse))
-postServers_Id_ActionsCreateImageM id
-                                   body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsCreateImageResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsCreateImageResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostServersIdActionsCreateImageResponseBody201)
-                                                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /servers/{id}/actions/create_image
--- 
--- Monadic version of 'postServers_Id_ActionsCreateImageRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsCreateImageRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                       HCloud.Common.SecurityScheme s) =>
-                                         GHC.Integer.Type.Integer ->
-                                         GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody ->
-                                         Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                            m
-                                                                            (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsCreateImageRawM id
-                                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postServers_Id_ActionsCreateImageRequestBody
+postServers_Id_ActionsCreateImage :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsCreateImageResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsCreateImage id
+                                  body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsCreateImageResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsCreateImageResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  PostServersIdActionsCreateImageResponseBody201)
+                                                                                                                                                                                                   | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsCreateImageRequestBody = PostServersIdActionsCreateImageRequestBody {
@@ -111,12 +68,17 @@ data PostServersIdActionsCreateImageRequestBody = PostServersIdActionsCreateImag
   , postServersIdActionsCreateImageRequestBodyType :: (GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBodyType)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (postServersIdActionsCreateImageRequestBodyDescription obj) : (Data.Aeson..=) "labels" (postServersIdActionsCreateImageRequestBodyLabels obj) : (Data.Aeson..=) "type" (postServersIdActionsCreateImageRequestBodyType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (postServersIdActionsCreateImageRequestBodyDescription obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postServersIdActionsCreateImageRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsCreateImageRequestBodyType obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyDescription obj : "labels" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyLabels obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyDescription obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyLabels obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyType obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageRequestBody" (\obj -> ((GHC.Base.pure PostServersIdActionsCreateImageRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type"))
--- | Defines the data type for the schema postServers_Id_ActionsCreateImageRequestBodyLabels
+-- | Create a new 'PostServersIdActionsCreateImageRequestBody' with all required fields.
+mkPostServersIdActionsCreateImageRequestBody :: PostServersIdActionsCreateImageRequestBody
+mkPostServersIdActionsCreateImageRequestBody = PostServersIdActionsCreateImageRequestBody{postServersIdActionsCreateImageRequestBodyDescription = GHC.Maybe.Nothing,
+                                                                                          postServersIdActionsCreateImageRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                          postServersIdActionsCreateImageRequestBodyType = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.requestBody.content.application\/json.schema.properties.labels@ in the specification.
 -- 
 -- User-defined labels (key-value pairs)
 data PostServersIdActionsCreateImageRequestBodyLabels = PostServersIdActionsCreateImageRequestBodyLabels {
@@ -124,39 +86,40 @@ data PostServersIdActionsCreateImageRequestBodyLabels = PostServersIdActionsCrea
   postServersIdActionsCreateImageRequestBodyLabelsLabelkey :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageRequestBodyLabels
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labelkey" (postServersIdActionsCreateImageRequestBodyLabelsLabelkey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labelkey" (postServersIdActionsCreateImageRequestBodyLabelsLabelkey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageRequestBodyLabels
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labelkey" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyLabelsLabelkey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("labelkey" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageRequestBodyLabelsLabelkey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageRequestBodyLabels
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageRequestBodyLabels" (\obj -> GHC.Base.pure PostServersIdActionsCreateImageRequestBodyLabels GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labelkey"))
--- | Defines the enum schema postServers_Id_ActionsCreateImageRequestBodyType
+-- | Create a new 'PostServersIdActionsCreateImageRequestBodyLabels' with all required fields.
+mkPostServersIdActionsCreateImageRequestBodyLabels :: PostServersIdActionsCreateImageRequestBodyLabels
+mkPostServersIdActionsCreateImageRequestBodyLabels = PostServersIdActionsCreateImageRequestBodyLabels{postServersIdActionsCreateImageRequestBodyLabelsLabelkey = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.requestBody.content.application\/json.schema.properties.type@ in the specification.
 -- 
 -- Type of Image to create (default: \`snapshot\`)
-data PostServersIdActionsCreateImageRequestBodyType
-    = PostServersIdActionsCreateImageRequestBodyTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsCreateImageRequestBodyTypeEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsCreateImageRequestBodyTypeEnumStringBackup
-    | PostServersIdActionsCreateImageRequestBodyTypeEnumStringSnapshot
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageRequestBodyType
-    where toJSON (PostServersIdActionsCreateImageRequestBodyTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageRequestBodyTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageRequestBodyTypeEnumStringBackup) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup"
-          toJSON (PostServersIdActionsCreateImageRequestBodyTypeEnumStringSnapshot) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot"
-instance Data.Aeson.FromJSON PostServersIdActionsCreateImageRequestBodyType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup")
-                                          then PostServersIdActionsCreateImageRequestBodyTypeEnumStringBackup
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot")
-                                                then PostServersIdActionsCreateImageRequestBodyTypeEnumStringSnapshot
-                                                else PostServersIdActionsCreateImageRequestBodyTypeEnumOther val)
+data PostServersIdActionsCreateImageRequestBodyType =
+   PostServersIdActionsCreateImageRequestBodyTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsCreateImageRequestBodyTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsCreateImageRequestBodyTypeEnumSnapshot -- ^ Represents the JSON value @"snapshot"@
+  | PostServersIdActionsCreateImageRequestBodyTypeEnumBackup -- ^ Represents the JSON value @"backup"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageRequestBodyType
+    where toJSON (PostServersIdActionsCreateImageRequestBodyTypeOther val) = val
+          toJSON (PostServersIdActionsCreateImageRequestBodyTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsCreateImageRequestBodyTypeEnumSnapshot) = "snapshot"
+          toJSON (PostServersIdActionsCreateImageRequestBodyTypeEnumBackup) = "backup"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageRequestBodyType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "snapshot" -> PostServersIdActionsCreateImageRequestBodyTypeEnumSnapshot
+                                            | val GHC.Classes.== "backup" -> PostServersIdActionsCreateImageRequestBodyTypeEnumBackup
+                                            | GHC.Base.otherwise -> PostServersIdActionsCreateImageRequestBodyTypeOther val)
 -- | Represents a response of the operation 'postServers_Id_ActionsCreateImage'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsCreateImageResponseError' is used.
-data PostServersIdActionsCreateImageResponse =                                                 
-   PostServersIdActionsCreateImageResponseError GHC.Base.String                                -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsCreateImageResponse201 PostServersIdActionsCreateImageResponseBody201  -- ^ The \`image\` key in the reply contains an the created Image, which is an object with this structure  The \`action\` key in the reply contains an Action object with this structure 
+data PostServersIdActionsCreateImageResponse =
+   PostServersIdActionsCreateImageResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsCreateImageResponse201 PostServersIdActionsCreateImageResponseBody201 -- ^ The \`image\` key in the reply contains an the created Image, which is an object with this structure  The \`action\` key in the reply contains an Action object with this structure 
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsCreateImageResponseBody201 = PostServersIdActionsCreateImageResponseBody201 {
@@ -166,39 +129,61 @@ data PostServersIdActionsCreateImageResponseBody201 = PostServersIdActionsCreate
   , postServersIdActionsCreateImageResponseBody201Image :: (GHC.Maybe.Maybe PostServersIdActionsCreateImageResponseBody201Image)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsCreateImageResponseBody201Action obj) : (Data.Aeson..=) "image" (postServersIdActionsCreateImageResponseBody201Image obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsCreateImageResponseBody201Action obj) GHC.Base.<> (Data.Aeson..=) "image" (postServersIdActionsCreateImageResponseBody201Image obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201Action obj : "image" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201Image obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201Action obj) GHC.Base.<> ("image" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201Image obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201" (\obj -> (GHC.Base.pure PostServersIdActionsCreateImageResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "image"))
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201Action
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201 :: PostServersIdActionsCreateImageResponseBody201
+mkPostServersIdActionsCreateImageResponseBody201 = PostServersIdActionsCreateImageResponseBody201{postServersIdActionsCreateImageResponseBody201Action = GHC.Maybe.Nothing,
+                                                                                                  postServersIdActionsCreateImageResponseBody201Image = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsCreateImageResponseBody201Action = PostServersIdActionsCreateImageResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsCreateImageResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsCreateImageResponseBody201ActionError :: PostServersIdActionsCreateImageResponseBody201ActionError
+  , postServersIdActionsCreateImageResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsCreateImageResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsCreateImageResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsCreateImageResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsCreateImageResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsCreateImageResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsCreateImageResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsCreateImageResponseBody201ActionResources :: ([] PostServersIdActionsCreateImageResponseBody201ActionResources)
+  , postServersIdActionsCreateImageResponseBody201ActionResources :: ([PostServersIdActionsCreateImageResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsCreateImageResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsCreateImageResponseBody201ActionStatus :: PostServersIdActionsCreateImageResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsCreateImageResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsCreateImageResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsCreateImageResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsCreateImageResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsCreateImageResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsCreateImageResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsCreateImageResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsCreateImageResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsCreateImageResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsCreateImageResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsCreateImageResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsCreateImageResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsCreateImageResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsCreateImageResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsCreateImageResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201Action' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageResponseBody201ActionError -- ^ 'postServersIdActionsCreateImageResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsCreateImageResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsCreateImageResponseBody201ActionProgress'
+  -> [PostServersIdActionsCreateImageResponseBody201ActionResources] -- ^ 'postServersIdActionsCreateImageResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ActionStarted'
+  -> PostServersIdActionsCreateImageResponseBody201ActionStatus -- ^ 'postServersIdActionsCreateImageResponseBody201ActionStatus'
+  -> PostServersIdActionsCreateImageResponseBody201Action
+mkPostServersIdActionsCreateImageResponseBody201Action postServersIdActionsCreateImageResponseBody201ActionCommand postServersIdActionsCreateImageResponseBody201ActionError postServersIdActionsCreateImageResponseBody201ActionFinished postServersIdActionsCreateImageResponseBody201ActionId postServersIdActionsCreateImageResponseBody201ActionProgress postServersIdActionsCreateImageResponseBody201ActionResources postServersIdActionsCreateImageResponseBody201ActionStarted postServersIdActionsCreateImageResponseBody201ActionStatus = PostServersIdActionsCreateImageResponseBody201Action{postServersIdActionsCreateImageResponseBody201ActionCommand = postServersIdActionsCreateImageResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionError = postServersIdActionsCreateImageResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionFinished = postServersIdActionsCreateImageResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionId = postServersIdActionsCreateImageResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionProgress = postServersIdActionsCreateImageResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionResources = postServersIdActionsCreateImageResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionStarted = postServersIdActionsCreateImageResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          postServersIdActionsCreateImageResponseBody201ActionStatus = postServersIdActionsCreateImageResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsCreateImageResponseBody201ActionError = PostServersIdActionsCreateImageResponseBody201ActionError {
@@ -208,82 +193,91 @@ data PostServersIdActionsCreateImageResponseBody201ActionError = PostServersIdAc
   , postServersIdActionsCreateImageResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsCreateImageResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsCreateImageResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsCreateImageResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsCreateImageResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsCreateImageResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsCreateImageResponseBody201ActionError
+mkPostServersIdActionsCreateImageResponseBody201ActionError postServersIdActionsCreateImageResponseBody201ActionErrorCode postServersIdActionsCreateImageResponseBody201ActionErrorMessage = PostServersIdActionsCreateImageResponseBody201ActionError{postServersIdActionsCreateImageResponseBody201ActionErrorCode = postServersIdActionsCreateImageResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                       postServersIdActionsCreateImageResponseBody201ActionErrorMessage = postServersIdActionsCreateImageResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsCreateImageResponseBody201ActionResources = PostServersIdActionsCreateImageResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsCreateImageResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsCreateImageResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsCreateImageResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsCreateImageResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsCreateImageResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsCreateImageResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsCreateImageResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsCreateImageResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ActionResourcesType'
+  -> PostServersIdActionsCreateImageResponseBody201ActionResources
+mkPostServersIdActionsCreateImageResponseBody201ActionResources postServersIdActionsCreateImageResponseBody201ActionResourcesId postServersIdActionsCreateImageResponseBody201ActionResourcesType = PostServersIdActionsCreateImageResponseBody201ActionResources{postServersIdActionsCreateImageResponseBody201ActionResourcesId = postServersIdActionsCreateImageResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                  postServersIdActionsCreateImageResponseBody201ActionResourcesType = postServersIdActionsCreateImageResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsCreateImageResponseBody201ActionStatus
-    = PostServersIdActionsCreateImageResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsCreateImageResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsCreateImageResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsCreateImageResponseBody201ActionStatusEnumOther val)
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201Image
+data PostServersIdActionsCreateImageResponseBody201ActionStatus =
+   PostServersIdActionsCreateImageResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsCreateImageResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsCreateImageResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsCreateImageResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsCreateImageResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsCreateImageResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsCreateImageResponseBody201ActionStatusOther val)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.image@ in the specification.
 -- 
 -- 
 data PostServersIdActionsCreateImageResponseBody201Image = PostServersIdActionsCreateImageResponseBody201Image {
   -- | bound_to: ID of Server the Image is bound to. Only set for Images of type \`backup\`.
-  postServersIdActionsCreateImageResponseBody201ImageBoundTo :: GHC.Integer.Type.Integer
+  postServersIdActionsCreateImageResponseBody201ImageBoundTo :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | build_id: Build ID of the Image
   , postServersIdActionsCreateImageResponseBody201ImageBuildId :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , postServersIdActionsCreateImageResponseBody201ImageCreated :: Data.Text.Internal.Text
   -- | created_from: Information about the Server the Image was created from
-  , postServersIdActionsCreateImageResponseBody201ImageCreatedFrom :: PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom
+  , postServersIdActionsCreateImageResponseBody201ImageCreatedFrom :: (GHC.Maybe.Maybe PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom)
   -- | deleted: Point in time where the Image was deleted (in ISO-8601 format)
-  , postServersIdActionsCreateImageResponseBody201ImageDeleted :: Data.Text.Internal.Text
+  , postServersIdActionsCreateImageResponseBody201ImageDeleted :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | deprecated: Point in time when the Image is considered to be deprecated (in ISO-8601 format)
-  , postServersIdActionsCreateImageResponseBody201ImageDeprecated :: Data.Text.Internal.Text
+  , postServersIdActionsCreateImageResponseBody201ImageDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Image
   , postServersIdActionsCreateImageResponseBody201ImageDescription :: Data.Text.Internal.Text
   -- | disk_size: Size of the disk contained in the Image in GB
   , postServersIdActionsCreateImageResponseBody201ImageDiskSize :: GHC.Types.Double
   -- | id: ID of the Resource
-  , postServersIdActionsCreateImageResponseBody201ImageId :: GHC.Integer.Type.Integer
+  , postServersIdActionsCreateImageResponseBody201ImageId :: GHC.Types.Int
   -- | image_size: Size of the Image file in our storage in GB. For snapshot Images this is the value relevant for calculating costs for the Image.
-  , postServersIdActionsCreateImageResponseBody201ImageImageSize :: GHC.Types.Double
+  , postServersIdActionsCreateImageResponseBody201ImageImageSize :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | labels: User-defined labels (key-value pairs)
-  , postServersIdActionsCreateImageResponseBody201ImageLabels :: PostServersIdActionsCreateImageResponseBody201ImageLabels
+  , postServersIdActionsCreateImageResponseBody201ImageLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Unique identifier of the Image. This value is only set for system Images.
-  , postServersIdActionsCreateImageResponseBody201ImageName :: Data.Text.Internal.Text
+  , postServersIdActionsCreateImageResponseBody201ImageName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | os_flavor: Flavor of operating system contained in the Image
   , postServersIdActionsCreateImageResponseBody201ImageOsFlavor :: PostServersIdActionsCreateImageResponseBody201ImageOsFlavor
   -- | os_version: Operating system version
-  , postServersIdActionsCreateImageResponseBody201ImageOsVersion :: Data.Text.Internal.Text
+  , postServersIdActionsCreateImageResponseBody201ImageOsVersion :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | protection: Protection configuration for the Resource
   , postServersIdActionsCreateImageResponseBody201ImageProtection :: PostServersIdActionsCreateImageResponseBody201ImageProtection
   -- | rapid_deploy: Indicates that rapid deploy of the Image is available
@@ -294,71 +288,96 @@ data PostServersIdActionsCreateImageResponseBody201Image = PostServersIdActionsC
   , postServersIdActionsCreateImageResponseBody201ImageType :: PostServersIdActionsCreateImageResponseBody201ImageType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201Image
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "bound_to" (postServersIdActionsCreateImageResponseBody201ImageBoundTo obj) : (Data.Aeson..=) "build_id" (postServersIdActionsCreateImageResponseBody201ImageBuildId obj) : (Data.Aeson..=) "created" (postServersIdActionsCreateImageResponseBody201ImageCreated obj) : (Data.Aeson..=) "created_from" (postServersIdActionsCreateImageResponseBody201ImageCreatedFrom obj) : (Data.Aeson..=) "deleted" (postServersIdActionsCreateImageResponseBody201ImageDeleted obj) : (Data.Aeson..=) "deprecated" (postServersIdActionsCreateImageResponseBody201ImageDeprecated obj) : (Data.Aeson..=) "description" (postServersIdActionsCreateImageResponseBody201ImageDescription obj) : (Data.Aeson..=) "disk_size" (postServersIdActionsCreateImageResponseBody201ImageDiskSize obj) : (Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ImageId obj) : (Data.Aeson..=) "image_size" (postServersIdActionsCreateImageResponseBody201ImageImageSize obj) : (Data.Aeson..=) "labels" (postServersIdActionsCreateImageResponseBody201ImageLabels obj) : (Data.Aeson..=) "name" (postServersIdActionsCreateImageResponseBody201ImageName obj) : (Data.Aeson..=) "os_flavor" (postServersIdActionsCreateImageResponseBody201ImageOsFlavor obj) : (Data.Aeson..=) "os_version" (postServersIdActionsCreateImageResponseBody201ImageOsVersion obj) : (Data.Aeson..=) "protection" (postServersIdActionsCreateImageResponseBody201ImageProtection obj) : (Data.Aeson..=) "rapid_deploy" (postServersIdActionsCreateImageResponseBody201ImageRapidDeploy obj) : (Data.Aeson..=) "status" (postServersIdActionsCreateImageResponseBody201ImageStatus obj) : (Data.Aeson..=) "type" (postServersIdActionsCreateImageResponseBody201ImageType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "bound_to" (postServersIdActionsCreateImageResponseBody201ImageBoundTo obj) GHC.Base.<> ((Data.Aeson..=) "build_id" (postServersIdActionsCreateImageResponseBody201ImageBuildId obj) GHC.Base.<> ((Data.Aeson..=) "created" (postServersIdActionsCreateImageResponseBody201ImageCreated obj) GHC.Base.<> ((Data.Aeson..=) "created_from" (postServersIdActionsCreateImageResponseBody201ImageCreatedFrom obj) GHC.Base.<> ((Data.Aeson..=) "deleted" (postServersIdActionsCreateImageResponseBody201ImageDeleted obj) GHC.Base.<> ((Data.Aeson..=) "deprecated" (postServersIdActionsCreateImageResponseBody201ImageDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (postServersIdActionsCreateImageResponseBody201ImageDescription obj) GHC.Base.<> ((Data.Aeson..=) "disk_size" (postServersIdActionsCreateImageResponseBody201ImageDiskSize obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ImageId obj) GHC.Base.<> ((Data.Aeson..=) "image_size" (postServersIdActionsCreateImageResponseBody201ImageImageSize obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postServersIdActionsCreateImageResponseBody201ImageLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postServersIdActionsCreateImageResponseBody201ImageName obj) GHC.Base.<> ((Data.Aeson..=) "os_flavor" (postServersIdActionsCreateImageResponseBody201ImageOsFlavor obj) GHC.Base.<> ((Data.Aeson..=) "os_version" (postServersIdActionsCreateImageResponseBody201ImageOsVersion obj) GHC.Base.<> ((Data.Aeson..=) "protection" (postServersIdActionsCreateImageResponseBody201ImageProtection obj) GHC.Base.<> ((Data.Aeson..=) "rapid_deploy" (postServersIdActionsCreateImageResponseBody201ImageRapidDeploy obj) GHC.Base.<> ((Data.Aeson..=) "status" (postServersIdActionsCreateImageResponseBody201ImageStatus obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsCreateImageResponseBody201ImageType obj))))))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201Image
+    where toJSON obj = Data.Aeson.Types.Internal.object ("bound_to" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageBoundTo obj : "build_id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageBuildId obj : "created" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreated obj : "created_from" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreatedFrom obj : "deleted" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDeleted obj : "deprecated" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDeprecated obj : "description" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDescription obj : "disk_size" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDiskSize obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageId obj : "image_size" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageImageSize obj : "labels" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageLabels obj : "name" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageName obj : "os_flavor" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageOsFlavor obj : "os_version" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageOsVersion obj : "protection" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageProtection obj : "rapid_deploy" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageRapidDeploy obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageStatus obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("bound_to" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageBoundTo obj) GHC.Base.<> (("build_id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageBuildId obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreated obj) GHC.Base.<> (("created_from" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreatedFrom obj) GHC.Base.<> (("deleted" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDeleted obj) GHC.Base.<> (("deprecated" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDescription obj) GHC.Base.<> (("disk_size" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageDiskSize obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageId obj) GHC.Base.<> (("image_size" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageImageSize obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageName obj) GHC.Base.<> (("os_flavor" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageOsFlavor obj) GHC.Base.<> (("os_version" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageOsVersion obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageProtection obj) GHC.Base.<> (("rapid_deploy" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageRapidDeploy obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageStatus obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageType obj))))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201Image
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201Image" (\obj -> (((((((((((((((((GHC.Base.pure PostServersIdActionsCreateImageResponseBody201Image GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "bound_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "build_id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created_from")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deleted")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "disk_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_flavor")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_version")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "rapid_deploy")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201ImageCreated_from
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201Image' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201Image :: GHC.Maybe.Maybe GHC.Types.Int -- ^ 'postServersIdActionsCreateImageResponseBody201ImageBoundTo'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageCreated'
+  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom -- ^ 'postServersIdActionsCreateImageResponseBody201ImageCreatedFrom'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageDeleted'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageDescription'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsCreateImageResponseBody201ImageDiskSize'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsCreateImageResponseBody201ImageId'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'postServersIdActionsCreateImageResponseBody201ImageImageSize'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'postServersIdActionsCreateImageResponseBody201ImageLabels'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageName'
+  -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavor -- ^ 'postServersIdActionsCreateImageResponseBody201ImageOsFlavor'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageOsVersion'
+  -> PostServersIdActionsCreateImageResponseBody201ImageProtection -- ^ 'postServersIdActionsCreateImageResponseBody201ImageProtection'
+  -> PostServersIdActionsCreateImageResponseBody201ImageStatus -- ^ 'postServersIdActionsCreateImageResponseBody201ImageStatus'
+  -> PostServersIdActionsCreateImageResponseBody201ImageType -- ^ 'postServersIdActionsCreateImageResponseBody201ImageType'
+  -> PostServersIdActionsCreateImageResponseBody201Image
+mkPostServersIdActionsCreateImageResponseBody201Image postServersIdActionsCreateImageResponseBody201ImageBoundTo postServersIdActionsCreateImageResponseBody201ImageCreated postServersIdActionsCreateImageResponseBody201ImageCreatedFrom postServersIdActionsCreateImageResponseBody201ImageDeleted postServersIdActionsCreateImageResponseBody201ImageDeprecated postServersIdActionsCreateImageResponseBody201ImageDescription postServersIdActionsCreateImageResponseBody201ImageDiskSize postServersIdActionsCreateImageResponseBody201ImageId postServersIdActionsCreateImageResponseBody201ImageImageSize postServersIdActionsCreateImageResponseBody201ImageLabels postServersIdActionsCreateImageResponseBody201ImageName postServersIdActionsCreateImageResponseBody201ImageOsFlavor postServersIdActionsCreateImageResponseBody201ImageOsVersion postServersIdActionsCreateImageResponseBody201ImageProtection postServersIdActionsCreateImageResponseBody201ImageStatus postServersIdActionsCreateImageResponseBody201ImageType = PostServersIdActionsCreateImageResponseBody201Image{postServersIdActionsCreateImageResponseBody201ImageBoundTo = postServersIdActionsCreateImageResponseBody201ImageBoundTo,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageBuildId = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageCreated = postServersIdActionsCreateImageResponseBody201ImageCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageCreatedFrom = postServersIdActionsCreateImageResponseBody201ImageCreatedFrom,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageDeleted = postServersIdActionsCreateImageResponseBody201ImageDeleted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageDeprecated = postServersIdActionsCreateImageResponseBody201ImageDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageDescription = postServersIdActionsCreateImageResponseBody201ImageDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageDiskSize = postServersIdActionsCreateImageResponseBody201ImageDiskSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageId = postServersIdActionsCreateImageResponseBody201ImageId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageImageSize = postServersIdActionsCreateImageResponseBody201ImageImageSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageLabels = postServersIdActionsCreateImageResponseBody201ImageLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageName = postServersIdActionsCreateImageResponseBody201ImageName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageOsFlavor = postServersIdActionsCreateImageResponseBody201ImageOsFlavor,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageOsVersion = postServersIdActionsCreateImageResponseBody201ImageOsVersion,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageProtection = postServersIdActionsCreateImageResponseBody201ImageProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageRapidDeploy = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageStatus = postServersIdActionsCreateImageResponseBody201ImageStatus,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   postServersIdActionsCreateImageResponseBody201ImageType = postServersIdActionsCreateImageResponseBody201ImageType}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.image.properties.created_from@ in the specification.
 -- 
 -- Information about the Server the Image was created from
 data PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom = PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom {
   -- | id: ID of the Server the Image was created from
-  postServersIdActionsCreateImageResponseBody201ImageCreatedFromId :: GHC.Integer.Type.Integer
+  postServersIdActionsCreateImageResponseBody201ImageCreatedFromId :: GHC.Types.Int
   -- | name: Server name at the time the Image was created
   , postServersIdActionsCreateImageResponseBody201ImageCreatedFromName :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ImageCreatedFromId obj) : (Data.Aeson..=) "name" (postServersIdActionsCreateImageResponseBody201ImageCreatedFromName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsCreateImageResponseBody201ImageCreatedFromId obj) GHC.Base.<> (Data.Aeson..=) "name" (postServersIdActionsCreateImageResponseBody201ImageCreatedFromName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreatedFromId obj : "name" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreatedFromName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreatedFromId obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageCreatedFromName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom" (\obj -> (GHC.Base.pure PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name"))
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201ImageLabels
--- 
--- User-defined labels (key-value pairs)
-data PostServersIdActionsCreateImageResponseBody201ImageLabels = PostServersIdActionsCreateImageResponseBody201ImageLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ImageLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ImageLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201ImageLabels" (\obj -> GHC.Base.pure PostServersIdActionsCreateImageResponseBody201ImageLabels)
--- | Defines the enum schema PostServersIdActionsCreateImageResponseBody201ImageOs_flavor
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201ImageCreatedFrom :: GHC.Types.Int -- ^ 'postServersIdActionsCreateImageResponseBody201ImageCreatedFromId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsCreateImageResponseBody201ImageCreatedFromName'
+  -> PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom
+mkPostServersIdActionsCreateImageResponseBody201ImageCreatedFrom postServersIdActionsCreateImageResponseBody201ImageCreatedFromId postServersIdActionsCreateImageResponseBody201ImageCreatedFromName = PostServersIdActionsCreateImageResponseBody201ImageCreatedFrom{postServersIdActionsCreateImageResponseBody201ImageCreatedFromId = postServersIdActionsCreateImageResponseBody201ImageCreatedFromId,
+                                                                                                                                                                                                                                                                      postServersIdActionsCreateImageResponseBody201ImageCreatedFromName = postServersIdActionsCreateImageResponseBody201ImageCreatedFromName}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.image.properties.os_flavor@ in the specification.
 -- 
 -- Flavor of operating system contained in the Image
-data PostServersIdActionsCreateImageResponseBody201ImageOsFlavor
-    = PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringCentos
-    | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringDebian
-    | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringFedora
-    | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringUbuntu
-    | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringUnknown
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ImageOsFlavor
-    where toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringCentos) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringDebian) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringFedora) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringUbuntu) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringUnknown) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown"
-instance Data.Aeson.FromJSON PostServersIdActionsCreateImageResponseBody201ImageOsFlavor
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos")
-                                          then PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringCentos
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian")
-                                                then PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringDebian
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora")
-                                                      then PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringFedora
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu")
-                                                            then PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringUbuntu
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown")
-                                                                  then PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumStringUnknown
-                                                                  else PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumOther val)
--- | Defines the data type for the schema PostServersIdActionsCreateImageResponseBody201ImageProtection
+data PostServersIdActionsCreateImageResponseBody201ImageOsFlavor =
+   PostServersIdActionsCreateImageResponseBody201ImageOsFlavorOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumUbuntu -- ^ Represents the JSON value @"ubuntu"@
+  | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumCentos -- ^ Represents the JSON value @"centos"@
+  | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumDebian -- ^ Represents the JSON value @"debian"@
+  | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumFedora -- ^ Represents the JSON value @"fedora"@
+  | PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumUnknown -- ^ Represents the JSON value @"unknown"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ImageOsFlavor
+    where toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorOther val) = val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumUbuntu) = "ubuntu"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumCentos) = "centos"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumDebian) = "debian"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumFedora) = "fedora"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumUnknown) = "unknown"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ImageOsFlavor
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ubuntu" -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumUbuntu
+                                            | val GHC.Classes.== "centos" -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumCentos
+                                            | val GHC.Classes.== "debian" -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumDebian
+                                            | val GHC.Classes.== "fedora" -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumFedora
+                                            | val GHC.Classes.== "unknown" -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavorEnumUnknown
+                                            | GHC.Base.otherwise -> PostServersIdActionsCreateImageResponseBody201ImageOsFlavorOther val)
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.image.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PostServersIdActionsCreateImageResponseBody201ImageProtection = PostServersIdActionsCreateImageResponseBody201ImageProtection {
@@ -366,64 +385,90 @@ data PostServersIdActionsCreateImageResponseBody201ImageProtection = PostServers
   postServersIdActionsCreateImageResponseBody201ImageProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ImageProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postServersIdActionsCreateImageResponseBody201ImageProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postServersIdActionsCreateImageResponseBody201ImageProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ImageProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postServersIdActionsCreateImageResponseBody201ImageProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ImageProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsCreateImageResponseBody201ImageProtection" (\obj -> GHC.Base.pure PostServersIdActionsCreateImageResponseBody201ImageProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema PostServersIdActionsCreateImageResponseBody201ImageStatus
+-- | Create a new 'PostServersIdActionsCreateImageResponseBody201ImageProtection' with all required fields.
+mkPostServersIdActionsCreateImageResponseBody201ImageProtection :: GHC.Types.Bool -- ^ 'postServersIdActionsCreateImageResponseBody201ImageProtectionDelete'
+  -> PostServersIdActionsCreateImageResponseBody201ImageProtection
+mkPostServersIdActionsCreateImageResponseBody201ImageProtection postServersIdActionsCreateImageResponseBody201ImageProtectionDelete = PostServersIdActionsCreateImageResponseBody201ImageProtection{postServersIdActionsCreateImageResponseBody201ImageProtectionDelete = postServersIdActionsCreateImageResponseBody201ImageProtectionDelete}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.image.properties.status@ in the specification.
 -- 
 -- Whether the Image can be used or if it\'s still being created or unavailable
-data PostServersIdActionsCreateImageResponseBody201ImageStatus
-    = PostServersIdActionsCreateImageResponseBody201ImageStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringAvailable
-    | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringCreating
-    | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ImageStatus
-    where toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringAvailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringCreating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON PostServersIdActionsCreateImageResponseBody201ImageStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringAvailable
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating")
-                                                then PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringCreating
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                      then PostServersIdActionsCreateImageResponseBody201ImageStatusEnumStringUnavailable
-                                                      else PostServersIdActionsCreateImageResponseBody201ImageStatusEnumOther val)
--- | Defines the enum schema PostServersIdActionsCreateImageResponseBody201ImageType
+data PostServersIdActionsCreateImageResponseBody201ImageStatus =
+   PostServersIdActionsCreateImageResponseBody201ImageStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsCreateImageResponseBody201ImageStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  | PostServersIdActionsCreateImageResponseBody201ImageStatusEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ImageStatus
+    where toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusOther val) = val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumAvailable) = "available"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumCreating) = "creating"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageStatusEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ImageStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> PostServersIdActionsCreateImageResponseBody201ImageStatusEnumAvailable
+                                            | val GHC.Classes.== "creating" -> PostServersIdActionsCreateImageResponseBody201ImageStatusEnumCreating
+                                            | val GHC.Classes.== "unavailable" -> PostServersIdActionsCreateImageResponseBody201ImageStatusEnumUnavailable
+                                            | GHC.Base.otherwise -> PostServersIdActionsCreateImageResponseBody201ImageStatusOther val)
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/create_image.POST.responses.201.content.application\/json.schema.properties.image.properties.type@ in the specification.
 -- 
 -- Type of the Image
-data PostServersIdActionsCreateImageResponseBody201ImageType
-    = PostServersIdActionsCreateImageResponseBody201ImageTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringApp
-    | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringBackup
-    | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringSnapshot
-    | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringSystem
-    | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringTemporary
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsCreateImageResponseBody201ImageType
-    where toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringApp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringBackup) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringSnapshot) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringSystem) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system"
-          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringTemporary) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary"
-instance Data.Aeson.FromJSON PostServersIdActionsCreateImageResponseBody201ImageType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app")
-                                          then PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringApp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup")
-                                                then PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringBackup
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot")
-                                                      then PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringSnapshot
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system")
-                                                            then PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringSystem
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary")
-                                                                  then PostServersIdActionsCreateImageResponseBody201ImageTypeEnumStringTemporary
-                                                                  else PostServersIdActionsCreateImageResponseBody201ImageTypeEnumOther val)
+data PostServersIdActionsCreateImageResponseBody201ImageType =
+   PostServersIdActionsCreateImageResponseBody201ImageTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsCreateImageResponseBody201ImageTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumSystem -- ^ Represents the JSON value @"system"@
+  | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumApp -- ^ Represents the JSON value @"app"@
+  | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumSnapshot -- ^ Represents the JSON value @"snapshot"@
+  | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumBackup -- ^ Represents the JSON value @"backup"@
+  | PostServersIdActionsCreateImageResponseBody201ImageTypeEnumTemporary -- ^ Represents the JSON value @"temporary"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsCreateImageResponseBody201ImageType
+    where toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeOther val) = val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumSystem) = "system"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumApp) = "app"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumSnapshot) = "snapshot"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumBackup) = "backup"
+          toJSON (PostServersIdActionsCreateImageResponseBody201ImageTypeEnumTemporary) = "temporary"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsCreateImageResponseBody201ImageType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "system" -> PostServersIdActionsCreateImageResponseBody201ImageTypeEnumSystem
+                                            | val GHC.Classes.== "app" -> PostServersIdActionsCreateImageResponseBody201ImageTypeEnumApp
+                                            | val GHC.Classes.== "snapshot" -> PostServersIdActionsCreateImageResponseBody201ImageTypeEnumSnapshot
+                                            | val GHC.Classes.== "backup" -> PostServersIdActionsCreateImageResponseBody201ImageTypeEnumBackup
+                                            | val GHC.Classes.== "temporary" -> PostServersIdActionsCreateImageResponseBody201ImageTypeEnumTemporary
+                                            | GHC.Base.otherwise -> PostServersIdActionsCreateImageResponseBody201ImageTypeOther val)
+-- | > POST /servers/{id}/actions/create_image
+-- 
+-- The same as 'postServers_Id_ActionsCreateImage' but accepts an explicit configuration.
+postServers_Id_ActionsCreateImageWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsCreateImageResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsCreateImageWithConfiguration config
+                                                   id
+                                                   body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsCreateImageResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsCreateImageResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   PostServersIdActionsCreateImageResponseBody201)
+                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/create_image
+-- 
+-- The same as 'postServers_Id_ActionsCreateImage' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsCreateImageRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsCreateImageRaw id
+                                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /servers/{id}/actions/create_image
+-- 
+-- The same as 'postServers_Id_ActionsCreateImage' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsCreateImageWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> GHC.Maybe.Maybe PostServersIdActionsCreateImageRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsCreateImageWithConfigurationRaw config
+                                                      id
+                                                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/create_image"))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

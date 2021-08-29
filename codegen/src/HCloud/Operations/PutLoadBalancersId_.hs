@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putLoadBalancers_Id_
 module HCloud.Operations.PutLoadBalancersId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,91 +49,40 @@ import HCloud.Types
 -- Note that when updating labels, the Load Balancer’s current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
 -- 
 -- Note: if the Load Balancer object changes during the request, the response will be a “conflict” error.
-putLoadBalancers_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                         -- ^ id: ID of the Load Balancer
-  -> GHC.Maybe.Maybe PutLoadBalancersIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutLoadBalancersIdResponse))   -- ^ Monad containing the result of the operation
-putLoadBalancers_Id_ config
-                     id
-                     body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutLoadBalancersIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                          PutLoadBalancersIdResponseBody200)
-                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /load_balancers/{id}
--- 
--- The same as 'putLoadBalancers_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putLoadBalancers_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                         HCloud.Common.SecurityScheme s) =>
-                           HCloud.Common.Configuration s ->
-                           GHC.Integer.Type.Integer ->
-                           GHC.Maybe.Maybe PutLoadBalancersIdRequestBody ->
-                           m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putLoadBalancers_Id_Raw config
-                        id
-                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /load_balancers/{id}
--- 
--- Monadic version of 'putLoadBalancers_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putLoadBalancers_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                       HCloud.Common.SecurityScheme s) =>
-                         GHC.Integer.Type.Integer ->
-                         GHC.Maybe.Maybe PutLoadBalancersIdRequestBody ->
-                         Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                            m
-                                                            (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                (Network.HTTP.Client.Types.Response PutLoadBalancersIdResponse))
-putLoadBalancers_Id_M id
-                      body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutLoadBalancersIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                           PutLoadBalancersIdResponseBody200)
-                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /load_balancers/{id}
--- 
--- Monadic version of 'putLoadBalancers_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putLoadBalancers_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                          HCloud.Common.SecurityScheme s) =>
-                            GHC.Integer.Type.Integer ->
-                            GHC.Maybe.Maybe PutLoadBalancersIdRequestBody ->
-                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                               m
-                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                   (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putLoadBalancers_Id_RawM id
-                         body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putLoadBalancers_Id_RequestBody
+putLoadBalancers_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PutLoadBalancersIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutLoadBalancersIdResponse) -- ^ Monadic computation which returns the result of the operation
+putLoadBalancers_Id_ id
+                     body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutLoadBalancersIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                           PutLoadBalancersIdResponseBody200)
+                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdRequestBody = PutLoadBalancersIdRequestBody {
   -- | labels: User-defined labels (key-value pairs)
-  putLoadBalancersIdRequestBodyLabels :: (GHC.Maybe.Maybe PutLoadBalancersIdRequestBodyLabels)
+  putLoadBalancersIdRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: New Load Balancer name
   , putLoadBalancersIdRequestBodyName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (putLoadBalancersIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putLoadBalancersIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (putLoadBalancersIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putLoadBalancersIdRequestBodyName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= putLoadBalancersIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= putLoadBalancersIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdRequestBodyName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdRequestBody" (\obj -> (GHC.Base.pure PutLoadBalancersIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name"))
--- | Defines the data type for the schema putLoadBalancers_Id_RequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PutLoadBalancersIdRequestBodyLabels = PutLoadBalancersIdRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdRequestBodyLabels" (\obj -> GHC.Base.pure PutLoadBalancersIdRequestBodyLabels)
+-- | Create a new 'PutLoadBalancersIdRequestBody' with all required fields.
+mkPutLoadBalancersIdRequestBody :: PutLoadBalancersIdRequestBody
+mkPutLoadBalancersIdRequestBody = PutLoadBalancersIdRequestBody{putLoadBalancersIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                putLoadBalancersIdRequestBodyName = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putLoadBalancers_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutLoadBalancersIdResponseError' is used.
-data PutLoadBalancersIdResponse =                                    
-   PutLoadBalancersIdResponseError GHC.Base.String                   -- ^ Means either no matching case available or a parse error
-  | PutLoadBalancersIdResponse200 PutLoadBalancersIdResponseBody200  -- ^ The \`load_balancer\` key contains the updated Load Balancer
+data PutLoadBalancersIdResponse =
+   PutLoadBalancersIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutLoadBalancersIdResponse200 PutLoadBalancersIdResponseBody200 -- ^ The \`load_balancer\` key contains the updated Load Balancer
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200 = PutLoadBalancersIdResponseBody200 {
@@ -141,12 +90,16 @@ data PutLoadBalancersIdResponseBody200 = PutLoadBalancersIdResponseBody200 {
   putLoadBalancersIdResponseBody200LoadBalancer :: PutLoadBalancersIdResponseBody200LoadBalancer
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "load_balancer" (putLoadBalancersIdResponseBody200LoadBalancer obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "load_balancer" (putLoadBalancersIdResponseBody200LoadBalancer obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("load_balancer" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancer obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("load_balancer" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancer obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "load_balancer"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancer
+-- | Create a new 'PutLoadBalancersIdResponseBody200' with all required fields.
+mkPutLoadBalancersIdResponseBody200 :: PutLoadBalancersIdResponseBody200LoadBalancer -- ^ 'putLoadBalancersIdResponseBody200LoadBalancer'
+  -> PutLoadBalancersIdResponseBody200
+mkPutLoadBalancersIdResponseBody200 putLoadBalancersIdResponseBody200LoadBalancer = PutLoadBalancersIdResponseBody200{putLoadBalancersIdResponseBody200LoadBalancer = putLoadBalancersIdResponseBody200LoadBalancer}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancer = PutLoadBalancersIdResponseBody200LoadBalancer {
@@ -155,13 +108,13 @@ data PutLoadBalancersIdResponseBody200LoadBalancer = PutLoadBalancersIdResponseB
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , putLoadBalancersIdResponseBody200LoadBalancerCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , putLoadBalancersIdResponseBody200LoadBalancerId :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerId :: GHC.Types.Int
   -- | included_traffic: Free Traffic for the current billing period in bytes
-  , putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic :: GHC.Types.Int
   -- | ingoing_traffic: Inbound Traffic for the current billing period in bytes
-  , putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | labels: User-defined labels (key-value pairs)
-  , putLoadBalancersIdResponseBody200LoadBalancerLabels :: PutLoadBalancersIdResponseBody200LoadBalancerLabels
+  , putLoadBalancersIdResponseBody200LoadBalancerLabels :: Data.Aeson.Types.Internal.Object
   -- | load_balancer_type
   , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType :: PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType
   -- | location
@@ -169,25 +122,57 @@ data PutLoadBalancersIdResponseBody200LoadBalancer = PutLoadBalancersIdResponseB
   -- | name: Name of the Resource. Must be unique per Project.
   , putLoadBalancersIdResponseBody200LoadBalancerName :: Data.Text.Internal.Text
   -- | outgoing_traffic: Outbound Traffic for the current billing period in bytes
-  , putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | private_net: Private networks information
-  , putLoadBalancersIdResponseBody200LoadBalancerPrivateNet :: ([] PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet)
+  , putLoadBalancersIdResponseBody200LoadBalancerPrivateNet :: ([PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet])
   -- | protection: Protection configuration for the Resource
   , putLoadBalancersIdResponseBody200LoadBalancerProtection :: PutLoadBalancersIdResponseBody200LoadBalancerProtection
   -- | public_net: Public network information
   , putLoadBalancersIdResponseBody200LoadBalancerPublicNet :: PutLoadBalancersIdResponseBody200LoadBalancerPublicNet
   -- | services: List of services that belong to this Load Balancer
-  , putLoadBalancersIdResponseBody200LoadBalancerServices :: ([] PutLoadBalancersIdResponseBody200LoadBalancerServices)
+  , putLoadBalancersIdResponseBody200LoadBalancerServices :: ([PutLoadBalancersIdResponseBody200LoadBalancerServices])
   -- | targets: List of targets that belong to this Load Balancer
-  , putLoadBalancersIdResponseBody200LoadBalancerTargets :: ([] PutLoadBalancersIdResponseBody200LoadBalancerTargets)
+  , putLoadBalancersIdResponseBody200LoadBalancerTargets :: ([PutLoadBalancersIdResponseBody200LoadBalancerTargets])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "algorithm" (putLoadBalancersIdResponseBody200LoadBalancerAlgorithm obj) : (Data.Aeson..=) "created" (putLoadBalancersIdResponseBody200LoadBalancerCreated obj) : (Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerId obj) : (Data.Aeson..=) "included_traffic" (putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic obj) : (Data.Aeson..=) "ingoing_traffic" (putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic obj) : (Data.Aeson..=) "labels" (putLoadBalancersIdResponseBody200LoadBalancerLabels obj) : (Data.Aeson..=) "load_balancer_type" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType obj) : (Data.Aeson..=) "location" (putLoadBalancersIdResponseBody200LoadBalancerLocation obj) : (Data.Aeson..=) "name" (putLoadBalancersIdResponseBody200LoadBalancerName obj) : (Data.Aeson..=) "outgoing_traffic" (putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic obj) : (Data.Aeson..=) "private_net" (putLoadBalancersIdResponseBody200LoadBalancerPrivateNet obj) : (Data.Aeson..=) "protection" (putLoadBalancersIdResponseBody200LoadBalancerProtection obj) : (Data.Aeson..=) "public_net" (putLoadBalancersIdResponseBody200LoadBalancerPublicNet obj) : (Data.Aeson..=) "services" (putLoadBalancersIdResponseBody200LoadBalancerServices obj) : (Data.Aeson..=) "targets" (putLoadBalancersIdResponseBody200LoadBalancerTargets obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "algorithm" (putLoadBalancersIdResponseBody200LoadBalancerAlgorithm obj) GHC.Base.<> ((Data.Aeson..=) "created" (putLoadBalancersIdResponseBody200LoadBalancerCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerId obj) GHC.Base.<> ((Data.Aeson..=) "included_traffic" (putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic obj) GHC.Base.<> ((Data.Aeson..=) "ingoing_traffic" (putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putLoadBalancersIdResponseBody200LoadBalancerLabels obj) GHC.Base.<> ((Data.Aeson..=) "load_balancer_type" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType obj) GHC.Base.<> ((Data.Aeson..=) "location" (putLoadBalancersIdResponseBody200LoadBalancerLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (putLoadBalancersIdResponseBody200LoadBalancerName obj) GHC.Base.<> ((Data.Aeson..=) "outgoing_traffic" (putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "private_net" (putLoadBalancersIdResponseBody200LoadBalancerPrivateNet obj) GHC.Base.<> ((Data.Aeson..=) "protection" (putLoadBalancersIdResponseBody200LoadBalancerProtection obj) GHC.Base.<> ((Data.Aeson..=) "public_net" (putLoadBalancersIdResponseBody200LoadBalancerPublicNet obj) GHC.Base.<> ((Data.Aeson..=) "services" (putLoadBalancersIdResponseBody200LoadBalancerServices obj) GHC.Base.<> (Data.Aeson..=) "targets" (putLoadBalancersIdResponseBody200LoadBalancerTargets obj)))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("algorithm" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerAlgorithm obj : "created" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerCreated obj : "id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerId obj : "included_traffic" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic obj : "ingoing_traffic" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic obj : "labels" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLabels obj : "load_balancer_type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType obj : "location" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocation obj : "name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerName obj : "outgoing_traffic" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic obj : "private_net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPrivateNet obj : "protection" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerProtection obj : "public_net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNet obj : "services" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServices obj : "targets" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargets obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("algorithm" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerAlgorithm obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerId obj) GHC.Base.<> (("included_traffic" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic obj) GHC.Base.<> (("ingoing_traffic" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLabels obj) GHC.Base.<> (("load_balancer_type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerName obj) GHC.Base.<> (("outgoing_traffic" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic obj) GHC.Base.<> (("private_net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPrivateNet obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerProtection obj) GHC.Base.<> (("public_net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNet obj) GHC.Base.<> (("services" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServices obj) GHC.Base.<> ("targets" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargets obj)))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancer" (\obj -> ((((((((((((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "algorithm")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "included_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ingoing_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "load_balancer_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "outgoing_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "private_net")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_net")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "services")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "targets"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerAlgorithm
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancer' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancer :: PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerAlgorithm'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerCreated'
+  -> GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerId'
+  -> GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLabels'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLocation -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocation'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerName'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic'
+  -> [PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet] -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerPrivateNet'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerProtection -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerProtection'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerPublicNet -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerPublicNet'
+  -> [PutLoadBalancersIdResponseBody200LoadBalancerServices] -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServices'
+  -> [PutLoadBalancersIdResponseBody200LoadBalancerTargets] -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerTargets'
+  -> PutLoadBalancersIdResponseBody200LoadBalancer
+mkPutLoadBalancersIdResponseBody200LoadBalancer putLoadBalancersIdResponseBody200LoadBalancerAlgorithm putLoadBalancersIdResponseBody200LoadBalancerCreated putLoadBalancersIdResponseBody200LoadBalancerId putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic putLoadBalancersIdResponseBody200LoadBalancerLabels putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType putLoadBalancersIdResponseBody200LoadBalancerLocation putLoadBalancersIdResponseBody200LoadBalancerName putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic putLoadBalancersIdResponseBody200LoadBalancerPrivateNet putLoadBalancersIdResponseBody200LoadBalancerProtection putLoadBalancersIdResponseBody200LoadBalancerPublicNet putLoadBalancersIdResponseBody200LoadBalancerServices putLoadBalancersIdResponseBody200LoadBalancerTargets = PutLoadBalancersIdResponseBody200LoadBalancer{putLoadBalancersIdResponseBody200LoadBalancerAlgorithm = putLoadBalancersIdResponseBody200LoadBalancerAlgorithm,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerCreated = putLoadBalancersIdResponseBody200LoadBalancerCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerId = putLoadBalancersIdResponseBody200LoadBalancerId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic = putLoadBalancersIdResponseBody200LoadBalancerIncludedTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic = putLoadBalancersIdResponseBody200LoadBalancerIngoingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerLabels = putLoadBalancersIdResponseBody200LoadBalancerLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerLocation = putLoadBalancersIdResponseBody200LoadBalancerLocation,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerName = putLoadBalancersIdResponseBody200LoadBalancerName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic = putLoadBalancersIdResponseBody200LoadBalancerOutgoingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerPrivateNet = putLoadBalancersIdResponseBody200LoadBalancerPrivateNet,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerProtection = putLoadBalancersIdResponseBody200LoadBalancerProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerPublicNet = putLoadBalancersIdResponseBody200LoadBalancerPublicNet,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerServices = putLoadBalancersIdResponseBody200LoadBalancerServices,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              putLoadBalancersIdResponseBody200LoadBalancerTargets = putLoadBalancersIdResponseBody200LoadBalancerTargets}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.algorithm@ in the specification.
 -- 
 -- Algorithm of the Load Balancer
 data PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm = PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm {
@@ -195,49 +180,39 @@ data PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm = PutLoadBalancersId
   putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType :: PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "type" (putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "type" (putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm
+    where toJSON obj = Data.Aeson.Types.Internal.object ("type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PutLoadBalancersIdResponseBody200Load_balancerAlgorithmType
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerAlgorithm :: PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm
+mkPutLoadBalancersIdResponseBody200LoadBalancerAlgorithm putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType = PutLoadBalancersIdResponseBody200LoadBalancerAlgorithm{putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType = putLoadBalancersIdResponseBody200LoadBalancerAlgorithmType}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.algorithm.properties.type@ in the specification.
 -- 
 -- Type of the algorithm
-data PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType
-    = PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumTyped Data.Text.Internal.Text
-    | PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumStringLeastConnections
-    | PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumStringRoundRobin
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType
-    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumStringLeastConnections) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "least_connections"
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumStringRoundRobin) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "round_robin"
-instance Data.Aeson.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "least_connections")
-                                          then PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumStringLeastConnections
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "round_robin")
-                                                then PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumStringRoundRobin
-                                                else PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumOther val)
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerLabels
--- 
--- User-defined labels (key-value pairs)
-data PutLoadBalancersIdResponseBody200LoadBalancerLabels = PutLoadBalancersIdResponseBody200LoadBalancerLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerLabels" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerLabels)
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerLoad_balancer_type
+data PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType =
+   PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumRoundRobin -- ^ Represents the JSON value @"round_robin"@
+  | PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumLeastConnections -- ^ Represents the JSON value @"least_connections"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType
+    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeOther val) = val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumRoundRobin) = "round_robin"
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumLeastConnections) = "least_connections"
+instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "round_robin" -> PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumRoundRobin
+                                            | val GHC.Classes.== "least_connections" -> PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeEnumLeastConnections
+                                            | GHC.Base.otherwise -> PutLoadBalancersIdResponseBody200LoadBalancerAlgorithmTypeOther val)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType {
   -- | deprecated: Point in time when the Load Balancer type is deprecated (in ISO-8601 format)
-  putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated :: Data.Text.Internal.Text
+  putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Load Balancer type
   , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription :: Data.Text.Internal.Text
   -- | id: ID of the Load Balancer type
@@ -253,15 +228,35 @@ data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType = PutLoadBala
   -- | name: Unique identifier of the Load Balancer type
   , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName :: Data.Text.Internal.Text
   -- | prices: Prices in different network zones
-  , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices :: ([] PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices)
+  , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices :: ([PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "deprecated" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated obj) : (Data.Aeson..=) "description" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription obj) : (Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId obj) : (Data.Aeson..=) "max_assigned_certificates" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj) : (Data.Aeson..=) "max_connections" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections obj) : (Data.Aeson..=) "max_services" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices obj) : (Data.Aeson..=) "max_targets" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets obj) : (Data.Aeson..=) "name" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName obj) : (Data.Aeson..=) "prices" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "deprecated" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId obj) GHC.Base.<> ((Data.Aeson..=) "max_assigned_certificates" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj) GHC.Base.<> ((Data.Aeson..=) "max_connections" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections obj) GHC.Base.<> ((Data.Aeson..=) "max_services" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices obj) GHC.Base.<> ((Data.Aeson..=) "max_targets" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets obj) GHC.Base.<> ((Data.Aeson..=) "name" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName obj) GHC.Base.<> (Data.Aeson..=) "prices" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices obj)))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType
+    where toJSON obj = Data.Aeson.Types.Internal.object ("deprecated" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated obj : "description" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription obj : "id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId obj : "max_assigned_certificates" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj : "max_connections" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections obj : "max_services" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices obj : "max_targets" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets obj : "name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName obj : "prices" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("deprecated" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId obj) GHC.Base.<> (("max_assigned_certificates" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj) GHC.Base.<> (("max_connections" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections obj) GHC.Base.<> (("max_services" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices obj) GHC.Base.<> (("max_targets" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName obj) GHC.Base.<> ("prices" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices obj)))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType" (\obj -> ((((((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_assigned_certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_connections")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_services")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_targets")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerLoad_balancer_typePrices
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName'
+  -> [PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices] -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerType{putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxAssignedCertificates,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxConnections,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxServices,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeMaxTargets,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypeName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type.properties.prices.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices {
@@ -273,12 +268,20 @@ data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices = PutLo
   , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly :: PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation obj) : (Data.Aeson..=) "price_hourly" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly obj) : (Data.Aeson..=) "price_monthly" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation obj) GHC.Base.<> ((Data.Aeson..=) "price_hourly" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation obj : "price_hourly" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly obj : "price_monthly" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation obj) GHC.Base.<> (("price_hourly" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices" (\obj -> ((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_hourly")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerLoad_balancer_typePricesPrice_hourly
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices :: Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePrices{putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesLocation,
+                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly,
+                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type.properties.prices.items.properties.price_hourly@ in the specification.
 -- 
 -- Hourly costs for a Resource in this Location
 data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly {
@@ -288,12 +291,18 @@ data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHou
   , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj) : (Data.Aeson..=) "net" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj : "net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerLoad_balancer_typePricesPrice_monthly
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly :: Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourly{putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyGross,
+                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceHourlyNet}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Resource in this Location
 data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly {
@@ -303,12 +312,18 @@ data PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMon
   , putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerLocation
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly
+mkPutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet = PutLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthly{putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                                                                                            putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet = putLoadBalancersIdResponseBody200LoadBalancerLoadBalancerTypePricesPriceMonthlyNet}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.location@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerLocation = PutLoadBalancersIdResponseBody200LoadBalancerLocation {
@@ -330,27 +345,49 @@ data PutLoadBalancersIdResponseBody200LoadBalancerLocation = PutLoadBalancersIdR
   , putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (putLoadBalancersIdResponseBody200LoadBalancerLocationCity obj) : (Data.Aeson..=) "country" (putLoadBalancersIdResponseBody200LoadBalancerLocationCountry obj) : (Data.Aeson..=) "description" (putLoadBalancersIdResponseBody200LoadBalancerLocationDescription obj) : (Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerLocationId obj) : (Data.Aeson..=) "latitude" (putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude obj) : (Data.Aeson..=) "longitude" (putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude obj) : (Data.Aeson..=) "name" (putLoadBalancersIdResponseBody200LoadBalancerLocationName obj) : (Data.Aeson..=) "network_zone" (putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (putLoadBalancersIdResponseBody200LoadBalancerLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (putLoadBalancersIdResponseBody200LoadBalancerLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (putLoadBalancersIdResponseBody200LoadBalancerLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (putLoadBalancersIdResponseBody200LoadBalancerLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationCity obj : "country" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerLocation" (\obj -> (((((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerPrivate_net
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerLocation' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerLocation :: Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationDescription'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationId'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude'
+  -> GHC.Types.Double -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationName'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerLocation
+mkPutLoadBalancersIdResponseBody200LoadBalancerLocation putLoadBalancersIdResponseBody200LoadBalancerLocationCity putLoadBalancersIdResponseBody200LoadBalancerLocationCountry putLoadBalancersIdResponseBody200LoadBalancerLocationDescription putLoadBalancersIdResponseBody200LoadBalancerLocationId putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude putLoadBalancersIdResponseBody200LoadBalancerLocationName putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone = PutLoadBalancersIdResponseBody200LoadBalancerLocation{putLoadBalancersIdResponseBody200LoadBalancerLocationCity = putLoadBalancersIdResponseBody200LoadBalancerLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationCountry = putLoadBalancersIdResponseBody200LoadBalancerLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationDescription = putLoadBalancersIdResponseBody200LoadBalancerLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationId = putLoadBalancersIdResponseBody200LoadBalancerLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude = putLoadBalancersIdResponseBody200LoadBalancerLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude = putLoadBalancersIdResponseBody200LoadBalancerLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationName = putLoadBalancersIdResponseBody200LoadBalancerLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone = putLoadBalancersIdResponseBody200LoadBalancerLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.private_net.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet = PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet {
   -- | ip
   putLoadBalancersIdResponseBody200LoadBalancerPrivateNetIp :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | network
-  , putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork :: (GHC.Maybe.Maybe GHC.Types.Int)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerPrivateNetIp obj) : (Data.Aeson..=) "network" (putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerPrivateNetIp obj) GHC.Base.<> (Data.Aeson..=) "network" (putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPrivateNetIp obj : "network" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPrivateNetIp obj) GHC.Base.<> ("network" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "network"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerProtection
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerPrivateNet :: PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet
+mkPutLoadBalancersIdResponseBody200LoadBalancerPrivateNet = PutLoadBalancersIdResponseBody200LoadBalancerPrivateNet{putLoadBalancersIdResponseBody200LoadBalancerPrivateNetIp = GHC.Maybe.Nothing,
+                                                                                                                    putLoadBalancersIdResponseBody200LoadBalancerPrivateNetNetwork = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PutLoadBalancersIdResponseBody200LoadBalancerProtection = PutLoadBalancersIdResponseBody200LoadBalancerProtection {
@@ -358,12 +395,16 @@ data PutLoadBalancersIdResponseBody200LoadBalancerProtection = PutLoadBalancersI
   putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerProtection" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerPublic_net
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerProtection' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerProtection :: GHC.Types.Bool -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerProtection
+mkPutLoadBalancersIdResponseBody200LoadBalancerProtection putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete = PutLoadBalancersIdResponseBody200LoadBalancerProtection{putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete = putLoadBalancersIdResponseBody200LoadBalancerProtectionDelete}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.public_net@ in the specification.
 -- 
 -- Public network information
 data PutLoadBalancersIdResponseBody200LoadBalancerPublicNet = PutLoadBalancersIdResponseBody200LoadBalancerPublicNet {
@@ -375,12 +416,20 @@ data PutLoadBalancersIdResponseBody200LoadBalancerPublicNet = PutLoadBalancersId
   , putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 :: PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNet
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "enabled" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled obj) : (Data.Aeson..=) "ipv4" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 obj) : (Data.Aeson..=) "ipv6" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "enabled" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled obj) GHC.Base.<> ((Data.Aeson..=) "ipv4" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 obj) GHC.Base.<> (Data.Aeson..=) "ipv6" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNet
+    where toJSON obj = Data.Aeson.Types.Internal.object ("enabled" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled obj : "ipv4" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 obj : "ipv6" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("enabled" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled obj) GHC.Base.<> (("ipv4" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 obj) GHC.Base.<> ("ipv6" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNet
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerPublicNet" (\obj -> ((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerPublicNet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "enabled")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ipv4")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ipv6"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerPublic_netIpv4
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerPublicNet' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerPublicNet :: GHC.Types.Bool -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerPublicNet
+mkPutLoadBalancersIdResponseBody200LoadBalancerPublicNet putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 = PutLoadBalancersIdResponseBody200LoadBalancerPublicNet{putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled = putLoadBalancersIdResponseBody200LoadBalancerPublicNetEnabled,
+                                                                                                                                                                                                                                                                                                      putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 = putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4,
+                                                                                                                                                                                                                                                                                                      putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 = putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.public_net.properties.ipv4@ in the specification.
 -- 
 -- IP address (v4)
 data PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 = PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 {
@@ -390,12 +439,16 @@ data PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 = PutLoadBalance
   , putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4Ip :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4DnsPtr obj) : (Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4Ip obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4DnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4Ip obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4DnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4Ip obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4DnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4Ip obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerPublic_netIpv6
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 :: PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4
+mkPutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4 = PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4{putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4DnsPtr = GHC.Maybe.Nothing,
+                                                                                                                          putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv4Ip = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.public_net.properties.ipv6@ in the specification.
 -- 
 -- IP address (v6)
 data PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 = PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 {
@@ -405,106 +458,143 @@ data PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 = PutLoadBalance
   , putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6Ip :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6DnsPtr obj) : (Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6Ip obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6DnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6Ip obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6DnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6Ip obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6DnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6Ip obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerServices
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 :: PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6
+mkPutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6 = PutLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6{putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6DnsPtr = GHC.Maybe.Nothing,
+                                                                                                                          putLoadBalancersIdResponseBody200LoadBalancerPublicNetIpv6Ip = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.services.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerServices = PutLoadBalancersIdResponseBody200LoadBalancerServices {
   -- | destination_port: Port the Load Balancer will balance to
-  putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort :: GHC.Integer.Type.Integer
+  putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort :: GHC.Types.Int
   -- | health_check: Service health check
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck :: PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck
   -- | http: Configuration option for protocols http and https
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHttp :: (GHC.Maybe.Maybe PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp)
   -- | listen_port: Port the Load Balancer listens on
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort :: GHC.Types.Int
   -- | protocol: Protocol of the Load Balancer
   , putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol :: PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol
   -- | proxyprotocol: Is Proxyprotocol enabled or not
   , putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination_port" (putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort obj) : (Data.Aeson..=) "health_check" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck obj) : (Data.Aeson..=) "http" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttp obj) : (Data.Aeson..=) "listen_port" (putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort obj) : (Data.Aeson..=) "protocol" (putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol obj) : (Data.Aeson..=) "proxyprotocol" (putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination_port" (putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort obj) GHC.Base.<> ((Data.Aeson..=) "health_check" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck obj) GHC.Base.<> ((Data.Aeson..=) "http" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttp obj) GHC.Base.<> ((Data.Aeson..=) "listen_port" (putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol obj) GHC.Base.<> (Data.Aeson..=) "proxyprotocol" (putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort obj : "health_check" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck obj : "http" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttp obj : "listen_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort obj : "protocol" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol obj : "proxyprotocol" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort obj) GHC.Base.<> (("health_check" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck obj) GHC.Base.<> (("http" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttp obj) GHC.Base.<> (("listen_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol obj) GHC.Base.<> ("proxyprotocol" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerServices" (\obj -> (((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerServices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "health_check")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "proxyprotocol"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerServicesHealth_check
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerServices' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerServices :: GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck'
+  -> GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol'
+  -> GHC.Types.Bool -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServices
+mkPutLoadBalancersIdResponseBody200LoadBalancerServices putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol = PutLoadBalancersIdResponseBody200LoadBalancerServices{putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort = putLoadBalancersIdResponseBody200LoadBalancerServicesDestinationPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerServicesHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort = putLoadBalancersIdResponseBody200LoadBalancerServicesListenPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol = putLoadBalancersIdResponseBody200LoadBalancerServicesProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol = putLoadBalancersIdResponseBody200LoadBalancerServicesProxyprotocol}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.health_check@ in the specification.
 -- 
 -- Service health check
 data PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck = PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck {
   -- | http: Additional configuration for protocol http
   putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp :: (GHC.Maybe.Maybe PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp)
   -- | interval: Time interval in seconds health checks are performed
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval :: GHC.Types.Int
   -- | port: Port the health check will be performed on
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort :: GHC.Types.Int
   -- | protocol: Type of the health check
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol :: PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol
   -- | retries: Unsuccessful retries needed until a target is considered unhealthy; an unhealthy target needs the same number of successful retries to become healthy again
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries :: GHC.Types.Int
   -- | timeout: Time in seconds after an attempt is considered a timeout
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "http" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp obj) : (Data.Aeson..=) "interval" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval obj) : (Data.Aeson..=) "port" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort obj) : (Data.Aeson..=) "protocol" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol obj) : (Data.Aeson..=) "retries" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries obj) : (Data.Aeson..=) "timeout" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "http" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp obj) GHC.Base.<> ((Data.Aeson..=) "interval" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval obj) GHC.Base.<> ((Data.Aeson..=) "port" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol obj) GHC.Base.<> ((Data.Aeson..=) "retries" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries obj) GHC.Base.<> (Data.Aeson..=) "timeout" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck
+    where toJSON obj = Data.Aeson.Types.Internal.object ("http" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp obj : "interval" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval obj : "port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort obj : "protocol" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol obj : "retries" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries obj : "timeout" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("http" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp obj) GHC.Base.<> (("interval" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol obj) GHC.Base.<> (("retries" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries obj) GHC.Base.<> ("timeout" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck" (\obj -> (((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "interval")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "retries")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "timeout"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerServicesHealth_checkHttp
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck :: GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval'
+  -> GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol'
+  -> GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries'
+  -> GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck
+mkPutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout = PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheck{putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckInterval,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckRetries,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckTimeout}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.health_check.properties.http@ in the specification.
 -- 
 -- Additional configuration for protocol http
 data PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp = PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp {
   -- | domain: Host header to send in the HTTP request. May not contain spaces, percent or backslash symbols. Can be null, in that case no host header is sent.
-  putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain :: Data.Text.Internal.Text
+  putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | path: HTTP path to use for health checks
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath :: Data.Text.Internal.Text
   -- | response: String that must be contained in HTTP response in order to pass the health check
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpResponse :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status_codes: List of returned HTTP status codes in order to pass the health check. Supports the wildcards \`?\` for exactly one character and \`*\` for multiple ones. The default is to pass the health check for any status code between 2?? and 3??.
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | tls: Use HTTPS for health check
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpTls :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "domain" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain obj) : (Data.Aeson..=) "path" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath obj) : (Data.Aeson..=) "response" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpResponse obj) : (Data.Aeson..=) "status_codes" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes obj) : (Data.Aeson..=) "tls" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpTls obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "domain" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain obj) GHC.Base.<> ((Data.Aeson..=) "path" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath obj) GHC.Base.<> ((Data.Aeson..=) "response" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpResponse obj) GHC.Base.<> ((Data.Aeson..=) "status_codes" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes obj) GHC.Base.<> (Data.Aeson..=) "tls" (putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpTls obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("domain" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain obj : "path" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath obj : "response" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpResponse obj : "status_codes" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes obj : "tls" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpTls obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("domain" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain obj) GHC.Base.<> (("path" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath obj) GHC.Base.<> (("response" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpResponse obj) GHC.Base.<> (("status_codes" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes obj) GHC.Base.<> ("tls" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpTls obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp" (\obj -> ((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "path")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "response")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status_codes")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tls"))
--- | Defines the enum schema PutLoadBalancersIdResponseBody200Load_balancerServicesHealth_checkProtocol
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp
+mkPutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath = PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttp{putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpDomain,
+                                                                                                                                                                                                                                                                                                  putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath = putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpPath,
+                                                                                                                                                                                                                                                                                                  putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpResponse = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                  putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpStatusCodes = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                  putLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckHttpTls = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.health_check.properties.protocol@ in the specification.
 -- 
 -- Type of the health check
-data PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol
-    = PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumTyped Data.Text.Internal.Text
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumStringHttp
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol
-    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                then PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumStringTcp
-                                                else PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumOther val)
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerServicesHttp
+data PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol =
+   PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol
+    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolOther val) = val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumTcp) = "tcp"
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumHttp) = "http"
+instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolEnumHttp
+                                            | GHC.Base.otherwise -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHealthCheckProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.http@ in the specification.
 -- 
 -- Configuration option for protocols http and https
 data PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp = PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp {
   -- | certificates: IDs of the Certificates to use for TLS\/SSL termination by the Load Balancer; empty for TLS\/SSL passthrough or if \`protocol\` is \"http\"
-  putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | cookie_lifetime: Lifetime of the cookie used for sticky sessions
-  , putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime :: GHC.Integer.Type.Integer
+  , putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime :: GHC.Types.Int
   -- | cookie_name: Name of the cookie used for sticky sessions
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName :: Data.Text.Internal.Text
   -- | redirect_http: Redirect HTTP requests to HTTPS. Only available if protocol is \"https\". Default \`false\`
@@ -513,41 +603,47 @@ data PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp = PutLoadBalancer
   , putLoadBalancersIdResponseBody200LoadBalancerServicesHttpStickySessions :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificates" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates obj) : (Data.Aeson..=) "cookie_lifetime" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime obj) : (Data.Aeson..=) "cookie_name" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName obj) : (Data.Aeson..=) "redirect_http" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpRedirectHttp obj) : (Data.Aeson..=) "sticky_sessions" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpStickySessions obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificates" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates obj) GHC.Base.<> ((Data.Aeson..=) "cookie_lifetime" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime obj) GHC.Base.<> ((Data.Aeson..=) "cookie_name" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName obj) GHC.Base.<> ((Data.Aeson..=) "redirect_http" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpRedirectHttp obj) GHC.Base.<> (Data.Aeson..=) "sticky_sessions" (putLoadBalancersIdResponseBody200LoadBalancerServicesHttpStickySessions obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificates" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates obj : "cookie_lifetime" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime obj : "cookie_name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName obj : "redirect_http" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpRedirectHttp obj : "sticky_sessions" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpStickySessions obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificates" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates obj) GHC.Base.<> (("cookie_lifetime" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime obj) GHC.Base.<> (("cookie_name" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName obj) GHC.Base.<> (("redirect_http" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpRedirectHttp obj) GHC.Base.<> ("sticky_sessions" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerServicesHttpStickySessions obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp" (\obj -> ((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_lifetime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "redirect_http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "sticky_sessions"))
--- | Defines the enum schema PutLoadBalancersIdResponseBody200Load_balancerServicesProtocol
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerServicesHttp :: GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime'
+  -> Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp
+mkPutLoadBalancersIdResponseBody200LoadBalancerServicesHttp putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName = PutLoadBalancersIdResponseBody200LoadBalancerServicesHttp{putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCertificates = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                    putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime = putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieLifetime,
+                                                                                                                                                                                                                                                                    putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName = putLoadBalancersIdResponseBody200LoadBalancerServicesHttpCookieName,
+                                                                                                                                                                                                                                                                    putLoadBalancersIdResponseBody200LoadBalancerServicesHttpRedirectHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                    putLoadBalancersIdResponseBody200LoadBalancerServicesHttpStickySessions = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.protocol@ in the specification.
 -- 
 -- Protocol of the Load Balancer
-data PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol
-    = PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumTyped Data.Text.Internal.Text
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringHttp
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringHttps
-    | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol
-    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringHttps) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https"
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https")
-                                                then PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringHttps
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                      then PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumStringTcp
-                                                      else PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumOther val)
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargets
+data PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol =
+   PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  | PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumHttps -- ^ Represents the JSON value @"https"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol
+    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolOther val) = val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumTcp) = "tcp"
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumHttp) = "http"
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumHttps) = "https"
+instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumHttp
+                                            | val GHC.Classes.== "https" -> PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolEnumHttps
+                                            | GHC.Base.otherwise -> PutLoadBalancersIdResponseBody200LoadBalancerServicesProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerTargets = PutLoadBalancersIdResponseBody200LoadBalancerTargets {
   -- | health_status: List of health statuses of the services on this target
-  putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus :: (GHC.Maybe.Maybe ([] PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus))
+  putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus :: (GHC.Maybe.Maybe ([PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus]))
   -- | ip: IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsIp :: (GHC.Maybe.Maybe PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp)
   -- | label_selector: Label selector and a list of selected targets
@@ -555,34 +651,48 @@ data PutLoadBalancersIdResponseBody200LoadBalancerTargets = PutLoadBalancersIdRe
   -- | server: Server where the traffic should be routed through
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsServer :: (GHC.Maybe.Maybe PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer)
   -- | targets: List of selected targets
-  , putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets :: (GHC.Maybe.Maybe ([] PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets))
+  , putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets :: (GHC.Maybe.Maybe ([PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets]))
   -- | type: Type of the resource
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsType :: PutLoadBalancersIdResponseBody200LoadBalancerTargetsType
   -- | use_private_ip: Use the private network IP instead of the public IP. Default value is false.
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsUsePrivateIp :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "health_status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus obj) : (Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsIp obj) : (Data.Aeson..=) "label_selector" (putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector obj) : (Data.Aeson..=) "server" (putLoadBalancersIdResponseBody200LoadBalancerTargetsServer obj) : (Data.Aeson..=) "targets" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets obj) : (Data.Aeson..=) "type" (putLoadBalancersIdResponseBody200LoadBalancerTargetsType obj) : (Data.Aeson..=) "use_private_ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsUsePrivateIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "health_status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus obj) GHC.Base.<> ((Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsIp obj) GHC.Base.<> ((Data.Aeson..=) "label_selector" (putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (putLoadBalancersIdResponseBody200LoadBalancerTargetsServer obj) GHC.Base.<> ((Data.Aeson..=) "targets" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets obj) GHC.Base.<> ((Data.Aeson..=) "type" (putLoadBalancersIdResponseBody200LoadBalancerTargetsType obj) GHC.Base.<> (Data.Aeson..=) "use_private_ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsUsePrivateIp obj)))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("health_status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus obj : "ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsIp obj : "label_selector" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsServer obj : "targets" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets obj : "type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsType obj : "use_private_ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsUsePrivateIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("health_status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus obj) GHC.Base.<> (("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsIp obj) GHC.Base.<> (("label_selector" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsServer obj) GHC.Base.<> (("targets" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsType obj) GHC.Base.<> ("use_private_ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsUsePrivateIp obj)))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargets" (\obj -> ((((((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "health_status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "targets")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "use_private_ip"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsHealth_status
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargets' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargets :: PutLoadBalancersIdResponseBody200LoadBalancerTargetsType -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerTargetsType'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerTargets
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargets putLoadBalancersIdResponseBody200LoadBalancerTargetsType = PutLoadBalancersIdResponseBody200LoadBalancerTargets{putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus = GHC.Maybe.Nothing,
+                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerTargetsIp = GHC.Maybe.Nothing,
+                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector = GHC.Maybe.Nothing,
+                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerTargetsServer = GHC.Maybe.Nothing,
+                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerTargetsTargets = GHC.Maybe.Nothing,
+                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerTargetsType = putLoadBalancersIdResponseBody200LoadBalancerTargetsType,
+                                                                                                                                                                       putLoadBalancersIdResponseBody200LoadBalancerTargetsUsePrivateIp = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.health_status.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus = PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus {
   -- | listen_port
-  putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusStatus :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "listen_port" (putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort obj) : (Data.Aeson..=) "status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "listen_port" (putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort obj) GHC.Base.<> (Data.Aeson..=) "status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("listen_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort obj : "status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("listen_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsIp
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus :: PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus = PutLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatus{putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusListenPort = GHC.Maybe.Nothing,
+                                                                                                                                      putLoadBalancersIdResponseBody200LoadBalancerTargetsHealthStatusStatus = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.ip@ in the specification.
 -- 
 -- IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp = PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp {
@@ -590,12 +700,16 @@ data PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp = PutLoadBalancersId
   putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsLabel_selector
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsIp :: Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsIp putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp = PutLoadBalancersIdResponseBody200LoadBalancerTargetsIp{putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp = putLoadBalancersIdResponseBody200LoadBalancerTargetsIpIp}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.label_selector@ in the specification.
 -- 
 -- Label selector and a list of selected targets
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector = PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector {
@@ -603,30 +717,38 @@ data PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector = PutLoad
   putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsServer
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector :: Data.Text.Internal.Text -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector = PutLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelector{putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector = putLoadBalancersIdResponseBody200LoadBalancerTargetsLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.server@ in the specification.
 -- 
 -- Server where the traffic should be routed through
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer = PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer {
   -- | id: ID of the Server
-  putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId :: GHC.Integer.Type.Integer
+  putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsTargets
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsServer :: GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsServer putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId = PutLoadBalancersIdResponseBody200LoadBalancerTargetsServer{putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId = putLoadBalancersIdResponseBody200LoadBalancerTargetsServerId}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.targets.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets {
   -- | health_status
-  putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus :: (GHC.Maybe.Maybe ([] PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus))
+  putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus :: (GHC.Maybe.Maybe ([PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus]))
   -- | server
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer :: (GHC.Maybe.Maybe PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer)
   -- | type
@@ -635,60 +757,101 @@ data PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets = PutLoadBalanc
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsUsePrivateIp :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "health_status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus obj) : (Data.Aeson..=) "server" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer obj) : (Data.Aeson..=) "type" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsType obj) : (Data.Aeson..=) "use_private_ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsUsePrivateIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "health_status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus obj) GHC.Base.<> ((Data.Aeson..=) "server" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer obj) GHC.Base.<> ((Data.Aeson..=) "type" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsType obj) GHC.Base.<> (Data.Aeson..=) "use_private_ip" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsUsePrivateIp obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("health_status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus obj : "server" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer obj : "type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsType obj : "use_private_ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsUsePrivateIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("health_status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsType obj) GHC.Base.<> ("use_private_ip" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsUsePrivateIp obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets" (\obj -> (((GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "health_status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "use_private_ip"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsTargetsHealth_status
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets :: PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargets{putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus = GHC.Maybe.Nothing,
+                                                                                                                            putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer = GHC.Maybe.Nothing,
+                                                                                                                            putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsType = GHC.Maybe.Nothing,
+                                                                                                                            putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsUsePrivateIp = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.targets.items.properties.health_status.items@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus {
   -- | listen_port
-  putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status
   , putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusStatus :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "listen_port" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort obj) : (Data.Aeson..=) "status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "listen_port" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort obj) GHC.Base.<> (Data.Aeson..=) "status" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("listen_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort obj : "status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("listen_port" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus" (\obj -> (GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the data type for the schema PutLoadBalancersIdResponseBody200Load_balancerTargetsTargetsServer
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus :: PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatus{putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusListenPort = GHC.Maybe.Nothing,
+                                                                                                                                                    putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsHealthStatusStatus = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.targets.items.properties.server@ in the specification.
 -- 
 -- 
 data PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer {
   -- | id: ID of the Server
-  putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId :: GHC.Integer.Type.Integer
+  putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer" (\obj -> GHC.Base.pure PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema PutLoadBalancersIdResponseBody200Load_balancerTargetsType
+-- | Create a new 'PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer' with all required fields.
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer :: GHC.Types.Int -- ^ 'putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId'
+  -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer
+mkPutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServer{putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId = putLoadBalancersIdResponseBody200LoadBalancerTargetsTargetsServerId}
+-- | Defines the enum schema located at @paths.\/load_balancers\/{id}.PUT.responses.200.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.type@ in the specification.
 -- 
 -- Type of the resource
-data PutLoadBalancersIdResponseBody200LoadBalancerTargetsType
-    = PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumTyped Data.Text.Internal.Text
-    | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringIp
-    | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringLabelSelector
-    | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsType
-    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringIp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip"
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip")
-                                          then PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringIp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                                then PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringLabelSelector
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                      then PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumStringServer
-                                                      else PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumOther val)
+data PutLoadBalancersIdResponseBody200LoadBalancerTargetsType =
+   PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  | PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumIp -- ^ Represents the JSON value @"ip"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsType
+    where toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeOther val) = val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumServer) = "server"
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumLabelSelector) = "label_selector"
+          toJSON (PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumIp) = "ip"
+instance Data.Aeson.Types.FromJSON.FromJSON PutLoadBalancersIdResponseBody200LoadBalancerTargetsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumLabelSelector
+                                            | val GHC.Classes.== "ip" -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeEnumIp
+                                            | GHC.Base.otherwise -> PutLoadBalancersIdResponseBody200LoadBalancerTargetsTypeOther val)
+-- | > PUT /load_balancers/{id}
+-- 
+-- The same as 'putLoadBalancers_Id_' but accepts an explicit configuration.
+putLoadBalancers_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PutLoadBalancersIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutLoadBalancersIdResponse) -- ^ Monadic computation which returns the result of the operation
+putLoadBalancers_Id_WithConfiguration config
+                                      id
+                                      body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutLoadBalancersIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                            PutLoadBalancersIdResponseBody200)
+                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /load_balancers/{id}
+-- 
+-- The same as 'putLoadBalancers_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putLoadBalancers_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PutLoadBalancersIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putLoadBalancers_Id_Raw id
+                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /load_balancers/{id}
+-- 
+-- The same as 'putLoadBalancers_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putLoadBalancers_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> GHC.Maybe.Maybe PutLoadBalancersIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putLoadBalancers_Id_WithConfigurationRaw config
+                                         id
+                                         body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

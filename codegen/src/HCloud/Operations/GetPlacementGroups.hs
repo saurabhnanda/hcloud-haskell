@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getPlacementGroups
 module HCloud.Operations.GetPlacementGroups where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -42,197 +42,230 @@ import qualified Network.HTTP.Types as Network.HTTP.Types.URI
 import qualified HCloud.Common
 import HCloud.Types
 
--- | > GET /placement_groups
--- 
--- Returns all PlacementGroup objects.
-getPlacementGroups :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                        -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                        -- ^ name: Can be used to filter resources by their name. The response will only contain the resources matching the specified name
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                        -- ^ label_selector: Can be used to filter resources by labels. The response will only contain resources matching the label selector.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                        -- ^ type: Can be used multiple times. The response will only contain PlacementGroups matching the type.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetPlacementGroupsResponse)) -- ^ Monad containing the result of the operation
-getPlacementGroups config
-                   sort
-                   name
-                   labelSelector
-                   type' = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPlacementGroupsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                         GetPlacementGroupsResponseBody200)
-                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | > GET /placement_groups
--- 
--- The same as 'getPlacementGroups' but returns the raw 'Data.ByteString.Char8.ByteString'
-getPlacementGroupsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                       HCloud.Common.SecurityScheme s) =>
-                         HCloud.Common.Configuration s ->
-                         GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                         GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                         GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                         GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                         m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                               (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getPlacementGroupsRaw config
-                      sort
-                      name
-                      labelSelector
-                      type' = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") ((Data.Text.pack "sort",
-                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | > GET /placement_groups
--- 
--- Monadic version of 'getPlacementGroups' (use with 'HCloud.Common.runWithConfiguration')
-getPlacementGroupsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                     HCloud.Common.SecurityScheme s) =>
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                       Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                          m
-                                                          (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                              (Network.HTTP.Client.Types.Response GetPlacementGroupsResponse))
-getPlacementGroupsM sort
-                    name
-                    labelSelector
-                    type' = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPlacementGroupsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                          GetPlacementGroupsResponseBody200)
-                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | > GET /placement_groups
--- 
--- Monadic version of 'getPlacementGroupsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getPlacementGroupsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                        HCloud.Common.SecurityScheme s) =>
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                             m
-                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                 (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getPlacementGroupsRawM sort
-                       name
-                       labelSelector
-                       type' = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") ((Data.Text.pack "sort",
-                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "name",
-                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> type') : [])))))
--- | Represents a response of the operation 'getPlacementGroups'.
--- 
--- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetPlacementGroupsResponseError' is used.
-data GetPlacementGroupsResponse =                                    
-   GetPlacementGroupsResponseError GHC.Base.String                   -- ^ Means either no matching case available or a parse error
-  | GetPlacementGroupsResponse200 GetPlacementGroupsResponseBody200  -- ^ The \`placement_groups\` key contains an array of PlacementGroup objects
-  deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetPlacementGroupsResponseBody200
--- 
--- 
-data GetPlacementGroupsResponseBody200 = GetPlacementGroupsResponseBody200 {
-  -- | meta
-  getPlacementGroupsResponseBody200Meta :: (GHC.Maybe.Maybe GetPlacementGroupsResponseBody200Meta)
-  -- | placement_groups
-  , getPlacementGroupsResponseBody200PlacementGroups :: ([] GetPlacementGroupsResponseBody200PlacementGroups)
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPlacementGroupsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "meta" (getPlacementGroupsResponseBody200Meta obj) : (Data.Aeson..=) "placement_groups" (getPlacementGroupsResponseBody200PlacementGroups obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "meta" (getPlacementGroupsResponseBody200Meta obj) GHC.Base.<> (Data.Aeson..=) "placement_groups" (getPlacementGroupsResponseBody200PlacementGroups obj))
-instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200" (\obj -> (GHC.Base.pure GetPlacementGroupsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "placement_groups"))
--- | Defines the data type for the schema GetPlacementGroupsResponseBody200Meta
--- 
--- 
-data GetPlacementGroupsResponseBody200Meta = GetPlacementGroupsResponseBody200Meta {
-  -- | pagination
-  getPlacementGroupsResponseBody200MetaPagination :: GetPlacementGroupsResponseBody200MetaPagination
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPlacementGroupsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getPlacementGroupsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getPlacementGroupsResponseBody200MetaPagination obj))
-instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200Meta
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200Meta" (\obj -> GHC.Base.pure GetPlacementGroupsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetPlacementGroupsResponseBody200MetaPagination
--- 
--- 
-data GetPlacementGroupsResponseBody200MetaPagination = GetPlacementGroupsResponseBody200MetaPagination {
-  -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getPlacementGroupsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
-  -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getPlacementGroupsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
-  -- | page: Current page number
-  , getPlacementGroupsResponseBody200MetaPaginationPage :: GHC.Types.Double
-  -- | per_page: Maximum number of items shown per page in the response
-  , getPlacementGroupsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
-  -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getPlacementGroupsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
-  -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getPlacementGroupsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPlacementGroupsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getPlacementGroupsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getPlacementGroupsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getPlacementGroupsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getPlacementGroupsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getPlacementGroupsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getPlacementGroupsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getPlacementGroupsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getPlacementGroupsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getPlacementGroupsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getPlacementGroupsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getPlacementGroupsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getPlacementGroupsResponseBody200MetaPaginationTotalEntries obj))))))
-instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200MetaPagination
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetPlacementGroupsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
--- | Defines the data type for the schema GetPlacementGroupsResponseBody200Placement_groups
--- 
--- 
-data GetPlacementGroupsResponseBody200PlacementGroups = GetPlacementGroupsResponseBody200PlacementGroups {
-  -- | created: Point in time when the Resource was created (in ISO-8601 format)
-  getPlacementGroupsResponseBody200PlacementGroupsCreated :: Data.Text.Internal.Text
-  -- | id: ID of the Resource
-  , getPlacementGroupsResponseBody200PlacementGroupsId :: GHC.Integer.Type.Integer
-  -- | labels: User-defined labels (key-value pairs)
-  , getPlacementGroupsResponseBody200PlacementGroupsLabels :: GetPlacementGroupsResponseBody200PlacementGroupsLabels
-  -- | name: Name of the Resource. Must be unique per Project.
-  , getPlacementGroupsResponseBody200PlacementGroupsName :: Data.Text.Internal.Text
-  -- | servers: Array of IDs of Servers that are part of this Placement Group
-  , getPlacementGroupsResponseBody200PlacementGroupsServers :: ([] GHC.Integer.Type.Integer)
-  -- | type: Type of the Placement Group
-  , getPlacementGroupsResponseBody200PlacementGroupsType :: GetPlacementGroupsResponseBody200PlacementGroupsType
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPlacementGroupsResponseBody200PlacementGroups
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (getPlacementGroupsResponseBody200PlacementGroupsCreated obj) : (Data.Aeson..=) "id" (getPlacementGroupsResponseBody200PlacementGroupsId obj) : (Data.Aeson..=) "labels" (getPlacementGroupsResponseBody200PlacementGroupsLabels obj) : (Data.Aeson..=) "name" (getPlacementGroupsResponseBody200PlacementGroupsName obj) : (Data.Aeson..=) "servers" (getPlacementGroupsResponseBody200PlacementGroupsServers obj) : (Data.Aeson..=) "type" (getPlacementGroupsResponseBody200PlacementGroupsType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (getPlacementGroupsResponseBody200PlacementGroupsCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (getPlacementGroupsResponseBody200PlacementGroupsId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getPlacementGroupsResponseBody200PlacementGroupsLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getPlacementGroupsResponseBody200PlacementGroupsName obj) GHC.Base.<> ((Data.Aeson..=) "servers" (getPlacementGroupsResponseBody200PlacementGroupsServers obj) GHC.Base.<> (Data.Aeson..=) "type" (getPlacementGroupsResponseBody200PlacementGroupsType obj))))))
-instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200PlacementGroups
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200PlacementGroups" (\obj -> (((((GHC.Base.pure GetPlacementGroupsResponseBody200PlacementGroups GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetPlacementGroupsResponseBody200Placement_groupsLabels
--- 
--- User-defined labels (key-value pairs)
-data GetPlacementGroupsResponseBody200PlacementGroupsLabels = GetPlacementGroupsResponseBody200PlacementGroupsLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPlacementGroupsResponseBody200PlacementGroupsLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200PlacementGroupsLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200PlacementGroupsLabels" (\obj -> GHC.Base.pure GetPlacementGroupsResponseBody200PlacementGroupsLabels)
--- | Defines the enum schema GetPlacementGroupsResponseBody200Placement_groupsType
--- 
--- Type of the Placement Group
-data GetPlacementGroupsResponseBody200PlacementGroupsType
-    = GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumTyped Data.Text.Internal.Text
-    | GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumStringSpread
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetPlacementGroupsResponseBody200PlacementGroupsType
-    where toJSON (GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumStringSpread) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread"
-instance Data.Aeson.FromJSON GetPlacementGroupsResponseBody200PlacementGroupsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread")
-                                          then GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumStringSpread
-                                          else GetPlacementGroupsResponseBody200PlacementGroupsTypeEnumOther val)
+-- -- | > GET /placement_groups
+-- -- 
+-- -- Returns all PlacementGroup objects.
+-- getPlacementGroups :: forall m . HCloud.Common.MonadHTTP m => GetPlacementGroupsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+--   -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetPlacementGroupsResponse) -- ^ Monadic computation which returns the result of the operation
+-- getPlacementGroups parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPlacementGroupsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+--                                                                                                                                                                                                                                                                                                                                                                                                                                GetPlacementGroupsResponseBody200)
+--                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])
+-- -- | Defines the object schema located at @paths.\/placement_groups.GET.parameters@ in the specification.
+-- -- 
+-- -- 
+-- data GetPlacementGroupsParameters = GetPlacementGroupsParameters {
+--   -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+--   -- 
+--   -- Can be used to filter resources by labels. The response will only contain resources matching the label selector.
+--   getPlacementGroupsParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+--   -- | queryName: Represents the parameter named \'name\'
+--   -- 
+--   -- Can be used to filter resources by their name. The response will only contain the resources matching the specified name
+--   , getPlacementGroupsParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+--   -- | querySort: Represents the parameter named \'sort\'
+--   -- 
+--   -- Can be used multiple times.
+--   , getPlacementGroupsParametersQuerySort :: (GHC.Maybe.Maybe GetPlacementGroupsParametersQuerySort)
+--   } deriving (GHC.Show.Show
+--   , GHC.Classes.Eq)
+-- instance Data.Aeson.Types.ToJSON.ToJSON GetPlacementGroupsParameters
+--     where toJSON obj = Data.Aeson.Types.Internal.object ("queryLabel_selector" Data.Aeson.Types.ToJSON..= getPlacementGroupsParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getPlacementGroupsParametersQueryName obj : "querySort" Data.Aeson.Types.ToJSON..= getPlacementGroupsParametersQuerySort obj : "queryType" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread" : GHC.Base.mempty)
+--           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getPlacementGroupsParametersQueryLabelSelector obj) GHC.Base.<> (("queryName" Data.Aeson.Types.ToJSON..= getPlacementGroupsParametersQueryName obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getPlacementGroupsParametersQuerySort obj) GHC.Base.<> ("queryType" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread"))))
+-- instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsParameters
+--     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsParameters" (\obj -> ((GHC.Base.pure GetPlacementGroupsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort"))
+-- -- | Create a new 'GetPlacementGroupsParameters' with all required fields.
+-- mkGetPlacementGroupsParameters :: GetPlacementGroupsParameters
+-- mkGetPlacementGroupsParameters = GetPlacementGroupsParameters{getPlacementGroupsParametersQueryLabelSelector = GHC.Maybe.Nothing,
+--                                                               getPlacementGroupsParametersQueryName = GHC.Maybe.Nothing,
+--                                                               getPlacementGroupsParametersQuerySort = GHC.Maybe.Nothing}
+-- -- | Defines the enum schema located at @paths.\/placement_groups.GET.parameters.properties.querySort@ in the specification.
+-- -- 
+-- -- Represents the parameter named \'sort\'
+-- -- 
+-- -- Can be used multiple times.
+-- data GetPlacementGroupsParametersQuerySort =
+--    GetPlacementGroupsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+--   | GetPlacementGroupsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+--   | GetPlacementGroupsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+--   | GetPlacementGroupsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+--   | GetPlacementGroupsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+--   | GetPlacementGroupsParametersQuerySortEnumName -- ^ Represents the JSON value @"name"@
+--   | GetPlacementGroupsParametersQuerySortEnumNameAsc -- ^ Represents the JSON value @"name:asc"@
+--   | GetPlacementGroupsParametersQuerySortEnumNameDesc -- ^ Represents the JSON value @"name:desc"@
+--   | GetPlacementGroupsParametersQuerySortEnumCreated -- ^ Represents the JSON value @"created"@
+--   | GetPlacementGroupsParametersQuerySortEnumCreatedAsc -- ^ Represents the JSON value @"created:asc"@
+--   | GetPlacementGroupsParametersQuerySortEnumCreatedDesc -- ^ Represents the JSON value @"created:desc"@
+--   deriving (GHC.Show.Show, GHC.Classes.Eq)
+-- instance Data.Aeson.Types.ToJSON.ToJSON GetPlacementGroupsParametersQuerySort
+--     where toJSON (GetPlacementGroupsParametersQuerySortOther val) = val
+--           toJSON (GetPlacementGroupsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumId) = "id"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumIdAsc) = "id:asc"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumIdDesc) = "id:desc"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumName) = "name"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumNameAsc) = "name:asc"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumNameDesc) = "name:desc"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumCreated) = "created"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumCreatedAsc) = "created:asc"
+--           toJSON (GetPlacementGroupsParametersQuerySortEnumCreatedDesc) = "created:desc"
+-- instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsParametersQuerySort
+--     where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetPlacementGroupsParametersQuerySortEnumId
+--                                             | val GHC.Classes.== "id:asc" -> GetPlacementGroupsParametersQuerySortEnumIdAsc
+--                                             | val GHC.Classes.== "id:desc" -> GetPlacementGroupsParametersQuerySortEnumIdDesc
+--                                             | val GHC.Classes.== "name" -> GetPlacementGroupsParametersQuerySortEnumName
+--                                             | val GHC.Classes.== "name:asc" -> GetPlacementGroupsParametersQuerySortEnumNameAsc
+--                                             | val GHC.Classes.== "name:desc" -> GetPlacementGroupsParametersQuerySortEnumNameDesc
+--                                             | val GHC.Classes.== "created" -> GetPlacementGroupsParametersQuerySortEnumCreated
+--                                             | val GHC.Classes.== "created:asc" -> GetPlacementGroupsParametersQuerySortEnumCreatedAsc
+--                                             | val GHC.Classes.== "created:desc" -> GetPlacementGroupsParametersQuerySortEnumCreatedDesc
+--                                             | GHC.Base.otherwise -> GetPlacementGroupsParametersQuerySortOther val)
+-- -- | Represents a response of the operation 'getPlacementGroups'.
+-- -- 
+-- -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetPlacementGroupsResponseError' is used.
+-- data GetPlacementGroupsResponse =
+--    GetPlacementGroupsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+--   | GetPlacementGroupsResponse200 GetPlacementGroupsResponseBody200 -- ^ The \`placement_groups\` key contains an array of PlacementGroup objects
+--   deriving (GHC.Show.Show, GHC.Classes.Eq)
+-- -- | Defines the object schema located at @paths.\/placement_groups.GET.responses.200.content.application\/json.schema@ in the specification.
+-- -- 
+-- -- 
+-- data GetPlacementGroupsResponseBody200 = GetPlacementGroupsResponseBody200 {
+--   -- | meta
+--   getPlacementGroupsResponseBody200Meta :: (GHC.Maybe.Maybe GetPlacementGroupsResponseBody200Meta)
+--   -- | placement_groups
+--   , getPlacementGroupsResponseBody200PlacementGroups :: ([GetPlacementGroupsResponseBody200PlacementGroups])
+--   } deriving (GHC.Show.Show
+--   , GHC.Classes.Eq)
+-- instance Data.Aeson.Types.ToJSON.ToJSON GetPlacementGroupsResponseBody200
+--     where toJSON obj = Data.Aeson.Types.Internal.object ("meta" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200Meta obj : "placement_groups" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroups obj : GHC.Base.mempty)
+--           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("meta" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200Meta obj) GHC.Base.<> ("placement_groups" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroups obj))
+-- instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200
+--     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200" (\obj -> (GHC.Base.pure GetPlacementGroupsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "placement_groups"))
+-- -- | Create a new 'GetPlacementGroupsResponseBody200' with all required fields.
+-- mkGetPlacementGroupsResponseBody200 :: [GetPlacementGroupsResponseBody200PlacementGroups] -- ^ 'getPlacementGroupsResponseBody200PlacementGroups'
+--   -> GetPlacementGroupsResponseBody200
+-- mkGetPlacementGroupsResponseBody200 getPlacementGroupsResponseBody200PlacementGroups = GetPlacementGroupsResponseBody200{getPlacementGroupsResponseBody200Meta = GHC.Maybe.Nothing,
+--                                                                                                                          getPlacementGroupsResponseBody200PlacementGroups = getPlacementGroupsResponseBody200PlacementGroups}
+-- -- | Defines the object schema located at @paths.\/placement_groups.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
+-- -- 
+-- -- 
+-- data GetPlacementGroupsResponseBody200Meta = GetPlacementGroupsResponseBody200Meta {
+--   -- | pagination
+--   getPlacementGroupsResponseBody200MetaPagination :: GetPlacementGroupsResponseBody200MetaPagination
+--   } deriving (GHC.Show.Show
+--   , GHC.Classes.Eq)
+-- instance Data.Aeson.Types.ToJSON.ToJSON GetPlacementGroupsResponseBody200Meta
+--     where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPagination obj : GHC.Base.mempty)
+--           toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPagination obj)
+-- instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200Meta
+--     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200Meta" (\obj -> GHC.Base.pure GetPlacementGroupsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
+-- -- | Create a new 'GetPlacementGroupsResponseBody200Meta' with all required fields.
+-- mkGetPlacementGroupsResponseBody200Meta :: GetPlacementGroupsResponseBody200MetaPagination -- ^ 'getPlacementGroupsResponseBody200MetaPagination'
+--   -> GetPlacementGroupsResponseBody200Meta
+-- mkGetPlacementGroupsResponseBody200Meta getPlacementGroupsResponseBody200MetaPagination = GetPlacementGroupsResponseBody200Meta{getPlacementGroupsResponseBody200MetaPagination = getPlacementGroupsResponseBody200MetaPagination}
+-- -- | Defines the object schema located at @paths.\/placement_groups.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
+-- -- 
+-- -- 
+-- data GetPlacementGroupsResponseBody200MetaPagination = GetPlacementGroupsResponseBody200MetaPagination {
+--   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
+--   getPlacementGroupsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
+--   -- | next_page: ID of the next page. Can be null if the current page is the last one.
+--   , getPlacementGroupsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
+--   -- | page: Current page number
+--   , getPlacementGroupsResponseBody200MetaPaginationPage :: GHC.Types.Double
+--   -- | per_page: Maximum number of items shown per page in the response
+--   , getPlacementGroupsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
+--   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
+--   , getPlacementGroupsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
+--   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
+--   , getPlacementGroupsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
+--   } deriving (GHC.Show.Show
+--   , GHC.Classes.Eq)
+-- instance Data.Aeson.Types.ToJSON.ToJSON GetPlacementGroupsResponseBody200MetaPagination
+--     where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+--           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200MetaPaginationTotalEntries obj))))))
+-- instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200MetaPagination
+--     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetPlacementGroupsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- -- | Create a new 'GetPlacementGroupsResponseBody200MetaPagination' with all required fields.
+-- mkGetPlacementGroupsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getPlacementGroupsResponseBody200MetaPaginationLastPage'
+--   -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getPlacementGroupsResponseBody200MetaPaginationNextPage'
+--   -> GHC.Types.Double -- ^ 'getPlacementGroupsResponseBody200MetaPaginationPage'
+--   -> GHC.Types.Double -- ^ 'getPlacementGroupsResponseBody200MetaPaginationPerPage'
+--   -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getPlacementGroupsResponseBody200MetaPaginationPreviousPage'
+--   -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getPlacementGroupsResponseBody200MetaPaginationTotalEntries'
+--   -> GetPlacementGroupsResponseBody200MetaPagination
+-- mkGetPlacementGroupsResponseBody200MetaPagination getPlacementGroupsResponseBody200MetaPaginationLastPage getPlacementGroupsResponseBody200MetaPaginationNextPage getPlacementGroupsResponseBody200MetaPaginationPage getPlacementGroupsResponseBody200MetaPaginationPerPage getPlacementGroupsResponseBody200MetaPaginationPreviousPage getPlacementGroupsResponseBody200MetaPaginationTotalEntries = GetPlacementGroupsResponseBody200MetaPagination{getPlacementGroupsResponseBody200MetaPaginationLastPage = getPlacementGroupsResponseBody200MetaPaginationLastPage,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                        getPlacementGroupsResponseBody200MetaPaginationNextPage = getPlacementGroupsResponseBody200MetaPaginationNextPage,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                        getPlacementGroupsResponseBody200MetaPaginationPage = getPlacementGroupsResponseBody200MetaPaginationPage,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                        getPlacementGroupsResponseBody200MetaPaginationPerPage = getPlacementGroupsResponseBody200MetaPaginationPerPage,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                        getPlacementGroupsResponseBody200MetaPaginationPreviousPage = getPlacementGroupsResponseBody200MetaPaginationPreviousPage,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                        getPlacementGroupsResponseBody200MetaPaginationTotalEntries = getPlacementGroupsResponseBody200MetaPaginationTotalEntries}
+-- -- | Defines the object schema located at @paths.\/placement_groups.GET.responses.200.content.application\/json.schema.properties.placement_groups.items@ in the specification.
+-- -- 
+-- -- 
+-- data GetPlacementGroupsResponseBody200PlacementGroups = GetPlacementGroupsResponseBody200PlacementGroups {
+--   -- | created: Point in time when the Resource was created (in ISO-8601 format)
+--   getPlacementGroupsResponseBody200PlacementGroupsCreated :: Data.Text.Internal.Text
+--   -- | id: ID of the Resource
+--   , getPlacementGroupsResponseBody200PlacementGroupsId :: GHC.Types.Int
+--   -- | labels: User-defined labels (key-value pairs)
+--   , getPlacementGroupsResponseBody200PlacementGroupsLabels :: Data.Aeson.Types.Internal.Object
+--   -- | name: Name of the Resource. Must be unique per Project.
+--   , getPlacementGroupsResponseBody200PlacementGroupsName :: Data.Text.Internal.Text
+--   -- | servers: Array of IDs of Servers that are part of this Placement Group
+--   , getPlacementGroupsResponseBody200PlacementGroupsServers :: ([GHC.Types.Int])
+--   } deriving (GHC.Show.Show
+--   , GHC.Classes.Eq)
+-- instance Data.Aeson.Types.ToJSON.ToJSON GetPlacementGroupsResponseBody200PlacementGroups
+--     where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsCreated obj : "id" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsId obj : "labels" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsLabels obj : "name" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsName obj : "servers" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsServers obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread" : GHC.Base.mempty)
+--           toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsName obj) GHC.Base.<> (("servers" Data.Aeson.Types.ToJSON..= getPlacementGroupsResponseBody200PlacementGroupsServers obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread"))))))
+-- instance Data.Aeson.Types.FromJSON.FromJSON GetPlacementGroupsResponseBody200PlacementGroups
+--     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetPlacementGroupsResponseBody200PlacementGroups" (\obj -> ((((GHC.Base.pure GetPlacementGroupsResponseBody200PlacementGroups GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers"))
+-- -- | Create a new 'GetPlacementGroupsResponseBody200PlacementGroups' with all required fields.
+-- mkGetPlacementGroupsResponseBody200PlacementGroups :: Data.Text.Internal.Text -- ^ 'getPlacementGroupsResponseBody200PlacementGroupsCreated'
+--   -> GHC.Types.Int -- ^ 'getPlacementGroupsResponseBody200PlacementGroupsId'
+--   -> Data.Aeson.Types.Internal.Object -- ^ 'getPlacementGroupsResponseBody200PlacementGroupsLabels'
+--   -> Data.Text.Internal.Text -- ^ 'getPlacementGroupsResponseBody200PlacementGroupsName'
+--   -> [GHC.Types.Int] -- ^ 'getPlacementGroupsResponseBody200PlacementGroupsServers'
+--   -> GetPlacementGroupsResponseBody200PlacementGroups
+-- mkGetPlacementGroupsResponseBody200PlacementGroups getPlacementGroupsResponseBody200PlacementGroupsCreated getPlacementGroupsResponseBody200PlacementGroupsId getPlacementGroupsResponseBody200PlacementGroupsLabels getPlacementGroupsResponseBody200PlacementGroupsName getPlacementGroupsResponseBody200PlacementGroupsServers = GetPlacementGroupsResponseBody200PlacementGroups{getPlacementGroupsResponseBody200PlacementGroupsCreated = getPlacementGroupsResponseBody200PlacementGroupsCreated,
+--                                                                                                                                                                                                                                                                                                                                                                                      getPlacementGroupsResponseBody200PlacementGroupsId = getPlacementGroupsResponseBody200PlacementGroupsId,
+--                                                                                                                                                                                                                                                                                                                                                                                      getPlacementGroupsResponseBody200PlacementGroupsLabels = getPlacementGroupsResponseBody200PlacementGroupsLabels,
+--                                                                                                                                                                                                                                                                                                                                                                                      getPlacementGroupsResponseBody200PlacementGroupsName = getPlacementGroupsResponseBody200PlacementGroupsName,
+--                                                                                                                                                                                                                                                                                                                                                                                      getPlacementGroupsResponseBody200PlacementGroupsServers = getPlacementGroupsResponseBody200PlacementGroupsServers}
+-- -- | > GET /placement_groups
+-- -- 
+-- -- The same as 'getPlacementGroups' but accepts an explicit configuration.
+-- getPlacementGroupsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+--   -> GetPlacementGroupsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+--   -> m (Network.HTTP.Client.Types.Response GetPlacementGroupsResponse) -- ^ Monadic computation which returns the result of the operation
+-- getPlacementGroupsWithConfiguration config
+--                                     parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetPlacementGroupsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetPlacementGroupsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                 GetPlacementGroupsResponseBody200)
+--                                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])
+-- -- | > GET /placement_groups
+-- -- 
+-- -- The same as 'getPlacementGroups' but returns the raw 'Data.ByteString.Char8.ByteString'.
+-- getPlacementGroupsRaw :: forall m . HCloud.Common.MonadHTTP m => GetPlacementGroupsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+--   -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+-- getPlacementGroupsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                   HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])
+-- -- | > GET /placement_groups
+-- -- 
+-- -- The same as 'getPlacementGroups' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+-- getPlacementGroupsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+--   -> GetPlacementGroupsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+--   -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+-- getPlacementGroupsWithConfigurationRaw config
+--                                        parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/placement_groups") [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+--                                                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "type") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getPlacementGroupsParametersQueryType parameters) (Data.Text.pack "form") GHC.Types.False])

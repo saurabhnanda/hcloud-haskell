@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postSshKeys
 module HCloud.Operations.PostSshKeys where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,85 +45,43 @@ import HCloud.Types
 -- | > POST /ssh_keys
 -- 
 -- Creates a new SSH key with the given \`name\` and \`public_key\`. Once an SSH key is created, it can be used in other calls such as creating Servers.
-postSshKeys :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe PostSshKeysRequestBody                                                                                  -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostSshKeysResponse)) -- ^ Monad containing the result of the operation
-postSshKeys config
-            body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostSshKeysResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostSshKeysResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                   PostSshKeysResponseBody201)
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /ssh_keys
--- 
--- The same as 'postSshKeys' but returns the raw 'Data.ByteString.Char8.ByteString'
-postSshKeysRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  HCloud.Common.Configuration s ->
-                  GHC.Maybe.Maybe PostSshKeysRequestBody ->
-                  m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postSshKeysRaw config
-               body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /ssh_keys
--- 
--- Monadic version of 'postSshKeys' (use with 'HCloud.Common.runWithConfiguration')
-postSshKeysM :: forall m s . (HCloud.Common.MonadHTTP m,
-                              HCloud.Common.SecurityScheme s) =>
-                GHC.Maybe.Maybe PostSshKeysRequestBody ->
-                Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                   m
-                                                   (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                       (Network.HTTP.Client.Types.Response PostSshKeysResponse))
-postSshKeysM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostSshKeysResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostSshKeysResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                    PostSshKeysResponseBody201)
-                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /ssh_keys
--- 
--- Monadic version of 'postSshKeysRaw' (use with 'HCloud.Common.runWithConfiguration')
-postSshKeysRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Maybe.Maybe PostSshKeysRequestBody ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postSshKeysRawM body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postSshKeysRequestBody
+postSshKeys :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostSshKeysRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostSshKeysResponse) -- ^ Monadic computation which returns the result of the operation
+postSshKeys body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostSshKeysResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostSshKeysResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                    PostSshKeysResponseBody201)
+                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/ssh_keys.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostSshKeysRequestBody = PostSshKeysRequestBody {
   -- | labels: User-defined labels (key-value pairs)
-  postSshKeysRequestBodyLabels :: (GHC.Maybe.Maybe PostSshKeysRequestBodyLabels)
+  postSshKeysRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: Name of the SSH key
   , postSshKeysRequestBodyName :: Data.Text.Internal.Text
   -- | public_key: Public key
   , postSshKeysRequestBodyPublicKey :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostSshKeysRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (postSshKeysRequestBodyLabels obj) : (Data.Aeson..=) "name" (postSshKeysRequestBodyName obj) : (Data.Aeson..=) "public_key" (postSshKeysRequestBodyPublicKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (postSshKeysRequestBodyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postSshKeysRequestBodyName obj) GHC.Base.<> (Data.Aeson..=) "public_key" (postSshKeysRequestBodyPublicKey obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostSshKeysRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= postSshKeysRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= postSshKeysRequestBodyName obj : "public_key" Data.Aeson.Types.ToJSON..= postSshKeysRequestBodyPublicKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= postSshKeysRequestBodyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postSshKeysRequestBodyName obj) GHC.Base.<> ("public_key" Data.Aeson.Types.ToJSON..= postSshKeysRequestBodyPublicKey obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostSshKeysRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostSshKeysRequestBody" (\obj -> ((GHC.Base.pure PostSshKeysRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_key"))
--- | Defines the data type for the schema postSshKeysRequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PostSshKeysRequestBodyLabels = PostSshKeysRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostSshKeysRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostSshKeysRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostSshKeysRequestBodyLabels" (\obj -> GHC.Base.pure PostSshKeysRequestBodyLabels)
+-- | Create a new 'PostSshKeysRequestBody' with all required fields.
+mkPostSshKeysRequestBody :: Data.Text.Internal.Text -- ^ 'postSshKeysRequestBodyName'
+  -> Data.Text.Internal.Text -- ^ 'postSshKeysRequestBodyPublicKey'
+  -> PostSshKeysRequestBody
+mkPostSshKeysRequestBody postSshKeysRequestBodyName postSshKeysRequestBodyPublicKey = PostSshKeysRequestBody{postSshKeysRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                                             postSshKeysRequestBodyName = postSshKeysRequestBodyName,
+                                                                                                             postSshKeysRequestBodyPublicKey = postSshKeysRequestBodyPublicKey}
 -- | Represents a response of the operation 'postSshKeys'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostSshKeysResponseError' is used.
-data PostSshKeysResponse =                             
-   PostSshKeysResponseError GHC.Base.String            -- ^ Means either no matching case available or a parse error
-  | PostSshKeysResponse201 PostSshKeysResponseBody201  -- ^ The \`ssh_key\` key in the reply contains the object that was just created
+data PostSshKeysResponse =
+   PostSshKeysResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostSshKeysResponse201 PostSshKeysResponseBody201 -- ^ The \`ssh_key\` key in the reply contains the object that was just created
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostSshKeysResponseBody201
+-- | Defines the object schema located at @paths.\/ssh_keys.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostSshKeysResponseBody201 = PostSshKeysResponseBody201 {
@@ -131,12 +89,16 @@ data PostSshKeysResponseBody201 = PostSshKeysResponseBody201 {
   postSshKeysResponseBody201SshKey :: PostSshKeysResponseBody201SshKey
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostSshKeysResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ssh_key" (postSshKeysResponseBody201SshKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ssh_key" (postSshKeysResponseBody201SshKey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostSshKeysResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ssh_key" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ssh_key" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostSshKeysResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostSshKeysResponseBody201" (\obj -> GHC.Base.pure PostSshKeysResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ssh_key"))
--- | Defines the data type for the schema PostSshKeysResponseBody201Ssh_key
+-- | Create a new 'PostSshKeysResponseBody201' with all required fields.
+mkPostSshKeysResponseBody201 :: PostSshKeysResponseBody201SshKey -- ^ 'postSshKeysResponseBody201SshKey'
+  -> PostSshKeysResponseBody201
+mkPostSshKeysResponseBody201 postSshKeysResponseBody201SshKey = PostSshKeysResponseBody201{postSshKeysResponseBody201SshKey = postSshKeysResponseBody201SshKey}
+-- | Defines the object schema located at @paths.\/ssh_keys.POST.responses.201.content.application\/json.schema.properties.ssh_key@ in the specification.
 -- 
 -- 
 data PostSshKeysResponseBody201SshKey = PostSshKeysResponseBody201SshKey {
@@ -145,29 +107,55 @@ data PostSshKeysResponseBody201SshKey = PostSshKeysResponseBody201SshKey {
   -- | fingerprint: Fingerprint of public key
   , postSshKeysResponseBody201SshKeyFingerprint :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , postSshKeysResponseBody201SshKeyId :: GHC.Integer.Type.Integer
+  , postSshKeysResponseBody201SshKeyId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , postSshKeysResponseBody201SshKeyLabels :: PostSshKeysResponseBody201SshKeyLabels
+  , postSshKeysResponseBody201SshKeyLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , postSshKeysResponseBody201SshKeyName :: Data.Text.Internal.Text
   -- | public_key: Public key
   , postSshKeysResponseBody201SshKeyPublicKey :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostSshKeysResponseBody201SshKey
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (postSshKeysResponseBody201SshKeyCreated obj) : (Data.Aeson..=) "fingerprint" (postSshKeysResponseBody201SshKeyFingerprint obj) : (Data.Aeson..=) "id" (postSshKeysResponseBody201SshKeyId obj) : (Data.Aeson..=) "labels" (postSshKeysResponseBody201SshKeyLabels obj) : (Data.Aeson..=) "name" (postSshKeysResponseBody201SshKeyName obj) : (Data.Aeson..=) "public_key" (postSshKeysResponseBody201SshKeyPublicKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (postSshKeysResponseBody201SshKeyCreated obj) GHC.Base.<> ((Data.Aeson..=) "fingerprint" (postSshKeysResponseBody201SshKeyFingerprint obj) GHC.Base.<> ((Data.Aeson..=) "id" (postSshKeysResponseBody201SshKeyId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postSshKeysResponseBody201SshKeyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (postSshKeysResponseBody201SshKeyName obj) GHC.Base.<> (Data.Aeson..=) "public_key" (postSshKeysResponseBody201SshKeyPublicKey obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostSshKeysResponseBody201SshKey
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyCreated obj : "fingerprint" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyFingerprint obj : "id" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyId obj : "labels" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyLabels obj : "name" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyName obj : "public_key" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyPublicKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyCreated obj) GHC.Base.<> (("fingerprint" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyFingerprint obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyName obj) GHC.Base.<> ("public_key" Data.Aeson.Types.ToJSON..= postSshKeysResponseBody201SshKeyPublicKey obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostSshKeysResponseBody201SshKey
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostSshKeysResponseBody201SshKey" (\obj -> (((((GHC.Base.pure PostSshKeysResponseBody201SshKey GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fingerprint")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_key"))
--- | Defines the data type for the schema PostSshKeysResponseBody201Ssh_keyLabels
+-- | Create a new 'PostSshKeysResponseBody201SshKey' with all required fields.
+mkPostSshKeysResponseBody201SshKey :: Data.Text.Internal.Text -- ^ 'postSshKeysResponseBody201SshKeyCreated'
+  -> Data.Text.Internal.Text -- ^ 'postSshKeysResponseBody201SshKeyFingerprint'
+  -> GHC.Types.Int -- ^ 'postSshKeysResponseBody201SshKeyId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'postSshKeysResponseBody201SshKeyLabels'
+  -> Data.Text.Internal.Text -- ^ 'postSshKeysResponseBody201SshKeyName'
+  -> Data.Text.Internal.Text -- ^ 'postSshKeysResponseBody201SshKeyPublicKey'
+  -> PostSshKeysResponseBody201SshKey
+mkPostSshKeysResponseBody201SshKey postSshKeysResponseBody201SshKeyCreated postSshKeysResponseBody201SshKeyFingerprint postSshKeysResponseBody201SshKeyId postSshKeysResponseBody201SshKeyLabels postSshKeysResponseBody201SshKeyName postSshKeysResponseBody201SshKeyPublicKey = PostSshKeysResponseBody201SshKey{postSshKeysResponseBody201SshKeyCreated = postSshKeysResponseBody201SshKeyCreated,
+                                                                                                                                                                                                                                                                                                                   postSshKeysResponseBody201SshKeyFingerprint = postSshKeysResponseBody201SshKeyFingerprint,
+                                                                                                                                                                                                                                                                                                                   postSshKeysResponseBody201SshKeyId = postSshKeysResponseBody201SshKeyId,
+                                                                                                                                                                                                                                                                                                                   postSshKeysResponseBody201SshKeyLabels = postSshKeysResponseBody201SshKeyLabels,
+                                                                                                                                                                                                                                                                                                                   postSshKeysResponseBody201SshKeyName = postSshKeysResponseBody201SshKeyName,
+                                                                                                                                                                                                                                                                                                                   postSshKeysResponseBody201SshKeyPublicKey = postSshKeysResponseBody201SshKeyPublicKey}
+-- | > POST /ssh_keys
 -- 
--- User-defined labels (key-value pairs)
-data PostSshKeysResponseBody201SshKeyLabels = PostSshKeysResponseBody201SshKeyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostSshKeysResponseBody201SshKeyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostSshKeysResponseBody201SshKeyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostSshKeysResponseBody201SshKeyLabels" (\obj -> GHC.Base.pure PostSshKeysResponseBody201SshKeyLabels)
+-- The same as 'postSshKeys' but accepts an explicit configuration.
+postSshKeysWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostSshKeysRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostSshKeysResponse) -- ^ Monadic computation which returns the result of the operation
+postSshKeysWithConfiguration config
+                             body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostSshKeysResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostSshKeysResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                     PostSshKeysResponseBody201)
+                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /ssh_keys
+-- 
+-- The same as 'postSshKeys' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postSshKeysRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostSshKeysRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postSshKeysRaw body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /ssh_keys
+-- 
+-- The same as 'postSshKeys' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postSshKeysWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostSshKeysRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postSshKeysWithConfigurationRaw config
+                                body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/ssh_keys") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

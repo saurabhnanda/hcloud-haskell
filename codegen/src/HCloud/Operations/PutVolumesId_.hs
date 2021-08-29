@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putVolumes_Id_
 module HCloud.Operations.PutVolumesId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,57 +47,14 @@ import HCloud.Types
 -- Updates the Volume properties.
 -- 
 -- Note that when updating labels, the volume’s current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
-putVolumes_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> Data.Text.Internal.Text                                                                                                    -- ^ id: ID of the Volume to update
-  -> GHC.Maybe.Maybe PutVolumesIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutVolumesIdResponse))   -- ^ Monad containing the result of the operation
-putVolumes_Id_ config
-               id
-               body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutVolumesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutVolumesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                        PutVolumesIdResponseBody200)
-                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /volumes/{id}
--- 
--- The same as 'putVolumes_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putVolumes_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     HCloud.Common.Configuration s ->
-                     Data.Text.Internal.Text ->
-                     GHC.Maybe.Maybe PutVolumesIdRequestBody ->
-                     m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putVolumes_Id_Raw config
-                  id
-                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /volumes/{id}
--- 
--- Monadic version of 'putVolumes_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putVolumes_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe PutVolumesIdRequestBody ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response PutVolumesIdResponse))
-putVolumes_Id_M id
-                body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutVolumesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutVolumesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                         PutVolumesIdResponseBody200)
-                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /volumes/{id}
--- 
--- Monadic version of 'putVolumes_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putVolumes_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe PutVolumesIdRequestBody ->
-                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                         m
-                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putVolumes_Id_RawM id
-                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putVolumes_Id_RequestBody
+putVolumes_Id_ :: forall m . HCloud.Common.MonadHTTP m => Data.Text.Internal.Text -- ^ id: ID of the Volume to update
+  -> GHC.Maybe.Maybe PutVolumesIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutVolumesIdResponse) -- ^ Monadic computation which returns the result of the operation
+putVolumes_Id_ id
+               body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutVolumesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutVolumesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                         PutVolumesIdResponseBody200)
+                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/volumes\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutVolumesIdRequestBody = PutVolumesIdRequestBody {
@@ -107,12 +64,17 @@ data PutVolumesIdRequestBody = PutVolumesIdRequestBody {
   , putVolumesIdRequestBodyName :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (putVolumesIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putVolumesIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (putVolumesIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putVolumesIdRequestBodyName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= putVolumesIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putVolumesIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= putVolumesIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putVolumesIdRequestBodyName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdRequestBody" (\obj -> (GHC.Base.pure PutVolumesIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name"))
--- | Defines the data type for the schema putVolumes_Id_RequestBodyLabels
+-- | Create a new 'PutVolumesIdRequestBody' with all required fields.
+mkPutVolumesIdRequestBody :: Data.Text.Internal.Text -- ^ 'putVolumesIdRequestBodyName'
+  -> PutVolumesIdRequestBody
+mkPutVolumesIdRequestBody putVolumesIdRequestBodyName = PutVolumesIdRequestBody{putVolumesIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                putVolumesIdRequestBodyName = putVolumesIdRequestBodyName}
+-- | Defines the object schema located at @paths.\/volumes\/{id}.PUT.requestBody.content.application\/json.schema.properties.labels@ in the specification.
 -- 
 -- User-defined labels (key-value pairs)
 data PutVolumesIdRequestBodyLabels = PutVolumesIdRequestBodyLabels {
@@ -120,19 +82,22 @@ data PutVolumesIdRequestBodyLabels = PutVolumesIdRequestBodyLabels {
   putVolumesIdRequestBodyLabelsLabelkey :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labelkey" (putVolumesIdRequestBodyLabelsLabelkey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labelkey" (putVolumesIdRequestBodyLabelsLabelkey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdRequestBodyLabels
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labelkey" Data.Aeson.Types.ToJSON..= putVolumesIdRequestBodyLabelsLabelkey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("labelkey" Data.Aeson.Types.ToJSON..= putVolumesIdRequestBodyLabelsLabelkey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdRequestBodyLabels
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdRequestBodyLabels" (\obj -> GHC.Base.pure PutVolumesIdRequestBodyLabels GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labelkey"))
+-- | Create a new 'PutVolumesIdRequestBodyLabels' with all required fields.
+mkPutVolumesIdRequestBodyLabels :: PutVolumesIdRequestBodyLabels
+mkPutVolumesIdRequestBodyLabels = PutVolumesIdRequestBodyLabels{putVolumesIdRequestBodyLabelsLabelkey = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putVolumes_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutVolumesIdResponseError' is used.
-data PutVolumesIdResponse =                              
-   PutVolumesIdResponseError GHC.Base.String             -- ^ Means either no matching case available or a parse error
-  | PutVolumesIdResponse200 PutVolumesIdResponseBody200  -- ^ The \`volume\` key contains the updated volume
+data PutVolumesIdResponse =
+   PutVolumesIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutVolumesIdResponse200 PutVolumesIdResponseBody200 -- ^ The \`volume\` key contains the updated volume
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutVolumesIdResponseBody200
+-- | Defines the object schema located at @paths.\/volumes\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutVolumesIdResponseBody200 = PutVolumesIdResponseBody200 {
@@ -140,23 +105,27 @@ data PutVolumesIdResponseBody200 = PutVolumesIdResponseBody200 {
   putVolumesIdResponseBody200Volume :: PutVolumesIdResponseBody200Volume
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "volume" (putVolumesIdResponseBody200Volume obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "volume" (putVolumesIdResponseBody200Volume obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("volume" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200Volume obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("volume" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200Volume obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdResponseBody200" (\obj -> GHC.Base.pure PutVolumesIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "volume"))
--- | Defines the data type for the schema PutVolumesIdResponseBody200Volume
+-- | Create a new 'PutVolumesIdResponseBody200' with all required fields.
+mkPutVolumesIdResponseBody200 :: PutVolumesIdResponseBody200Volume -- ^ 'putVolumesIdResponseBody200Volume'
+  -> PutVolumesIdResponseBody200
+mkPutVolumesIdResponseBody200 putVolumesIdResponseBody200Volume = PutVolumesIdResponseBody200{putVolumesIdResponseBody200Volume = putVolumesIdResponseBody200Volume}
+-- | Defines the object schema located at @paths.\/volumes\/{id}.PUT.responses.200.content.application\/json.schema.properties.volume@ in the specification.
 -- 
 -- 
 data PutVolumesIdResponseBody200Volume = PutVolumesIdResponseBody200Volume {
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   putVolumesIdResponseBody200VolumeCreated :: Data.Text.Internal.Text
   -- | format: Filesystem of the Volume if formatted on creation, null if not formatted on creation
-  , putVolumesIdResponseBody200VolumeFormat :: Data.Text.Internal.Text
+  , putVolumesIdResponseBody200VolumeFormat :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , putVolumesIdResponseBody200VolumeId :: GHC.Integer.Type.Integer
+  , putVolumesIdResponseBody200VolumeId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , putVolumesIdResponseBody200VolumeLabels :: PutVolumesIdResponseBody200VolumeLabels
+  , putVolumesIdResponseBody200VolumeLabels :: Data.Aeson.Types.Internal.Object
   -- | linux_device: Device path on the file system for the Volume
   , putVolumesIdResponseBody200VolumeLinuxDevice :: Data.Text.Internal.Text
   -- | location: Location of the Volume. Volume can only be attached to Servers in the same Location.
@@ -166,31 +135,43 @@ data PutVolumesIdResponseBody200Volume = PutVolumesIdResponseBody200Volume {
   -- | protection: Protection configuration for the Resource
   , putVolumesIdResponseBody200VolumeProtection :: PutVolumesIdResponseBody200VolumeProtection
   -- | server: ID of the Server the Volume is attached to, null if it is not attached at all
-  , putVolumesIdResponseBody200VolumeServer :: GHC.Integer.Type.Integer
+  , putVolumesIdResponseBody200VolumeServer :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | size: Size in GB of the Volume
   , putVolumesIdResponseBody200VolumeSize :: GHC.Types.Double
   -- | status: Current status of the Volume
   , putVolumesIdResponseBody200VolumeStatus :: PutVolumesIdResponseBody200VolumeStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdResponseBody200Volume
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (putVolumesIdResponseBody200VolumeCreated obj) : (Data.Aeson..=) "format" (putVolumesIdResponseBody200VolumeFormat obj) : (Data.Aeson..=) "id" (putVolumesIdResponseBody200VolumeId obj) : (Data.Aeson..=) "labels" (putVolumesIdResponseBody200VolumeLabels obj) : (Data.Aeson..=) "linux_device" (putVolumesIdResponseBody200VolumeLinuxDevice obj) : (Data.Aeson..=) "location" (putVolumesIdResponseBody200VolumeLocation obj) : (Data.Aeson..=) "name" (putVolumesIdResponseBody200VolumeName obj) : (Data.Aeson..=) "protection" (putVolumesIdResponseBody200VolumeProtection obj) : (Data.Aeson..=) "server" (putVolumesIdResponseBody200VolumeServer obj) : (Data.Aeson..=) "size" (putVolumesIdResponseBody200VolumeSize obj) : (Data.Aeson..=) "status" (putVolumesIdResponseBody200VolumeStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (putVolumesIdResponseBody200VolumeCreated obj) GHC.Base.<> ((Data.Aeson..=) "format" (putVolumesIdResponseBody200VolumeFormat obj) GHC.Base.<> ((Data.Aeson..=) "id" (putVolumesIdResponseBody200VolumeId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putVolumesIdResponseBody200VolumeLabels obj) GHC.Base.<> ((Data.Aeson..=) "linux_device" (putVolumesIdResponseBody200VolumeLinuxDevice obj) GHC.Base.<> ((Data.Aeson..=) "location" (putVolumesIdResponseBody200VolumeLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (putVolumesIdResponseBody200VolumeName obj) GHC.Base.<> ((Data.Aeson..=) "protection" (putVolumesIdResponseBody200VolumeProtection obj) GHC.Base.<> ((Data.Aeson..=) "server" (putVolumesIdResponseBody200VolumeServer obj) GHC.Base.<> ((Data.Aeson..=) "size" (putVolumesIdResponseBody200VolumeSize obj) GHC.Base.<> (Data.Aeson..=) "status" (putVolumesIdResponseBody200VolumeStatus obj)))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdResponseBody200Volume
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeCreated obj : "format" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeFormat obj : "id" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeId obj : "labels" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLabels obj : "linux_device" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLinuxDevice obj : "location" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocation obj : "name" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeName obj : "protection" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeProtection obj : "server" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeServer obj : "size" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeSize obj : "status" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeCreated obj) GHC.Base.<> (("format" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeFormat obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLabels obj) GHC.Base.<> (("linux_device" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLinuxDevice obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeName obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeProtection obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeServer obj) GHC.Base.<> (("size" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeSize obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeStatus obj)))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdResponseBody200Volume
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdResponseBody200Volume" (\obj -> ((((((((((GHC.Base.pure PutVolumesIdResponseBody200Volume GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "format")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "linux_device")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PutVolumesIdResponseBody200VolumeLabels
--- 
--- User-defined labels (key-value pairs)
-data PutVolumesIdResponseBody200VolumeLabels = PutVolumesIdResponseBody200VolumeLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdResponseBody200VolumeLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdResponseBody200VolumeLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdResponseBody200VolumeLabels" (\obj -> GHC.Base.pure PutVolumesIdResponseBody200VolumeLabels)
--- | Defines the data type for the schema PutVolumesIdResponseBody200VolumeLocation
+-- | Create a new 'PutVolumesIdResponseBody200Volume' with all required fields.
+mkPutVolumesIdResponseBody200Volume :: Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeCreated'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeFormat'
+  -> GHC.Types.Int -- ^ 'putVolumesIdResponseBody200VolumeId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putVolumesIdResponseBody200VolumeLabels'
+  -> Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeLinuxDevice'
+  -> PutVolumesIdResponseBody200VolumeLocation -- ^ 'putVolumesIdResponseBody200VolumeLocation'
+  -> Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeName'
+  -> PutVolumesIdResponseBody200VolumeProtection -- ^ 'putVolumesIdResponseBody200VolumeProtection'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'putVolumesIdResponseBody200VolumeServer'
+  -> GHC.Types.Double -- ^ 'putVolumesIdResponseBody200VolumeSize'
+  -> PutVolumesIdResponseBody200VolumeStatus -- ^ 'putVolumesIdResponseBody200VolumeStatus'
+  -> PutVolumesIdResponseBody200Volume
+mkPutVolumesIdResponseBody200Volume putVolumesIdResponseBody200VolumeCreated putVolumesIdResponseBody200VolumeFormat putVolumesIdResponseBody200VolumeId putVolumesIdResponseBody200VolumeLabels putVolumesIdResponseBody200VolumeLinuxDevice putVolumesIdResponseBody200VolumeLocation putVolumesIdResponseBody200VolumeName putVolumesIdResponseBody200VolumeProtection putVolumesIdResponseBody200VolumeServer putVolumesIdResponseBody200VolumeSize putVolumesIdResponseBody200VolumeStatus = PutVolumesIdResponseBody200Volume{putVolumesIdResponseBody200VolumeCreated = putVolumesIdResponseBody200VolumeCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeFormat = putVolumesIdResponseBody200VolumeFormat,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeId = putVolumesIdResponseBody200VolumeId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeLabels = putVolumesIdResponseBody200VolumeLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeLinuxDevice = putVolumesIdResponseBody200VolumeLinuxDevice,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeLocation = putVolumesIdResponseBody200VolumeLocation,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeName = putVolumesIdResponseBody200VolumeName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeProtection = putVolumesIdResponseBody200VolumeProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeServer = putVolumesIdResponseBody200VolumeServer,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeSize = putVolumesIdResponseBody200VolumeSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    putVolumesIdResponseBody200VolumeStatus = putVolumesIdResponseBody200VolumeStatus}
+-- | Defines the object schema located at @paths.\/volumes\/{id}.PUT.responses.200.content.application\/json.schema.properties.volume.properties.location@ in the specification.
 -- 
 -- Location of the Volume. Volume can only be attached to Servers in the same Location.
 data PutVolumesIdResponseBody200VolumeLocation = PutVolumesIdResponseBody200VolumeLocation {
@@ -212,12 +193,30 @@ data PutVolumesIdResponseBody200VolumeLocation = PutVolumesIdResponseBody200Volu
   , putVolumesIdResponseBody200VolumeLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdResponseBody200VolumeLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (putVolumesIdResponseBody200VolumeLocationCity obj) : (Data.Aeson..=) "country" (putVolumesIdResponseBody200VolumeLocationCountry obj) : (Data.Aeson..=) "description" (putVolumesIdResponseBody200VolumeLocationDescription obj) : (Data.Aeson..=) "id" (putVolumesIdResponseBody200VolumeLocationId obj) : (Data.Aeson..=) "latitude" (putVolumesIdResponseBody200VolumeLocationLatitude obj) : (Data.Aeson..=) "longitude" (putVolumesIdResponseBody200VolumeLocationLongitude obj) : (Data.Aeson..=) "name" (putVolumesIdResponseBody200VolumeLocationName obj) : (Data.Aeson..=) "network_zone" (putVolumesIdResponseBody200VolumeLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (putVolumesIdResponseBody200VolumeLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (putVolumesIdResponseBody200VolumeLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (putVolumesIdResponseBody200VolumeLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (putVolumesIdResponseBody200VolumeLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (putVolumesIdResponseBody200VolumeLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (putVolumesIdResponseBody200VolumeLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (putVolumesIdResponseBody200VolumeLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (putVolumesIdResponseBody200VolumeLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdResponseBody200VolumeLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationCity obj : "country" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdResponseBody200VolumeLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdResponseBody200VolumeLocation" (\obj -> (((((((GHC.Base.pure PutVolumesIdResponseBody200VolumeLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema PutVolumesIdResponseBody200VolumeProtection
+-- | Create a new 'PutVolumesIdResponseBody200VolumeLocation' with all required fields.
+mkPutVolumesIdResponseBody200VolumeLocation :: Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeLocationDescription'
+  -> GHC.Types.Double -- ^ 'putVolumesIdResponseBody200VolumeLocationId'
+  -> GHC.Types.Double -- ^ 'putVolumesIdResponseBody200VolumeLocationLatitude'
+  -> GHC.Types.Double -- ^ 'putVolumesIdResponseBody200VolumeLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeLocationName'
+  -> Data.Text.Internal.Text -- ^ 'putVolumesIdResponseBody200VolumeLocationNetworkZone'
+  -> PutVolumesIdResponseBody200VolumeLocation
+mkPutVolumesIdResponseBody200VolumeLocation putVolumesIdResponseBody200VolumeLocationCity putVolumesIdResponseBody200VolumeLocationCountry putVolumesIdResponseBody200VolumeLocationDescription putVolumesIdResponseBody200VolumeLocationId putVolumesIdResponseBody200VolumeLocationLatitude putVolumesIdResponseBody200VolumeLocationLongitude putVolumesIdResponseBody200VolumeLocationName putVolumesIdResponseBody200VolumeLocationNetworkZone = PutVolumesIdResponseBody200VolumeLocation{putVolumesIdResponseBody200VolumeLocationCity = putVolumesIdResponseBody200VolumeLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationCountry = putVolumesIdResponseBody200VolumeLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationDescription = putVolumesIdResponseBody200VolumeLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationId = putVolumesIdResponseBody200VolumeLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationLatitude = putVolumesIdResponseBody200VolumeLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationLongitude = putVolumesIdResponseBody200VolumeLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationName = putVolumesIdResponseBody200VolumeLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                putVolumesIdResponseBody200VolumeLocationNetworkZone = putVolumesIdResponseBody200VolumeLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/volumes\/{id}.PUT.responses.200.content.application\/json.schema.properties.volume.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PutVolumesIdResponseBody200VolumeProtection = PutVolumesIdResponseBody200VolumeProtection {
@@ -225,28 +224,60 @@ data PutVolumesIdResponseBody200VolumeProtection = PutVolumesIdResponseBody200Vo
   putVolumesIdResponseBody200VolumeProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdResponseBody200VolumeProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (putVolumesIdResponseBody200VolumeProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (putVolumesIdResponseBody200VolumeProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdResponseBody200VolumeProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= putVolumesIdResponseBody200VolumeProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdResponseBody200VolumeProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutVolumesIdResponseBody200VolumeProtection" (\obj -> GHC.Base.pure PutVolumesIdResponseBody200VolumeProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema PutVolumesIdResponseBody200VolumeStatus
+-- | Create a new 'PutVolumesIdResponseBody200VolumeProtection' with all required fields.
+mkPutVolumesIdResponseBody200VolumeProtection :: GHC.Types.Bool -- ^ 'putVolumesIdResponseBody200VolumeProtectionDelete'
+  -> PutVolumesIdResponseBody200VolumeProtection
+mkPutVolumesIdResponseBody200VolumeProtection putVolumesIdResponseBody200VolumeProtectionDelete = PutVolumesIdResponseBody200VolumeProtection{putVolumesIdResponseBody200VolumeProtectionDelete = putVolumesIdResponseBody200VolumeProtectionDelete}
+-- | Defines the enum schema located at @paths.\/volumes\/{id}.PUT.responses.200.content.application\/json.schema.properties.volume.properties.status@ in the specification.
 -- 
 -- Current status of the Volume
-data PutVolumesIdResponseBody200VolumeStatus
-    = PutVolumesIdResponseBody200VolumeStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PutVolumesIdResponseBody200VolumeStatusEnumTyped Data.Text.Internal.Text
-    | PutVolumesIdResponseBody200VolumeStatusEnumStringAvailable
-    | PutVolumesIdResponseBody200VolumeStatusEnumStringCreating
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutVolumesIdResponseBody200VolumeStatus
-    where toJSON (PutVolumesIdResponseBody200VolumeStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutVolumesIdResponseBody200VolumeStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutVolumesIdResponseBody200VolumeStatusEnumStringAvailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (PutVolumesIdResponseBody200VolumeStatusEnumStringCreating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating"
-instance Data.Aeson.FromJSON PutVolumesIdResponseBody200VolumeStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then PutVolumesIdResponseBody200VolumeStatusEnumStringAvailable
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating")
-                                                then PutVolumesIdResponseBody200VolumeStatusEnumStringCreating
-                                                else PutVolumesIdResponseBody200VolumeStatusEnumOther val)
+data PutVolumesIdResponseBody200VolumeStatus =
+   PutVolumesIdResponseBody200VolumeStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutVolumesIdResponseBody200VolumeStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutVolumesIdResponseBody200VolumeStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  | PutVolumesIdResponseBody200VolumeStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutVolumesIdResponseBody200VolumeStatus
+    where toJSON (PutVolumesIdResponseBody200VolumeStatusOther val) = val
+          toJSON (PutVolumesIdResponseBody200VolumeStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutVolumesIdResponseBody200VolumeStatusEnumCreating) = "creating"
+          toJSON (PutVolumesIdResponseBody200VolumeStatusEnumAvailable) = "available"
+instance Data.Aeson.Types.FromJSON.FromJSON PutVolumesIdResponseBody200VolumeStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "creating" -> PutVolumesIdResponseBody200VolumeStatusEnumCreating
+                                            | val GHC.Classes.== "available" -> PutVolumesIdResponseBody200VolumeStatusEnumAvailable
+                                            | GHC.Base.otherwise -> PutVolumesIdResponseBody200VolumeStatusOther val)
+-- | > PUT /volumes/{id}
+-- 
+-- The same as 'putVolumes_Id_' but accepts an explicit configuration.
+putVolumes_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> Data.Text.Internal.Text -- ^ id: ID of the Volume to update
+  -> GHC.Maybe.Maybe PutVolumesIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutVolumesIdResponse) -- ^ Monadic computation which returns the result of the operation
+putVolumes_Id_WithConfiguration config
+                                id
+                                body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutVolumesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutVolumesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                          PutVolumesIdResponseBody200)
+                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /volumes/{id}
+-- 
+-- The same as 'putVolumes_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putVolumes_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => Data.Text.Internal.Text -- ^ id: ID of the Volume to update
+  -> GHC.Maybe.Maybe PutVolumesIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putVolumes_Id_Raw id
+                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /volumes/{id}
+-- 
+-- The same as 'putVolumes_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putVolumes_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> Data.Text.Internal.Text -- ^ id: ID of the Volume to update
+  -> GHC.Maybe.Maybe PutVolumesIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putVolumes_Id_WithConfigurationRaw config
+                                   id
+                                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/volumes/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

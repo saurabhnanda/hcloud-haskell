@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation deleteLoadBalancers_Id_
 module HCloud.Operations.DeleteLoadBalancersId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,50 +45,37 @@ import HCloud.Types
 -- | > DELETE /load_balancers/{id}
 -- 
 -- Deletes a Load Balancer.
-deleteLoadBalancers_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                            -- ^ id: ID of the Load Balancer
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response DeleteLoadBalancersIdResponse))   -- ^ Monad containing the result of the operation
-deleteLoadBalancers_Id_ config
-                        id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either DeleteLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 204) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteLoadBalancersIdResponse204
-                                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > DELETE /load_balancers/{id}
--- 
--- The same as 'deleteLoadBalancers_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-deleteLoadBalancers_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                            HCloud.Common.SecurityScheme s) =>
-                              HCloud.Common.Configuration s ->
-                              GHC.Integer.Type.Integer ->
-                              m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-deleteLoadBalancers_Id_Raw config
-                           id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > DELETE /load_balancers/{id}
--- 
--- Monadic version of 'deleteLoadBalancers_Id_' (use with 'HCloud.Common.runWithConfiguration')
-deleteLoadBalancers_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                          HCloud.Common.SecurityScheme s) =>
-                            GHC.Integer.Type.Integer ->
-                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                               m
-                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                   (Network.HTTP.Client.Types.Response DeleteLoadBalancersIdResponse))
-deleteLoadBalancers_Id_M id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either DeleteLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 204) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteLoadBalancersIdResponse204
-                                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
--- | > DELETE /load_balancers/{id}
--- 
--- Monadic version of 'deleteLoadBalancers_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-deleteLoadBalancers_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                             HCloud.Common.SecurityScheme s) =>
-                               GHC.Integer.Type.Integer ->
-                               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                  m
-                                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-deleteLoadBalancers_Id_RawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [])
+deleteLoadBalancers_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response DeleteLoadBalancersIdResponse) -- ^ Monadic computation which returns the result of the operation
+deleteLoadBalancers_Id_ id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either DeleteLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 204) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteLoadBalancersIdResponse204
+                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
 -- | Represents a response of the operation 'deleteLoadBalancers_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'DeleteLoadBalancersIdResponseError' is used.
-data DeleteLoadBalancersIdResponse =                   
-   DeleteLoadBalancersIdResponseError GHC.Base.String  -- ^ Means either no matching case available or a parse error
-  | DeleteLoadBalancersIdResponse204                   -- ^ Load Balancer deleted
+data DeleteLoadBalancersIdResponse =
+   DeleteLoadBalancersIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | DeleteLoadBalancersIdResponse204 -- ^ Load Balancer deleted
   deriving (GHC.Show.Show, GHC.Classes.Eq)
+-- | > DELETE /load_balancers/{id}
+-- 
+-- The same as 'deleteLoadBalancers_Id_' but accepts an explicit configuration.
+deleteLoadBalancers_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> m (Network.HTTP.Client.Types.Response DeleteLoadBalancersIdResponse) -- ^ Monadic computation which returns the result of the operation
+deleteLoadBalancers_Id_WithConfiguration config
+                                         id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either DeleteLoadBalancersIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 204) (Network.HTTP.Client.Types.responseStatus response) -> Data.Either.Right DeleteLoadBalancersIdResponse204
+                                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > DELETE /load_balancers/{id}
+-- 
+-- The same as 'deleteLoadBalancers_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+deleteLoadBalancers_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+deleteLoadBalancers_Id_Raw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)
+-- | > DELETE /load_balancers/{id}
+-- 
+-- The same as 'deleteLoadBalancers_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+deleteLoadBalancers_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Load Balancer
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+deleteLoadBalancers_Id_WithConfigurationRaw config
+                                            id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "DELETE") (Data.Text.pack ("/load_balancers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty)

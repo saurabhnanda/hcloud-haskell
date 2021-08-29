@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putCertificates_Id_
 module HCloud.Operations.PutCertificatesId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,91 +49,40 @@ import HCloud.Types
 -- Note that when updating labels, the Certificate’s current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
 -- 
 -- Note: if the Certificate object changes during the request, the response will be a “conflict” error.
-putCertificates_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                        -- ^ id: ID of the resource
-  -> GHC.Maybe.Maybe PutCertificatesIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutCertificatesIdResponse))   -- ^ Monad containing the result of the operation
-putCertificates_Id_ config
-                    id
-                    body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutCertificatesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutCertificatesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                       PutCertificatesIdResponseBody200)
-                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /certificates/{id}
--- 
--- The same as 'putCertificates_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putCertificates_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                        HCloud.Common.SecurityScheme s) =>
-                          HCloud.Common.Configuration s ->
-                          GHC.Integer.Type.Integer ->
-                          GHC.Maybe.Maybe PutCertificatesIdRequestBody ->
-                          m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putCertificates_Id_Raw config
-                       id
-                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /certificates/{id}
--- 
--- Monadic version of 'putCertificates_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putCertificates_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                      HCloud.Common.SecurityScheme s) =>
-                        GHC.Integer.Type.Integer ->
-                        GHC.Maybe.Maybe PutCertificatesIdRequestBody ->
-                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                           m
-                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                               (Network.HTTP.Client.Types.Response PutCertificatesIdResponse))
-putCertificates_Id_M id
-                     body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutCertificatesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutCertificatesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                        PutCertificatesIdResponseBody200)
-                                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /certificates/{id}
--- 
--- Monadic version of 'putCertificates_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putCertificates_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                         HCloud.Common.SecurityScheme s) =>
-                           GHC.Integer.Type.Integer ->
-                           GHC.Maybe.Maybe PutCertificatesIdRequestBody ->
-                           Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                              m
-                                                              (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putCertificates_Id_RawM id
-                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putCertificates_Id_RequestBody
+putCertificates_Id_ :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutCertificatesIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutCertificatesIdResponse) -- ^ Monadic computation which returns the result of the operation
+putCertificates_Id_ id
+                    body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutCertificatesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutCertificatesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                        PutCertificatesIdResponseBody200)
+                                                                                                                                                                       | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/certificates\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutCertificatesIdRequestBody = PutCertificatesIdRequestBody {
   -- | labels: User-defined labels (key-value pairs)
-  putCertificatesIdRequestBodyLabels :: (GHC.Maybe.Maybe PutCertificatesIdRequestBodyLabels)
+  putCertificatesIdRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: New Certificate name
   , putCertificatesIdRequestBodyName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (putCertificatesIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putCertificatesIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (putCertificatesIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putCertificatesIdRequestBodyName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= putCertificatesIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putCertificatesIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= putCertificatesIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putCertificatesIdRequestBodyName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdRequestBody" (\obj -> (GHC.Base.pure PutCertificatesIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name"))
--- | Defines the data type for the schema putCertificates_Id_RequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PutCertificatesIdRequestBodyLabels = PutCertificatesIdRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdRequestBodyLabels" (\obj -> GHC.Base.pure PutCertificatesIdRequestBodyLabels)
+-- | Create a new 'PutCertificatesIdRequestBody' with all required fields.
+mkPutCertificatesIdRequestBody :: PutCertificatesIdRequestBody
+mkPutCertificatesIdRequestBody = PutCertificatesIdRequestBody{putCertificatesIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                              putCertificatesIdRequestBodyName = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putCertificates_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutCertificatesIdResponseError' is used.
-data PutCertificatesIdResponse =                                   
-   PutCertificatesIdResponseError GHC.Base.String                  -- ^ Means either no matching case available or a parse error
-  | PutCertificatesIdResponse200 PutCertificatesIdResponseBody200  -- ^ The \`certificate\` key contains the Certificate that was just updated
+data PutCertificatesIdResponse =
+   PutCertificatesIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutCertificatesIdResponse200 PutCertificatesIdResponseBody200 -- ^ The \`certificate\` key contains the Certificate that was just updated
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutCertificatesIdResponseBody200
+-- | Defines the object schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutCertificatesIdResponseBody200 = PutCertificatesIdResponseBody200 {
@@ -141,59 +90,75 @@ data PutCertificatesIdResponseBody200 = PutCertificatesIdResponseBody200 {
   putCertificatesIdResponseBody200Certificate :: PutCertificatesIdResponseBody200Certificate
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificate" (putCertificatesIdResponseBody200Certificate obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificate" (putCertificatesIdResponseBody200Certificate obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificate" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200Certificate obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("certificate" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200Certificate obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdResponseBody200" (\obj -> GHC.Base.pure PutCertificatesIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "certificate"))
--- | Defines the data type for the schema PutCertificatesIdResponseBody200Certificate
+-- | Create a new 'PutCertificatesIdResponseBody200' with all required fields.
+mkPutCertificatesIdResponseBody200 :: PutCertificatesIdResponseBody200Certificate -- ^ 'putCertificatesIdResponseBody200Certificate'
+  -> PutCertificatesIdResponseBody200
+mkPutCertificatesIdResponseBody200 putCertificatesIdResponseBody200Certificate = PutCertificatesIdResponseBody200{putCertificatesIdResponseBody200Certificate = putCertificatesIdResponseBody200Certificate}
+-- | Defines the object schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate@ in the specification.
 -- 
 -- 
 data PutCertificatesIdResponseBody200Certificate = PutCertificatesIdResponseBody200Certificate {
   -- | certificate: Certificate and chain in PEM format, in order so that each record directly certifies the one preceding
-  putCertificatesIdResponseBody200CertificateCertificate :: Data.Text.Internal.Text
+  putCertificatesIdResponseBody200CertificateCertificate :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , putCertificatesIdResponseBody200CertificateCreated :: Data.Text.Internal.Text
   -- | domain_names: Domains and subdomains covered by the Certificate
-  , putCertificatesIdResponseBody200CertificateDomainNames :: ([] Data.Text.Internal.Text)
+  , putCertificatesIdResponseBody200CertificateDomainNames :: ([Data.Text.Internal.Text])
   -- | fingerprint: SHA256 fingerprint of the Certificate
-  , putCertificatesIdResponseBody200CertificateFingerprint :: Data.Text.Internal.Text
+  , putCertificatesIdResponseBody200CertificateFingerprint :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , putCertificatesIdResponseBody200CertificateId :: GHC.Integer.Type.Integer
+  , putCertificatesIdResponseBody200CertificateId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , putCertificatesIdResponseBody200CertificateLabels :: PutCertificatesIdResponseBody200CertificateLabels
+  , putCertificatesIdResponseBody200CertificateLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , putCertificatesIdResponseBody200CertificateName :: Data.Text.Internal.Text
   -- | not_valid_after: Point in time when the Certificate stops being valid (in ISO-8601 format)
-  , putCertificatesIdResponseBody200CertificateNotValidAfter :: Data.Text.Internal.Text
+  , putCertificatesIdResponseBody200CertificateNotValidAfter :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | not_valid_before: Point in time when the Certificate becomes valid (in ISO-8601 format)
-  , putCertificatesIdResponseBody200CertificateNotValidBefore :: Data.Text.Internal.Text
+  , putCertificatesIdResponseBody200CertificateNotValidBefore :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status: Current status of a type \`managed\` Certificate, always *null* for type \`uploaded\` Certificates
   , putCertificatesIdResponseBody200CertificateStatus :: (GHC.Maybe.Maybe PutCertificatesIdResponseBody200CertificateStatus)
   -- | type: Type of the Certificate
   , putCertificatesIdResponseBody200CertificateType :: (GHC.Maybe.Maybe PutCertificatesIdResponseBody200CertificateType)
   -- | used_by: Resources currently using the Certificate
-  , putCertificatesIdResponseBody200CertificateUsedBy :: ([] PutCertificatesIdResponseBody200CertificateUsedBy)
+  , putCertificatesIdResponseBody200CertificateUsedBy :: ([PutCertificatesIdResponseBody200CertificateUsedBy])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200Certificate
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificate" (putCertificatesIdResponseBody200CertificateCertificate obj) : (Data.Aeson..=) "created" (putCertificatesIdResponseBody200CertificateCreated obj) : (Data.Aeson..=) "domain_names" (putCertificatesIdResponseBody200CertificateDomainNames obj) : (Data.Aeson..=) "fingerprint" (putCertificatesIdResponseBody200CertificateFingerprint obj) : (Data.Aeson..=) "id" (putCertificatesIdResponseBody200CertificateId obj) : (Data.Aeson..=) "labels" (putCertificatesIdResponseBody200CertificateLabels obj) : (Data.Aeson..=) "name" (putCertificatesIdResponseBody200CertificateName obj) : (Data.Aeson..=) "not_valid_after" (putCertificatesIdResponseBody200CertificateNotValidAfter obj) : (Data.Aeson..=) "not_valid_before" (putCertificatesIdResponseBody200CertificateNotValidBefore obj) : (Data.Aeson..=) "status" (putCertificatesIdResponseBody200CertificateStatus obj) : (Data.Aeson..=) "type" (putCertificatesIdResponseBody200CertificateType obj) : (Data.Aeson..=) "used_by" (putCertificatesIdResponseBody200CertificateUsedBy obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificate" (putCertificatesIdResponseBody200CertificateCertificate obj) GHC.Base.<> ((Data.Aeson..=) "created" (putCertificatesIdResponseBody200CertificateCreated obj) GHC.Base.<> ((Data.Aeson..=) "domain_names" (putCertificatesIdResponseBody200CertificateDomainNames obj) GHC.Base.<> ((Data.Aeson..=) "fingerprint" (putCertificatesIdResponseBody200CertificateFingerprint obj) GHC.Base.<> ((Data.Aeson..=) "id" (putCertificatesIdResponseBody200CertificateId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putCertificatesIdResponseBody200CertificateLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (putCertificatesIdResponseBody200CertificateName obj) GHC.Base.<> ((Data.Aeson..=) "not_valid_after" (putCertificatesIdResponseBody200CertificateNotValidAfter obj) GHC.Base.<> ((Data.Aeson..=) "not_valid_before" (putCertificatesIdResponseBody200CertificateNotValidBefore obj) GHC.Base.<> ((Data.Aeson..=) "status" (putCertificatesIdResponseBody200CertificateStatus obj) GHC.Base.<> ((Data.Aeson..=) "type" (putCertificatesIdResponseBody200CertificateType obj) GHC.Base.<> (Data.Aeson..=) "used_by" (putCertificatesIdResponseBody200CertificateUsedBy obj))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200Certificate
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificate" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateCertificate obj : "created" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateCreated obj : "domain_names" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateDomainNames obj : "fingerprint" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateFingerprint obj : "id" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateId obj : "labels" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateLabels obj : "name" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateName obj : "not_valid_after" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateNotValidAfter obj : "not_valid_before" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateNotValidBefore obj : "status" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatus obj : "type" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateType obj : "used_by" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateUsedBy obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificate" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateCertificate obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateCreated obj) GHC.Base.<> (("domain_names" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateDomainNames obj) GHC.Base.<> (("fingerprint" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateFingerprint obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateName obj) GHC.Base.<> (("not_valid_after" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateNotValidAfter obj) GHC.Base.<> (("not_valid_before" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateNotValidBefore obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatus obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateType obj) GHC.Base.<> ("used_by" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateUsedBy obj))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200Certificate
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdResponseBody200Certificate" (\obj -> (((((((((((GHC.Base.pure PutCertificatesIdResponseBody200Certificate GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "certificate")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain_names")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fingerprint")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "not_valid_after")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "not_valid_before")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "used_by"))
--- | Defines the data type for the schema PutCertificatesIdResponseBody200CertificateLabels
--- 
--- User-defined labels (key-value pairs)
-data PutCertificatesIdResponseBody200CertificateLabels = PutCertificatesIdResponseBody200CertificateLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdResponseBody200CertificateLabels" (\obj -> GHC.Base.pure PutCertificatesIdResponseBody200CertificateLabels)
--- | Defines the data type for the schema PutCertificatesIdResponseBody200CertificateStatus
+-- | Create a new 'PutCertificatesIdResponseBody200Certificate' with all required fields.
+mkPutCertificatesIdResponseBody200Certificate :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateCertificate'
+  -> Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateCreated'
+  -> [Data.Text.Internal.Text] -- ^ 'putCertificatesIdResponseBody200CertificateDomainNames'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateFingerprint'
+  -> GHC.Types.Int -- ^ 'putCertificatesIdResponseBody200CertificateId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putCertificatesIdResponseBody200CertificateLabels'
+  -> Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateName'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateNotValidAfter'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateNotValidBefore'
+  -> [PutCertificatesIdResponseBody200CertificateUsedBy] -- ^ 'putCertificatesIdResponseBody200CertificateUsedBy'
+  -> PutCertificatesIdResponseBody200Certificate
+mkPutCertificatesIdResponseBody200Certificate putCertificatesIdResponseBody200CertificateCertificate putCertificatesIdResponseBody200CertificateCreated putCertificatesIdResponseBody200CertificateDomainNames putCertificatesIdResponseBody200CertificateFingerprint putCertificatesIdResponseBody200CertificateId putCertificatesIdResponseBody200CertificateLabels putCertificatesIdResponseBody200CertificateName putCertificatesIdResponseBody200CertificateNotValidAfter putCertificatesIdResponseBody200CertificateNotValidBefore putCertificatesIdResponseBody200CertificateUsedBy = PutCertificatesIdResponseBody200Certificate{putCertificatesIdResponseBody200CertificateCertificate = putCertificatesIdResponseBody200CertificateCertificate,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateCreated = putCertificatesIdResponseBody200CertificateCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateDomainNames = putCertificatesIdResponseBody200CertificateDomainNames,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateFingerprint = putCertificatesIdResponseBody200CertificateFingerprint,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateId = putCertificatesIdResponseBody200CertificateId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateLabels = putCertificatesIdResponseBody200CertificateLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateName = putCertificatesIdResponseBody200CertificateName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateNotValidAfter = putCertificatesIdResponseBody200CertificateNotValidAfter,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateNotValidBefore = putCertificatesIdResponseBody200CertificateNotValidBefore,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateStatus = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateType = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         putCertificatesIdResponseBody200CertificateUsedBy = putCertificatesIdResponseBody200CertificateUsedBy}
+-- | Defines the object schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate.properties.status@ in the specification.
 -- 
 -- Current status of a type \`managed\` Certificate, always *null* for type \`uploaded\` Certificates
 data PutCertificatesIdResponseBody200CertificateStatus = PutCertificatesIdResponseBody200CertificateStatus {
@@ -205,12 +170,17 @@ data PutCertificatesIdResponseBody200CertificateStatus = PutCertificatesIdRespon
   , putCertificatesIdResponseBody200CertificateStatusRenewal :: (GHC.Maybe.Maybe PutCertificatesIdResponseBody200CertificateStatusRenewal)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "error" (putCertificatesIdResponseBody200CertificateStatusError obj) : (Data.Aeson..=) "issuance" (putCertificatesIdResponseBody200CertificateStatusIssuance obj) : (Data.Aeson..=) "renewal" (putCertificatesIdResponseBody200CertificateStatusRenewal obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "error" (putCertificatesIdResponseBody200CertificateStatusError obj) GHC.Base.<> ((Data.Aeson..=) "issuance" (putCertificatesIdResponseBody200CertificateStatusIssuance obj) GHC.Base.<> (Data.Aeson..=) "renewal" (putCertificatesIdResponseBody200CertificateStatusRenewal obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200CertificateStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("error" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusError obj : "issuance" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusIssuance obj : "renewal" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusRenewal obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("error" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusError obj) GHC.Base.<> (("issuance" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusIssuance obj) GHC.Base.<> ("renewal" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusRenewal obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdResponseBody200CertificateStatus" (\obj -> ((GHC.Base.pure PutCertificatesIdResponseBody200CertificateStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "issuance")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "renewal"))
--- | Defines the data type for the schema PutCertificatesIdResponseBody200CertificateStatusError
+-- | Create a new 'PutCertificatesIdResponseBody200CertificateStatus' with all required fields.
+mkPutCertificatesIdResponseBody200CertificateStatus :: PutCertificatesIdResponseBody200CertificateStatus
+mkPutCertificatesIdResponseBody200CertificateStatus = PutCertificatesIdResponseBody200CertificateStatus{putCertificatesIdResponseBody200CertificateStatusError = GHC.Maybe.Nothing,
+                                                                                                        putCertificatesIdResponseBody200CertificateStatusIssuance = GHC.Maybe.Nothing,
+                                                                                                        putCertificatesIdResponseBody200CertificateStatusRenewal = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate.properties.status.properties.error@ in the specification.
 -- 
 -- If issuance or renewal reports \`failed\`, this property contains information about what happened
 data PutCertificatesIdResponseBody200CertificateStatusError = PutCertificatesIdResponseBody200CertificateStatusError {
@@ -220,95 +190,126 @@ data PutCertificatesIdResponseBody200CertificateStatusError = PutCertificatesIdR
   , putCertificatesIdResponseBody200CertificateStatusErrorMessage :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateStatusError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (putCertificatesIdResponseBody200CertificateStatusErrorCode obj) : (Data.Aeson..=) "message" (putCertificatesIdResponseBody200CertificateStatusErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (putCertificatesIdResponseBody200CertificateStatusErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (putCertificatesIdResponseBody200CertificateStatusErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200CertificateStatusError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusErrorCode obj : "message" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateStatusErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateStatusError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdResponseBody200CertificateStatusError" (\obj -> (GHC.Base.pure PutCertificatesIdResponseBody200CertificateStatusError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "message"))
--- | Defines the enum schema PutCertificatesIdResponseBody200CertificateStatusIssuance
+-- | Create a new 'PutCertificatesIdResponseBody200CertificateStatusError' with all required fields.
+mkPutCertificatesIdResponseBody200CertificateStatusError :: PutCertificatesIdResponseBody200CertificateStatusError
+mkPutCertificatesIdResponseBody200CertificateStatusError = PutCertificatesIdResponseBody200CertificateStatusError{putCertificatesIdResponseBody200CertificateStatusErrorCode = GHC.Maybe.Nothing,
+                                                                                                                  putCertificatesIdResponseBody200CertificateStatusErrorMessage = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate.properties.status.properties.issuance@ in the specification.
 -- 
 -- Status of the issuance process of the Certificate
-data PutCertificatesIdResponseBody200CertificateStatusIssuance
-    = PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumOther Data.Aeson.Types.Internal.Value
-    | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumTyped Data.Text.Internal.Text
-    | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringCompleted
-    | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringFailed
-    | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringPending
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateStatusIssuance
-    where toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringCompleted) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "completed"
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringFailed) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed"
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-instance Data.Aeson.FromJSON PutCertificatesIdResponseBody200CertificateStatusIssuance
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "completed")
-                                          then PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringCompleted
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed")
-                                                then PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringFailed
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                      then PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumStringPending
-                                                      else PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumOther val)
--- | Defines the enum schema PutCertificatesIdResponseBody200CertificateStatusRenewal
+data PutCertificatesIdResponseBody200CertificateStatusIssuance =
+   PutCertificatesIdResponseBody200CertificateStatusIssuanceOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutCertificatesIdResponseBody200CertificateStatusIssuanceTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumPending -- ^ Represents the JSON value @"pending"@
+  | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumCompleted -- ^ Represents the JSON value @"completed"@
+  | PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumFailed -- ^ Represents the JSON value @"failed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200CertificateStatusIssuance
+    where toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceOther val) = val
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumPending) = "pending"
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumCompleted) = "completed"
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumFailed) = "failed"
+instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateStatusIssuance
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "pending" -> PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumPending
+                                            | val GHC.Classes.== "completed" -> PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumCompleted
+                                            | val GHC.Classes.== "failed" -> PutCertificatesIdResponseBody200CertificateStatusIssuanceEnumFailed
+                                            | GHC.Base.otherwise -> PutCertificatesIdResponseBody200CertificateStatusIssuanceOther val)
+-- | Defines the enum schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate.properties.status.properties.renewal@ in the specification.
 -- 
 -- Status of the renewal process of the Certificate.
-data PutCertificatesIdResponseBody200CertificateStatusRenewal
-    = PutCertificatesIdResponseBody200CertificateStatusRenewalEnumOther Data.Aeson.Types.Internal.Value
-    | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumTyped Data.Text.Internal.Text
-    | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringFailed
-    | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringPending
-    | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringScheduled
-    | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateStatusRenewal
-    where toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringFailed) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed"
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringScheduled) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "scheduled"
-          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON PutCertificatesIdResponseBody200CertificateStatusRenewal
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "failed")
-                                          then PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringFailed
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                then PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringPending
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "scheduled")
-                                                      then PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringScheduled
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                            then PutCertificatesIdResponseBody200CertificateStatusRenewalEnumStringUnavailable
-                                                            else PutCertificatesIdResponseBody200CertificateStatusRenewalEnumOther val)
--- | Defines the enum schema PutCertificatesIdResponseBody200CertificateType
+data PutCertificatesIdResponseBody200CertificateStatusRenewal =
+   PutCertificatesIdResponseBody200CertificateStatusRenewalOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutCertificatesIdResponseBody200CertificateStatusRenewalTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumScheduled -- ^ Represents the JSON value @"scheduled"@
+  | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumPending -- ^ Represents the JSON value @"pending"@
+  | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumFailed -- ^ Represents the JSON value @"failed"@
+  | PutCertificatesIdResponseBody200CertificateStatusRenewalEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200CertificateStatusRenewal
+    where toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalOther val) = val
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumScheduled) = "scheduled"
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumPending) = "pending"
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumFailed) = "failed"
+          toJSON (PutCertificatesIdResponseBody200CertificateStatusRenewalEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateStatusRenewal
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "scheduled" -> PutCertificatesIdResponseBody200CertificateStatusRenewalEnumScheduled
+                                            | val GHC.Classes.== "pending" -> PutCertificatesIdResponseBody200CertificateStatusRenewalEnumPending
+                                            | val GHC.Classes.== "failed" -> PutCertificatesIdResponseBody200CertificateStatusRenewalEnumFailed
+                                            | val GHC.Classes.== "unavailable" -> PutCertificatesIdResponseBody200CertificateStatusRenewalEnumUnavailable
+                                            | GHC.Base.otherwise -> PutCertificatesIdResponseBody200CertificateStatusRenewalOther val)
+-- | Defines the enum schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate.properties.type@ in the specification.
 -- 
 -- Type of the Certificate
-data PutCertificatesIdResponseBody200CertificateType
-    = PutCertificatesIdResponseBody200CertificateTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PutCertificatesIdResponseBody200CertificateTypeEnumTyped Data.Text.Internal.Text
-    | PutCertificatesIdResponseBody200CertificateTypeEnumStringManaged
-    | PutCertificatesIdResponseBody200CertificateTypeEnumStringUploaded
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateType
-    where toJSON (PutCertificatesIdResponseBody200CertificateTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutCertificatesIdResponseBody200CertificateTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PutCertificatesIdResponseBody200CertificateTypeEnumStringManaged) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed"
-          toJSON (PutCertificatesIdResponseBody200CertificateTypeEnumStringUploaded) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded"
-instance Data.Aeson.FromJSON PutCertificatesIdResponseBody200CertificateType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "managed")
-                                          then PutCertificatesIdResponseBody200CertificateTypeEnumStringManaged
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "uploaded")
-                                                then PutCertificatesIdResponseBody200CertificateTypeEnumStringUploaded
-                                                else PutCertificatesIdResponseBody200CertificateTypeEnumOther val)
--- | Defines the data type for the schema PutCertificatesIdResponseBody200CertificateUsed_by
+data PutCertificatesIdResponseBody200CertificateType =
+   PutCertificatesIdResponseBody200CertificateTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PutCertificatesIdResponseBody200CertificateTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PutCertificatesIdResponseBody200CertificateTypeEnumUploaded -- ^ Represents the JSON value @"uploaded"@
+  | PutCertificatesIdResponseBody200CertificateTypeEnumManaged -- ^ Represents the JSON value @"managed"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200CertificateType
+    where toJSON (PutCertificatesIdResponseBody200CertificateTypeOther val) = val
+          toJSON (PutCertificatesIdResponseBody200CertificateTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PutCertificatesIdResponseBody200CertificateTypeEnumUploaded) = "uploaded"
+          toJSON (PutCertificatesIdResponseBody200CertificateTypeEnumManaged) = "managed"
+instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "uploaded" -> PutCertificatesIdResponseBody200CertificateTypeEnumUploaded
+                                            | val GHC.Classes.== "managed" -> PutCertificatesIdResponseBody200CertificateTypeEnumManaged
+                                            | GHC.Base.otherwise -> PutCertificatesIdResponseBody200CertificateTypeOther val)
+-- | Defines the object schema located at @paths.\/certificates\/{id}.PUT.responses.200.content.application\/json.schema.properties.certificate.properties.used_by.items@ in the specification.
 -- 
 -- 
 data PutCertificatesIdResponseBody200CertificateUsedBy = PutCertificatesIdResponseBody200CertificateUsedBy {
   -- | id: ID of resource referenced
-  putCertificatesIdResponseBody200CertificateUsedById :: GHC.Integer.Type.Integer
+  putCertificatesIdResponseBody200CertificateUsedById :: GHC.Types.Int
   -- | type: Type of resource referenced
   , putCertificatesIdResponseBody200CertificateUsedByType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutCertificatesIdResponseBody200CertificateUsedBy
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (putCertificatesIdResponseBody200CertificateUsedById obj) : (Data.Aeson..=) "type" (putCertificatesIdResponseBody200CertificateUsedByType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (putCertificatesIdResponseBody200CertificateUsedById obj) GHC.Base.<> (Data.Aeson..=) "type" (putCertificatesIdResponseBody200CertificateUsedByType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutCertificatesIdResponseBody200CertificateUsedBy
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateUsedById obj : "type" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateUsedByType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateUsedById obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= putCertificatesIdResponseBody200CertificateUsedByType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutCertificatesIdResponseBody200CertificateUsedBy
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutCertificatesIdResponseBody200CertificateUsedBy" (\obj -> (GHC.Base.pure PutCertificatesIdResponseBody200CertificateUsedBy GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
+-- | Create a new 'PutCertificatesIdResponseBody200CertificateUsedBy' with all required fields.
+mkPutCertificatesIdResponseBody200CertificateUsedBy :: GHC.Types.Int -- ^ 'putCertificatesIdResponseBody200CertificateUsedById'
+  -> Data.Text.Internal.Text -- ^ 'putCertificatesIdResponseBody200CertificateUsedByType'
+  -> PutCertificatesIdResponseBody200CertificateUsedBy
+mkPutCertificatesIdResponseBody200CertificateUsedBy putCertificatesIdResponseBody200CertificateUsedById putCertificatesIdResponseBody200CertificateUsedByType = PutCertificatesIdResponseBody200CertificateUsedBy{putCertificatesIdResponseBody200CertificateUsedById = putCertificatesIdResponseBody200CertificateUsedById,
+                                                                                                                                                                                                                  putCertificatesIdResponseBody200CertificateUsedByType = putCertificatesIdResponseBody200CertificateUsedByType}
+-- | > PUT /certificates/{id}
+-- 
+-- The same as 'putCertificates_Id_' but accepts an explicit configuration.
+putCertificates_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutCertificatesIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutCertificatesIdResponse) -- ^ Monadic computation which returns the result of the operation
+putCertificates_Id_WithConfiguration config
+                                     id
+                                     body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutCertificatesIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutCertificatesIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                         PutCertificatesIdResponseBody200)
+                                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /certificates/{id}
+-- 
+-- The same as 'putCertificates_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putCertificates_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutCertificatesIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putCertificates_Id_Raw id
+                       body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /certificates/{id}
+-- 
+-- The same as 'putCertificates_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putCertificates_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the resource
+  -> GHC.Maybe.Maybe PutCertificatesIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putCertificates_Id_WithConfigurationRaw config
+                                        id
+                                        body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/certificates/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getDatacenters
 module HCloud.Operations.GetDatacenters where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,82 +45,47 @@ import HCloud.Types
 -- | > GET /datacenters
 -- 
 -- Returns all Datacenter objects.
-getDatacenters :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                    -- ^ name: Can be used to filter Datacenters by their name. The response will only contain the Datacenter matching the specified name. When the name does not match the Datacenter name format, an \`invalid_input\` error is returned.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetDatacentersResponse)) -- ^ Monad containing the result of the operation
-getDatacenters config
-               name = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetDatacentersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetDatacentersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                            GetDatacentersResponseBody200)
-                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /datacenters
--- 
--- The same as 'getDatacenters' but returns the raw 'Data.ByteString.Char8.ByteString'
-getDatacentersRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     HCloud.Common.Configuration s ->
-                     GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                     m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getDatacentersRaw config
-                  name = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") ((Data.Text.pack "name",
-                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /datacenters
--- 
--- Monadic version of 'getDatacenters' (use with 'HCloud.Common.runWithConfiguration')
-getDatacentersM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response GetDatacentersResponse))
-getDatacentersM name = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetDatacentersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetDatacentersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                             GetDatacentersResponseBody200)
-                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /datacenters
--- 
--- Monadic version of 'getDatacentersRaw' (use with 'HCloud.Common.runWithConfiguration')
-getDatacentersRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                         m
-                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getDatacentersRawM name = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") ((Data.Text.pack "name",
-                                                                                                                                                                     HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
+getDatacenters :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Datacenters by their name. The response will only contain the Datacenter matching the specified name. When the name does not match the Datacenter name format, an \`invalid_input\` error is returned.
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetDatacentersResponse) -- ^ Monadic computation which returns the result of the operation
+getDatacenters name = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetDatacentersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetDatacentersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                             GetDatacentersResponseBody200)
+                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
 -- | Represents a response of the operation 'getDatacenters'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetDatacentersResponseError' is used.
-data GetDatacentersResponse =                                
-   GetDatacentersResponseError GHC.Base.String               -- ^ Means either no matching case available or a parse error
-  | GetDatacentersResponse200 GetDatacentersResponseBody200  -- ^ The reply contains the \`datacenters\` and \`recommendation\` keys
+data GetDatacentersResponse =
+   GetDatacentersResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetDatacentersResponse200 GetDatacentersResponseBody200 -- ^ The reply contains the \`datacenters\` and \`recommendation\` keys
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetDatacentersResponseBody200
+-- | Defines the object schema located at @paths.\/datacenters.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetDatacentersResponseBody200 = GetDatacentersResponseBody200 {
   -- | datacenters
-  getDatacentersResponseBody200Datacenters :: ([] GetDatacentersResponseBody200Datacenters)
+  getDatacentersResponseBody200Datacenters :: ([GetDatacentersResponseBody200Datacenters])
   -- | recommendation: The Datacenter which is recommended to be used to create new Servers.
   , getDatacentersResponseBody200Recommendation :: GHC.Types.Double
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetDatacentersResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "datacenters" (getDatacentersResponseBody200Datacenters obj) : (Data.Aeson..=) "recommendation" (getDatacentersResponseBody200Recommendation obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "datacenters" (getDatacentersResponseBody200Datacenters obj) GHC.Base.<> (Data.Aeson..=) "recommendation" (getDatacentersResponseBody200Recommendation obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetDatacentersResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("datacenters" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200Datacenters obj : "recommendation" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200Recommendation obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("datacenters" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200Datacenters obj) GHC.Base.<> ("recommendation" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200Recommendation obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetDatacentersResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetDatacentersResponseBody200" (\obj -> (GHC.Base.pure GetDatacentersResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "datacenters")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "recommendation"))
--- | Defines the data type for the schema GetDatacentersResponseBody200Datacenters
+-- | Create a new 'GetDatacentersResponseBody200' with all required fields.
+mkGetDatacentersResponseBody200 :: [GetDatacentersResponseBody200Datacenters] -- ^ 'getDatacentersResponseBody200Datacenters'
+  -> GHC.Types.Double -- ^ 'getDatacentersResponseBody200Recommendation'
+  -> GetDatacentersResponseBody200
+mkGetDatacentersResponseBody200 getDatacentersResponseBody200Datacenters getDatacentersResponseBody200Recommendation = GetDatacentersResponseBody200{getDatacentersResponseBody200Datacenters = getDatacentersResponseBody200Datacenters,
+                                                                                                                                                     getDatacentersResponseBody200Recommendation = getDatacentersResponseBody200Recommendation}
+-- | Defines the object schema located at @paths.\/datacenters.GET.responses.200.content.application\/json.schema.properties.datacenters.items@ in the specification.
 -- 
 -- 
 data GetDatacentersResponseBody200Datacenters = GetDatacentersResponseBody200Datacenters {
   -- | description: Description of the Datacenter
   getDatacentersResponseBody200DatacentersDescription :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getDatacentersResponseBody200DatacentersId :: GHC.Integer.Type.Integer
+  , getDatacentersResponseBody200DatacentersId :: GHC.Types.Int
   -- | location
   , getDatacentersResponseBody200DatacentersLocation :: GetDatacentersResponseBody200DatacentersLocation
   -- | name: Unique identifier of the Datacenter
@@ -129,12 +94,24 @@ data GetDatacentersResponseBody200Datacenters = GetDatacentersResponseBody200Dat
   , getDatacentersResponseBody200DatacentersServerTypes :: GetDatacentersResponseBody200DatacentersServerTypes
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetDatacentersResponseBody200Datacenters
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (getDatacentersResponseBody200DatacentersDescription obj) : (Data.Aeson..=) "id" (getDatacentersResponseBody200DatacentersId obj) : (Data.Aeson..=) "location" (getDatacentersResponseBody200DatacentersLocation obj) : (Data.Aeson..=) "name" (getDatacentersResponseBody200DatacentersName obj) : (Data.Aeson..=) "server_types" (getDatacentersResponseBody200DatacentersServerTypes obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (getDatacentersResponseBody200DatacentersDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getDatacentersResponseBody200DatacentersId obj) GHC.Base.<> ((Data.Aeson..=) "location" (getDatacentersResponseBody200DatacentersLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (getDatacentersResponseBody200DatacentersName obj) GHC.Base.<> (Data.Aeson..=) "server_types" (getDatacentersResponseBody200DatacentersServerTypes obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetDatacentersResponseBody200Datacenters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersDescription obj : "id" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersId obj : "location" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocation obj : "name" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersName obj : "server_types" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypes obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersId obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersName obj) GHC.Base.<> ("server_types" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypes obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetDatacentersResponseBody200Datacenters
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetDatacentersResponseBody200Datacenters" (\obj -> ((((GHC.Base.pure GetDatacentersResponseBody200Datacenters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server_types"))
--- | Defines the data type for the schema GetDatacentersResponseBody200DatacentersLocation
+-- | Create a new 'GetDatacentersResponseBody200Datacenters' with all required fields.
+mkGetDatacentersResponseBody200Datacenters :: Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersDescription'
+  -> GHC.Types.Int -- ^ 'getDatacentersResponseBody200DatacentersId'
+  -> GetDatacentersResponseBody200DatacentersLocation -- ^ 'getDatacentersResponseBody200DatacentersLocation'
+  -> Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersName'
+  -> GetDatacentersResponseBody200DatacentersServerTypes -- ^ 'getDatacentersResponseBody200DatacentersServerTypes'
+  -> GetDatacentersResponseBody200Datacenters
+mkGetDatacentersResponseBody200Datacenters getDatacentersResponseBody200DatacentersDescription getDatacentersResponseBody200DatacentersId getDatacentersResponseBody200DatacentersLocation getDatacentersResponseBody200DatacentersName getDatacentersResponseBody200DatacentersServerTypes = GetDatacentersResponseBody200Datacenters{getDatacentersResponseBody200DatacentersDescription = getDatacentersResponseBody200DatacentersDescription,
+                                                                                                                                                                                                                                                                                                                                       getDatacentersResponseBody200DatacentersId = getDatacentersResponseBody200DatacentersId,
+                                                                                                                                                                                                                                                                                                                                       getDatacentersResponseBody200DatacentersLocation = getDatacentersResponseBody200DatacentersLocation,
+                                                                                                                                                                                                                                                                                                                                       getDatacentersResponseBody200DatacentersName = getDatacentersResponseBody200DatacentersName,
+                                                                                                                                                                                                                                                                                                                                       getDatacentersResponseBody200DatacentersServerTypes = getDatacentersResponseBody200DatacentersServerTypes}
+-- | Defines the object schema located at @paths.\/datacenters.GET.responses.200.content.application\/json.schema.properties.datacenters.items.properties.location@ in the specification.
 -- 
 -- 
 data GetDatacentersResponseBody200DatacentersLocation = GetDatacentersResponseBody200DatacentersLocation {
@@ -156,25 +133,75 @@ data GetDatacentersResponseBody200DatacentersLocation = GetDatacentersResponseBo
   , getDatacentersResponseBody200DatacentersLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetDatacentersResponseBody200DatacentersLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (getDatacentersResponseBody200DatacentersLocationCity obj) : (Data.Aeson..=) "country" (getDatacentersResponseBody200DatacentersLocationCountry obj) : (Data.Aeson..=) "description" (getDatacentersResponseBody200DatacentersLocationDescription obj) : (Data.Aeson..=) "id" (getDatacentersResponseBody200DatacentersLocationId obj) : (Data.Aeson..=) "latitude" (getDatacentersResponseBody200DatacentersLocationLatitude obj) : (Data.Aeson..=) "longitude" (getDatacentersResponseBody200DatacentersLocationLongitude obj) : (Data.Aeson..=) "name" (getDatacentersResponseBody200DatacentersLocationName obj) : (Data.Aeson..=) "network_zone" (getDatacentersResponseBody200DatacentersLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (getDatacentersResponseBody200DatacentersLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (getDatacentersResponseBody200DatacentersLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (getDatacentersResponseBody200DatacentersLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getDatacentersResponseBody200DatacentersLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (getDatacentersResponseBody200DatacentersLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (getDatacentersResponseBody200DatacentersLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (getDatacentersResponseBody200DatacentersLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (getDatacentersResponseBody200DatacentersLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetDatacentersResponseBody200DatacentersLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationCity obj : "country" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetDatacentersResponseBody200DatacentersLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetDatacentersResponseBody200DatacentersLocation" (\obj -> (((((((GHC.Base.pure GetDatacentersResponseBody200DatacentersLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema GetDatacentersResponseBody200DatacentersServer_types
+-- | Create a new 'GetDatacentersResponseBody200DatacentersLocation' with all required fields.
+mkGetDatacentersResponseBody200DatacentersLocation :: Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersLocationDescription'
+  -> GHC.Types.Double -- ^ 'getDatacentersResponseBody200DatacentersLocationId'
+  -> GHC.Types.Double -- ^ 'getDatacentersResponseBody200DatacentersLocationLatitude'
+  -> GHC.Types.Double -- ^ 'getDatacentersResponseBody200DatacentersLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersLocationName'
+  -> Data.Text.Internal.Text -- ^ 'getDatacentersResponseBody200DatacentersLocationNetworkZone'
+  -> GetDatacentersResponseBody200DatacentersLocation
+mkGetDatacentersResponseBody200DatacentersLocation getDatacentersResponseBody200DatacentersLocationCity getDatacentersResponseBody200DatacentersLocationCountry getDatacentersResponseBody200DatacentersLocationDescription getDatacentersResponseBody200DatacentersLocationId getDatacentersResponseBody200DatacentersLocationLatitude getDatacentersResponseBody200DatacentersLocationLongitude getDatacentersResponseBody200DatacentersLocationName getDatacentersResponseBody200DatacentersLocationNetworkZone = GetDatacentersResponseBody200DatacentersLocation{getDatacentersResponseBody200DatacentersLocationCity = getDatacentersResponseBody200DatacentersLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationCountry = getDatacentersResponseBody200DatacentersLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationDescription = getDatacentersResponseBody200DatacentersLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationId = getDatacentersResponseBody200DatacentersLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationLatitude = getDatacentersResponseBody200DatacentersLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationLongitude = getDatacentersResponseBody200DatacentersLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationName = getDatacentersResponseBody200DatacentersLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      getDatacentersResponseBody200DatacentersLocationNetworkZone = getDatacentersResponseBody200DatacentersLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/datacenters.GET.responses.200.content.application\/json.schema.properties.datacenters.items.properties.server_types@ in the specification.
 -- 
 -- The Server types the Datacenter can handle
 data GetDatacentersResponseBody200DatacentersServerTypes = GetDatacentersResponseBody200DatacentersServerTypes {
   -- | available: IDs of Server types that are supported and for which the Datacenter has enough resources left
-  getDatacentersResponseBody200DatacentersServerTypesAvailable :: ([] GHC.Types.Double)
+  getDatacentersResponseBody200DatacentersServerTypesAvailable :: ([GHC.Types.Double])
   -- | available_for_migration: IDs of Server types that are supported and for which the Datacenter has enough resources left
-  , getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration :: ([] GHC.Types.Double)
+  , getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration :: ([GHC.Types.Double])
   -- | supported: IDs of Server types that are supported in the Datacenter
-  , getDatacentersResponseBody200DatacentersServerTypesSupported :: ([] GHC.Types.Double)
+  , getDatacentersResponseBody200DatacentersServerTypesSupported :: ([GHC.Types.Double])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetDatacentersResponseBody200DatacentersServerTypes
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "available" (getDatacentersResponseBody200DatacentersServerTypesAvailable obj) : (Data.Aeson..=) "available_for_migration" (getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration obj) : (Data.Aeson..=) "supported" (getDatacentersResponseBody200DatacentersServerTypesSupported obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "available" (getDatacentersResponseBody200DatacentersServerTypesAvailable obj) GHC.Base.<> ((Data.Aeson..=) "available_for_migration" (getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration obj) GHC.Base.<> (Data.Aeson..=) "supported" (getDatacentersResponseBody200DatacentersServerTypesSupported obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetDatacentersResponseBody200DatacentersServerTypes
+    where toJSON obj = Data.Aeson.Types.Internal.object ("available" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypesAvailable obj : "available_for_migration" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration obj : "supported" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypesSupported obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("available" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypesAvailable obj) GHC.Base.<> (("available_for_migration" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration obj) GHC.Base.<> ("supported" Data.Aeson.Types.ToJSON..= getDatacentersResponseBody200DatacentersServerTypesSupported obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetDatacentersResponseBody200DatacentersServerTypes
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetDatacentersResponseBody200DatacentersServerTypes" (\obj -> ((GHC.Base.pure GetDatacentersResponseBody200DatacentersServerTypes GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "available")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "available_for_migration")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "supported"))
+-- | Create a new 'GetDatacentersResponseBody200DatacentersServerTypes' with all required fields.
+mkGetDatacentersResponseBody200DatacentersServerTypes :: [GHC.Types.Double] -- ^ 'getDatacentersResponseBody200DatacentersServerTypesAvailable'
+  -> [GHC.Types.Double] -- ^ 'getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration'
+  -> [GHC.Types.Double] -- ^ 'getDatacentersResponseBody200DatacentersServerTypesSupported'
+  -> GetDatacentersResponseBody200DatacentersServerTypes
+mkGetDatacentersResponseBody200DatacentersServerTypes getDatacentersResponseBody200DatacentersServerTypesAvailable getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration getDatacentersResponseBody200DatacentersServerTypesSupported = GetDatacentersResponseBody200DatacentersServerTypes{getDatacentersResponseBody200DatacentersServerTypesAvailable = getDatacentersResponseBody200DatacentersServerTypesAvailable,
+                                                                                                                                                                                                                                                                                                               getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration = getDatacentersResponseBody200DatacentersServerTypesAvailableForMigration,
+                                                                                                                                                                                                                                                                                                               getDatacentersResponseBody200DatacentersServerTypesSupported = getDatacentersResponseBody200DatacentersServerTypesSupported}
+-- | > GET /datacenters
+-- 
+-- The same as 'getDatacenters' but accepts an explicit configuration.
+getDatacentersWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Datacenters by their name. The response will only contain the Datacenter matching the specified name. When the name does not match the Datacenter name format, an \`invalid_input\` error is returned.
+  -> m (Network.HTTP.Client.Types.Response GetDatacentersResponse) -- ^ Monadic computation which returns the result of the operation
+getDatacentersWithConfiguration config
+                                name = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetDatacentersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetDatacentersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                              GetDatacentersResponseBody200)
+                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /datacenters
+-- 
+-- The same as 'getDatacenters' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getDatacentersRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Datacenters by their name. The response will only contain the Datacenter matching the specified name. When the name does not match the Datacenter name format, an \`invalid_input\` error is returned.
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getDatacentersRaw name = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /datacenters
+-- 
+-- The same as 'getDatacenters' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getDatacentersWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter Datacenters by their name. The response will only contain the Datacenter matching the specified name. When the name does not match the Datacenter name format, an \`invalid_input\` error is returned.
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getDatacentersWithConfigurationRaw config
+                                   name = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/datacenters") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])

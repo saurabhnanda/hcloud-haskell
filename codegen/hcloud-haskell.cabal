@@ -1,101 +1,62 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
---
--- see: https://github.com/sol/hpack
---
--- hash: 80f001e3ec4332f3fc4a1b3ac5d0332050eea49f3e14f158c6865086002fe197
-
 name:           hcloud-haskell
 version:        0.1.0.0
-category:       Web
-homepage:       https://github.com/saurabhnanda/hcloud-haskell#readme
-author:         Saurabh Nanda
-maintainer:     saurabhnanda@gmail.com
-copyright:      Saurabh Nanda
-license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
-extra-source-files:
-    README.md
 
 library
   exposed-modules:
       HCloud
-      HCloud.Common
-      HCloud.Configuration
-      HCloud.Operations.DeleteCertificatesId_
-      HCloud.Operations.DeleteFirewallsId_
-      HCloud.Operations.DeleteFloatingIpsId_
-      HCloud.Operations.DeleteImagesId_
-      HCloud.Operations.DeleteLoadBalancersId_
-      HCloud.Operations.DeleteNetworksId_
-      HCloud.Operations.DeletePlacementGroupsId_
-      HCloud.Operations.DeleteServersId_
-      HCloud.Operations.DeleteSshKeysId_
-      HCloud.Operations.DeleteVolumesId_
       HCloud.Operations.GetActions
       HCloud.Operations.GetActionsId_
       HCloud.Operations.GetCertificates
+      HCloud.Operations.PostCertificates
       HCloud.Operations.GetCertificatesId_
+      HCloud.Operations.PutCertificatesId_
+      HCloud.Operations.DeleteCertificatesId_
       HCloud.Operations.GetCertificatesIdActions
+      HCloud.Operations.PostCertificatesIdActionsRetry
       HCloud.Operations.GetCertificatesIdActionsActionId_
       HCloud.Operations.GetDatacenters
       HCloud.Operations.GetDatacentersId_
       HCloud.Operations.GetFirewalls
-      HCloud.Operations.GetFirewallsId_
-      HCloud.Operations.GetFirewallsIdActions
-      HCloud.Operations.GetFirewallsIdActionsActionId_
-      HCloud.Operations.GetFloatingIps
-      HCloud.Operations.GetFloatingIpsId_
-      HCloud.Operations.GetFloatingIpsIdActions
-      HCloud.Operations.GetFloatingIpsIdActionsActionId_
-      HCloud.Operations.GetImages
-      HCloud.Operations.GetImagesId_
-      HCloud.Operations.GetImagesIdActions
-      HCloud.Operations.GetImagesIdActionsActionId_
-      HCloud.Operations.GetIsos
-      HCloud.Operations.GetIsosId_
-      HCloud.Operations.GetLoadBalancers
-      HCloud.Operations.GetLoadBalancersId_
-      HCloud.Operations.GetLoadBalancersIdActions
-      HCloud.Operations.GetLoadBalancersIdActionsActionId_
-      HCloud.Operations.GetLoadBalancersIdMetrics
-      HCloud.Operations.GetLoadBalancerTypes
-      HCloud.Operations.GetLoadBalancerTypesId_
-      HCloud.Operations.GetLocations
-      HCloud.Operations.GetLocationsId_
-      HCloud.Operations.GetNetworks
-      HCloud.Operations.GetNetworksId_
-      HCloud.Operations.GetNetworksIdActions
-      HCloud.Operations.GetNetworksIdActionsActionId_
-      HCloud.Operations.GetPricing
-      HCloud.Operations.GetServers
-      HCloud.Operations.GetServersId_
-      HCloud.Operations.GetServersIdActions
-      HCloud.Operations.GetServersIdActionsActionId_
-      HCloud.Operations.GetServersIdMetrics
-      HCloud.Operations.GetServerTypes
-      HCloud.Operations.GetServerTypesId_
-      HCloud.Operations.GetSshKeys
-      HCloud.Operations.GetSshKeysId_
-      HCloud.Operations.GetVolumes
-      HCloud.Operations.GetVolumesId_
-      HCloud.Operations.GetVolumesIdActions
-      HCloud.Operations.GetVolumesIdActionsActionId_
-      HCloud.Operations.PostCertificates
-      HCloud.Operations.PostCertificatesIdActionsRetry
       HCloud.Operations.PostFirewalls
+      HCloud.Operations.GetFirewallsId_
+      HCloud.Operations.PutFirewallsId_
+      HCloud.Operations.DeleteFirewallsId_
+      HCloud.Operations.GetFirewallsIdActions
       HCloud.Operations.PostFirewallsIdActionsApplyToResources
       HCloud.Operations.PostFirewallsIdActionsRemoveFromResources
       HCloud.Operations.PostFirewallsIdActionsSetRules
+      HCloud.Operations.GetFirewallsIdActionsActionId_
+      HCloud.Operations.GetFloatingIps
       HCloud.Operations.PostFloatingIps
+      HCloud.Operations.GetFloatingIpsId_
+      HCloud.Operations.PutFloatingIpsId_
+      HCloud.Operations.DeleteFloatingIpsId_
+      HCloud.Operations.GetFloatingIpsIdActions
       HCloud.Operations.PostFloatingIpsIdActionsAssign
       HCloud.Operations.PostFloatingIpsIdActionsChangeDnsPtr
       HCloud.Operations.PostFloatingIpsIdActionsChangeProtection
       HCloud.Operations.PostFloatingIpsIdActionsUnassign
+      HCloud.Operations.GetFloatingIpsIdActionsActionId_
+      HCloud.Operations.GetImages
+      HCloud.Operations.GetImagesId_
+      HCloud.Operations.PutImagesId_
+      HCloud.Operations.DeleteImagesId_
+      HCloud.Operations.GetImagesIdActions
       HCloud.Operations.PostImagesIdActionsChangeProtection
+      HCloud.Operations.GetImagesIdActionsActionId_
+      HCloud.Operations.GetIsos
+      HCloud.Operations.GetIsosId_
+      HCloud.Operations.GetLoadBalancerTypes
+      HCloud.Operations.GetLoadBalancerTypesId_
+      HCloud.Operations.GetLoadBalancers
       HCloud.Operations.PostLoadBalancers
+      HCloud.Operations.GetLoadBalancersId_
+      HCloud.Operations.PutLoadBalancersId_
+      HCloud.Operations.DeleteLoadBalancersId_
+      HCloud.Operations.GetLoadBalancersIdActions
       HCloud.Operations.PostLoadBalancersIdActionsAddService
       HCloud.Operations.PostLoadBalancersIdActionsAddTarget
       HCloud.Operations.PostLoadBalancersIdActionsAttachToNetwork
@@ -109,15 +70,37 @@ library
       HCloud.Operations.PostLoadBalancersIdActionsEnablePublicInterface
       HCloud.Operations.PostLoadBalancersIdActionsRemoveTarget
       HCloud.Operations.PostLoadBalancersIdActionsUpdateService
+      HCloud.Operations.GetLoadBalancersIdActionsActionId_
+      HCloud.Operations.GetLoadBalancersIdMetrics
+      HCloud.Operations.GetLocations
+      HCloud.Operations.GetLocationsId_
+      HCloud.Operations.GetNetworks
       HCloud.Operations.PostNetworks
+      HCloud.Operations.GetNetworksId_
+      HCloud.Operations.PutNetworksId_
+      HCloud.Operations.DeleteNetworksId_
+      HCloud.Operations.GetNetworksIdActions
       HCloud.Operations.PostNetworksIdActionsAddRoute
       HCloud.Operations.PostNetworksIdActionsAddSubnet
       HCloud.Operations.PostNetworksIdActionsChangeIpRange
       HCloud.Operations.PostNetworksIdActionsChangeProtection
       HCloud.Operations.PostNetworksIdActionsDeleteRoute
       HCloud.Operations.PostNetworksIdActionsDeleteSubnet
+      HCloud.Operations.GetNetworksIdActionsActionId_
+      HCloud.Operations.GetPlacementGroups
       HCloud.Operations.PostPlacementGroups
+      HCloud.Operations.GetPlacementGroupsId_
+      HCloud.Operations.PutPlacementGroupsId_
+      HCloud.Operations.DeletePlacementGroupsId_
+      HCloud.Operations.GetPricing
+      HCloud.Operations.GetServerTypes
+      HCloud.Operations.GetServerTypesId_
+      HCloud.Operations.GetServers
       HCloud.Operations.PostServers
+      HCloud.Operations.GetServersId_
+      HCloud.Operations.PutServersId_
+      HCloud.Operations.DeleteServersId_
+      HCloud.Operations.GetServersIdActions
       HCloud.Operations.PostServersIdActionsAddToPlacementGroup
       HCloud.Operations.PostServersIdActionsAttachIso
       HCloud.Operations.PostServersIdActionsAttachToNetwork
@@ -141,46 +124,44 @@ library
       HCloud.Operations.PostServersIdActionsReset
       HCloud.Operations.PostServersIdActionsResetPassword
       HCloud.Operations.PostServersIdActionsShutdown
+      HCloud.Operations.GetServersIdActionsActionId_
+      HCloud.Operations.GetServersIdMetrics
+      HCloud.Operations.GetSshKeys
       HCloud.Operations.PostSshKeys
+      HCloud.Operations.GetSshKeysId_
+      HCloud.Operations.PutSshKeysId_
+      HCloud.Operations.DeleteSshKeysId_
+      HCloud.Operations.GetVolumes
       HCloud.Operations.PostVolumes
+      HCloud.Operations.GetVolumesId_
+      HCloud.Operations.PutVolumesId_
+      HCloud.Operations.DeleteVolumesId_
+      HCloud.Operations.GetVolumesIdActions
       HCloud.Operations.PostVolumesIdActionsAttach
       HCloud.Operations.PostVolumesIdActionsChangeProtection
       HCloud.Operations.PostVolumesIdActionsDetach
       HCloud.Operations.PostVolumesIdActionsResize
-      HCloud.Operations.PutCertificatesId_
-      HCloud.Operations.PutFirewallsId_
-      HCloud.Operations.PutFloatingIpsId_
-      HCloud.Operations.PutImagesId_
-      HCloud.Operations.PutLoadBalancersId_
-      HCloud.Operations.PutNetworksId_
-      HCloud.Operations.PutPlacementGroupsId_
-      HCloud.Operations.PutServersId_
-      HCloud.Operations.PutSshKeysId_
-      HCloud.Operations.PutVolumesId_
-      HCloud.SecuritySchemes
+      HCloud.Operations.GetVolumesIdActionsActionId_
       HCloud.Types
       HCloud.TypeAlias
-      HCloud.Overrides
-  other-modules:
-      HCloud.Operations.GetPlacementGroups
-      HCloud.Operations.GetPlacementGroupsId_
-      Paths_hcloud_haskell
+      HCloud.Configuration
+      HCloud.SecuritySchemes
+      HCloud.Common
   hs-source-dirs:
-      codegen/src
       src
   build-depends:
-      aeson
-    , base >=4.7 && <5
-    , bytestring
-    , ghc-prim
-    , http-client
-    , http-conduit
-    , http-types
-    , mtl
-    , scientific
+      base >=4.7 && <5
     , text
-    , time
-    , transformers
+    , ghc-prim
+    , http-conduit
+    , http-client
+    , http-types
+    , bytestring
+    , aeson
     , unordered-containers
     , vector
+    , scientific
+    , time
+    , mtl
+    , transformers
   default-language: Haskell2010

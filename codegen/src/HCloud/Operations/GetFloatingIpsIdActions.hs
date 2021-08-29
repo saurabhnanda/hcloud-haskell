@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getFloatingIps_Id_Actions
 module HCloud.Operations.GetFloatingIpsIdActions where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,120 +45,202 @@ import HCloud.Types
 -- | > GET /floating_ips/{id}/actions
 -- 
 -- Returns all Action objects for a Floating IP. You can sort the results by using the \`sort\` URI parameter, and filter them with the \`status\` parameter.
-getFloatingIps_Id_Actions :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                              -- ^ id: ID of the Floating IP
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                               -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                               -- ^ status: Can be used multiple times, the response will contain only Actions with specified statuses
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetFloatingIpsIdActionsResponse))   -- ^ Monad containing the result of the operation
-getFloatingIps_Id_Actions config
-                          id
-                          sort
-                          status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                           GetFloatingIpsIdActionsResponseBody200)
-                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /floating_ips/{id}/actions
+getFloatingIps_Id_Actions :: forall m . HCloud.Common.MonadHTTP m => GetFloatingIpsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetFloatingIpsIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getFloatingIps_Id_Actions parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                GetFloatingIpsIdActionsResponseBody200)
+                                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFloatingIpsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions.GET.parameters@ in the specification.
 -- 
--- The same as 'getFloatingIps_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'
-getFloatingIps_Id_ActionsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                              HCloud.Common.SecurityScheme s) =>
-                                HCloud.Common.Configuration s ->
-                                GHC.Integer.Type.Integer ->
-                                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFloatingIps_Id_ActionsRaw config
-                             id
-                             sort
-                             status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /floating_ips/{id}/actions
 -- 
--- Monadic version of 'getFloatingIps_Id_Actions' (use with 'HCloud.Common.runWithConfiguration')
-getFloatingIps_Id_ActionsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                            HCloud.Common.SecurityScheme s) =>
-                              GHC.Integer.Type.Integer ->
-                              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                              Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                 m
-                                                                 (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                     (Network.HTTP.Client.Types.Response GetFloatingIpsIdActionsResponse))
-getFloatingIps_Id_ActionsM id
-                           sort
-                           status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            GetFloatingIpsIdActionsResponseBody200)
-                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /floating_ips/{id}/actions
+data GetFloatingIpsIdActionsParameters = GetFloatingIpsIdActionsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Floating IP
+  getFloatingIpsIdActionsParametersPathId :: GHC.Types.Int
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getFloatingIpsIdActionsParametersQuerySort :: (GHC.Maybe.Maybe GetFloatingIpsIdActionsParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified statuses
+  , getFloatingIpsIdActionsParametersQueryStatus :: (GHC.Maybe.Maybe GetFloatingIpsIdActionsParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsParametersPathId obj : "querySort" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsParametersPathId obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsParametersQueryStatus obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsIdActionsParameters" (\obj -> ((GHC.Base.pure GetFloatingIpsIdActionsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetFloatingIpsIdActionsParameters' with all required fields.
+mkGetFloatingIpsIdActionsParameters :: GHC.Types.Int -- ^ 'getFloatingIpsIdActionsParametersPathId'
+  -> GetFloatingIpsIdActionsParameters
+mkGetFloatingIpsIdActionsParameters getFloatingIpsIdActionsParametersPathId = GetFloatingIpsIdActionsParameters{getFloatingIpsIdActionsParametersPathId = getFloatingIpsIdActionsParametersPathId,
+                                                                                                                getFloatingIpsIdActionsParametersQuerySort = GHC.Maybe.Nothing,
+                                                                                                                getFloatingIpsIdActionsParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/floating_ips\/{id}\/actions.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getFloatingIps_Id_ActionsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getFloatingIps_Id_ActionsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                               HCloud.Common.SecurityScheme s) =>
-                                 GHC.Integer.Type.Integer ->
-                                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                                 Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                    m
-                                                                    (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                        (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFloatingIps_Id_ActionsRawM id
-                              sort
-                              status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetFloatingIpsIdActionsParametersQuerySort =
+   GetFloatingIpsIdActionsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFloatingIpsIdActionsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFloatingIpsIdActionsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumCommand -- ^ Represents the JSON value @"command"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumCommandAsc -- ^ Represents the JSON value @"command:asc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumCommandDesc -- ^ Represents the JSON value @"command:desc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumStatus -- ^ Represents the JSON value @"status"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumStatusAsc -- ^ Represents the JSON value @"status:asc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumStatusDesc -- ^ Represents the JSON value @"status:desc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumProgress -- ^ Represents the JSON value @"progress"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumProgressAsc -- ^ Represents the JSON value @"progress:asc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumProgressDesc -- ^ Represents the JSON value @"progress:desc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumStarted -- ^ Represents the JSON value @"started"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumStartedAsc -- ^ Represents the JSON value @"started:asc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumStartedDesc -- ^ Represents the JSON value @"started:desc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumFinished -- ^ Represents the JSON value @"finished"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumFinishedAsc -- ^ Represents the JSON value @"finished:asc"@
+  | GetFloatingIpsIdActionsParametersQuerySortEnumFinishedDesc -- ^ Represents the JSON value @"finished:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsParametersQuerySort
+    where toJSON (GetFloatingIpsIdActionsParametersQuerySortOther val) = val
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumId) = "id"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumCommand) = "command"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumCommandAsc) = "command:asc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumCommandDesc) = "command:desc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumStatus) = "status"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumStatusAsc) = "status:asc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumStatusDesc) = "status:desc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumProgress) = "progress"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumProgressAsc) = "progress:asc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumProgressDesc) = "progress:desc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumStarted) = "started"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumStartedAsc) = "started:asc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumStartedDesc) = "started:desc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumFinished) = "finished"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumFinishedAsc) = "finished:asc"
+          toJSON (GetFloatingIpsIdActionsParametersQuerySortEnumFinishedDesc) = "finished:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetFloatingIpsIdActionsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetFloatingIpsIdActionsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetFloatingIpsIdActionsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "command" -> GetFloatingIpsIdActionsParametersQuerySortEnumCommand
+                                            | val GHC.Classes.== "command:asc" -> GetFloatingIpsIdActionsParametersQuerySortEnumCommandAsc
+                                            | val GHC.Classes.== "command:desc" -> GetFloatingIpsIdActionsParametersQuerySortEnumCommandDesc
+                                            | val GHC.Classes.== "status" -> GetFloatingIpsIdActionsParametersQuerySortEnumStatus
+                                            | val GHC.Classes.== "status:asc" -> GetFloatingIpsIdActionsParametersQuerySortEnumStatusAsc
+                                            | val GHC.Classes.== "status:desc" -> GetFloatingIpsIdActionsParametersQuerySortEnumStatusDesc
+                                            | val GHC.Classes.== "progress" -> GetFloatingIpsIdActionsParametersQuerySortEnumProgress
+                                            | val GHC.Classes.== "progress:asc" -> GetFloatingIpsIdActionsParametersQuerySortEnumProgressAsc
+                                            | val GHC.Classes.== "progress:desc" -> GetFloatingIpsIdActionsParametersQuerySortEnumProgressDesc
+                                            | val GHC.Classes.== "started" -> GetFloatingIpsIdActionsParametersQuerySortEnumStarted
+                                            | val GHC.Classes.== "started:asc" -> GetFloatingIpsIdActionsParametersQuerySortEnumStartedAsc
+                                            | val GHC.Classes.== "started:desc" -> GetFloatingIpsIdActionsParametersQuerySortEnumStartedDesc
+                                            | val GHC.Classes.== "finished" -> GetFloatingIpsIdActionsParametersQuerySortEnumFinished
+                                            | val GHC.Classes.== "finished:asc" -> GetFloatingIpsIdActionsParametersQuerySortEnumFinishedAsc
+                                            | val GHC.Classes.== "finished:desc" -> GetFloatingIpsIdActionsParametersQuerySortEnumFinishedDesc
+                                            | GHC.Base.otherwise -> GetFloatingIpsIdActionsParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/floating_ips\/{id}\/actions.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times, the response will contain only Actions with specified statuses
+data GetFloatingIpsIdActionsParametersQueryStatus =
+   GetFloatingIpsIdActionsParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFloatingIpsIdActionsParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFloatingIpsIdActionsParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetFloatingIpsIdActionsParametersQueryStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetFloatingIpsIdActionsParametersQueryStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsParametersQueryStatus
+    where toJSON (GetFloatingIpsIdActionsParametersQueryStatusOther val) = val
+          toJSON (GetFloatingIpsIdActionsParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFloatingIpsIdActionsParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetFloatingIpsIdActionsParametersQueryStatusEnumSuccess) = "success"
+          toJSON (GetFloatingIpsIdActionsParametersQueryStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetFloatingIpsIdActionsParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "success" -> GetFloatingIpsIdActionsParametersQueryStatusEnumSuccess
+                                            | val GHC.Classes.== "error" -> GetFloatingIpsIdActionsParametersQueryStatusEnumError
+                                            | GHC.Base.otherwise -> GetFloatingIpsIdActionsParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getFloatingIps_Id_Actions'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetFloatingIpsIdActionsResponseError' is used.
-data GetFloatingIpsIdActionsResponse =                                         
-   GetFloatingIpsIdActionsResponseError GHC.Base.String                        -- ^ Means either no matching case available or a parse error
-  | GetFloatingIpsIdActionsResponse200 GetFloatingIpsIdActionsResponseBody200  -- ^ The \`actions\` key contains a list of Actions
+data GetFloatingIpsIdActionsResponse =
+   GetFloatingIpsIdActionsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetFloatingIpsIdActionsResponse200 GetFloatingIpsIdActionsResponseBody200 -- ^ The \`actions\` key contains a list of Actions
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetFloatingIpsIdActionsResponseBody200
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetFloatingIpsIdActionsResponseBody200 = GetFloatingIpsIdActionsResponseBody200 {
   -- | actions
-  getFloatingIpsIdActionsResponseBody200Actions :: ([] GetFloatingIpsIdActionsResponseBody200Actions)
+  getFloatingIpsIdActionsResponseBody200Actions :: ([GetFloatingIpsIdActionsResponseBody200Actions])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsIdActionsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (getFloatingIpsIdActionsResponseBody200Actions obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (getFloatingIpsIdActionsResponseBody200Actions obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200Actions obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("actions" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200Actions obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsIdActionsResponseBody200" (\obj -> GHC.Base.pure GetFloatingIpsIdActionsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "actions"))
--- | Defines the data type for the schema GetFloatingIpsIdActionsResponseBody200Actions
+-- | Create a new 'GetFloatingIpsIdActionsResponseBody200' with all required fields.
+mkGetFloatingIpsIdActionsResponseBody200 :: [GetFloatingIpsIdActionsResponseBody200Actions] -- ^ 'getFloatingIpsIdActionsResponseBody200Actions'
+  -> GetFloatingIpsIdActionsResponseBody200
+mkGetFloatingIpsIdActionsResponseBody200 getFloatingIpsIdActionsResponseBody200Actions = GetFloatingIpsIdActionsResponseBody200{getFloatingIpsIdActionsResponseBody200Actions = getFloatingIpsIdActionsResponseBody200Actions}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data GetFloatingIpsIdActionsResponseBody200Actions = GetFloatingIpsIdActionsResponseBody200Actions {
   -- | command: Command executed in the Action
   getFloatingIpsIdActionsResponseBody200ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getFloatingIpsIdActionsResponseBody200ActionsError :: GetFloatingIpsIdActionsResponseBody200ActionsError
+  , getFloatingIpsIdActionsResponseBody200ActionsError :: (GHC.Maybe.Maybe GetFloatingIpsIdActionsResponseBody200ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getFloatingIpsIdActionsResponseBody200ActionsFinished :: Data.Text.Internal.Text
+  , getFloatingIpsIdActionsResponseBody200ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getFloatingIpsIdActionsResponseBody200ActionsId :: GHC.Integer.Type.Integer
+  , getFloatingIpsIdActionsResponseBody200ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getFloatingIpsIdActionsResponseBody200ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getFloatingIpsIdActionsResponseBody200ActionsResources :: ([] GetFloatingIpsIdActionsResponseBody200ActionsResources)
+  , getFloatingIpsIdActionsResponseBody200ActionsResources :: ([GetFloatingIpsIdActionsResponseBody200ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getFloatingIpsIdActionsResponseBody200ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getFloatingIpsIdActionsResponseBody200ActionsStatus :: GetFloatingIpsIdActionsResponseBody200ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsIdActionsResponseBody200Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getFloatingIpsIdActionsResponseBody200ActionsCommand obj) : (Data.Aeson..=) "error" (getFloatingIpsIdActionsResponseBody200ActionsError obj) : (Data.Aeson..=) "finished" (getFloatingIpsIdActionsResponseBody200ActionsFinished obj) : (Data.Aeson..=) "id" (getFloatingIpsIdActionsResponseBody200ActionsId obj) : (Data.Aeson..=) "progress" (getFloatingIpsIdActionsResponseBody200ActionsProgress obj) : (Data.Aeson..=) "resources" (getFloatingIpsIdActionsResponseBody200ActionsResources obj) : (Data.Aeson..=) "started" (getFloatingIpsIdActionsResponseBody200ActionsStarted obj) : (Data.Aeson..=) "status" (getFloatingIpsIdActionsResponseBody200ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getFloatingIpsIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getFloatingIpsIdActionsResponseBody200ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getFloatingIpsIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getFloatingIpsIdActionsResponseBody200ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getFloatingIpsIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getFloatingIpsIdActionsResponseBody200ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getFloatingIpsIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getFloatingIpsIdActionsResponseBody200ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsResponseBody200Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsResponseBody200Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsIdActionsResponseBody200Actions" (\obj -> (((((((GHC.Base.pure GetFloatingIpsIdActionsResponseBody200Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetFloatingIpsIdActionsResponseBody200ActionsError
+-- | Create a new 'GetFloatingIpsIdActionsResponseBody200Actions' with all required fields.
+mkGetFloatingIpsIdActionsResponseBody200Actions :: Data.Text.Internal.Text -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsCommand'
+  -> GHC.Maybe.Maybe GetFloatingIpsIdActionsResponseBody200ActionsError -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsFinished'
+  -> GHC.Types.Int -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsId'
+  -> GHC.Types.Double -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsProgress'
+  -> [GetFloatingIpsIdActionsResponseBody200ActionsResources] -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsStarted'
+  -> GetFloatingIpsIdActionsResponseBody200ActionsStatus -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsStatus'
+  -> GetFloatingIpsIdActionsResponseBody200Actions
+mkGetFloatingIpsIdActionsResponseBody200Actions getFloatingIpsIdActionsResponseBody200ActionsCommand getFloatingIpsIdActionsResponseBody200ActionsError getFloatingIpsIdActionsResponseBody200ActionsFinished getFloatingIpsIdActionsResponseBody200ActionsId getFloatingIpsIdActionsResponseBody200ActionsProgress getFloatingIpsIdActionsResponseBody200ActionsResources getFloatingIpsIdActionsResponseBody200ActionsStarted getFloatingIpsIdActionsResponseBody200ActionsStatus = GetFloatingIpsIdActionsResponseBody200Actions{getFloatingIpsIdActionsResponseBody200ActionsCommand = getFloatingIpsIdActionsResponseBody200ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsError = getFloatingIpsIdActionsResponseBody200ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsFinished = getFloatingIpsIdActionsResponseBody200ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsId = getFloatingIpsIdActionsResponseBody200ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsProgress = getFloatingIpsIdActionsResponseBody200ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsResources = getFloatingIpsIdActionsResponseBody200ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsStarted = getFloatingIpsIdActionsResponseBody200ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    getFloatingIpsIdActionsResponseBody200ActionsStatus = getFloatingIpsIdActionsResponseBody200ActionsStatus}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetFloatingIpsIdActionsResponseBody200ActionsError = GetFloatingIpsIdActionsResponseBody200ActionsError {
@@ -168,47 +250,83 @@ data GetFloatingIpsIdActionsResponseBody200ActionsError = GetFloatingIpsIdAction
   , getFloatingIpsIdActionsResponseBody200ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsIdActionsResponseBody200ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getFloatingIpsIdActionsResponseBody200ActionsErrorCode obj) : (Data.Aeson..=) "message" (getFloatingIpsIdActionsResponseBody200ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getFloatingIpsIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getFloatingIpsIdActionsResponseBody200ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsResponseBody200ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsResponseBody200ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsIdActionsResponseBody200ActionsError" (\obj -> (GHC.Base.pure GetFloatingIpsIdActionsResponseBody200ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetFloatingIpsIdActionsResponseBody200ActionsResources
+-- | Create a new 'GetFloatingIpsIdActionsResponseBody200ActionsError' with all required fields.
+mkGetFloatingIpsIdActionsResponseBody200ActionsError :: Data.Text.Internal.Text -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsErrorMessage'
+  -> GetFloatingIpsIdActionsResponseBody200ActionsError
+mkGetFloatingIpsIdActionsResponseBody200ActionsError getFloatingIpsIdActionsResponseBody200ActionsErrorCode getFloatingIpsIdActionsResponseBody200ActionsErrorMessage = GetFloatingIpsIdActionsResponseBody200ActionsError{getFloatingIpsIdActionsResponseBody200ActionsErrorCode = getFloatingIpsIdActionsResponseBody200ActionsErrorCode,
+                                                                                                                                                                                                                           getFloatingIpsIdActionsResponseBody200ActionsErrorMessage = getFloatingIpsIdActionsResponseBody200ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/floating_ips\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetFloatingIpsIdActionsResponseBody200ActionsResources = GetFloatingIpsIdActionsResponseBody200ActionsResources {
   -- | id: ID of the Resource
-  getFloatingIpsIdActionsResponseBody200ActionsResourcesId :: GHC.Integer.Type.Integer
+  getFloatingIpsIdActionsResponseBody200ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getFloatingIpsIdActionsResponseBody200ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsIdActionsResponseBody200ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getFloatingIpsIdActionsResponseBody200ActionsResourcesId obj) : (Data.Aeson..=) "type" (getFloatingIpsIdActionsResponseBody200ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getFloatingIpsIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getFloatingIpsIdActionsResponseBody200ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsResponseBody200ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getFloatingIpsIdActionsResponseBody200ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsResponseBody200ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsIdActionsResponseBody200ActionsResources" (\obj -> (GHC.Base.pure GetFloatingIpsIdActionsResponseBody200ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetFloatingIpsIdActionsResponseBody200ActionsStatus
+-- | Create a new 'GetFloatingIpsIdActionsResponseBody200ActionsResources' with all required fields.
+mkGetFloatingIpsIdActionsResponseBody200ActionsResources :: GHC.Types.Int -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsIdActionsResponseBody200ActionsResourcesType'
+  -> GetFloatingIpsIdActionsResponseBody200ActionsResources
+mkGetFloatingIpsIdActionsResponseBody200ActionsResources getFloatingIpsIdActionsResponseBody200ActionsResourcesId getFloatingIpsIdActionsResponseBody200ActionsResourcesType = GetFloatingIpsIdActionsResponseBody200ActionsResources{getFloatingIpsIdActionsResponseBody200ActionsResourcesId = getFloatingIpsIdActionsResponseBody200ActionsResourcesId,
+                                                                                                                                                                                                                                      getFloatingIpsIdActionsResponseBody200ActionsResourcesType = getFloatingIpsIdActionsResponseBody200ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/floating_ips\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetFloatingIpsIdActionsResponseBody200ActionsStatus
-    = GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumTyped Data.Text.Internal.Text
-    | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringError
-    | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringRunning
-    | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsIdActionsResponseBody200ActionsStatus
-    where toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetFloatingIpsIdActionsResponseBody200ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumStringSuccess
-                                                      else GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumOther val)
+data GetFloatingIpsIdActionsResponseBody200ActionsStatus =
+   GetFloatingIpsIdActionsResponseBody200ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFloatingIpsIdActionsResponseBody200ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsIdActionsResponseBody200ActionsStatus
+    where toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusOther val) = val
+          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumSuccess) = "success"
+          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumRunning) = "running"
+          toJSON (GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsIdActionsResponseBody200ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetFloatingIpsIdActionsResponseBody200ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> GetFloatingIpsIdActionsResponseBody200ActionsStatusOther val)
+-- | > GET /floating_ips/{id}/actions
+-- 
+-- The same as 'getFloatingIps_Id_Actions' but accepts an explicit configuration.
+getFloatingIps_Id_ActionsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFloatingIpsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetFloatingIpsIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getFloatingIps_Id_ActionsWithConfiguration config
+                                           parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                 GetFloatingIpsIdActionsResponseBody200)
+                                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFloatingIpsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /floating_ips/{id}/actions
+-- 
+-- The same as 'getFloatingIps_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getFloatingIps_Id_ActionsRaw :: forall m . HCloud.Common.MonadHTTP m => GetFloatingIpsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFloatingIps_Id_ActionsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFloatingIpsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /floating_ips/{id}/actions
+-- 
+-- The same as 'getFloatingIps_Id_Actions' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getFloatingIps_Id_ActionsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFloatingIpsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFloatingIps_Id_ActionsWithConfigurationRaw config
+                                              parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/floating_ips/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFloatingIpsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

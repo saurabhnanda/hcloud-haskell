@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getServers_Id_Metrics
 module HCloud.Operations.GetServersIdMetrics where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -67,104 +67,87 @@ import HCloud.Types
 -- If you do not provide the step argument we will automatically adjust it so that a maximum of 200 samples are returned.
 -- 
 -- We limit the number of samples returned to a maximum of 500 and will adjust the step parameter accordingly.
-getServers_Id_Metrics :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                          -- ^ id: ID of the Server
-  -> Data.Text.Internal.Text                                                                                                           -- ^ type: Type of metrics to get
-  -> Data.Text.Internal.Text                                                                                                           -- ^ start: Start of period to get Metrics for (in ISO-8601 format)
-  -> Data.Text.Internal.Text                                                                                                           -- ^ end: End of period to get Metrics for (in ISO-8601 format)
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                           -- ^ step: Resolution of results in seconds
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetServersIdMetricsResponse))   -- ^ Monad containing the result of the operation
-getServers_Id_Metrics config
-                      id
-                      type'
-                      start
-                      end
-                      step = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetServersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                             GetServersIdMetricsResponseBody200)
-                                                                                                                                                                                          | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
--- | > GET /servers/{id}/metrics
+getServers_Id_Metrics :: forall m . HCloud.Common.MonadHTTP m => GetServersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetServersIdMetricsResponse) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_Metrics parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetServersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                    GetServersIdMetricsResponseBody200)
+                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/servers\/{id}\/metrics.GET.parameters@ in the specification.
 -- 
--- The same as 'getServers_Id_Metrics' but returns the raw 'Data.ByteString.Char8.ByteString'
-getServers_Id_MetricsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                          HCloud.Common.SecurityScheme s) =>
-                            HCloud.Common.Configuration s ->
-                            GHC.Integer.Type.Integer ->
-                            Data.Text.Internal.Text ->
-                            Data.Text.Internal.Text ->
-                            Data.Text.Internal.Text ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getServers_Id_MetricsRaw config
-                         id
-                         type'
-                         start
-                         end
-                         step = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                        GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                           GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
--- | > GET /servers/{id}/metrics
 -- 
--- Monadic version of 'getServers_Id_Metrics' (use with 'HCloud.Common.runWithConfiguration')
-getServers_Id_MetricsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                        HCloud.Common.SecurityScheme s) =>
-                          GHC.Integer.Type.Integer ->
-                          Data.Text.Internal.Text ->
-                          Data.Text.Internal.Text ->
-                          Data.Text.Internal.Text ->
-                          GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                          Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                             m
-                                                             (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                 (Network.HTTP.Client.Types.Response GetServersIdMetricsResponse))
-getServers_Id_MetricsM id
-                       type'
-                       start
-                       end
-                       step = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetServersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                              GetServersIdMetricsResponseBody200)
-                                                                                                                                                                                           | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
--- | > GET /servers/{id}/metrics
+data GetServersIdMetricsParameters = GetServersIdMetricsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Server
+  getServersIdMetricsParametersPathId :: GHC.Types.Int
+  -- | queryEnd: Represents the parameter named \'end\'
+  -- 
+  -- End of period to get Metrics for (in ISO-8601 format)
+  , getServersIdMetricsParametersQueryEnd :: Data.Text.Internal.Text
+  -- | queryStart: Represents the parameter named \'start\'
+  -- 
+  -- Start of period to get Metrics for (in ISO-8601 format)
+  , getServersIdMetricsParametersQueryStart :: Data.Text.Internal.Text
+  -- | queryStep: Represents the parameter named \'step\'
+  -- 
+  -- Resolution of results in seconds
+  , getServersIdMetricsParametersQueryStep :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryType: Represents the parameter named \'type\'
+  -- 
+  -- Type of metrics to get
+  , getServersIdMetricsParametersQueryType :: GetServersIdMetricsParametersQueryType
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdMetricsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersPathId obj : "queryEnd" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryEnd obj : "queryStart" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryStart obj : "queryStep" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryStep obj : "queryType" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersPathId obj) GHC.Base.<> (("queryEnd" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryEnd obj) GHC.Base.<> (("queryStart" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryStart obj) GHC.Base.<> (("queryStep" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryStep obj) GHC.Base.<> ("queryType" Data.Aeson.Types.ToJSON..= getServersIdMetricsParametersQueryType obj)))))
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdMetricsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdMetricsParameters" (\obj -> ((((GHC.Base.pure GetServersIdMetricsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryEnd")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryStart")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStep")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "queryType"))
+-- | Create a new 'GetServersIdMetricsParameters' with all required fields.
+mkGetServersIdMetricsParameters :: GHC.Types.Int -- ^ 'getServersIdMetricsParametersPathId'
+  -> Data.Text.Internal.Text -- ^ 'getServersIdMetricsParametersQueryEnd'
+  -> Data.Text.Internal.Text -- ^ 'getServersIdMetricsParametersQueryStart'
+  -> GetServersIdMetricsParametersQueryType -- ^ 'getServersIdMetricsParametersQueryType'
+  -> GetServersIdMetricsParameters
+mkGetServersIdMetricsParameters getServersIdMetricsParametersPathId getServersIdMetricsParametersQueryEnd getServersIdMetricsParametersQueryStart getServersIdMetricsParametersQueryType = GetServersIdMetricsParameters{getServersIdMetricsParametersPathId = getServersIdMetricsParametersPathId,
+                                                                                                                                                                                                                         getServersIdMetricsParametersQueryEnd = getServersIdMetricsParametersQueryEnd,
+                                                                                                                                                                                                                         getServersIdMetricsParametersQueryStart = getServersIdMetricsParametersQueryStart,
+                                                                                                                                                                                                                         getServersIdMetricsParametersQueryStep = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                         getServersIdMetricsParametersQueryType = getServersIdMetricsParametersQueryType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/metrics.GET.parameters.properties.queryType@ in the specification.
 -- 
--- Monadic version of 'getServers_Id_MetricsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getServers_Id_MetricsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                           HCloud.Common.SecurityScheme s) =>
-                             GHC.Integer.Type.Integer ->
-                             Data.Text.Internal.Text ->
-                             Data.Text.Internal.Text ->
-                             Data.Text.Internal.Text ->
-                             GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                             Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                m
-                                                                (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getServers_Id_MetricsRawM id
-                          type'
-                          start
-                          end
-                          step = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/metrics"))) ((Data.Text.pack "type",
-                                                                                                                                                                                                                                                                                                                                                                                   GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel type') : ((Data.Text.pack "start",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                      GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel start) : ((Data.Text.pack "end",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         GHC.Maybe.Just GHC.Base.$ HCloud.Common.stringifyModel end) : ((Data.Text.pack "step",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> step) : [])))))
+-- Represents the parameter named \'type\'
+-- 
+-- Type of metrics to get
+data GetServersIdMetricsParametersQueryType =
+   GetServersIdMetricsParametersQueryTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersIdMetricsParametersQueryTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersIdMetricsParametersQueryTypeEnumCpu -- ^ Represents the JSON value @"cpu"@
+  | GetServersIdMetricsParametersQueryTypeEnumDisk -- ^ Represents the JSON value @"disk"@
+  | GetServersIdMetricsParametersQueryTypeEnumNetwork -- ^ Represents the JSON value @"network"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdMetricsParametersQueryType
+    where toJSON (GetServersIdMetricsParametersQueryTypeOther val) = val
+          toJSON (GetServersIdMetricsParametersQueryTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersIdMetricsParametersQueryTypeEnumCpu) = "cpu"
+          toJSON (GetServersIdMetricsParametersQueryTypeEnumDisk) = "disk"
+          toJSON (GetServersIdMetricsParametersQueryTypeEnumNetwork) = "network"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdMetricsParametersQueryType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "cpu" -> GetServersIdMetricsParametersQueryTypeEnumCpu
+                                            | val GHC.Classes.== "disk" -> GetServersIdMetricsParametersQueryTypeEnumDisk
+                                            | val GHC.Classes.== "network" -> GetServersIdMetricsParametersQueryTypeEnumNetwork
+                                            | GHC.Base.otherwise -> GetServersIdMetricsParametersQueryTypeOther val)
 -- | Represents a response of the operation 'getServers_Id_Metrics'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetServersIdMetricsResponseError' is used.
-data GetServersIdMetricsResponse =                                     
-   GetServersIdMetricsResponseError GHC.Base.String                    -- ^ Means either no matching case available or a parse error
-  | GetServersIdMetricsResponse200 GetServersIdMetricsResponseBody200  -- ^ The \`metrics\` key in the reply contains a metrics object with this structure
+data GetServersIdMetricsResponse =
+   GetServersIdMetricsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetServersIdMetricsResponse200 GetServersIdMetricsResponseBody200 -- ^ The \`metrics\` key in the reply contains a metrics object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetServersIdMetricsResponseBody200
+-- | Defines the object schema located at @paths.\/servers\/{id}\/metrics.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetServersIdMetricsResponseBody200 = GetServersIdMetricsResponseBody200 {
@@ -172,12 +155,16 @@ data GetServersIdMetricsResponseBody200 = GetServersIdMetricsResponseBody200 {
   getServersIdMetricsResponseBody200Metrics :: GetServersIdMetricsResponseBody200Metrics
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdMetricsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "metrics" (getServersIdMetricsResponseBody200Metrics obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "metrics" (getServersIdMetricsResponseBody200Metrics obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdMetricsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("metrics" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200Metrics obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("metrics" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200Metrics obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdMetricsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdMetricsResponseBody200" (\obj -> GHC.Base.pure GetServersIdMetricsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "metrics"))
--- | Defines the data type for the schema GetServersIdMetricsResponseBody200Metrics
+-- | Create a new 'GetServersIdMetricsResponseBody200' with all required fields.
+mkGetServersIdMetricsResponseBody200 :: GetServersIdMetricsResponseBody200Metrics -- ^ 'getServersIdMetricsResponseBody200Metrics'
+  -> GetServersIdMetricsResponseBody200
+mkGetServersIdMetricsResponseBody200 getServersIdMetricsResponseBody200Metrics = GetServersIdMetricsResponseBody200{getServersIdMetricsResponseBody200Metrics = getServersIdMetricsResponseBody200Metrics}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/metrics.GET.responses.200.content.application\/json.schema.properties.metrics@ in the specification.
 -- 
 -- 
 data GetServersIdMetricsResponseBody200Metrics = GetServersIdMetricsResponseBody200Metrics {
@@ -188,23 +175,54 @@ data GetServersIdMetricsResponseBody200Metrics = GetServersIdMetricsResponseBody
   -- | step: Resolution of results in seconds.
   , getServersIdMetricsResponseBody200MetricsStep :: GHC.Types.Double
   -- | time_series: Hash with timeseries information, containing the name of timeseries as key
-  , getServersIdMetricsResponseBody200MetricsTimeSeries :: GetServersIdMetricsResponseBody200MetricsTimeSeries
+  , getServersIdMetricsResponseBody200MetricsTimeSeries :: Data.Aeson.Types.Internal.Object
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdMetricsResponseBody200Metrics
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "end" (getServersIdMetricsResponseBody200MetricsEnd obj) : (Data.Aeson..=) "start" (getServersIdMetricsResponseBody200MetricsStart obj) : (Data.Aeson..=) "step" (getServersIdMetricsResponseBody200MetricsStep obj) : (Data.Aeson..=) "time_series" (getServersIdMetricsResponseBody200MetricsTimeSeries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "end" (getServersIdMetricsResponseBody200MetricsEnd obj) GHC.Base.<> ((Data.Aeson..=) "start" (getServersIdMetricsResponseBody200MetricsStart obj) GHC.Base.<> ((Data.Aeson..=) "step" (getServersIdMetricsResponseBody200MetricsStep obj) GHC.Base.<> (Data.Aeson..=) "time_series" (getServersIdMetricsResponseBody200MetricsTimeSeries obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersIdMetricsResponseBody200Metrics
+    where toJSON obj = Data.Aeson.Types.Internal.object ("end" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsEnd obj : "start" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsStart obj : "step" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsStep obj : "time_series" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsTimeSeries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("end" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsEnd obj) GHC.Base.<> (("start" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsStart obj) GHC.Base.<> (("step" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsStep obj) GHC.Base.<> ("time_series" Data.Aeson.Types.ToJSON..= getServersIdMetricsResponseBody200MetricsTimeSeries obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdMetricsResponseBody200Metrics
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdMetricsResponseBody200Metrics" (\obj -> (((GHC.Base.pure GetServersIdMetricsResponseBody200Metrics GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "end")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "start")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "step")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "time_series"))
--- | Defines the data type for the schema GetServersIdMetricsResponseBody200MetricsTime_series
+-- | Create a new 'GetServersIdMetricsResponseBody200Metrics' with all required fields.
+mkGetServersIdMetricsResponseBody200Metrics :: Data.Text.Internal.Text -- ^ 'getServersIdMetricsResponseBody200MetricsEnd'
+  -> Data.Text.Internal.Text -- ^ 'getServersIdMetricsResponseBody200MetricsStart'
+  -> GHC.Types.Double -- ^ 'getServersIdMetricsResponseBody200MetricsStep'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getServersIdMetricsResponseBody200MetricsTimeSeries'
+  -> GetServersIdMetricsResponseBody200Metrics
+mkGetServersIdMetricsResponseBody200Metrics getServersIdMetricsResponseBody200MetricsEnd getServersIdMetricsResponseBody200MetricsStart getServersIdMetricsResponseBody200MetricsStep getServersIdMetricsResponseBody200MetricsTimeSeries = GetServersIdMetricsResponseBody200Metrics{getServersIdMetricsResponseBody200MetricsEnd = getServersIdMetricsResponseBody200MetricsEnd,
+                                                                                                                                                                                                                                                                                      getServersIdMetricsResponseBody200MetricsStart = getServersIdMetricsResponseBody200MetricsStart,
+                                                                                                                                                                                                                                                                                      getServersIdMetricsResponseBody200MetricsStep = getServersIdMetricsResponseBody200MetricsStep,
+                                                                                                                                                                                                                                                                                      getServersIdMetricsResponseBody200MetricsTimeSeries = getServersIdMetricsResponseBody200MetricsTimeSeries}
+-- | > GET /servers/{id}/metrics
 -- 
--- Hash with timeseries information, containing the name of timeseries as key
-data GetServersIdMetricsResponseBody200MetricsTimeSeries = GetServersIdMetricsResponseBody200MetricsTimeSeries {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersIdMetricsResponseBody200MetricsTimeSeries
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetServersIdMetricsResponseBody200MetricsTimeSeries
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersIdMetricsResponseBody200MetricsTimeSeries" (\obj -> GHC.Base.pure GetServersIdMetricsResponseBody200MetricsTimeSeries)
+-- The same as 'getServers_Id_Metrics' but accepts an explicit configuration.
+getServers_Id_MetricsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetServersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetServersIdMetricsResponse) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_MetricsWithConfiguration config
+                                       parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetServersIdMetricsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersIdMetricsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                     GetServersIdMetricsResponseBody200)
+                                                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /servers/{id}/metrics
+-- 
+-- The same as 'getServers_Id_Metrics' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getServers_Id_MetricsRaw :: forall m . HCloud.Common.MonadHTTP m => GetServersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_MetricsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /servers/{id}/metrics
+-- 
+-- The same as 'getServers_Id_Metrics' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getServers_Id_MetricsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetServersIdMetricsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getServers_Id_MetricsWithConfigurationRaw config
+                                          parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getServersIdMetricsParametersPathId parameters))) GHC.Base.++ "/metrics"))) [HCloud.Common.QueryParameter (Data.Text.pack "type") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryType parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "start") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryStart parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "end") (GHC.Maybe.Just GHC.Base.$ Data.Aeson.Types.ToJSON.toJSON (getServersIdMetricsParametersQueryEnd parameters)) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.QueryParameter (Data.Text.pack "step") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersIdMetricsParametersQueryStep parameters) (Data.Text.pack "form") GHC.Types.False])

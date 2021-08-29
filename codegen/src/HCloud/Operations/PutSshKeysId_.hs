@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation putSshKeys_Id_
 module HCloud.Operations.PutSshKeysId_ where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -47,91 +47,40 @@ import HCloud.Types
 -- Updates an SSH key. You can update an SSH key name and an SSH key labels.
 -- 
 -- Please note that when updating labels, the SSH key current set of labels will be replaced with the labels provided in the request body. So, for example, if you want to add a new label, you have to provide all existing labels plus the new label in the request body.
-putSshKeys_Id_ :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> Data.Text.Internal.Text                                                                                                    -- ^ id: ID of the SSH key
-  -> GHC.Maybe.Maybe PutSshKeysIdRequestBody                                                                                    -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PutSshKeysIdResponse))   -- ^ Monad containing the result of the operation
-putSshKeys_Id_ config
-               id
-               body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                        PutSshKeysIdResponseBody200)
-                                                                                                                                                                            | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /ssh_keys/{id}
--- 
--- The same as 'putSshKeys_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'
-putSshKeys_Id_Raw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     HCloud.Common.Configuration s ->
-                     Data.Text.Internal.Text ->
-                     GHC.Maybe.Maybe PutSshKeysIdRequestBody ->
-                     m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putSshKeys_Id_Raw config
-                  id
-                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /ssh_keys/{id}
--- 
--- Monadic version of 'putSshKeys_Id_' (use with 'HCloud.Common.runWithConfiguration')
-putSshKeys_Id_M :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe PutSshKeysIdRequestBody ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response PutSshKeysIdResponse))
-putSshKeys_Id_M id
-                body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                         PutSshKeysIdResponseBody200)
-                                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > PUT /ssh_keys/{id}
--- 
--- Monadic version of 'putSshKeys_Id_Raw' (use with 'HCloud.Common.runWithConfiguration')
-putSshKeys_Id_RawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe PutSshKeysIdRequestBody ->
-                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                         m
-                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-putSshKeys_Id_RawM id
-                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema putSshKeys_Id_RequestBody
+putSshKeys_Id_ :: forall m . HCloud.Common.MonadHTTP m => Data.Text.Internal.Text -- ^ id: ID of the SSH key
+  -> GHC.Maybe.Maybe PutSshKeysIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PutSshKeysIdResponse) -- ^ Monadic computation which returns the result of the operation
+putSshKeys_Id_ id
+               body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PutSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                         PutSshKeysIdResponseBody200)
+                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/ssh_keys\/{id}.PUT.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutSshKeysIdRequestBody = PutSshKeysIdRequestBody {
   -- | labels: User-defined labels (key-value pairs)
-  putSshKeysIdRequestBodyLabels :: (GHC.Maybe.Maybe PutSshKeysIdRequestBodyLabels)
+  putSshKeysIdRequestBodyLabels :: (GHC.Maybe.Maybe Data.Aeson.Types.Internal.Object)
   -- | name: New name Name to set
   , putSshKeysIdRequestBodyName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutSshKeysIdRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labels" (putSshKeysIdRequestBodyLabels obj) : (Data.Aeson..=) "name" (putSshKeysIdRequestBodyName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labels" (putSshKeysIdRequestBodyLabels obj) GHC.Base.<> (Data.Aeson..=) "name" (putSshKeysIdRequestBodyName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutSshKeysIdRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labels" Data.Aeson.Types.ToJSON..= putSshKeysIdRequestBodyLabels obj : "name" Data.Aeson.Types.ToJSON..= putSshKeysIdRequestBodyName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("labels" Data.Aeson.Types.ToJSON..= putSshKeysIdRequestBodyLabels obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= putSshKeysIdRequestBodyName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PutSshKeysIdRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutSshKeysIdRequestBody" (\obj -> (GHC.Base.pure PutSshKeysIdRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "name"))
--- | Defines the data type for the schema putSshKeys_Id_RequestBodyLabels
--- 
--- User-defined labels (key-value pairs)
-data PutSshKeysIdRequestBodyLabels = PutSshKeysIdRequestBodyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutSshKeysIdRequestBodyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutSshKeysIdRequestBodyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutSshKeysIdRequestBodyLabels" (\obj -> GHC.Base.pure PutSshKeysIdRequestBodyLabels)
+-- | Create a new 'PutSshKeysIdRequestBody' with all required fields.
+mkPutSshKeysIdRequestBody :: PutSshKeysIdRequestBody
+mkPutSshKeysIdRequestBody = PutSshKeysIdRequestBody{putSshKeysIdRequestBodyLabels = GHC.Maybe.Nothing,
+                                                    putSshKeysIdRequestBodyName = GHC.Maybe.Nothing}
 -- | Represents a response of the operation 'putSshKeys_Id_'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PutSshKeysIdResponseError' is used.
-data PutSshKeysIdResponse =                              
-   PutSshKeysIdResponseError GHC.Base.String             -- ^ Means either no matching case available or a parse error
-  | PutSshKeysIdResponse200 PutSshKeysIdResponseBody200  -- ^ The \`ssh_key\` key in the reply contains the modified SSH key object with the new description
+data PutSshKeysIdResponse =
+   PutSshKeysIdResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PutSshKeysIdResponse200 PutSshKeysIdResponseBody200 -- ^ The \`ssh_key\` key in the reply contains the modified SSH key object with the new description
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PutSshKeysIdResponseBody200
+-- | Defines the object schema located at @paths.\/ssh_keys\/{id}.PUT.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PutSshKeysIdResponseBody200 = PutSshKeysIdResponseBody200 {
@@ -139,12 +88,16 @@ data PutSshKeysIdResponseBody200 = PutSshKeysIdResponseBody200 {
   putSshKeysIdResponseBody200SshKey :: PutSshKeysIdResponseBody200SshKey
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutSshKeysIdResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ssh_key" (putSshKeysIdResponseBody200SshKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ssh_key" (putSshKeysIdResponseBody200SshKey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PutSshKeysIdResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ssh_key" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ssh_key" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PutSshKeysIdResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutSshKeysIdResponseBody200" (\obj -> GHC.Base.pure PutSshKeysIdResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ssh_key"))
--- | Defines the data type for the schema PutSshKeysIdResponseBody200Ssh_key
+-- | Create a new 'PutSshKeysIdResponseBody200' with all required fields.
+mkPutSshKeysIdResponseBody200 :: PutSshKeysIdResponseBody200SshKey -- ^ 'putSshKeysIdResponseBody200SshKey'
+  -> PutSshKeysIdResponseBody200
+mkPutSshKeysIdResponseBody200 putSshKeysIdResponseBody200SshKey = PutSshKeysIdResponseBody200{putSshKeysIdResponseBody200SshKey = putSshKeysIdResponseBody200SshKey}
+-- | Defines the object schema located at @paths.\/ssh_keys\/{id}.PUT.responses.200.content.application\/json.schema.properties.ssh_key@ in the specification.
 -- 
 -- 
 data PutSshKeysIdResponseBody200SshKey = PutSshKeysIdResponseBody200SshKey {
@@ -153,29 +106,61 @@ data PutSshKeysIdResponseBody200SshKey = PutSshKeysIdResponseBody200SshKey {
   -- | fingerprint: Fingerprint of public key
   , putSshKeysIdResponseBody200SshKeyFingerprint :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , putSshKeysIdResponseBody200SshKeyId :: GHC.Integer.Type.Integer
+  , putSshKeysIdResponseBody200SshKeyId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , putSshKeysIdResponseBody200SshKeyLabels :: PutSshKeysIdResponseBody200SshKeyLabels
+  , putSshKeysIdResponseBody200SshKeyLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , putSshKeysIdResponseBody200SshKeyName :: Data.Text.Internal.Text
   -- | public_key: Public key
   , putSshKeysIdResponseBody200SshKeyPublicKey :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutSshKeysIdResponseBody200SshKey
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (putSshKeysIdResponseBody200SshKeyCreated obj) : (Data.Aeson..=) "fingerprint" (putSshKeysIdResponseBody200SshKeyFingerprint obj) : (Data.Aeson..=) "id" (putSshKeysIdResponseBody200SshKeyId obj) : (Data.Aeson..=) "labels" (putSshKeysIdResponseBody200SshKeyLabels obj) : (Data.Aeson..=) "name" (putSshKeysIdResponseBody200SshKeyName obj) : (Data.Aeson..=) "public_key" (putSshKeysIdResponseBody200SshKeyPublicKey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (putSshKeysIdResponseBody200SshKeyCreated obj) GHC.Base.<> ((Data.Aeson..=) "fingerprint" (putSshKeysIdResponseBody200SshKeyFingerprint obj) GHC.Base.<> ((Data.Aeson..=) "id" (putSshKeysIdResponseBody200SshKeyId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (putSshKeysIdResponseBody200SshKeyLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (putSshKeysIdResponseBody200SshKeyName obj) GHC.Base.<> (Data.Aeson..=) "public_key" (putSshKeysIdResponseBody200SshKeyPublicKey obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PutSshKeysIdResponseBody200SshKey
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyCreated obj : "fingerprint" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyFingerprint obj : "id" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyId obj : "labels" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyLabels obj : "name" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyName obj : "public_key" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyPublicKey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyCreated obj) GHC.Base.<> (("fingerprint" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyFingerprint obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyName obj) GHC.Base.<> ("public_key" Data.Aeson.Types.ToJSON..= putSshKeysIdResponseBody200SshKeyPublicKey obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PutSshKeysIdResponseBody200SshKey
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutSshKeysIdResponseBody200SshKey" (\obj -> (((((GHC.Base.pure PutSshKeysIdResponseBody200SshKey GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "fingerprint")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_key"))
--- | Defines the data type for the schema PutSshKeysIdResponseBody200Ssh_keyLabels
+-- | Create a new 'PutSshKeysIdResponseBody200SshKey' with all required fields.
+mkPutSshKeysIdResponseBody200SshKey :: Data.Text.Internal.Text -- ^ 'putSshKeysIdResponseBody200SshKeyCreated'
+  -> Data.Text.Internal.Text -- ^ 'putSshKeysIdResponseBody200SshKeyFingerprint'
+  -> GHC.Types.Int -- ^ 'putSshKeysIdResponseBody200SshKeyId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'putSshKeysIdResponseBody200SshKeyLabels'
+  -> Data.Text.Internal.Text -- ^ 'putSshKeysIdResponseBody200SshKeyName'
+  -> Data.Text.Internal.Text -- ^ 'putSshKeysIdResponseBody200SshKeyPublicKey'
+  -> PutSshKeysIdResponseBody200SshKey
+mkPutSshKeysIdResponseBody200SshKey putSshKeysIdResponseBody200SshKeyCreated putSshKeysIdResponseBody200SshKeyFingerprint putSshKeysIdResponseBody200SshKeyId putSshKeysIdResponseBody200SshKeyLabels putSshKeysIdResponseBody200SshKeyName putSshKeysIdResponseBody200SshKeyPublicKey = PutSshKeysIdResponseBody200SshKey{putSshKeysIdResponseBody200SshKeyCreated = putSshKeysIdResponseBody200SshKeyCreated,
+                                                                                                                                                                                                                                                                                                                           putSshKeysIdResponseBody200SshKeyFingerprint = putSshKeysIdResponseBody200SshKeyFingerprint,
+                                                                                                                                                                                                                                                                                                                           putSshKeysIdResponseBody200SshKeyId = putSshKeysIdResponseBody200SshKeyId,
+                                                                                                                                                                                                                                                                                                                           putSshKeysIdResponseBody200SshKeyLabels = putSshKeysIdResponseBody200SshKeyLabels,
+                                                                                                                                                                                                                                                                                                                           putSshKeysIdResponseBody200SshKeyName = putSshKeysIdResponseBody200SshKeyName,
+                                                                                                                                                                                                                                                                                                                           putSshKeysIdResponseBody200SshKeyPublicKey = putSshKeysIdResponseBody200SshKeyPublicKey}
+-- | > PUT /ssh_keys/{id}
 -- 
--- User-defined labels (key-value pairs)
-data PutSshKeysIdResponseBody200SshKeyLabels = PutSshKeysIdResponseBody200SshKeyLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PutSshKeysIdResponseBody200SshKeyLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PutSshKeysIdResponseBody200SshKeyLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PutSshKeysIdResponseBody200SshKeyLabels" (\obj -> GHC.Base.pure PutSshKeysIdResponseBody200SshKeyLabels)
+-- The same as 'putSshKeys_Id_' but accepts an explicit configuration.
+putSshKeys_Id_WithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> Data.Text.Internal.Text -- ^ id: ID of the SSH key
+  -> GHC.Maybe.Maybe PutSshKeysIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PutSshKeysIdResponse) -- ^ Monadic computation which returns the result of the operation
+putSshKeys_Id_WithConfiguration config
+                                id
+                                body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PutSshKeysIdResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> PutSshKeysIdResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                          PutSshKeysIdResponseBody200)
+                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /ssh_keys/{id}
+-- 
+-- The same as 'putSshKeys_Id_' but returns the raw 'Data.ByteString.Char8.ByteString'.
+putSshKeys_Id_Raw :: forall m . HCloud.Common.MonadHTTP m => Data.Text.Internal.Text -- ^ id: ID of the SSH key
+  -> GHC.Maybe.Maybe PutSshKeysIdRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putSshKeys_Id_Raw id
+                  body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > PUT /ssh_keys/{id}
+-- 
+-- The same as 'putSshKeys_Id_' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+putSshKeys_Id_WithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> Data.Text.Internal.Text -- ^ id: ID of the SSH key
+  -> GHC.Maybe.Maybe PutSshKeysIdRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+putSshKeys_Id_WithConfigurationRaw config
+                                   id
+                                   body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "PUT") (Data.Text.pack ("/ssh_keys/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ ""))) GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

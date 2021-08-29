@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getIsos
 module HCloud.Operations.GetIsos where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,116 +45,90 @@ import HCloud.Types
 -- | > GET /isos
 -- 
 -- Returns all available ISO objects.
-getIsos :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                             -- ^ name: Can be used to filter ISOs by their name. The response will only contain the ISO matching the specified name.
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetIsosResponse)) -- ^ Monad containing the result of the operation
-getIsos config
-        name = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetIsosResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                       GetIsosResponseBody200)
-                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /isos
--- 
--- The same as 'getIsos' but returns the raw 'Data.ByteString.Char8.ByteString'
-getIsosRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                            HCloud.Common.SecurityScheme s) =>
-              HCloud.Common.Configuration s ->
-              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-              m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getIsosRaw config
-           name = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") ((Data.Text.pack "name",
-                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /isos
--- 
--- Monadic version of 'getIsos' (use with 'HCloud.Common.runWithConfiguration')
-getIsosM :: forall m s . (HCloud.Common.MonadHTTP m,
-                          HCloud.Common.SecurityScheme s) =>
-            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                               m
-                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                   (Network.HTTP.Client.Types.Response GetIsosResponse))
-getIsosM name = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetIsosResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                        GetIsosResponseBody200)
-                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
--- | > GET /isos
--- 
--- Monadic version of 'getIsosRaw' (use with 'HCloud.Common.runWithConfiguration')
-getIsosRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                             HCloud.Common.SecurityScheme s) =>
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                  m
-                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getIsosRawM name = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") ((Data.Text.pack "name",
-                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> name) : []))
+getIsos :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter ISOs by their name. The response will only contain the ISO matching the specified name.
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetIsosResponse) -- ^ Monadic computation which returns the result of the operation
+getIsos name = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetIsosResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                        GetIsosResponseBody200)
+                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
 -- | Represents a response of the operation 'getIsos'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetIsosResponseError' is used.
-data GetIsosResponse =                         
-   GetIsosResponseError GHC.Base.String        -- ^ Means either no matching case available or a parse error
-  | GetIsosResponse200 GetIsosResponseBody200  -- ^ The \`isos\` key in the reply contains an array of iso objects with this structure
+data GetIsosResponse =
+   GetIsosResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetIsosResponse200 GetIsosResponseBody200 -- ^ The \`isos\` key in the reply contains an array of iso objects with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetIsosResponseBody200
+-- | Defines the object schema located at @paths.\/isos.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetIsosResponseBody200 = GetIsosResponseBody200 {
   -- | isos
-  getIsosResponseBody200Isos :: ([] GetIsosResponseBody200Isos)
+  getIsosResponseBody200Isos :: ([GetIsosResponseBody200Isos])
   -- | meta
   , getIsosResponseBody200Meta :: (GHC.Maybe.Maybe GetIsosResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "isos" (getIsosResponseBody200Isos obj) : (Data.Aeson..=) "meta" (getIsosResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "isos" (getIsosResponseBody200Isos obj) GHC.Base.<> (Data.Aeson..=) "meta" (getIsosResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("isos" Data.Aeson.Types.ToJSON..= getIsosResponseBody200Isos obj : "meta" Data.Aeson.Types.ToJSON..= getIsosResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("isos" Data.Aeson.Types.ToJSON..= getIsosResponseBody200Isos obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getIsosResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetIsosResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetIsosResponseBody200" (\obj -> (GHC.Base.pure GetIsosResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "isos")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetIsosResponseBody200Isos
+-- | Create a new 'GetIsosResponseBody200' with all required fields.
+mkGetIsosResponseBody200 :: [GetIsosResponseBody200Isos] -- ^ 'getIsosResponseBody200Isos'
+  -> GetIsosResponseBody200
+mkGetIsosResponseBody200 getIsosResponseBody200Isos = GetIsosResponseBody200{getIsosResponseBody200Isos = getIsosResponseBody200Isos,
+                                                                             getIsosResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/isos.GET.responses.200.content.application\/json.schema.properties.isos.items@ in the specification.
 -- 
 -- 
 data GetIsosResponseBody200Isos = GetIsosResponseBody200Isos {
   -- | deprecated: ISO 8601 timestamp of deprecation, null if ISO is still available. After the deprecation time it will no longer be possible to attach the ISO to Servers.
-  getIsosResponseBody200IsosDeprecated :: Data.Text.Internal.Text
+  getIsosResponseBody200IsosDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the ISO
   , getIsosResponseBody200IsosDescription :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getIsosResponseBody200IsosId :: GHC.Integer.Type.Integer
+  , getIsosResponseBody200IsosId :: GHC.Types.Int
   -- | name: Unique identifier of the ISO. Only set for public ISOs
-  , getIsosResponseBody200IsosName :: Data.Text.Internal.Text
+  , getIsosResponseBody200IsosName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | type: Type of the ISO
   , getIsosResponseBody200IsosType :: GetIsosResponseBody200IsosType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosResponseBody200Isos
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "deprecated" (getIsosResponseBody200IsosDeprecated obj) : (Data.Aeson..=) "description" (getIsosResponseBody200IsosDescription obj) : (Data.Aeson..=) "id" (getIsosResponseBody200IsosId obj) : (Data.Aeson..=) "name" (getIsosResponseBody200IsosName obj) : (Data.Aeson..=) "type" (getIsosResponseBody200IsosType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "deprecated" (getIsosResponseBody200IsosDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getIsosResponseBody200IsosDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getIsosResponseBody200IsosId obj) GHC.Base.<> ((Data.Aeson..=) "name" (getIsosResponseBody200IsosName obj) GHC.Base.<> (Data.Aeson..=) "type" (getIsosResponseBody200IsosType obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosResponseBody200Isos
+    where toJSON obj = Data.Aeson.Types.Internal.object ("deprecated" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosDescription obj : "id" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosId obj : "name" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosName obj : "type" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("deprecated" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosId obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosName obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getIsosResponseBody200IsosType obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetIsosResponseBody200Isos
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetIsosResponseBody200Isos" (\obj -> ((((GHC.Base.pure GetIsosResponseBody200Isos GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetIsosResponseBody200IsosType
+-- | Create a new 'GetIsosResponseBody200Isos' with all required fields.
+mkGetIsosResponseBody200Isos :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getIsosResponseBody200IsosDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getIsosResponseBody200IsosDescription'
+  -> GHC.Types.Int -- ^ 'getIsosResponseBody200IsosId'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getIsosResponseBody200IsosName'
+  -> GetIsosResponseBody200IsosType -- ^ 'getIsosResponseBody200IsosType'
+  -> GetIsosResponseBody200Isos
+mkGetIsosResponseBody200Isos getIsosResponseBody200IsosDeprecated getIsosResponseBody200IsosDescription getIsosResponseBody200IsosId getIsosResponseBody200IsosName getIsosResponseBody200IsosType = GetIsosResponseBody200Isos{getIsosResponseBody200IsosDeprecated = getIsosResponseBody200IsosDeprecated,
+                                                                                                                                                                                                                                getIsosResponseBody200IsosDescription = getIsosResponseBody200IsosDescription,
+                                                                                                                                                                                                                                getIsosResponseBody200IsosId = getIsosResponseBody200IsosId,
+                                                                                                                                                                                                                                getIsosResponseBody200IsosName = getIsosResponseBody200IsosName,
+                                                                                                                                                                                                                                getIsosResponseBody200IsosType = getIsosResponseBody200IsosType}
+-- | Defines the enum schema located at @paths.\/isos.GET.responses.200.content.application\/json.schema.properties.isos.items.properties.type@ in the specification.
 -- 
 -- Type of the ISO
-data GetIsosResponseBody200IsosType
-    = GetIsosResponseBody200IsosTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetIsosResponseBody200IsosTypeEnumTyped Data.Text.Internal.Text
-    | GetIsosResponseBody200IsosTypeEnumStringPrivate
-    | GetIsosResponseBody200IsosTypeEnumStringPublic
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosResponseBody200IsosType
-    where toJSON (GetIsosResponseBody200IsosTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetIsosResponseBody200IsosTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetIsosResponseBody200IsosTypeEnumStringPrivate) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "private"
-          toJSON (GetIsosResponseBody200IsosTypeEnumStringPublic) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "public"
-instance Data.Aeson.FromJSON GetIsosResponseBody200IsosType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "private")
-                                          then GetIsosResponseBody200IsosTypeEnumStringPrivate
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "public")
-                                                then GetIsosResponseBody200IsosTypeEnumStringPublic
-                                                else GetIsosResponseBody200IsosTypeEnumOther val)
--- | Defines the data type for the schema GetIsosResponseBody200Meta
+data GetIsosResponseBody200IsosType =
+   GetIsosResponseBody200IsosTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetIsosResponseBody200IsosTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetIsosResponseBody200IsosTypeEnumPublic -- ^ Represents the JSON value @"public"@
+  | GetIsosResponseBody200IsosTypeEnumPrivate -- ^ Represents the JSON value @"private"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosResponseBody200IsosType
+    where toJSON (GetIsosResponseBody200IsosTypeOther val) = val
+          toJSON (GetIsosResponseBody200IsosTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetIsosResponseBody200IsosTypeEnumPublic) = "public"
+          toJSON (GetIsosResponseBody200IsosTypeEnumPrivate) = "private"
+instance Data.Aeson.Types.FromJSON.FromJSON GetIsosResponseBody200IsosType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "public" -> GetIsosResponseBody200IsosTypeEnumPublic
+                                            | val GHC.Classes.== "private" -> GetIsosResponseBody200IsosTypeEnumPrivate
+                                            | GHC.Base.otherwise -> GetIsosResponseBody200IsosTypeOther val)
+-- | Defines the object schema located at @paths.\/isos.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetIsosResponseBody200Meta = GetIsosResponseBody200Meta {
@@ -162,31 +136,73 @@ data GetIsosResponseBody200Meta = GetIsosResponseBody200Meta {
   getIsosResponseBody200MetaPagination :: GetIsosResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getIsosResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getIsosResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetIsosResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetIsosResponseBody200Meta" (\obj -> GHC.Base.pure GetIsosResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetIsosResponseBody200MetaPagination
+-- | Create a new 'GetIsosResponseBody200Meta' with all required fields.
+mkGetIsosResponseBody200Meta :: GetIsosResponseBody200MetaPagination -- ^ 'getIsosResponseBody200MetaPagination'
+  -> GetIsosResponseBody200Meta
+mkGetIsosResponseBody200Meta getIsosResponseBody200MetaPagination = GetIsosResponseBody200Meta{getIsosResponseBody200MetaPagination = getIsosResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/isos.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetIsosResponseBody200MetaPagination = GetIsosResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getIsosResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getIsosResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getIsosResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getIsosResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getIsosResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getIsosResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getIsosResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getIsosResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getIsosResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getIsosResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetIsosResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getIsosResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getIsosResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getIsosResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getIsosResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getIsosResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getIsosResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getIsosResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getIsosResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getIsosResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getIsosResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getIsosResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getIsosResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetIsosResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getIsosResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetIsosResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetIsosResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetIsosResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetIsosResponseBody200MetaPagination' with all required fields.
+mkGetIsosResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getIsosResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getIsosResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getIsosResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getIsosResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getIsosResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getIsosResponseBody200MetaPaginationTotalEntries'
+  -> GetIsosResponseBody200MetaPagination
+mkGetIsosResponseBody200MetaPagination getIsosResponseBody200MetaPaginationLastPage getIsosResponseBody200MetaPaginationNextPage getIsosResponseBody200MetaPaginationPage getIsosResponseBody200MetaPaginationPerPage getIsosResponseBody200MetaPaginationPreviousPage getIsosResponseBody200MetaPaginationTotalEntries = GetIsosResponseBody200MetaPagination{getIsosResponseBody200MetaPaginationLastPage = getIsosResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                               getIsosResponseBody200MetaPaginationNextPage = getIsosResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                               getIsosResponseBody200MetaPaginationPage = getIsosResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                               getIsosResponseBody200MetaPaginationPerPage = getIsosResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                               getIsosResponseBody200MetaPaginationPreviousPage = getIsosResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                               getIsosResponseBody200MetaPaginationTotalEntries = getIsosResponseBody200MetaPaginationTotalEntries}
+-- | > GET /isos
+-- 
+-- The same as 'getIsos' but accepts an explicit configuration.
+getIsosWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter ISOs by their name. The response will only contain the ISO matching the specified name.
+  -> m (Network.HTTP.Client.Types.Response GetIsosResponse) -- ^ Monadic computation which returns the result of the operation
+getIsosWithConfiguration config
+                         name = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetIsosResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetIsosResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                         GetIsosResponseBody200)
+                                                                                                                                                                  | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /isos
+-- 
+-- The same as 'getIsos' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getIsosRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter ISOs by their name. The response will only contain the ISO matching the specified name.
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getIsosRaw name = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /isos
+-- 
+-- The same as 'getIsos' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getIsosWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ name: Can be used to filter ISOs by their name. The response will only contain the ISO matching the specified name.
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getIsosWithConfigurationRaw config
+                            name = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/isos") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> name) (Data.Text.pack "form") GHC.Types.False])

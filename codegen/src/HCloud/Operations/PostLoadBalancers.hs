@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postLoadBalancers
 module HCloud.Operations.PostLoadBalancers where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -57,49 +57,12 @@ import HCloud.Types
 -- | \`server_not_attached_to_network\`        | The server you are trying to add as a target is not attached to the same network as the Load Balancer |
 -- | \`source_port_already_used\`              | The source port you are trying to add is already in use                                               |
 -- | \`target_already_defined\`                | The Load Balancer target you are trying to define is already defined                                  |
-postLoadBalancers :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe PostLoadBalancersRequestBody                                                                                  -- ^ The request body to send
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostLoadBalancersResponse)) -- ^ Monad containing the result of the operation
-postLoadBalancers config
-                  body = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                     PostLoadBalancersResponseBody201)
-                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers
--- 
--- The same as 'postLoadBalancers' but returns the raw 'Data.ByteString.Char8.ByteString'
-postLoadBalancersRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                      HCloud.Common.SecurityScheme s) =>
-                        HCloud.Common.Configuration s ->
-                        GHC.Maybe.Maybe PostLoadBalancersRequestBody ->
-                        m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                              (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancersRaw config
-                     body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers
--- 
--- Monadic version of 'postLoadBalancers' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancersM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      GHC.Maybe.Maybe PostLoadBalancersRequestBody ->
-                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                         m
-                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                             (Network.HTTP.Client.Types.Response PostLoadBalancersResponse))
-postLoadBalancersM body = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                      PostLoadBalancersResponseBody201)
-                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | > POST /load_balancers
--- 
--- Monadic version of 'postLoadBalancersRaw' (use with 'HCloud.Common.runWithConfiguration')
-postLoadBalancersRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                       HCloud.Common.SecurityScheme s) =>
-                         GHC.Maybe.Maybe PostLoadBalancersRequestBody ->
-                         Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                            m
-                                                            (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postLoadBalancersRawM body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") [] body HCloud.Common.RequestBodyEncodingJSON)
--- | Defines the data type for the schema postLoadBalancersRequestBody
+postLoadBalancers :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostLoadBalancersRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostLoadBalancersResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancers body = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                      PostLoadBalancersResponseBody201)
+                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBody = PostLoadBalancersRequestBody {
@@ -114,23 +77,38 @@ data PostLoadBalancersRequestBody = PostLoadBalancersRequestBody {
   -- | name: Name of the Load Balancer
   , postLoadBalancersRequestBodyName :: Data.Text.Internal.Text
   -- | network: ID of the network the Load Balancer should be attached to on creation
-  , postLoadBalancersRequestBodyNetwork :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , postLoadBalancersRequestBodyNetwork :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | network_zone: Name of network zone
   , postLoadBalancersRequestBodyNetworkZone :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | public_interface: Enable or disable the public interface of the Load Balancer
   , postLoadBalancersRequestBodyPublicInterface :: (GHC.Maybe.Maybe GHC.Types.Bool)
   -- | services: Array of services
-  , postLoadBalancersRequestBodyServices :: (GHC.Maybe.Maybe ([] PostLoadBalancersRequestBodyServices))
+  , postLoadBalancersRequestBodyServices :: (GHC.Maybe.Maybe ([PostLoadBalancersRequestBodyServices]))
   -- | targets: Array of targets
-  , postLoadBalancersRequestBodyTargets :: (GHC.Maybe.Maybe ([] PostLoadBalancersRequestBodyTargets))
+  , postLoadBalancersRequestBodyTargets :: (GHC.Maybe.Maybe ([PostLoadBalancersRequestBodyTargets]))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBody
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "algorithm" (postLoadBalancersRequestBodyAlgorithm obj) : (Data.Aeson..=) "labels" (postLoadBalancersRequestBodyLabels obj) : (Data.Aeson..=) "load_balancer_type" (postLoadBalancersRequestBodyLoadBalancerType obj) : (Data.Aeson..=) "location" (postLoadBalancersRequestBodyLocation obj) : (Data.Aeson..=) "name" (postLoadBalancersRequestBodyName obj) : (Data.Aeson..=) "network" (postLoadBalancersRequestBodyNetwork obj) : (Data.Aeson..=) "network_zone" (postLoadBalancersRequestBodyNetworkZone obj) : (Data.Aeson..=) "public_interface" (postLoadBalancersRequestBodyPublicInterface obj) : (Data.Aeson..=) "services" (postLoadBalancersRequestBodyServices obj) : (Data.Aeson..=) "targets" (postLoadBalancersRequestBodyTargets obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "algorithm" (postLoadBalancersRequestBodyAlgorithm obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postLoadBalancersRequestBodyLabels obj) GHC.Base.<> ((Data.Aeson..=) "load_balancer_type" (postLoadBalancersRequestBodyLoadBalancerType obj) GHC.Base.<> ((Data.Aeson..=) "location" (postLoadBalancersRequestBodyLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (postLoadBalancersRequestBodyName obj) GHC.Base.<> ((Data.Aeson..=) "network" (postLoadBalancersRequestBodyNetwork obj) GHC.Base.<> ((Data.Aeson..=) "network_zone" (postLoadBalancersRequestBodyNetworkZone obj) GHC.Base.<> ((Data.Aeson..=) "public_interface" (postLoadBalancersRequestBodyPublicInterface obj) GHC.Base.<> ((Data.Aeson..=) "services" (postLoadBalancersRequestBodyServices obj) GHC.Base.<> (Data.Aeson..=) "targets" (postLoadBalancersRequestBodyTargets obj))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBody
+    where toJSON obj = Data.Aeson.Types.Internal.object ("algorithm" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyAlgorithm obj : "labels" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLabels obj : "load_balancer_type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLoadBalancerType obj : "location" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLocation obj : "name" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyName obj : "network" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyNetwork obj : "network_zone" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyNetworkZone obj : "public_interface" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyPublicInterface obj : "services" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServices obj : "targets" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargets obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("algorithm" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyAlgorithm obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLabels obj) GHC.Base.<> (("load_balancer_type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLoadBalancerType obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyName obj) GHC.Base.<> (("network" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyNetwork obj) GHC.Base.<> (("network_zone" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyNetworkZone obj) GHC.Base.<> (("public_interface" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyPublicInterface obj) GHC.Base.<> (("services" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServices obj) GHC.Base.<> ("targets" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargets obj))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBody
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBody" (\obj -> (((((((((GHC.Base.pure PostLoadBalancersRequestBody GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "algorithm")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "load_balancer_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "network")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "network_zone")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "public_interface")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "services")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "targets"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyAlgorithm
+-- | Create a new 'PostLoadBalancersRequestBody' with all required fields.
+mkPostLoadBalancersRequestBody :: PostLoadBalancersRequestBodyAlgorithm -- ^ 'postLoadBalancersRequestBodyAlgorithm'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyLoadBalancerType'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyName'
+  -> PostLoadBalancersRequestBody
+mkPostLoadBalancersRequestBody postLoadBalancersRequestBodyAlgorithm postLoadBalancersRequestBodyLoadBalancerType postLoadBalancersRequestBodyName = PostLoadBalancersRequestBody{postLoadBalancersRequestBodyAlgorithm = postLoadBalancersRequestBodyAlgorithm,
+                                                                                                                                                                                  postLoadBalancersRequestBodyLabels = GHC.Maybe.Nothing,
+                                                                                                                                                                                  postLoadBalancersRequestBodyLoadBalancerType = postLoadBalancersRequestBodyLoadBalancerType,
+                                                                                                                                                                                  postLoadBalancersRequestBodyLocation = GHC.Maybe.Nothing,
+                                                                                                                                                                                  postLoadBalancersRequestBodyName = postLoadBalancersRequestBodyName,
+                                                                                                                                                                                  postLoadBalancersRequestBodyNetwork = GHC.Maybe.Nothing,
+                                                                                                                                                                                  postLoadBalancersRequestBodyNetworkZone = GHC.Maybe.Nothing,
+                                                                                                                                                                                  postLoadBalancersRequestBodyPublicInterface = GHC.Maybe.Nothing,
+                                                                                                                                                                                  postLoadBalancersRequestBodyServices = GHC.Maybe.Nothing,
+                                                                                                                                                                                  postLoadBalancersRequestBodyTargets = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.algorithm@ in the specification.
 -- 
 -- Algorithm of the Load Balancer
 data PostLoadBalancersRequestBodyAlgorithm = PostLoadBalancersRequestBodyAlgorithm {
@@ -138,32 +116,34 @@ data PostLoadBalancersRequestBodyAlgorithm = PostLoadBalancersRequestBodyAlgorit
   postLoadBalancersRequestBodyAlgorithmType :: PostLoadBalancersRequestBodyAlgorithmType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyAlgorithm
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "type" (postLoadBalancersRequestBodyAlgorithmType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "type" (postLoadBalancersRequestBodyAlgorithmType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyAlgorithm
+    where toJSON obj = Data.Aeson.Types.Internal.object ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyAlgorithmType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyAlgorithmType obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyAlgorithm
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyAlgorithm" (\obj -> GHC.Base.pure PostLoadBalancersRequestBodyAlgorithm GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema postLoadBalancersRequestBodyAlgorithmType
+-- | Create a new 'PostLoadBalancersRequestBodyAlgorithm' with all required fields.
+mkPostLoadBalancersRequestBodyAlgorithm :: PostLoadBalancersRequestBodyAlgorithmType -- ^ 'postLoadBalancersRequestBodyAlgorithmType'
+  -> PostLoadBalancersRequestBodyAlgorithm
+mkPostLoadBalancersRequestBodyAlgorithm postLoadBalancersRequestBodyAlgorithmType = PostLoadBalancersRequestBodyAlgorithm{postLoadBalancersRequestBodyAlgorithmType = postLoadBalancersRequestBodyAlgorithmType}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.algorithm.properties.type@ in the specification.
 -- 
 -- Type of the algorithm
-data PostLoadBalancersRequestBodyAlgorithmType
-    = PostLoadBalancersRequestBodyAlgorithmTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersRequestBodyAlgorithmTypeEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersRequestBodyAlgorithmTypeEnumStringLeastConnections
-    | PostLoadBalancersRequestBodyAlgorithmTypeEnumStringRoundRobin
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyAlgorithmType
-    where toJSON (PostLoadBalancersRequestBodyAlgorithmTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyAlgorithmTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyAlgorithmTypeEnumStringLeastConnections) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "least_connections"
-          toJSON (PostLoadBalancersRequestBodyAlgorithmTypeEnumStringRoundRobin) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "round_robin"
-instance Data.Aeson.FromJSON PostLoadBalancersRequestBodyAlgorithmType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "least_connections")
-                                          then PostLoadBalancersRequestBodyAlgorithmTypeEnumStringLeastConnections
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "round_robin")
-                                                then PostLoadBalancersRequestBodyAlgorithmTypeEnumStringRoundRobin
-                                                else PostLoadBalancersRequestBodyAlgorithmTypeEnumOther val)
--- | Defines the data type for the schema postLoadBalancersRequestBodyLabels
+data PostLoadBalancersRequestBodyAlgorithmType =
+   PostLoadBalancersRequestBodyAlgorithmTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersRequestBodyAlgorithmTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersRequestBodyAlgorithmTypeEnumRoundRobin -- ^ Represents the JSON value @"round_robin"@
+  | PostLoadBalancersRequestBodyAlgorithmTypeEnumLeastConnections -- ^ Represents the JSON value @"least_connections"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyAlgorithmType
+    where toJSON (PostLoadBalancersRequestBodyAlgorithmTypeOther val) = val
+          toJSON (PostLoadBalancersRequestBodyAlgorithmTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersRequestBodyAlgorithmTypeEnumRoundRobin) = "round_robin"
+          toJSON (PostLoadBalancersRequestBodyAlgorithmTypeEnumLeastConnections) = "least_connections"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyAlgorithmType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "round_robin" -> PostLoadBalancersRequestBodyAlgorithmTypeEnumRoundRobin
+                                            | val GHC.Classes.== "least_connections" -> PostLoadBalancersRequestBodyAlgorithmTypeEnumLeastConnections
+                                            | GHC.Base.otherwise -> PostLoadBalancersRequestBodyAlgorithmTypeOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.labels@ in the specification.
 -- 
 -- User-defined labels (key-value pairs)
 data PostLoadBalancersRequestBodyLabels = PostLoadBalancersRequestBodyLabels {
@@ -171,106 +151,142 @@ data PostLoadBalancersRequestBodyLabels = PostLoadBalancersRequestBodyLabels {
   postLoadBalancersRequestBodyLabelsLabelkey :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyLabels
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "labelkey" (postLoadBalancersRequestBodyLabelsLabelkey obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "labelkey" (postLoadBalancersRequestBodyLabelsLabelkey obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyLabels
+    where toJSON obj = Data.Aeson.Types.Internal.object ("labelkey" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLabelsLabelkey obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("labelkey" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyLabelsLabelkey obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyLabels
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyLabels" (\obj -> GHC.Base.pure PostLoadBalancersRequestBodyLabels GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "labelkey"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyServices
+-- | Create a new 'PostLoadBalancersRequestBodyLabels' with all required fields.
+mkPostLoadBalancersRequestBodyLabels :: PostLoadBalancersRequestBodyLabels
+mkPostLoadBalancersRequestBodyLabels = PostLoadBalancersRequestBodyLabels{postLoadBalancersRequestBodyLabelsLabelkey = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.services.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBodyServices = PostLoadBalancersRequestBodyServices {
   -- | destination_port: Port the Load Balancer will balance to
-  postLoadBalancersRequestBodyServicesDestinationPort :: GHC.Integer.Type.Integer
+  postLoadBalancersRequestBodyServicesDestinationPort :: GHC.Types.Int
   -- | health_check: Service health check
   , postLoadBalancersRequestBodyServicesHealthCheck :: PostLoadBalancersRequestBodyServicesHealthCheck
   -- | http: Configuration option for protocols http and https
   , postLoadBalancersRequestBodyServicesHttp :: (GHC.Maybe.Maybe PostLoadBalancersRequestBodyServicesHttp)
   -- | listen_port: Port the Load Balancer listens on
-  , postLoadBalancersRequestBodyServicesListenPort :: GHC.Integer.Type.Integer
+  , postLoadBalancersRequestBodyServicesListenPort :: GHC.Types.Int
   -- | protocol: Protocol of the Load Balancer
   , postLoadBalancersRequestBodyServicesProtocol :: PostLoadBalancersRequestBodyServicesProtocol
   -- | proxyprotocol: Is Proxyprotocol enabled or not
   , postLoadBalancersRequestBodyServicesProxyprotocol :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyServices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination_port" (postLoadBalancersRequestBodyServicesDestinationPort obj) : (Data.Aeson..=) "health_check" (postLoadBalancersRequestBodyServicesHealthCheck obj) : (Data.Aeson..=) "http" (postLoadBalancersRequestBodyServicesHttp obj) : (Data.Aeson..=) "listen_port" (postLoadBalancersRequestBodyServicesListenPort obj) : (Data.Aeson..=) "protocol" (postLoadBalancersRequestBodyServicesProtocol obj) : (Data.Aeson..=) "proxyprotocol" (postLoadBalancersRequestBodyServicesProxyprotocol obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination_port" (postLoadBalancersRequestBodyServicesDestinationPort obj) GHC.Base.<> ((Data.Aeson..=) "health_check" (postLoadBalancersRequestBodyServicesHealthCheck obj) GHC.Base.<> ((Data.Aeson..=) "http" (postLoadBalancersRequestBodyServicesHttp obj) GHC.Base.<> ((Data.Aeson..=) "listen_port" (postLoadBalancersRequestBodyServicesListenPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postLoadBalancersRequestBodyServicesProtocol obj) GHC.Base.<> (Data.Aeson..=) "proxyprotocol" (postLoadBalancersRequestBodyServicesProxyprotocol obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyServices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesDestinationPort obj : "health_check" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheck obj : "http" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttp obj : "listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesListenPort obj : "protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesProtocol obj : "proxyprotocol" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesProxyprotocol obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesDestinationPort obj) GHC.Base.<> (("health_check" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheck obj) GHC.Base.<> (("http" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttp obj) GHC.Base.<> (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesListenPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesProtocol obj) GHC.Base.<> ("proxyprotocol" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesProxyprotocol obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyServices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyServices" (\obj -> (((((GHC.Base.pure PostLoadBalancersRequestBodyServices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "health_check")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "proxyprotocol"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyServicesHealth_check
+-- | Create a new 'PostLoadBalancersRequestBodyServices' with all required fields.
+mkPostLoadBalancersRequestBodyServices :: GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesDestinationPort'
+  -> PostLoadBalancersRequestBodyServicesHealthCheck -- ^ 'postLoadBalancersRequestBodyServicesHealthCheck'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesListenPort'
+  -> PostLoadBalancersRequestBodyServicesProtocol -- ^ 'postLoadBalancersRequestBodyServicesProtocol'
+  -> GHC.Types.Bool -- ^ 'postLoadBalancersRequestBodyServicesProxyprotocol'
+  -> PostLoadBalancersRequestBodyServices
+mkPostLoadBalancersRequestBodyServices postLoadBalancersRequestBodyServicesDestinationPort postLoadBalancersRequestBodyServicesHealthCheck postLoadBalancersRequestBodyServicesListenPort postLoadBalancersRequestBodyServicesProtocol postLoadBalancersRequestBodyServicesProxyprotocol = PostLoadBalancersRequestBodyServices{postLoadBalancersRequestBodyServicesDestinationPort = postLoadBalancersRequestBodyServicesDestinationPort,
+                                                                                                                                                                                                                                                                                                                                postLoadBalancersRequestBodyServicesHealthCheck = postLoadBalancersRequestBodyServicesHealthCheck,
+                                                                                                                                                                                                                                                                                                                                postLoadBalancersRequestBodyServicesHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                postLoadBalancersRequestBodyServicesListenPort = postLoadBalancersRequestBodyServicesListenPort,
+                                                                                                                                                                                                                                                                                                                                postLoadBalancersRequestBodyServicesProtocol = postLoadBalancersRequestBodyServicesProtocol,
+                                                                                                                                                                                                                                                                                                                                postLoadBalancersRequestBodyServicesProxyprotocol = postLoadBalancersRequestBodyServicesProxyprotocol}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.services.items.properties.health_check@ in the specification.
 -- 
 -- Service health check
 data PostLoadBalancersRequestBodyServicesHealthCheck = PostLoadBalancersRequestBodyServicesHealthCheck {
   -- | http: Additional configuration for protocol http
   postLoadBalancersRequestBodyServicesHealthCheckHttp :: (GHC.Maybe.Maybe PostLoadBalancersRequestBodyServicesHealthCheckHttp)
   -- | interval: Time interval in seconds health checks are performed
-  , postLoadBalancersRequestBodyServicesHealthCheckInterval :: GHC.Integer.Type.Integer
+  , postLoadBalancersRequestBodyServicesHealthCheckInterval :: GHC.Types.Int
   -- | port: Port the health check will be performed on
-  , postLoadBalancersRequestBodyServicesHealthCheckPort :: GHC.Integer.Type.Integer
+  , postLoadBalancersRequestBodyServicesHealthCheckPort :: GHC.Types.Int
   -- | protocol: Type of the health check
   , postLoadBalancersRequestBodyServicesHealthCheckProtocol :: PostLoadBalancersRequestBodyServicesHealthCheckProtocol
   -- | retries: Unsuccessful retries needed until a target is considered unhealthy; an unhealthy target needs the same number of successful retries to become healthy again
-  , postLoadBalancersRequestBodyServicesHealthCheckRetries :: GHC.Integer.Type.Integer
+  , postLoadBalancersRequestBodyServicesHealthCheckRetries :: GHC.Types.Int
   -- | timeout: Time in seconds after an attempt is considered a timeout
-  , postLoadBalancersRequestBodyServicesHealthCheckTimeout :: GHC.Integer.Type.Integer
+  , postLoadBalancersRequestBodyServicesHealthCheckTimeout :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyServicesHealthCheck
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "http" (postLoadBalancersRequestBodyServicesHealthCheckHttp obj) : (Data.Aeson..=) "interval" (postLoadBalancersRequestBodyServicesHealthCheckInterval obj) : (Data.Aeson..=) "port" (postLoadBalancersRequestBodyServicesHealthCheckPort obj) : (Data.Aeson..=) "protocol" (postLoadBalancersRequestBodyServicesHealthCheckProtocol obj) : (Data.Aeson..=) "retries" (postLoadBalancersRequestBodyServicesHealthCheckRetries obj) : (Data.Aeson..=) "timeout" (postLoadBalancersRequestBodyServicesHealthCheckTimeout obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "http" (postLoadBalancersRequestBodyServicesHealthCheckHttp obj) GHC.Base.<> ((Data.Aeson..=) "interval" (postLoadBalancersRequestBodyServicesHealthCheckInterval obj) GHC.Base.<> ((Data.Aeson..=) "port" (postLoadBalancersRequestBodyServicesHealthCheckPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postLoadBalancersRequestBodyServicesHealthCheckProtocol obj) GHC.Base.<> ((Data.Aeson..=) "retries" (postLoadBalancersRequestBodyServicesHealthCheckRetries obj) GHC.Base.<> (Data.Aeson..=) "timeout" (postLoadBalancersRequestBodyServicesHealthCheckTimeout obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyServicesHealthCheck
+    where toJSON obj = Data.Aeson.Types.Internal.object ("http" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttp obj : "interval" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckInterval obj : "port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckPort obj : "protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckProtocol obj : "retries" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckRetries obj : "timeout" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckTimeout obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("http" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttp obj) GHC.Base.<> (("interval" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckInterval obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckProtocol obj) GHC.Base.<> (("retries" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckRetries obj) GHC.Base.<> ("timeout" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckTimeout obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyServicesHealthCheck
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyServicesHealthCheck" (\obj -> (((((GHC.Base.pure PostLoadBalancersRequestBodyServicesHealthCheck GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "interval")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "retries")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "timeout"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyServicesHealth_checkHttp
+-- | Create a new 'PostLoadBalancersRequestBodyServicesHealthCheck' with all required fields.
+mkPostLoadBalancersRequestBodyServicesHealthCheck :: GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckInterval'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckPort'
+  -> PostLoadBalancersRequestBodyServicesHealthCheckProtocol -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckProtocol'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckRetries'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckTimeout'
+  -> PostLoadBalancersRequestBodyServicesHealthCheck
+mkPostLoadBalancersRequestBodyServicesHealthCheck postLoadBalancersRequestBodyServicesHealthCheckInterval postLoadBalancersRequestBodyServicesHealthCheckPort postLoadBalancersRequestBodyServicesHealthCheckProtocol postLoadBalancersRequestBodyServicesHealthCheckRetries postLoadBalancersRequestBodyServicesHealthCheckTimeout = PostLoadBalancersRequestBodyServicesHealthCheck{postLoadBalancersRequestBodyServicesHealthCheckHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersRequestBodyServicesHealthCheckInterval = postLoadBalancersRequestBodyServicesHealthCheckInterval,
+                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersRequestBodyServicesHealthCheckPort = postLoadBalancersRequestBodyServicesHealthCheckPort,
+                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersRequestBodyServicesHealthCheckProtocol = postLoadBalancersRequestBodyServicesHealthCheckProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersRequestBodyServicesHealthCheckRetries = postLoadBalancersRequestBodyServicesHealthCheckRetries,
+                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersRequestBodyServicesHealthCheckTimeout = postLoadBalancersRequestBodyServicesHealthCheckTimeout}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.services.items.properties.health_check.properties.http@ in the specification.
 -- 
 -- Additional configuration for protocol http
 data PostLoadBalancersRequestBodyServicesHealthCheckHttp = PostLoadBalancersRequestBodyServicesHealthCheckHttp {
   -- | domain: Host header to send in the HTTP request. May not contain spaces, percent or backslash symbols. Can be null, in that case no host header is sent.
-  postLoadBalancersRequestBodyServicesHealthCheckHttpDomain :: Data.Text.Internal.Text
+  postLoadBalancersRequestBodyServicesHealthCheckHttpDomain :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | path: HTTP path to use for health checks
   , postLoadBalancersRequestBodyServicesHealthCheckHttpPath :: Data.Text.Internal.Text
   -- | response: String that must be contained in HTTP response in order to pass the health check
   , postLoadBalancersRequestBodyServicesHealthCheckHttpResponse :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status_codes: List of returned HTTP status codes in order to pass the health check. Supports the wildcards \`?\` for exactly one character and \`*\` for multiple ones. The default is to pass the health check for any status code between 2?? and 3??.
-  , postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | tls: Use HTTPS for health check
   , postLoadBalancersRequestBodyServicesHealthCheckHttpTls :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyServicesHealthCheckHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "domain" (postLoadBalancersRequestBodyServicesHealthCheckHttpDomain obj) : (Data.Aeson..=) "path" (postLoadBalancersRequestBodyServicesHealthCheckHttpPath obj) : (Data.Aeson..=) "response" (postLoadBalancersRequestBodyServicesHealthCheckHttpResponse obj) : (Data.Aeson..=) "status_codes" (postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes obj) : (Data.Aeson..=) "tls" (postLoadBalancersRequestBodyServicesHealthCheckHttpTls obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "domain" (postLoadBalancersRequestBodyServicesHealthCheckHttpDomain obj) GHC.Base.<> ((Data.Aeson..=) "path" (postLoadBalancersRequestBodyServicesHealthCheckHttpPath obj) GHC.Base.<> ((Data.Aeson..=) "response" (postLoadBalancersRequestBodyServicesHealthCheckHttpResponse obj) GHC.Base.<> ((Data.Aeson..=) "status_codes" (postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes obj) GHC.Base.<> (Data.Aeson..=) "tls" (postLoadBalancersRequestBodyServicesHealthCheckHttpTls obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyServicesHealthCheckHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("domain" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpDomain obj : "path" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpPath obj : "response" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpResponse obj : "status_codes" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes obj : "tls" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpTls obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("domain" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpDomain obj) GHC.Base.<> (("path" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpPath obj) GHC.Base.<> (("response" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpResponse obj) GHC.Base.<> (("status_codes" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes obj) GHC.Base.<> ("tls" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHealthCheckHttpTls obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyServicesHealthCheckHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyServicesHealthCheckHttp" (\obj -> ((((GHC.Base.pure PostLoadBalancersRequestBodyServicesHealthCheckHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "path")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "response")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status_codes")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tls"))
--- | Defines the enum schema postLoadBalancersRequestBodyServicesHealth_checkProtocol
+-- | Create a new 'PostLoadBalancersRequestBodyServicesHealthCheckHttp' with all required fields.
+mkPostLoadBalancersRequestBodyServicesHealthCheckHttp :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckHttpDomain'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyServicesHealthCheckHttpPath'
+  -> PostLoadBalancersRequestBodyServicesHealthCheckHttp
+mkPostLoadBalancersRequestBodyServicesHealthCheckHttp postLoadBalancersRequestBodyServicesHealthCheckHttpDomain postLoadBalancersRequestBodyServicesHealthCheckHttpPath = PostLoadBalancersRequestBodyServicesHealthCheckHttp{postLoadBalancersRequestBodyServicesHealthCheckHttpDomain = postLoadBalancersRequestBodyServicesHealthCheckHttpDomain,
+                                                                                                                                                                                                                              postLoadBalancersRequestBodyServicesHealthCheckHttpPath = postLoadBalancersRequestBodyServicesHealthCheckHttpPath,
+                                                                                                                                                                                                                              postLoadBalancersRequestBodyServicesHealthCheckHttpResponse = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                              postLoadBalancersRequestBodyServicesHealthCheckHttpStatusCodes = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                              postLoadBalancersRequestBodyServicesHealthCheckHttpTls = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.services.items.properties.health_check.properties.protocol@ in the specification.
 -- 
 -- Type of the health check
-data PostLoadBalancersRequestBodyServicesHealthCheckProtocol
-    = PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumStringHttp
-    | PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyServicesHealthCheckProtocol
-    where toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PostLoadBalancersRequestBodyServicesHealthCheckProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                then PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumStringTcp
-                                                else PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumOther val)
--- | Defines the data type for the schema postLoadBalancersRequestBodyServicesHttp
+data PostLoadBalancersRequestBodyServicesHealthCheckProtocol =
+   PostLoadBalancersRequestBodyServicesHealthCheckProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersRequestBodyServicesHealthCheckProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyServicesHealthCheckProtocol
+    where toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolOther val) = val
+          toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumTcp) = "tcp"
+          toJSON (PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumHttp) = "http"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyServicesHealthCheckProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PostLoadBalancersRequestBodyServicesHealthCheckProtocolEnumHttp
+                                            | GHC.Base.otherwise -> PostLoadBalancersRequestBodyServicesHealthCheckProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.services.items.properties.http@ in the specification.
 -- 
 -- Configuration option for protocols http and https
 data PostLoadBalancersRequestBodyServicesHttp = PostLoadBalancersRequestBodyServicesHttp {
   -- | certificates: IDs of the Certificates to use for TLS\/SSL termination by the Load Balancer; empty for TLS\/SSL passthrough or if \`protocol\` is \"http\"
-  postLoadBalancersRequestBodyServicesHttpCertificates :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  postLoadBalancersRequestBodyServicesHttpCertificates :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | cookie_lifetime: Lifetime of the cookie used for sticky sessions
-  , postLoadBalancersRequestBodyServicesHttpCookieLifetime :: GHC.Integer.Type.Integer
+  , postLoadBalancersRequestBodyServicesHttpCookieLifetime :: GHC.Types.Int
   -- | cookie_name: Name of the cookie used for sticky sessions
   , postLoadBalancersRequestBodyServicesHttpCookieName :: Data.Text.Internal.Text
   -- | redirect_http: Redirect HTTP requests to HTTPS. Only available if protocol is \"https\". Default \`false\`
@@ -279,41 +295,47 @@ data PostLoadBalancersRequestBodyServicesHttp = PostLoadBalancersRequestBodyServ
   , postLoadBalancersRequestBodyServicesHttpStickySessions :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyServicesHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificates" (postLoadBalancersRequestBodyServicesHttpCertificates obj) : (Data.Aeson..=) "cookie_lifetime" (postLoadBalancersRequestBodyServicesHttpCookieLifetime obj) : (Data.Aeson..=) "cookie_name" (postLoadBalancersRequestBodyServicesHttpCookieName obj) : (Data.Aeson..=) "redirect_http" (postLoadBalancersRequestBodyServicesHttpRedirectHttp obj) : (Data.Aeson..=) "sticky_sessions" (postLoadBalancersRequestBodyServicesHttpStickySessions obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificates" (postLoadBalancersRequestBodyServicesHttpCertificates obj) GHC.Base.<> ((Data.Aeson..=) "cookie_lifetime" (postLoadBalancersRequestBodyServicesHttpCookieLifetime obj) GHC.Base.<> ((Data.Aeson..=) "cookie_name" (postLoadBalancersRequestBodyServicesHttpCookieName obj) GHC.Base.<> ((Data.Aeson..=) "redirect_http" (postLoadBalancersRequestBodyServicesHttpRedirectHttp obj) GHC.Base.<> (Data.Aeson..=) "sticky_sessions" (postLoadBalancersRequestBodyServicesHttpStickySessions obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyServicesHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpCertificates obj : "cookie_lifetime" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpCookieLifetime obj : "cookie_name" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpCookieName obj : "redirect_http" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpRedirectHttp obj : "sticky_sessions" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpStickySessions obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpCertificates obj) GHC.Base.<> (("cookie_lifetime" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpCookieLifetime obj) GHC.Base.<> (("cookie_name" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpCookieName obj) GHC.Base.<> (("redirect_http" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpRedirectHttp obj) GHC.Base.<> ("sticky_sessions" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyServicesHttpStickySessions obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyServicesHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyServicesHttp" (\obj -> ((((GHC.Base.pure PostLoadBalancersRequestBodyServicesHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_lifetime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "redirect_http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "sticky_sessions"))
--- | Defines the enum schema postLoadBalancersRequestBodyServicesProtocol
+-- | Create a new 'PostLoadBalancersRequestBodyServicesHttp' with all required fields.
+mkPostLoadBalancersRequestBodyServicesHttp :: GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyServicesHttpCookieLifetime'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyServicesHttpCookieName'
+  -> PostLoadBalancersRequestBodyServicesHttp
+mkPostLoadBalancersRequestBodyServicesHttp postLoadBalancersRequestBodyServicesHttpCookieLifetime postLoadBalancersRequestBodyServicesHttpCookieName = PostLoadBalancersRequestBodyServicesHttp{postLoadBalancersRequestBodyServicesHttpCertificates = GHC.Maybe.Nothing,
+                                                                                                                                                                                                postLoadBalancersRequestBodyServicesHttpCookieLifetime = postLoadBalancersRequestBodyServicesHttpCookieLifetime,
+                                                                                                                                                                                                postLoadBalancersRequestBodyServicesHttpCookieName = postLoadBalancersRequestBodyServicesHttpCookieName,
+                                                                                                                                                                                                postLoadBalancersRequestBodyServicesHttpRedirectHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                postLoadBalancersRequestBodyServicesHttpStickySessions = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.services.items.properties.protocol@ in the specification.
 -- 
 -- Protocol of the Load Balancer
-data PostLoadBalancersRequestBodyServicesProtocol
-    = PostLoadBalancersRequestBodyServicesProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersRequestBodyServicesProtocolEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersRequestBodyServicesProtocolEnumStringHttp
-    | PostLoadBalancersRequestBodyServicesProtocolEnumStringHttps
-    | PostLoadBalancersRequestBodyServicesProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyServicesProtocol
-    where toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumStringHttps) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https"
-          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PostLoadBalancersRequestBodyServicesProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PostLoadBalancersRequestBodyServicesProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https")
-                                                then PostLoadBalancersRequestBodyServicesProtocolEnumStringHttps
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                      then PostLoadBalancersRequestBodyServicesProtocolEnumStringTcp
-                                                      else PostLoadBalancersRequestBodyServicesProtocolEnumOther val)
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargets
+data PostLoadBalancersRequestBodyServicesProtocol =
+   PostLoadBalancersRequestBodyServicesProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersRequestBodyServicesProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersRequestBodyServicesProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostLoadBalancersRequestBodyServicesProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  | PostLoadBalancersRequestBodyServicesProtocolEnumHttps -- ^ Represents the JSON value @"https"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyServicesProtocol
+    where toJSON (PostLoadBalancersRequestBodyServicesProtocolOther val) = val
+          toJSON (PostLoadBalancersRequestBodyServicesProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumTcp) = "tcp"
+          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumHttp) = "http"
+          toJSON (PostLoadBalancersRequestBodyServicesProtocolEnumHttps) = "https"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyServicesProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostLoadBalancersRequestBodyServicesProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PostLoadBalancersRequestBodyServicesProtocolEnumHttp
+                                            | val GHC.Classes.== "https" -> PostLoadBalancersRequestBodyServicesProtocolEnumHttps
+                                            | GHC.Base.otherwise -> PostLoadBalancersRequestBodyServicesProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBodyTargets = PostLoadBalancersRequestBodyTargets {
   -- | health_status: List of health statuses of the services on this target
-  postLoadBalancersRequestBodyTargetsHealthStatus :: (GHC.Maybe.Maybe ([] PostLoadBalancersRequestBodyTargetsHealthStatus))
+  postLoadBalancersRequestBodyTargetsHealthStatus :: (GHC.Maybe.Maybe ([PostLoadBalancersRequestBodyTargetsHealthStatus]))
   -- | ip: IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
   , postLoadBalancersRequestBodyTargetsIp :: (GHC.Maybe.Maybe PostLoadBalancersRequestBodyTargetsIp)
   -- | label_selector: Label selector and a list of selected targets
@@ -321,34 +343,48 @@ data PostLoadBalancersRequestBodyTargets = PostLoadBalancersRequestBodyTargets {
   -- | server: Server where the traffic should be routed through
   , postLoadBalancersRequestBodyTargetsServer :: (GHC.Maybe.Maybe PostLoadBalancersRequestBodyTargetsServer)
   -- | targets: List of selected targets
-  , postLoadBalancersRequestBodyTargetsTargets :: (GHC.Maybe.Maybe ([] PostLoadBalancersRequestBodyTargetsTargets))
+  , postLoadBalancersRequestBodyTargetsTargets :: (GHC.Maybe.Maybe ([PostLoadBalancersRequestBodyTargetsTargets]))
   -- | type: Type of the resource
   , postLoadBalancersRequestBodyTargetsType :: PostLoadBalancersRequestBodyTargetsType
   -- | use_private_ip: Use the private network IP instead of the public IP. Default value is false.
   , postLoadBalancersRequestBodyTargetsUsePrivateIp :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "health_status" (postLoadBalancersRequestBodyTargetsHealthStatus obj) : (Data.Aeson..=) "ip" (postLoadBalancersRequestBodyTargetsIp obj) : (Data.Aeson..=) "label_selector" (postLoadBalancersRequestBodyTargetsLabelSelector obj) : (Data.Aeson..=) "server" (postLoadBalancersRequestBodyTargetsServer obj) : (Data.Aeson..=) "targets" (postLoadBalancersRequestBodyTargetsTargets obj) : (Data.Aeson..=) "type" (postLoadBalancersRequestBodyTargetsType obj) : (Data.Aeson..=) "use_private_ip" (postLoadBalancersRequestBodyTargetsUsePrivateIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "health_status" (postLoadBalancersRequestBodyTargetsHealthStatus obj) GHC.Base.<> ((Data.Aeson..=) "ip" (postLoadBalancersRequestBodyTargetsIp obj) GHC.Base.<> ((Data.Aeson..=) "label_selector" (postLoadBalancersRequestBodyTargetsLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (postLoadBalancersRequestBodyTargetsServer obj) GHC.Base.<> ((Data.Aeson..=) "targets" (postLoadBalancersRequestBodyTargetsTargets obj) GHC.Base.<> ((Data.Aeson..=) "type" (postLoadBalancersRequestBodyTargetsType obj) GHC.Base.<> (Data.Aeson..=) "use_private_ip" (postLoadBalancersRequestBodyTargetsUsePrivateIp obj)))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsHealthStatus obj : "ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsIp obj : "label_selector" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsServer obj : "targets" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargets obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsType obj : "use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsUsePrivateIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsHealthStatus obj) GHC.Base.<> (("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsIp obj) GHC.Base.<> (("label_selector" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsServer obj) GHC.Base.<> (("targets" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargets obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsType obj) GHC.Base.<> ("use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsUsePrivateIp obj)))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargets" (\obj -> ((((((GHC.Base.pure PostLoadBalancersRequestBodyTargets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "health_status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "targets")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "use_private_ip"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsHealth_status
+-- | Create a new 'PostLoadBalancersRequestBodyTargets' with all required fields.
+mkPostLoadBalancersRequestBodyTargets :: PostLoadBalancersRequestBodyTargetsType -- ^ 'postLoadBalancersRequestBodyTargetsType'
+  -> PostLoadBalancersRequestBodyTargets
+mkPostLoadBalancersRequestBodyTargets postLoadBalancersRequestBodyTargetsType = PostLoadBalancersRequestBodyTargets{postLoadBalancersRequestBodyTargetsHealthStatus = GHC.Maybe.Nothing,
+                                                                                                                    postLoadBalancersRequestBodyTargetsIp = GHC.Maybe.Nothing,
+                                                                                                                    postLoadBalancersRequestBodyTargetsLabelSelector = GHC.Maybe.Nothing,
+                                                                                                                    postLoadBalancersRequestBodyTargetsServer = GHC.Maybe.Nothing,
+                                                                                                                    postLoadBalancersRequestBodyTargetsTargets = GHC.Maybe.Nothing,
+                                                                                                                    postLoadBalancersRequestBodyTargetsType = postLoadBalancersRequestBodyTargetsType,
+                                                                                                                    postLoadBalancersRequestBodyTargetsUsePrivateIp = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.health_status.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBodyTargetsHealthStatus = PostLoadBalancersRequestBodyTargetsHealthStatus {
   -- | listen_port
-  postLoadBalancersRequestBodyTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  postLoadBalancersRequestBodyTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status
   , postLoadBalancersRequestBodyTargetsHealthStatusStatus :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsHealthStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "listen_port" (postLoadBalancersRequestBodyTargetsHealthStatusListenPort obj) : (Data.Aeson..=) "status" (postLoadBalancersRequestBodyTargetsHealthStatusStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "listen_port" (postLoadBalancersRequestBodyTargetsHealthStatusListenPort obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersRequestBodyTargetsHealthStatusStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsHealthStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsHealthStatusListenPort obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsHealthStatusStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsHealthStatusListenPort obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsHealthStatusStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsHealthStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsHealthStatus" (\obj -> (GHC.Base.pure PostLoadBalancersRequestBodyTargetsHealthStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsIp
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsHealthStatus' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsHealthStatus :: PostLoadBalancersRequestBodyTargetsHealthStatus
+mkPostLoadBalancersRequestBodyTargetsHealthStatus = PostLoadBalancersRequestBodyTargetsHealthStatus{postLoadBalancersRequestBodyTargetsHealthStatusListenPort = GHC.Maybe.Nothing,
+                                                                                                    postLoadBalancersRequestBodyTargetsHealthStatusStatus = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.ip@ in the specification.
 -- 
 -- IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
 data PostLoadBalancersRequestBodyTargetsIp = PostLoadBalancersRequestBodyTargetsIp {
@@ -356,12 +392,16 @@ data PostLoadBalancersRequestBodyTargetsIp = PostLoadBalancersRequestBodyTargets
   postLoadBalancersRequestBodyTargetsIpIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsIp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (postLoadBalancersRequestBodyTargetsIpIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (postLoadBalancersRequestBodyTargetsIpIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsIp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsIpIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsIpIp obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsIp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsIp" (\obj -> GHC.Base.pure PostLoadBalancersRequestBodyTargetsIp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsLabel_selector
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsIp' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsIp :: Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyTargetsIpIp'
+  -> PostLoadBalancersRequestBodyTargetsIp
+mkPostLoadBalancersRequestBodyTargetsIp postLoadBalancersRequestBodyTargetsIpIp = PostLoadBalancersRequestBodyTargetsIp{postLoadBalancersRequestBodyTargetsIpIp = postLoadBalancersRequestBodyTargetsIpIp}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.label_selector@ in the specification.
 -- 
 -- Label selector and a list of selected targets
 data PostLoadBalancersRequestBodyTargetsLabelSelector = PostLoadBalancersRequestBodyTargetsLabelSelector {
@@ -369,30 +409,38 @@ data PostLoadBalancersRequestBodyTargetsLabelSelector = PostLoadBalancersRequest
   postLoadBalancersRequestBodyTargetsLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (postLoadBalancersRequestBodyTargetsLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (postLoadBalancersRequestBodyTargetsLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsLabelSelector" (\obj -> GHC.Base.pure PostLoadBalancersRequestBodyTargetsLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsServer
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsLabelSelector' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsLabelSelector :: Data.Text.Internal.Text -- ^ 'postLoadBalancersRequestBodyTargetsLabelSelectorSelector'
+  -> PostLoadBalancersRequestBodyTargetsLabelSelector
+mkPostLoadBalancersRequestBodyTargetsLabelSelector postLoadBalancersRequestBodyTargetsLabelSelectorSelector = PostLoadBalancersRequestBodyTargetsLabelSelector{postLoadBalancersRequestBodyTargetsLabelSelectorSelector = postLoadBalancersRequestBodyTargetsLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.server@ in the specification.
 -- 
 -- Server where the traffic should be routed through
 data PostLoadBalancersRequestBodyTargetsServer = PostLoadBalancersRequestBodyTargetsServer {
   -- | id: ID of the Server
-  postLoadBalancersRequestBodyTargetsServerId :: GHC.Integer.Type.Integer
+  postLoadBalancersRequestBodyTargetsServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersRequestBodyTargetsServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersRequestBodyTargetsServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsServer" (\obj -> GHC.Base.pure PostLoadBalancersRequestBodyTargetsServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsTargets
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsServer' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsServer :: GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyTargetsServerId'
+  -> PostLoadBalancersRequestBodyTargetsServer
+mkPostLoadBalancersRequestBodyTargetsServer postLoadBalancersRequestBodyTargetsServerId = PostLoadBalancersRequestBodyTargetsServer{postLoadBalancersRequestBodyTargetsServerId = postLoadBalancersRequestBodyTargetsServerId}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.targets.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBodyTargetsTargets = PostLoadBalancersRequestBodyTargetsTargets {
   -- | health_status
-  postLoadBalancersRequestBodyTargetsTargetsHealthStatus :: (GHC.Maybe.Maybe ([] PostLoadBalancersRequestBodyTargetsTargetsHealthStatus))
+  postLoadBalancersRequestBodyTargetsTargetsHealthStatus :: (GHC.Maybe.Maybe ([PostLoadBalancersRequestBodyTargetsTargetsHealthStatus]))
   -- | server
   , postLoadBalancersRequestBodyTargetsTargetsServer :: (GHC.Maybe.Maybe PostLoadBalancersRequestBodyTargetsTargetsServer)
   -- | type
@@ -401,71 +449,82 @@ data PostLoadBalancersRequestBodyTargetsTargets = PostLoadBalancersRequestBodyTa
   , postLoadBalancersRequestBodyTargetsTargetsUsePrivateIp :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsTargets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "health_status" (postLoadBalancersRequestBodyTargetsTargetsHealthStatus obj) : (Data.Aeson..=) "server" (postLoadBalancersRequestBodyTargetsTargetsServer obj) : (Data.Aeson..=) "type" (postLoadBalancersRequestBodyTargetsTargetsType obj) : (Data.Aeson..=) "use_private_ip" (postLoadBalancersRequestBodyTargetsTargetsUsePrivateIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "health_status" (postLoadBalancersRequestBodyTargetsTargetsHealthStatus obj) GHC.Base.<> ((Data.Aeson..=) "server" (postLoadBalancersRequestBodyTargetsTargetsServer obj) GHC.Base.<> ((Data.Aeson..=) "type" (postLoadBalancersRequestBodyTargetsTargetsType obj) GHC.Base.<> (Data.Aeson..=) "use_private_ip" (postLoadBalancersRequestBodyTargetsTargetsUsePrivateIp obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsTargets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsHealthStatus obj : "server" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsServer obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsType obj : "use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsUsePrivateIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsHealthStatus obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsServer obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsType obj) GHC.Base.<> ("use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsUsePrivateIp obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsTargets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsTargets" (\obj -> (((GHC.Base.pure PostLoadBalancersRequestBodyTargetsTargets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "health_status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "use_private_ip"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsTargetsHealth_status
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsTargets' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsTargets :: PostLoadBalancersRequestBodyTargetsTargets
+mkPostLoadBalancersRequestBodyTargetsTargets = PostLoadBalancersRequestBodyTargetsTargets{postLoadBalancersRequestBodyTargetsTargetsHealthStatus = GHC.Maybe.Nothing,
+                                                                                          postLoadBalancersRequestBodyTargetsTargetsServer = GHC.Maybe.Nothing,
+                                                                                          postLoadBalancersRequestBodyTargetsTargetsType = GHC.Maybe.Nothing,
+                                                                                          postLoadBalancersRequestBodyTargetsTargetsUsePrivateIp = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.targets.items.properties.health_status.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBodyTargetsTargetsHealthStatus = PostLoadBalancersRequestBodyTargetsTargetsHealthStatus {
   -- | listen_port
-  postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status
   , postLoadBalancersRequestBodyTargetsTargetsHealthStatusStatus :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsTargetsHealthStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "listen_port" (postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort obj) : (Data.Aeson..=) "status" (postLoadBalancersRequestBodyTargetsTargetsHealthStatusStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "listen_port" (postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersRequestBodyTargetsTargetsHealthStatusStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsTargetsHealthStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsHealthStatusStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsHealthStatusStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsTargetsHealthStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsTargetsHealthStatus" (\obj -> (GHC.Base.pure PostLoadBalancersRequestBodyTargetsTargetsHealthStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the data type for the schema postLoadBalancersRequestBodyTargetsTargetsServer
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsTargetsHealthStatus' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsTargetsHealthStatus :: PostLoadBalancersRequestBodyTargetsTargetsHealthStatus
+mkPostLoadBalancersRequestBodyTargetsTargetsHealthStatus = PostLoadBalancersRequestBodyTargetsTargetsHealthStatus{postLoadBalancersRequestBodyTargetsTargetsHealthStatusListenPort = GHC.Maybe.Nothing,
+                                                                                                                  postLoadBalancersRequestBodyTargetsTargetsHealthStatusStatus = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.targets.items.properties.server@ in the specification.
 -- 
 -- 
 data PostLoadBalancersRequestBodyTargetsTargetsServer = PostLoadBalancersRequestBodyTargetsTargetsServer {
   -- | id: ID of the Server
-  postLoadBalancersRequestBodyTargetsTargetsServerId :: GHC.Integer.Type.Integer
+  postLoadBalancersRequestBodyTargetsTargetsServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsTargetsServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersRequestBodyTargetsTargetsServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersRequestBodyTargetsTargetsServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsTargetsServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersRequestBodyTargetsTargetsServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsTargetsServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersRequestBodyTargetsTargetsServer" (\obj -> GHC.Base.pure PostLoadBalancersRequestBodyTargetsTargetsServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema postLoadBalancersRequestBodyTargetsType
+-- | Create a new 'PostLoadBalancersRequestBodyTargetsTargetsServer' with all required fields.
+mkPostLoadBalancersRequestBodyTargetsTargetsServer :: GHC.Types.Int -- ^ 'postLoadBalancersRequestBodyTargetsTargetsServerId'
+  -> PostLoadBalancersRequestBodyTargetsTargetsServer
+mkPostLoadBalancersRequestBodyTargetsTargetsServer postLoadBalancersRequestBodyTargetsTargetsServerId = PostLoadBalancersRequestBodyTargetsTargetsServer{postLoadBalancersRequestBodyTargetsTargetsServerId = postLoadBalancersRequestBodyTargetsTargetsServerId}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.requestBody.content.application\/json.schema.properties.targets.items.properties.type@ in the specification.
 -- 
 -- Type of the resource
-data PostLoadBalancersRequestBodyTargetsType
-    = PostLoadBalancersRequestBodyTargetsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersRequestBodyTargetsTypeEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersRequestBodyTargetsTypeEnumStringIp
-    | PostLoadBalancersRequestBodyTargetsTypeEnumStringLabelSelector
-    | PostLoadBalancersRequestBodyTargetsTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersRequestBodyTargetsType
-    where toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumStringIp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip"
-          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PostLoadBalancersRequestBodyTargetsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip")
-                                          then PostLoadBalancersRequestBodyTargetsTypeEnumStringIp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                                then PostLoadBalancersRequestBodyTargetsTypeEnumStringLabelSelector
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                      then PostLoadBalancersRequestBodyTargetsTypeEnumStringServer
-                                                      else PostLoadBalancersRequestBodyTargetsTypeEnumOther val)
+data PostLoadBalancersRequestBodyTargetsType =
+   PostLoadBalancersRequestBodyTargetsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersRequestBodyTargetsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersRequestBodyTargetsTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PostLoadBalancersRequestBodyTargetsTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  | PostLoadBalancersRequestBodyTargetsTypeEnumIp -- ^ Represents the JSON value @"ip"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersRequestBodyTargetsType
+    where toJSON (PostLoadBalancersRequestBodyTargetsTypeOther val) = val
+          toJSON (PostLoadBalancersRequestBodyTargetsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumServer) = "server"
+          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumLabelSelector) = "label_selector"
+          toJSON (PostLoadBalancersRequestBodyTargetsTypeEnumIp) = "ip"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersRequestBodyTargetsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> PostLoadBalancersRequestBodyTargetsTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> PostLoadBalancersRequestBodyTargetsTypeEnumLabelSelector
+                                            | val GHC.Classes.== "ip" -> PostLoadBalancersRequestBodyTargetsTypeEnumIp
+                                            | GHC.Base.otherwise -> PostLoadBalancersRequestBodyTargetsTypeOther val)
 -- | Represents a response of the operation 'postLoadBalancers'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostLoadBalancersResponseError' is used.
-data PostLoadBalancersResponse =                                   
-   PostLoadBalancersResponseError GHC.Base.String                  -- ^ Means either no matching case available or a parse error
-  | PostLoadBalancersResponse201 PostLoadBalancersResponseBody201  -- ^ The \`load_balancer\` key contains the Load Balancer that was just created
+data PostLoadBalancersResponse =
+   PostLoadBalancersResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostLoadBalancersResponse201 PostLoadBalancersResponseBody201 -- ^ The \`load_balancer\` key contains the Load Balancer that was just created
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostLoadBalancersResponseBody201
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201 = PostLoadBalancersResponseBody201 {
@@ -475,39 +534,63 @@ data PostLoadBalancersResponseBody201 = PostLoadBalancersResponseBody201 {
   , postLoadBalancersResponseBody201LoadBalancer :: PostLoadBalancersResponseBody201LoadBalancer
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postLoadBalancersResponseBody201Action obj) : (Data.Aeson..=) "load_balancer" (postLoadBalancersResponseBody201LoadBalancer obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postLoadBalancersResponseBody201Action obj) GHC.Base.<> (Data.Aeson..=) "load_balancer" (postLoadBalancersResponseBody201LoadBalancer obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201Action obj : "load_balancer" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancer obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("action" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201Action obj) GHC.Base.<> ("load_balancer" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancer obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "load_balancer"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Action
+-- | Create a new 'PostLoadBalancersResponseBody201' with all required fields.
+mkPostLoadBalancersResponseBody201 :: PostLoadBalancersResponseBody201Action -- ^ 'postLoadBalancersResponseBody201Action'
+  -> PostLoadBalancersResponseBody201LoadBalancer -- ^ 'postLoadBalancersResponseBody201LoadBalancer'
+  -> PostLoadBalancersResponseBody201
+mkPostLoadBalancersResponseBody201 postLoadBalancersResponseBody201Action postLoadBalancersResponseBody201LoadBalancer = PostLoadBalancersResponseBody201{postLoadBalancersResponseBody201Action = postLoadBalancersResponseBody201Action,
+                                                                                                                                                          postLoadBalancersResponseBody201LoadBalancer = postLoadBalancersResponseBody201LoadBalancer}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201Action = PostLoadBalancersResponseBody201Action {
   -- | command: Command executed in the Action
   postLoadBalancersResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postLoadBalancersResponseBody201ActionError :: PostLoadBalancersResponseBody201ActionError
+  , postLoadBalancersResponseBody201ActionError :: (GHC.Maybe.Maybe PostLoadBalancersResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postLoadBalancersResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postLoadBalancersResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postLoadBalancersResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postLoadBalancersResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postLoadBalancersResponseBody201ActionResources :: ([] PostLoadBalancersResponseBody201ActionResources)
+  , postLoadBalancersResponseBody201ActionResources :: ([PostLoadBalancersResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postLoadBalancersResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postLoadBalancersResponseBody201ActionStatus :: PostLoadBalancersResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postLoadBalancersResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postLoadBalancersResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postLoadBalancersResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postLoadBalancersResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postLoadBalancersResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postLoadBalancersResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postLoadBalancersResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postLoadBalancersResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postLoadBalancersResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postLoadBalancersResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postLoadBalancersResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postLoadBalancersResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postLoadBalancersResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postLoadBalancersResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostLoadBalancersResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201ActionError
+-- | Create a new 'PostLoadBalancersResponseBody201Action' with all required fields.
+mkPostLoadBalancersResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostLoadBalancersResponseBody201ActionError -- ^ 'postLoadBalancersResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201ActionProgress'
+  -> [PostLoadBalancersResponseBody201ActionResources] -- ^ 'postLoadBalancersResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201ActionStarted'
+  -> PostLoadBalancersResponseBody201ActionStatus -- ^ 'postLoadBalancersResponseBody201ActionStatus'
+  -> PostLoadBalancersResponseBody201Action
+mkPostLoadBalancersResponseBody201Action postLoadBalancersResponseBody201ActionCommand postLoadBalancersResponseBody201ActionError postLoadBalancersResponseBody201ActionFinished postLoadBalancersResponseBody201ActionId postLoadBalancersResponseBody201ActionProgress postLoadBalancersResponseBody201ActionResources postLoadBalancersResponseBody201ActionStarted postLoadBalancersResponseBody201ActionStatus = PostLoadBalancersResponseBody201Action{postLoadBalancersResponseBody201ActionCommand = postLoadBalancersResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionError = postLoadBalancersResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionFinished = postLoadBalancersResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionId = postLoadBalancersResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionProgress = postLoadBalancersResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionResources = postLoadBalancersResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionStarted = postLoadBalancersResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201ActionStatus = postLoadBalancersResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostLoadBalancersResponseBody201ActionError = PostLoadBalancersResponseBody201ActionError {
@@ -517,51 +600,60 @@ data PostLoadBalancersResponseBody201ActionError = PostLoadBalancersResponseBody
   , postLoadBalancersResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postLoadBalancersResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postLoadBalancersResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postLoadBalancersResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postLoadBalancersResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201ActionError" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201ActionResources
+-- | Create a new 'PostLoadBalancersResponseBody201ActionError' with all required fields.
+mkPostLoadBalancersResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201ActionErrorMessage'
+  -> PostLoadBalancersResponseBody201ActionError
+mkPostLoadBalancersResponseBody201ActionError postLoadBalancersResponseBody201ActionErrorCode postLoadBalancersResponseBody201ActionErrorMessage = PostLoadBalancersResponseBody201ActionError{postLoadBalancersResponseBody201ActionErrorCode = postLoadBalancersResponseBody201ActionErrorCode,
+                                                                                                                                                                                               postLoadBalancersResponseBody201ActionErrorMessage = postLoadBalancersResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201ActionResources = PostLoadBalancersResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postLoadBalancersResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postLoadBalancersResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postLoadBalancersResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postLoadBalancersResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postLoadBalancersResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersResponseBody201ActionStatus
+-- | Create a new 'PostLoadBalancersResponseBody201ActionResources' with all required fields.
+mkPostLoadBalancersResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201ActionResourcesType'
+  -> PostLoadBalancersResponseBody201ActionResources
+mkPostLoadBalancersResponseBody201ActionResources postLoadBalancersResponseBody201ActionResourcesId postLoadBalancersResponseBody201ActionResourcesType = PostLoadBalancersResponseBody201ActionResources{postLoadBalancersResponseBody201ActionResourcesId = postLoadBalancersResponseBody201ActionResourcesId,
+                                                                                                                                                                                                          postLoadBalancersResponseBody201ActionResourcesType = postLoadBalancersResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostLoadBalancersResponseBody201ActionStatus
-    = PostLoadBalancersResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersResponseBody201ActionStatusEnumStringError
-    | PostLoadBalancersResponseBody201ActionStatusEnumStringRunning
-    | PostLoadBalancersResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201ActionStatus
-    where toJSON (PostLoadBalancersResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostLoadBalancersResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostLoadBalancersResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostLoadBalancersResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostLoadBalancersResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostLoadBalancersResponseBody201ActionStatusEnumOther val)
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancer
+data PostLoadBalancersResponseBody201ActionStatus =
+   PostLoadBalancersResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostLoadBalancersResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostLoadBalancersResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201ActionStatus
+    where toJSON (PostLoadBalancersResponseBody201ActionStatusOther val) = val
+          toJSON (PostLoadBalancersResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostLoadBalancersResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostLoadBalancersResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostLoadBalancersResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostLoadBalancersResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostLoadBalancersResponseBody201ActionStatusOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancer = PostLoadBalancersResponseBody201LoadBalancer {
@@ -570,13 +662,13 @@ data PostLoadBalancersResponseBody201LoadBalancer = PostLoadBalancersResponseBod
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , postLoadBalancersResponseBody201LoadBalancerCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , postLoadBalancersResponseBody201LoadBalancerId :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerId :: GHC.Types.Int
   -- | included_traffic: Free Traffic for the current billing period in bytes
-  , postLoadBalancersResponseBody201LoadBalancerIncludedTraffic :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerIncludedTraffic :: GHC.Types.Int
   -- | ingoing_traffic: Inbound Traffic for the current billing period in bytes
-  , postLoadBalancersResponseBody201LoadBalancerIngoingTraffic :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerIngoingTraffic :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | labels: User-defined labels (key-value pairs)
-  , postLoadBalancersResponseBody201LoadBalancerLabels :: PostLoadBalancersResponseBody201LoadBalancerLabels
+  , postLoadBalancersResponseBody201LoadBalancerLabels :: Data.Aeson.Types.Internal.Object
   -- | load_balancer_type
   , postLoadBalancersResponseBody201LoadBalancerLoadBalancerType :: PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType
   -- | location
@@ -584,25 +676,57 @@ data PostLoadBalancersResponseBody201LoadBalancer = PostLoadBalancersResponseBod
   -- | name: Name of the Resource. Must be unique per Project.
   , postLoadBalancersResponseBody201LoadBalancerName :: Data.Text.Internal.Text
   -- | outgoing_traffic: Outbound Traffic for the current billing period in bytes
-  , postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | private_net: Private networks information
-  , postLoadBalancersResponseBody201LoadBalancerPrivateNet :: ([] PostLoadBalancersResponseBody201LoadBalancerPrivateNet)
+  , postLoadBalancersResponseBody201LoadBalancerPrivateNet :: ([PostLoadBalancersResponseBody201LoadBalancerPrivateNet])
   -- | protection: Protection configuration for the Resource
   , postLoadBalancersResponseBody201LoadBalancerProtection :: PostLoadBalancersResponseBody201LoadBalancerProtection
   -- | public_net: Public network information
   , postLoadBalancersResponseBody201LoadBalancerPublicNet :: PostLoadBalancersResponseBody201LoadBalancerPublicNet
   -- | services: List of services that belong to this Load Balancer
-  , postLoadBalancersResponseBody201LoadBalancerServices :: ([] PostLoadBalancersResponseBody201LoadBalancerServices)
+  , postLoadBalancersResponseBody201LoadBalancerServices :: ([PostLoadBalancersResponseBody201LoadBalancerServices])
   -- | targets: List of targets that belong to this Load Balancer
-  , postLoadBalancersResponseBody201LoadBalancerTargets :: ([] PostLoadBalancersResponseBody201LoadBalancerTargets)
+  , postLoadBalancersResponseBody201LoadBalancerTargets :: ([PostLoadBalancersResponseBody201LoadBalancerTargets])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "algorithm" (postLoadBalancersResponseBody201LoadBalancerAlgorithm obj) : (Data.Aeson..=) "created" (postLoadBalancersResponseBody201LoadBalancerCreated obj) : (Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerId obj) : (Data.Aeson..=) "included_traffic" (postLoadBalancersResponseBody201LoadBalancerIncludedTraffic obj) : (Data.Aeson..=) "ingoing_traffic" (postLoadBalancersResponseBody201LoadBalancerIngoingTraffic obj) : (Data.Aeson..=) "labels" (postLoadBalancersResponseBody201LoadBalancerLabels obj) : (Data.Aeson..=) "load_balancer_type" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerType obj) : (Data.Aeson..=) "location" (postLoadBalancersResponseBody201LoadBalancerLocation obj) : (Data.Aeson..=) "name" (postLoadBalancersResponseBody201LoadBalancerName obj) : (Data.Aeson..=) "outgoing_traffic" (postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic obj) : (Data.Aeson..=) "private_net" (postLoadBalancersResponseBody201LoadBalancerPrivateNet obj) : (Data.Aeson..=) "protection" (postLoadBalancersResponseBody201LoadBalancerProtection obj) : (Data.Aeson..=) "public_net" (postLoadBalancersResponseBody201LoadBalancerPublicNet obj) : (Data.Aeson..=) "services" (postLoadBalancersResponseBody201LoadBalancerServices obj) : (Data.Aeson..=) "targets" (postLoadBalancersResponseBody201LoadBalancerTargets obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "algorithm" (postLoadBalancersResponseBody201LoadBalancerAlgorithm obj) GHC.Base.<> ((Data.Aeson..=) "created" (postLoadBalancersResponseBody201LoadBalancerCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerId obj) GHC.Base.<> ((Data.Aeson..=) "included_traffic" (postLoadBalancersResponseBody201LoadBalancerIncludedTraffic obj) GHC.Base.<> ((Data.Aeson..=) "ingoing_traffic" (postLoadBalancersResponseBody201LoadBalancerIngoingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "labels" (postLoadBalancersResponseBody201LoadBalancerLabels obj) GHC.Base.<> ((Data.Aeson..=) "load_balancer_type" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerType obj) GHC.Base.<> ((Data.Aeson..=) "location" (postLoadBalancersResponseBody201LoadBalancerLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (postLoadBalancersResponseBody201LoadBalancerName obj) GHC.Base.<> ((Data.Aeson..=) "outgoing_traffic" (postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "private_net" (postLoadBalancersResponseBody201LoadBalancerPrivateNet obj) GHC.Base.<> ((Data.Aeson..=) "protection" (postLoadBalancersResponseBody201LoadBalancerProtection obj) GHC.Base.<> ((Data.Aeson..=) "public_net" (postLoadBalancersResponseBody201LoadBalancerPublicNet obj) GHC.Base.<> ((Data.Aeson..=) "services" (postLoadBalancersResponseBody201LoadBalancerServices obj) GHC.Base.<> (Data.Aeson..=) "targets" (postLoadBalancersResponseBody201LoadBalancerTargets obj)))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("algorithm" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerAlgorithm obj : "created" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerCreated obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerId obj : "included_traffic" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerIncludedTraffic obj : "ingoing_traffic" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerIngoingTraffic obj : "labels" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLabels obj : "load_balancer_type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerType obj : "location" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocation obj : "name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerName obj : "outgoing_traffic" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic obj : "private_net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPrivateNet obj : "protection" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerProtection obj : "public_net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNet obj : "services" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServices obj : "targets" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargets obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("algorithm" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerAlgorithm obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerId obj) GHC.Base.<> (("included_traffic" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerIncludedTraffic obj) GHC.Base.<> (("ingoing_traffic" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerIngoingTraffic obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLabels obj) GHC.Base.<> (("load_balancer_type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerType obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerName obj) GHC.Base.<> (("outgoing_traffic" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic obj) GHC.Base.<> (("private_net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPrivateNet obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerProtection obj) GHC.Base.<> (("public_net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNet obj) GHC.Base.<> (("services" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServices obj) GHC.Base.<> ("targets" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargets obj)))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancer" (\obj -> ((((((((((((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "algorithm")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "included_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ingoing_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "load_balancer_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "outgoing_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "private_net")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_net")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "services")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "targets"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerAlgorithm
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancer' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancer :: PostLoadBalancersResponseBody201LoadBalancerAlgorithm -- ^ 'postLoadBalancersResponseBody201LoadBalancerAlgorithm'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerCreated'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerId'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerIncludedTraffic'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerIngoingTraffic'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'postLoadBalancersResponseBody201LoadBalancerLabels'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerType'
+  -> PostLoadBalancersResponseBody201LoadBalancerLocation -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocation'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerName'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic'
+  -> [PostLoadBalancersResponseBody201LoadBalancerPrivateNet] -- ^ 'postLoadBalancersResponseBody201LoadBalancerPrivateNet'
+  -> PostLoadBalancersResponseBody201LoadBalancerProtection -- ^ 'postLoadBalancersResponseBody201LoadBalancerProtection'
+  -> PostLoadBalancersResponseBody201LoadBalancerPublicNet -- ^ 'postLoadBalancersResponseBody201LoadBalancerPublicNet'
+  -> [PostLoadBalancersResponseBody201LoadBalancerServices] -- ^ 'postLoadBalancersResponseBody201LoadBalancerServices'
+  -> [PostLoadBalancersResponseBody201LoadBalancerTargets] -- ^ 'postLoadBalancersResponseBody201LoadBalancerTargets'
+  -> PostLoadBalancersResponseBody201LoadBalancer
+mkPostLoadBalancersResponseBody201LoadBalancer postLoadBalancersResponseBody201LoadBalancerAlgorithm postLoadBalancersResponseBody201LoadBalancerCreated postLoadBalancersResponseBody201LoadBalancerId postLoadBalancersResponseBody201LoadBalancerIncludedTraffic postLoadBalancersResponseBody201LoadBalancerIngoingTraffic postLoadBalancersResponseBody201LoadBalancerLabels postLoadBalancersResponseBody201LoadBalancerLoadBalancerType postLoadBalancersResponseBody201LoadBalancerLocation postLoadBalancersResponseBody201LoadBalancerName postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic postLoadBalancersResponseBody201LoadBalancerPrivateNet postLoadBalancersResponseBody201LoadBalancerProtection postLoadBalancersResponseBody201LoadBalancerPublicNet postLoadBalancersResponseBody201LoadBalancerServices postLoadBalancersResponseBody201LoadBalancerTargets = PostLoadBalancersResponseBody201LoadBalancer{postLoadBalancersResponseBody201LoadBalancerAlgorithm = postLoadBalancersResponseBody201LoadBalancerAlgorithm,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerCreated = postLoadBalancersResponseBody201LoadBalancerCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerId = postLoadBalancersResponseBody201LoadBalancerId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerIncludedTraffic = postLoadBalancersResponseBody201LoadBalancerIncludedTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerIngoingTraffic = postLoadBalancersResponseBody201LoadBalancerIngoingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerLabels = postLoadBalancersResponseBody201LoadBalancerLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerLoadBalancerType = postLoadBalancersResponseBody201LoadBalancerLoadBalancerType,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerLocation = postLoadBalancersResponseBody201LoadBalancerLocation,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerName = postLoadBalancersResponseBody201LoadBalancerName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic = postLoadBalancersResponseBody201LoadBalancerOutgoingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerPrivateNet = postLoadBalancersResponseBody201LoadBalancerPrivateNet,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerProtection = postLoadBalancersResponseBody201LoadBalancerProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerPublicNet = postLoadBalancersResponseBody201LoadBalancerPublicNet,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerServices = postLoadBalancersResponseBody201LoadBalancerServices,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             postLoadBalancersResponseBody201LoadBalancerTargets = postLoadBalancersResponseBody201LoadBalancerTargets}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.algorithm@ in the specification.
 -- 
 -- Algorithm of the Load Balancer
 data PostLoadBalancersResponseBody201LoadBalancerAlgorithm = PostLoadBalancersResponseBody201LoadBalancerAlgorithm {
@@ -610,49 +734,39 @@ data PostLoadBalancersResponseBody201LoadBalancerAlgorithm = PostLoadBalancersRe
   postLoadBalancersResponseBody201LoadBalancerAlgorithmType :: PostLoadBalancersResponseBody201LoadBalancerAlgorithmType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithm
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "type" (postLoadBalancersResponseBody201LoadBalancerAlgorithmType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "type" (postLoadBalancersResponseBody201LoadBalancerAlgorithmType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithm
+    where toJSON obj = Data.Aeson.Types.Internal.object ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerAlgorithmType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerAlgorithmType obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithm
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerAlgorithm" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerAlgorithm GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostLoadBalancersResponseBody201Load_balancerAlgorithmType
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerAlgorithm' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerAlgorithm :: PostLoadBalancersResponseBody201LoadBalancerAlgorithmType -- ^ 'postLoadBalancersResponseBody201LoadBalancerAlgorithmType'
+  -> PostLoadBalancersResponseBody201LoadBalancerAlgorithm
+mkPostLoadBalancersResponseBody201LoadBalancerAlgorithm postLoadBalancersResponseBody201LoadBalancerAlgorithmType = PostLoadBalancersResponseBody201LoadBalancerAlgorithm{postLoadBalancersResponseBody201LoadBalancerAlgorithmType = postLoadBalancersResponseBody201LoadBalancerAlgorithmType}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.algorithm.properties.type@ in the specification.
 -- 
 -- Type of the algorithm
-data PostLoadBalancersResponseBody201LoadBalancerAlgorithmType
-    = PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumStringLeastConnections
-    | PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumStringRoundRobin
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithmType
-    where toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumStringLeastConnections) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "least_connections"
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumStringRoundRobin) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "round_robin"
-instance Data.Aeson.FromJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithmType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "least_connections")
-                                          then PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumStringLeastConnections
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "round_robin")
-                                                then PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumStringRoundRobin
-                                                else PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumOther val)
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerLabels
--- 
--- User-defined labels (key-value pairs)
-data PostLoadBalancersResponseBody201LoadBalancerLabels = PostLoadBalancersResponseBody201LoadBalancerLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerLabels" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerLabels)
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerLoad_balancer_type
+data PostLoadBalancersResponseBody201LoadBalancerAlgorithmType =
+   PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumRoundRobin -- ^ Represents the JSON value @"round_robin"@
+  | PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumLeastConnections -- ^ Represents the JSON value @"least_connections"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithmType
+    where toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeOther val) = val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumRoundRobin) = "round_robin"
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumLeastConnections) = "least_connections"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerAlgorithmType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "round_robin" -> PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumRoundRobin
+                                            | val GHC.Classes.== "least_connections" -> PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeEnumLeastConnections
+                                            | GHC.Base.otherwise -> PostLoadBalancersResponseBody201LoadBalancerAlgorithmTypeOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType {
   -- | deprecated: Point in time when the Load Balancer type is deprecated (in ISO-8601 format)
-  postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated :: Data.Text.Internal.Text
+  postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Load Balancer type
   , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription :: Data.Text.Internal.Text
   -- | id: ID of the Load Balancer type
@@ -668,15 +782,35 @@ data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType = PostLoadBala
   -- | name: Unique identifier of the Load Balancer type
   , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName :: Data.Text.Internal.Text
   -- | prices: Prices in different network zones
-  , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices :: ([] PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices)
+  , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices :: ([PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "deprecated" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated obj) : (Data.Aeson..=) "description" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription obj) : (Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId obj) : (Data.Aeson..=) "max_assigned_certificates" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj) : (Data.Aeson..=) "max_connections" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections obj) : (Data.Aeson..=) "max_services" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices obj) : (Data.Aeson..=) "max_targets" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets obj) : (Data.Aeson..=) "name" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName obj) : (Data.Aeson..=) "prices" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "deprecated" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId obj) GHC.Base.<> ((Data.Aeson..=) "max_assigned_certificates" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj) GHC.Base.<> ((Data.Aeson..=) "max_connections" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections obj) GHC.Base.<> ((Data.Aeson..=) "max_services" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices obj) GHC.Base.<> ((Data.Aeson..=) "max_targets" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets obj) GHC.Base.<> ((Data.Aeson..=) "name" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName obj) GHC.Base.<> (Data.Aeson..=) "prices" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices obj)))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType
+    where toJSON obj = Data.Aeson.Types.Internal.object ("deprecated" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated obj : "description" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId obj : "max_assigned_certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj : "max_connections" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections obj : "max_services" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices obj : "max_targets" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets obj : "name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName obj : "prices" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("deprecated" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId obj) GHC.Base.<> (("max_assigned_certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates obj) GHC.Base.<> (("max_connections" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections obj) GHC.Base.<> (("max_services" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices obj) GHC.Base.<> (("max_targets" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName obj) GHC.Base.<> ("prices" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices obj)))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType" (\obj -> ((((((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_assigned_certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_connections")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_services")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "max_targets")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerLoad_balancer_typePrices
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerType :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName'
+  -> [PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices] -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerType postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerType{postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxAssignedCertificates,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxConnections,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxServices,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeMaxTargets,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypeName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type.properties.prices.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices {
@@ -688,12 +822,20 @@ data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices = PostLo
   , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly :: PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation obj) : (Data.Aeson..=) "price_hourly" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly obj) : (Data.Aeson..=) "price_monthly" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation obj) GHC.Base.<> ((Data.Aeson..=) "price_hourly" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation obj : "price_hourly" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly obj : "price_monthly" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation obj) GHC.Base.<> (("price_hourly" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices" (\obj -> ((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_hourly")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerLoad_balancer_typePricesPrice_hourly
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePrices{postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesLocation,
+                                                                                                                                                                                                                                                                                                                                                                                  postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly,
+                                                                                                                                                                                                                                                                                                                                                                                  postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type.properties.prices.items.properties.price_hourly@ in the specification.
 -- 
 -- Hourly costs for a Resource in this Location
 data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly {
@@ -703,12 +845,18 @@ data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHour
   , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj) : (Data.Aeson..=) "net" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj : "net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerLoad_balancer_typePricesPrice_monthly
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourly{postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyGross,
+                                                                                                                                                                                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceHourlyNet}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.load_balancer_type.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Resource in this Location
 data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly {
@@ -718,12 +866,18 @@ data PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMont
   , postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerLocation
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet'
+  -> PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly
+mkPostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet = PostLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthly{postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                                                                                        postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet = postLoadBalancersResponseBody201LoadBalancerLoadBalancerTypePricesPriceMonthlyNet}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.location@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerLocation = PostLoadBalancersResponseBody201LoadBalancerLocation {
@@ -745,27 +899,49 @@ data PostLoadBalancersResponseBody201LoadBalancerLocation = PostLoadBalancersRes
   , postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (postLoadBalancersResponseBody201LoadBalancerLocationCity obj) : (Data.Aeson..=) "country" (postLoadBalancersResponseBody201LoadBalancerLocationCountry obj) : (Data.Aeson..=) "description" (postLoadBalancersResponseBody201LoadBalancerLocationDescription obj) : (Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerLocationId obj) : (Data.Aeson..=) "latitude" (postLoadBalancersResponseBody201LoadBalancerLocationLatitude obj) : (Data.Aeson..=) "longitude" (postLoadBalancersResponseBody201LoadBalancerLocationLongitude obj) : (Data.Aeson..=) "name" (postLoadBalancersResponseBody201LoadBalancerLocationName obj) : (Data.Aeson..=) "network_zone" (postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (postLoadBalancersResponseBody201LoadBalancerLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (postLoadBalancersResponseBody201LoadBalancerLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (postLoadBalancersResponseBody201LoadBalancerLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (postLoadBalancersResponseBody201LoadBalancerLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (postLoadBalancersResponseBody201LoadBalancerLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (postLoadBalancersResponseBody201LoadBalancerLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationCity obj : "country" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerLocation" (\obj -> (((((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerPrivate_net
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerLocation' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerLocation :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationDescription'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationId'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationLatitude'
+  -> GHC.Types.Double -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationName'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone'
+  -> PostLoadBalancersResponseBody201LoadBalancerLocation
+mkPostLoadBalancersResponseBody201LoadBalancerLocation postLoadBalancersResponseBody201LoadBalancerLocationCity postLoadBalancersResponseBody201LoadBalancerLocationCountry postLoadBalancersResponseBody201LoadBalancerLocationDescription postLoadBalancersResponseBody201LoadBalancerLocationId postLoadBalancersResponseBody201LoadBalancerLocationLatitude postLoadBalancersResponseBody201LoadBalancerLocationLongitude postLoadBalancersResponseBody201LoadBalancerLocationName postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone = PostLoadBalancersResponseBody201LoadBalancerLocation{postLoadBalancersResponseBody201LoadBalancerLocationCity = postLoadBalancersResponseBody201LoadBalancerLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationCountry = postLoadBalancersResponseBody201LoadBalancerLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationDescription = postLoadBalancersResponseBody201LoadBalancerLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationId = postLoadBalancersResponseBody201LoadBalancerLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationLatitude = postLoadBalancersResponseBody201LoadBalancerLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationLongitude = postLoadBalancersResponseBody201LoadBalancerLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationName = postLoadBalancersResponseBody201LoadBalancerLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone = postLoadBalancersResponseBody201LoadBalancerLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.private_net.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerPrivateNet = PostLoadBalancersResponseBody201LoadBalancerPrivateNet {
   -- | ip
   postLoadBalancersResponseBody201LoadBalancerPrivateNetIp :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | network
-  , postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork :: (GHC.Maybe.Maybe GHC.Types.Int)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerPrivateNet
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerPrivateNetIp obj) : (Data.Aeson..=) "network" (postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerPrivateNetIp obj) GHC.Base.<> (Data.Aeson..=) "network" (postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerPrivateNet
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPrivateNetIp obj : "network" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPrivateNetIp obj) GHC.Base.<> ("network" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerPrivateNet
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerPrivateNet" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerPrivateNet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "network"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerProtection
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerPrivateNet' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerPrivateNet :: PostLoadBalancersResponseBody201LoadBalancerPrivateNet
+mkPostLoadBalancersResponseBody201LoadBalancerPrivateNet = PostLoadBalancersResponseBody201LoadBalancerPrivateNet{postLoadBalancersResponseBody201LoadBalancerPrivateNetIp = GHC.Maybe.Nothing,
+                                                                                                                  postLoadBalancersResponseBody201LoadBalancerPrivateNetNetwork = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data PostLoadBalancersResponseBody201LoadBalancerProtection = PostLoadBalancersResponseBody201LoadBalancerProtection {
@@ -773,12 +949,16 @@ data PostLoadBalancersResponseBody201LoadBalancerProtection = PostLoadBalancersR
   postLoadBalancersResponseBody201LoadBalancerProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (postLoadBalancersResponseBody201LoadBalancerProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (postLoadBalancersResponseBody201LoadBalancerProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerProtection" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerPublic_net
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerProtection' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerProtection :: GHC.Types.Bool -- ^ 'postLoadBalancersResponseBody201LoadBalancerProtectionDelete'
+  -> PostLoadBalancersResponseBody201LoadBalancerProtection
+mkPostLoadBalancersResponseBody201LoadBalancerProtection postLoadBalancersResponseBody201LoadBalancerProtectionDelete = PostLoadBalancersResponseBody201LoadBalancerProtection{postLoadBalancersResponseBody201LoadBalancerProtectionDelete = postLoadBalancersResponseBody201LoadBalancerProtectionDelete}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.public_net@ in the specification.
 -- 
 -- Public network information
 data PostLoadBalancersResponseBody201LoadBalancerPublicNet = PostLoadBalancersResponseBody201LoadBalancerPublicNet {
@@ -790,12 +970,20 @@ data PostLoadBalancersResponseBody201LoadBalancerPublicNet = PostLoadBalancersRe
   , postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 :: PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerPublicNet
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "enabled" (postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled obj) : (Data.Aeson..=) "ipv4" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 obj) : (Data.Aeson..=) "ipv6" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "enabled" (postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled obj) GHC.Base.<> ((Data.Aeson..=) "ipv4" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 obj) GHC.Base.<> (Data.Aeson..=) "ipv6" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerPublicNet
+    where toJSON obj = Data.Aeson.Types.Internal.object ("enabled" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled obj : "ipv4" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 obj : "ipv6" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("enabled" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled obj) GHC.Base.<> (("ipv4" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 obj) GHC.Base.<> ("ipv6" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerPublicNet
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerPublicNet" (\obj -> ((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerPublicNet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "enabled")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ipv4")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ipv6"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerPublic_netIpv4
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerPublicNet' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerPublicNet :: GHC.Types.Bool -- ^ 'postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled'
+  -> PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 -- ^ 'postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4'
+  -> PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 -- ^ 'postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6'
+  -> PostLoadBalancersResponseBody201LoadBalancerPublicNet
+mkPostLoadBalancersResponseBody201LoadBalancerPublicNet postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 = PostLoadBalancersResponseBody201LoadBalancerPublicNet{postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled = postLoadBalancersResponseBody201LoadBalancerPublicNetEnabled,
+                                                                                                                                                                                                                                                                                                 postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 = postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4,
+                                                                                                                                                                                                                                                                                                 postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 = postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.public_net.properties.ipv4@ in the specification.
 -- 
 -- IP address (v4)
 data PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 = PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 {
@@ -805,12 +993,16 @@ data PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 = PostLoadBalance
   , postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4Ip :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4DnsPtr obj) : (Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4Ip obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4DnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4Ip obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4DnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4Ip obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4DnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4Ip obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerPublic_netIpv6
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 :: PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4
+mkPostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4 = PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv4{postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4DnsPtr = GHC.Maybe.Nothing,
+                                                                                                                        postLoadBalancersResponseBody201LoadBalancerPublicNetIpv4Ip = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.public_net.properties.ipv6@ in the specification.
 -- 
 -- IP address (v6)
 data PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 = PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 {
@@ -820,106 +1012,143 @@ data PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 = PostLoadBalance
   , postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6Ip :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6DnsPtr obj) : (Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6Ip obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6DnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6Ip obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6DnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6Ip obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6DnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6Ip obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerServices
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 :: PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6
+mkPostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6 = PostLoadBalancersResponseBody201LoadBalancerPublicNetIpv6{postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6DnsPtr = GHC.Maybe.Nothing,
+                                                                                                                        postLoadBalancersResponseBody201LoadBalancerPublicNetIpv6Ip = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.services.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerServices = PostLoadBalancersResponseBody201LoadBalancerServices {
   -- | destination_port: Port the Load Balancer will balance to
-  postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort :: GHC.Integer.Type.Integer
+  postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort :: GHC.Types.Int
   -- | health_check: Service health check
   , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck :: PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck
   -- | http: Configuration option for protocols http and https
   , postLoadBalancersResponseBody201LoadBalancerServicesHttp :: (GHC.Maybe.Maybe PostLoadBalancersResponseBody201LoadBalancerServicesHttp)
   -- | listen_port: Port the Load Balancer listens on
-  , postLoadBalancersResponseBody201LoadBalancerServicesListenPort :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerServicesListenPort :: GHC.Types.Int
   -- | protocol: Protocol of the Load Balancer
   , postLoadBalancersResponseBody201LoadBalancerServicesProtocol :: PostLoadBalancersResponseBody201LoadBalancerServicesProtocol
   -- | proxyprotocol: Is Proxyprotocol enabled or not
   , postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerServices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "destination_port" (postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort obj) : (Data.Aeson..=) "health_check" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck obj) : (Data.Aeson..=) "http" (postLoadBalancersResponseBody201LoadBalancerServicesHttp obj) : (Data.Aeson..=) "listen_port" (postLoadBalancersResponseBody201LoadBalancerServicesListenPort obj) : (Data.Aeson..=) "protocol" (postLoadBalancersResponseBody201LoadBalancerServicesProtocol obj) : (Data.Aeson..=) "proxyprotocol" (postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "destination_port" (postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort obj) GHC.Base.<> ((Data.Aeson..=) "health_check" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck obj) GHC.Base.<> ((Data.Aeson..=) "http" (postLoadBalancersResponseBody201LoadBalancerServicesHttp obj) GHC.Base.<> ((Data.Aeson..=) "listen_port" (postLoadBalancersResponseBody201LoadBalancerServicesListenPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postLoadBalancersResponseBody201LoadBalancerServicesProtocol obj) GHC.Base.<> (Data.Aeson..=) "proxyprotocol" (postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerServices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("destination_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort obj : "health_check" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck obj : "http" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttp obj : "listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesListenPort obj : "protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesProtocol obj : "proxyprotocol" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("destination_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort obj) GHC.Base.<> (("health_check" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck obj) GHC.Base.<> (("http" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttp obj) GHC.Base.<> (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesListenPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesProtocol obj) GHC.Base.<> ("proxyprotocol" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerServices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerServices" (\obj -> (((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerServices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "destination_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "health_check")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "proxyprotocol"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerServicesHealth_check
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerServices' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerServices :: GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort'
+  -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesListenPort'
+  -> PostLoadBalancersResponseBody201LoadBalancerServicesProtocol -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesProtocol'
+  -> GHC.Types.Bool -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol'
+  -> PostLoadBalancersResponseBody201LoadBalancerServices
+mkPostLoadBalancersResponseBody201LoadBalancerServices postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck postLoadBalancersResponseBody201LoadBalancerServicesListenPort postLoadBalancersResponseBody201LoadBalancerServicesProtocol postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol = PostLoadBalancersResponseBody201LoadBalancerServices{postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort = postLoadBalancersResponseBody201LoadBalancerServicesDestinationPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheck,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesListenPort = postLoadBalancersResponseBody201LoadBalancerServicesListenPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesProtocol = postLoadBalancersResponseBody201LoadBalancerServicesProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol = postLoadBalancersResponseBody201LoadBalancerServicesProxyprotocol}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.health_check@ in the specification.
 -- 
 -- Service health check
 data PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck = PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck {
   -- | http: Additional configuration for protocol http
   postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp :: (GHC.Maybe.Maybe PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp)
   -- | interval: Time interval in seconds health checks are performed
-  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval :: GHC.Types.Int
   -- | port: Port the health check will be performed on
-  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort :: GHC.Types.Int
   -- | protocol: Type of the health check
   , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol :: PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol
   -- | retries: Unsuccessful retries needed until a target is considered unhealthy; an unhealthy target needs the same number of successful retries to become healthy again
-  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries :: GHC.Types.Int
   -- | timeout: Time in seconds after an attempt is considered a timeout
-  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "http" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp obj) : (Data.Aeson..=) "interval" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval obj) : (Data.Aeson..=) "port" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort obj) : (Data.Aeson..=) "protocol" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol obj) : (Data.Aeson..=) "retries" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries obj) : (Data.Aeson..=) "timeout" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "http" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp obj) GHC.Base.<> ((Data.Aeson..=) "interval" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval obj) GHC.Base.<> ((Data.Aeson..=) "port" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort obj) GHC.Base.<> ((Data.Aeson..=) "protocol" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol obj) GHC.Base.<> ((Data.Aeson..=) "retries" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries obj) GHC.Base.<> (Data.Aeson..=) "timeout" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck
+    where toJSON obj = Data.Aeson.Types.Internal.object ("http" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp obj : "interval" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval obj : "port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort obj : "protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol obj : "retries" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries obj : "timeout" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("http" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp obj) GHC.Base.<> (("interval" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval obj) GHC.Base.<> (("port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort obj) GHC.Base.<> (("protocol" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol obj) GHC.Base.<> (("retries" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries obj) GHC.Base.<> ("timeout" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck" (\obj -> (((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "interval")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protocol")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "retries")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "timeout"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerServicesHealth_checkHttp
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck :: GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort'
+  -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries'
+  -> GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout'
+  -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck
+mkPostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout = PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheck{postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckInterval,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckPort,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckRetries,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckTimeout}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.health_check.properties.http@ in the specification.
 -- 
 -- Additional configuration for protocol http
 data PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp = PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp {
   -- | domain: Host header to send in the HTTP request. May not contain spaces, percent or backslash symbols. Can be null, in that case no host header is sent.
-  postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain :: Data.Text.Internal.Text
+  postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | path: HTTP path to use for health checks
   , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath :: Data.Text.Internal.Text
   -- | response: String that must be contained in HTTP response in order to pass the health check
   , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpResponse :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | status_codes: List of returned HTTP status codes in order to pass the health check. Supports the wildcards \`?\` for exactly one character and \`*\` for multiple ones. The default is to pass the health check for any status code between 2?? and 3??.
-  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | tls: Use HTTPS for health check
   , postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpTls :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "domain" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain obj) : (Data.Aeson..=) "path" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath obj) : (Data.Aeson..=) "response" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpResponse obj) : (Data.Aeson..=) "status_codes" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes obj) : (Data.Aeson..=) "tls" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpTls obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "domain" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain obj) GHC.Base.<> ((Data.Aeson..=) "path" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath obj) GHC.Base.<> ((Data.Aeson..=) "response" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpResponse obj) GHC.Base.<> ((Data.Aeson..=) "status_codes" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes obj) GHC.Base.<> (Data.Aeson..=) "tls" (postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpTls obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("domain" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain obj : "path" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath obj : "response" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpResponse obj : "status_codes" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes obj : "tls" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpTls obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("domain" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain obj) GHC.Base.<> (("path" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath obj) GHC.Base.<> (("response" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpResponse obj) GHC.Base.<> (("status_codes" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes obj) GHC.Base.<> ("tls" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpTls obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp" (\obj -> ((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "domain")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "path")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "response")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status_codes")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "tls"))
--- | Defines the enum schema PostLoadBalancersResponseBody201Load_balancerServicesHealth_checkProtocol
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath'
+  -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp
+mkPostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath = PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttp{postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpDomain,
+                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath = postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpPath,
+                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpResponse = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpStatusCodes = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                              postLoadBalancersResponseBody201LoadBalancerServicesHealthCheckHttpTls = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.health_check.properties.protocol@ in the specification.
 -- 
 -- Type of the health check
-data PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol
-    = PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumStringHttp
-    | PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol
-    where toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                then PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumStringTcp
-                                                else PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumOther val)
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerServicesHttp
+data PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol =
+   PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol
+    where toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolOther val) = val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumTcp) = "tcp"
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumHttp) = "http"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolEnumHttp
+                                            | GHC.Base.otherwise -> PostLoadBalancersResponseBody201LoadBalancerServicesHealthCheckProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.http@ in the specification.
 -- 
 -- Configuration option for protocols http and https
 data PostLoadBalancersResponseBody201LoadBalancerServicesHttp = PostLoadBalancersResponseBody201LoadBalancerServicesHttp {
   -- | certificates: IDs of the Certificates to use for TLS\/SSL termination by the Load Balancer; empty for TLS\/SSL passthrough or if \`protocol\` is \"http\"
-  postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | cookie_lifetime: Lifetime of the cookie used for sticky sessions
-  , postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime :: GHC.Integer.Type.Integer
+  , postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime :: GHC.Types.Int
   -- | cookie_name: Name of the cookie used for sticky sessions
   , postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName :: Data.Text.Internal.Text
   -- | redirect_http: Redirect HTTP requests to HTTPS. Only available if protocol is \"https\". Default \`false\`
@@ -928,41 +1157,47 @@ data PostLoadBalancersResponseBody201LoadBalancerServicesHttp = PostLoadBalancer
   , postLoadBalancersResponseBody201LoadBalancerServicesHttpStickySessions :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHttp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "certificates" (postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates obj) : (Data.Aeson..=) "cookie_lifetime" (postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime obj) : (Data.Aeson..=) "cookie_name" (postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName obj) : (Data.Aeson..=) "redirect_http" (postLoadBalancersResponseBody201LoadBalancerServicesHttpRedirectHttp obj) : (Data.Aeson..=) "sticky_sessions" (postLoadBalancersResponseBody201LoadBalancerServicesHttpStickySessions obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "certificates" (postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates obj) GHC.Base.<> ((Data.Aeson..=) "cookie_lifetime" (postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime obj) GHC.Base.<> ((Data.Aeson..=) "cookie_name" (postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName obj) GHC.Base.<> ((Data.Aeson..=) "redirect_http" (postLoadBalancersResponseBody201LoadBalancerServicesHttpRedirectHttp obj) GHC.Base.<> (Data.Aeson..=) "sticky_sessions" (postLoadBalancersResponseBody201LoadBalancerServicesHttpStickySessions obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesHttp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates obj : "cookie_lifetime" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime obj : "cookie_name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName obj : "redirect_http" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpRedirectHttp obj : "sticky_sessions" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpStickySessions obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("certificates" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates obj) GHC.Base.<> (("cookie_lifetime" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime obj) GHC.Base.<> (("cookie_name" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName obj) GHC.Base.<> (("redirect_http" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpRedirectHttp obj) GHC.Base.<> ("sticky_sessions" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerServicesHttpStickySessions obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesHttp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerServicesHttp" (\obj -> ((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerServicesHttp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "certificates")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_lifetime")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cookie_name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "redirect_http")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "sticky_sessions"))
--- | Defines the enum schema PostLoadBalancersResponseBody201Load_balancerServicesProtocol
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerServicesHttp' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerServicesHttp :: GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime'
+  -> Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName'
+  -> PostLoadBalancersResponseBody201LoadBalancerServicesHttp
+mkPostLoadBalancersResponseBody201LoadBalancerServicesHttp postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName = PostLoadBalancersResponseBody201LoadBalancerServicesHttp{postLoadBalancersResponseBody201LoadBalancerServicesHttpCertificates = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime = postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieLifetime,
+                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName = postLoadBalancersResponseBody201LoadBalancerServicesHttpCookieName,
+                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesHttpRedirectHttp = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                postLoadBalancersResponseBody201LoadBalancerServicesHttpStickySessions = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.services.items.properties.protocol@ in the specification.
 -- 
 -- Protocol of the Load Balancer
-data PostLoadBalancersResponseBody201LoadBalancerServicesProtocol
-    = PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringHttp
-    | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringHttps
-    | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringTcp
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesProtocol
-    where toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringHttp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http"
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringHttps) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https"
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringTcp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp"
-instance Data.Aeson.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesProtocol
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "http")
-                                          then PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringHttp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "https")
-                                                then PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringHttps
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "tcp")
-                                                      then PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumStringTcp
-                                                      else PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumOther val)
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargets
+data PostLoadBalancersResponseBody201LoadBalancerServicesProtocol =
+   PostLoadBalancersResponseBody201LoadBalancerServicesProtocolOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumTcp -- ^ Represents the JSON value @"tcp"@
+  | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumHttp -- ^ Represents the JSON value @"http"@
+  | PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumHttps -- ^ Represents the JSON value @"https"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerServicesProtocol
+    where toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolOther val) = val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumTcp) = "tcp"
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumHttp) = "http"
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumHttps) = "https"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerServicesProtocol
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "tcp" -> PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumTcp
+                                            | val GHC.Classes.== "http" -> PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumHttp
+                                            | val GHC.Classes.== "https" -> PostLoadBalancersResponseBody201LoadBalancerServicesProtocolEnumHttps
+                                            | GHC.Base.otherwise -> PostLoadBalancersResponseBody201LoadBalancerServicesProtocolOther val)
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerTargets = PostLoadBalancersResponseBody201LoadBalancerTargets {
   -- | health_status: List of health statuses of the services on this target
-  postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus :: (GHC.Maybe.Maybe ([] PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus))
+  postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus :: (GHC.Maybe.Maybe ([PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus]))
   -- | ip: IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
   , postLoadBalancersResponseBody201LoadBalancerTargetsIp :: (GHC.Maybe.Maybe PostLoadBalancersResponseBody201LoadBalancerTargetsIp)
   -- | label_selector: Label selector and a list of selected targets
@@ -970,34 +1205,48 @@ data PostLoadBalancersResponseBody201LoadBalancerTargets = PostLoadBalancersResp
   -- | server: Server where the traffic should be routed through
   , postLoadBalancersResponseBody201LoadBalancerTargetsServer :: (GHC.Maybe.Maybe PostLoadBalancersResponseBody201LoadBalancerTargetsServer)
   -- | targets: List of selected targets
-  , postLoadBalancersResponseBody201LoadBalancerTargetsTargets :: (GHC.Maybe.Maybe ([] PostLoadBalancersResponseBody201LoadBalancerTargetsTargets))
+  , postLoadBalancersResponseBody201LoadBalancerTargetsTargets :: (GHC.Maybe.Maybe ([PostLoadBalancersResponseBody201LoadBalancerTargetsTargets]))
   -- | type: Type of the resource
   , postLoadBalancersResponseBody201LoadBalancerTargetsType :: PostLoadBalancersResponseBody201LoadBalancerTargetsType
   -- | use_private_ip: Use the private network IP instead of the public IP. Default value is false.
   , postLoadBalancersResponseBody201LoadBalancerTargetsUsePrivateIp :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "health_status" (postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus obj) : (Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerTargetsIp obj) : (Data.Aeson..=) "label_selector" (postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector obj) : (Data.Aeson..=) "server" (postLoadBalancersResponseBody201LoadBalancerTargetsServer obj) : (Data.Aeson..=) "targets" (postLoadBalancersResponseBody201LoadBalancerTargetsTargets obj) : (Data.Aeson..=) "type" (postLoadBalancersResponseBody201LoadBalancerTargetsType obj) : (Data.Aeson..=) "use_private_ip" (postLoadBalancersResponseBody201LoadBalancerTargetsUsePrivateIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "health_status" (postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus obj) GHC.Base.<> ((Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerTargetsIp obj) GHC.Base.<> ((Data.Aeson..=) "label_selector" (postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector obj) GHC.Base.<> ((Data.Aeson..=) "server" (postLoadBalancersResponseBody201LoadBalancerTargetsServer obj) GHC.Base.<> ((Data.Aeson..=) "targets" (postLoadBalancersResponseBody201LoadBalancerTargetsTargets obj) GHC.Base.<> ((Data.Aeson..=) "type" (postLoadBalancersResponseBody201LoadBalancerTargetsType obj) GHC.Base.<> (Data.Aeson..=) "use_private_ip" (postLoadBalancersResponseBody201LoadBalancerTargetsUsePrivateIp obj)))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus obj : "ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsIp obj : "label_selector" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector obj : "server" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsServer obj : "targets" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargets obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsType obj : "use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsUsePrivateIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus obj) GHC.Base.<> (("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsIp obj) GHC.Base.<> (("label_selector" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsServer obj) GHC.Base.<> (("targets" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargets obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsType obj) GHC.Base.<> ("use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsUsePrivateIp obj)))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargets" (\obj -> ((((((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "health_status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "label_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "targets")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "use_private_ip"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsHealth_status
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargets' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargets :: PostLoadBalancersResponseBody201LoadBalancerTargetsType -- ^ 'postLoadBalancersResponseBody201LoadBalancerTargetsType'
+  -> PostLoadBalancersResponseBody201LoadBalancerTargets
+mkPostLoadBalancersResponseBody201LoadBalancerTargets postLoadBalancersResponseBody201LoadBalancerTargetsType = PostLoadBalancersResponseBody201LoadBalancerTargets{postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus = GHC.Maybe.Nothing,
+                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsIp = GHC.Maybe.Nothing,
+                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector = GHC.Maybe.Nothing,
+                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsServer = GHC.Maybe.Nothing,
+                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsTargets = GHC.Maybe.Nothing,
+                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsType = postLoadBalancersResponseBody201LoadBalancerTargetsType,
+                                                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsUsePrivateIp = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.health_status.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus = PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus {
   -- | listen_port
-  postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status
   , postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusStatus :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "listen_port" (postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort obj) : (Data.Aeson..=) "status" (postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "listen_port" (postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsIp
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus :: PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus = PostLoadBalancersResponseBody201LoadBalancerTargetsHealthStatus{postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusListenPort = GHC.Maybe.Nothing,
+                                                                                                                                    postLoadBalancersResponseBody201LoadBalancerTargetsHealthStatusStatus = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.ip@ in the specification.
 -- 
 -- IP targets where the traffic should be routed through. It is only possible to use the (Public or vSwitch) IPs of Hetzner Online Root Servers belonging to the project owner. IPs belonging to other users are blocked. Additionally IPs belonging to services provided by Hetzner Cloud (Servers, Load Balancers, ...) are blocked as well.
 data PostLoadBalancersResponseBody201LoadBalancerTargetsIp = PostLoadBalancersResponseBody201LoadBalancerTargetsIp {
@@ -1005,12 +1254,16 @@ data PostLoadBalancersResponseBody201LoadBalancerTargetsIp = PostLoadBalancersRe
   postLoadBalancersResponseBody201LoadBalancerTargetsIpIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsIp
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerTargetsIpIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "ip" (postLoadBalancersResponseBody201LoadBalancerTargetsIpIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsIp
+    where toJSON obj = Data.Aeson.Types.Internal.object ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsIpIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsIpIp obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsIp
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsIp" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsIp GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsLabel_selector
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsIp' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsIp :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerTargetsIpIp'
+  -> PostLoadBalancersResponseBody201LoadBalancerTargetsIp
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsIp postLoadBalancersResponseBody201LoadBalancerTargetsIpIp = PostLoadBalancersResponseBody201LoadBalancerTargetsIp{postLoadBalancersResponseBody201LoadBalancerTargetsIpIp = postLoadBalancersResponseBody201LoadBalancerTargetsIpIp}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.label_selector@ in the specification.
 -- 
 -- Label selector and a list of selected targets
 data PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector = PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector {
@@ -1018,30 +1271,38 @@ data PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector = PostLoad
   postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "selector" (postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "selector" (postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector
+    where toJSON obj = Data.Aeson.Types.Internal.object ("selector" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("selector" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "selector"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsServer
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector :: Data.Text.Internal.Text -- ^ 'postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector'
+  -> PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector = PostLoadBalancersResponseBody201LoadBalancerTargetsLabelSelector{postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector = postLoadBalancersResponseBody201LoadBalancerTargetsLabelSelectorSelector}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.server@ in the specification.
 -- 
 -- Server where the traffic should be routed through
 data PostLoadBalancersResponseBody201LoadBalancerTargetsServer = PostLoadBalancersResponseBody201LoadBalancerTargetsServer {
   -- | id: ID of the Server
-  postLoadBalancersResponseBody201LoadBalancerTargetsServerId :: GHC.Integer.Type.Integer
+  postLoadBalancersResponseBody201LoadBalancerTargetsServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerTargetsServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerTargetsServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsServer" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsTargets
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsServer' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsServer :: GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerTargetsServerId'
+  -> PostLoadBalancersResponseBody201LoadBalancerTargetsServer
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsServer postLoadBalancersResponseBody201LoadBalancerTargetsServerId = PostLoadBalancersResponseBody201LoadBalancerTargetsServer{postLoadBalancersResponseBody201LoadBalancerTargetsServerId = postLoadBalancersResponseBody201LoadBalancerTargetsServerId}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.targets.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerTargetsTargets = PostLoadBalancersResponseBody201LoadBalancerTargetsTargets {
   -- | health_status
-  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus :: (GHC.Maybe.Maybe ([] PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus))
+  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus :: (GHC.Maybe.Maybe ([PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus]))
   -- | server
   , postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer :: (GHC.Maybe.Maybe PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer)
   -- | type
@@ -1050,60 +1311,95 @@ data PostLoadBalancersResponseBody201LoadBalancerTargetsTargets = PostLoadBalanc
   , postLoadBalancersResponseBody201LoadBalancerTargetsTargetsUsePrivateIp :: (GHC.Maybe.Maybe GHC.Types.Bool)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargets
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "health_status" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus obj) : (Data.Aeson..=) "server" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer obj) : (Data.Aeson..=) "type" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsType obj) : (Data.Aeson..=) "use_private_ip" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsUsePrivateIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "health_status" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus obj) GHC.Base.<> ((Data.Aeson..=) "server" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer obj) GHC.Base.<> ((Data.Aeson..=) "type" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsType obj) GHC.Base.<> (Data.Aeson..=) "use_private_ip" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsUsePrivateIp obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargets
+    where toJSON obj = Data.Aeson.Types.Internal.object ("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus obj : "server" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer obj : "type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsType obj : "use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsUsePrivateIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("health_status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer obj) GHC.Base.<> (("type" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsType obj) GHC.Base.<> ("use_private_ip" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsUsePrivateIp obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargets
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsTargets" (\obj -> (((GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsTargets GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "health_status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "use_private_ip"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsTargetsHealth_status
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsTargets' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsTargets :: PostLoadBalancersResponseBody201LoadBalancerTargetsTargets
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsTargets = PostLoadBalancersResponseBody201LoadBalancerTargetsTargets{postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus = GHC.Maybe.Nothing,
+                                                                                                                          postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer = GHC.Maybe.Nothing,
+                                                                                                                          postLoadBalancersResponseBody201LoadBalancerTargetsTargetsType = GHC.Maybe.Nothing,
+                                                                                                                          postLoadBalancersResponseBody201LoadBalancerTargetsTargetsUsePrivateIp = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.targets.items.properties.health_status.items@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus = PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus {
   -- | listen_port
-  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status
   , postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusStatus :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "listen_port" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort obj) : (Data.Aeson..=) "status" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "listen_port" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort obj) GHC.Base.<> (Data.Aeson..=) "status" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus
+    where toJSON obj = Data.Aeson.Types.Internal.object ("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort obj : "status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("listen_port" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus" (\obj -> (GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "listen_port")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the data type for the schema PostLoadBalancersResponseBody201Load_balancerTargetsTargetsServer
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus :: PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus = PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatus{postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusListenPort = GHC.Maybe.Nothing,
+                                                                                                                                                  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsHealthStatusStatus = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.targets.items.properties.server@ in the specification.
 -- 
 -- 
 data PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer = PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer {
   -- | id: ID of the Server
-  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId :: GHC.Integer.Type.Integer
+  postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId :: GHC.Types.Int
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("id" Data.Aeson.Types.ToJSON..= postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer" (\obj -> GHC.Base.pure PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id"))
--- | Defines the enum schema PostLoadBalancersResponseBody201Load_balancerTargetsType
+-- | Create a new 'PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer' with all required fields.
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer :: GHC.Types.Int -- ^ 'postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId'
+  -> PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer
+mkPostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId = PostLoadBalancersResponseBody201LoadBalancerTargetsTargetsServer{postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId = postLoadBalancersResponseBody201LoadBalancerTargetsTargetsServerId}
+-- | Defines the enum schema located at @paths.\/load_balancers.POST.responses.201.content.application\/json.schema.properties.load_balancer.properties.targets.items.properties.type@ in the specification.
 -- 
 -- Type of the resource
-data PostLoadBalancersResponseBody201LoadBalancerTargetsType
-    = PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumTyped Data.Text.Internal.Text
-    | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringIp
-    | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringLabelSelector
-    | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringServer
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsType
-    where toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringIp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip"
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringLabelSelector) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector"
-          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringServer) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server"
-instance Data.Aeson.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ip")
-                                          then PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringIp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "label_selector")
-                                                then PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringLabelSelector
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "server")
-                                                      then PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumStringServer
-                                                      else PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumOther val)
+data PostLoadBalancersResponseBody201LoadBalancerTargetsType =
+   PostLoadBalancersResponseBody201LoadBalancerTargetsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumServer -- ^ Represents the JSON value @"server"@
+  | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumLabelSelector -- ^ Represents the JSON value @"label_selector"@
+  | PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumIp -- ^ Represents the JSON value @"ip"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostLoadBalancersResponseBody201LoadBalancerTargetsType
+    where toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeOther val) = val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumServer) = "server"
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumLabelSelector) = "label_selector"
+          toJSON (PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumIp) = "ip"
+instance Data.Aeson.Types.FromJSON.FromJSON PostLoadBalancersResponseBody201LoadBalancerTargetsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "server" -> PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumServer
+                                            | val GHC.Classes.== "label_selector" -> PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumLabelSelector
+                                            | val GHC.Classes.== "ip" -> PostLoadBalancersResponseBody201LoadBalancerTargetsTypeEnumIp
+                                            | GHC.Base.otherwise -> PostLoadBalancersResponseBody201LoadBalancerTargetsTypeOther val)
+-- | > POST /load_balancers
+-- 
+-- The same as 'postLoadBalancers' but accepts an explicit configuration.
+postLoadBalancersWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostLoadBalancersRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response PostLoadBalancersResponse) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancersWithConfiguration config
+                                   body = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostLoadBalancersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostLoadBalancersResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                       PostLoadBalancersResponseBody201)
+                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers
+-- 
+-- The same as 'postLoadBalancers' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancersRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Maybe.Maybe PostLoadBalancersRequestBody -- ^ The request body to send
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancersRaw body = GHC.Base.id (HCloud.Common.doBodyCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)
+-- | > POST /load_balancers
+-- 
+-- The same as 'postLoadBalancers' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postLoadBalancersWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Maybe.Maybe PostLoadBalancersRequestBody -- ^ The request body to send
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postLoadBalancersWithConfigurationRaw config
+                                      body = GHC.Base.id (HCloud.Common.doBodyCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack "/load_balancers") GHC.Base.mempty body HCloud.Common.RequestBodyEncodingJSON)

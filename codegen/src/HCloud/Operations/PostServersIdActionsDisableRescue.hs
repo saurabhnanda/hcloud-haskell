@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation postServers_Id_ActionsDisableRescue
 module HCloud.Operations.PostServersIdActionsDisableRescue where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -49,56 +49,19 @@ import HCloud.Types
 -- Rescue Mode is automatically disabled when you first boot into it or if you do not use it for 60 minutes.
 -- 
 -- Disabling rescue mode will not reboot your Server — you will have to do this yourself.
-postServers_Id_ActionsDisableRescue :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                                        -- ^ id: ID of the Server
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response PostServersIdActionsDisableRescueResponse))   -- ^ Monad containing the result of the operation
-postServers_Id_ActionsDisableRescue config
-                                    id = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDisableRescueResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDisableRescueResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     PostServersIdActionsDisableRescueResponseBody201)
-                                                                                                                                                                                                                    | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) [])
--- | > POST /servers/{id}/actions/disable_rescue
--- 
--- The same as 'postServers_Id_ActionsDisableRescue' but returns the raw 'Data.ByteString.Char8.ByteString'
-postServers_Id_ActionsDisableRescueRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                        HCloud.Common.SecurityScheme s) =>
-                                          HCloud.Common.Configuration s ->
-                                          GHC.Integer.Type.Integer ->
-                                          m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsDisableRescueRaw config
-                                       id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) [])
--- | > POST /servers/{id}/actions/disable_rescue
--- 
--- Monadic version of 'postServers_Id_ActionsDisableRescue' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsDisableRescueM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                      HCloud.Common.SecurityScheme s) =>
-                                        GHC.Integer.Type.Integer ->
-                                        Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                           m
-                                                                           (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                               (Network.HTTP.Client.Types.Response PostServersIdActionsDisableRescueResponse))
-postServers_Id_ActionsDisableRescueM id = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDisableRescueResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDisableRescueResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsDisableRescueResponseBody201)
-                                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) [])
--- | > POST /servers/{id}/actions/disable_rescue
--- 
--- Monadic version of 'postServers_Id_ActionsDisableRescueRaw' (use with 'HCloud.Common.runWithConfiguration')
-postServers_Id_ActionsDisableRescueRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                                         HCloud.Common.SecurityScheme s) =>
-                                           GHC.Integer.Type.Integer ->
-                                           Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                              m
-                                                                              (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                                  (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-postServers_Id_ActionsDisableRescueRawM id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) [])
+postServers_Id_ActionsDisableRescue :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response PostServersIdActionsDisableRescueResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDisableRescue id = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDisableRescueResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDisableRescueResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      PostServersIdActionsDisableRescueResponseBody201)
+                                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) GHC.Base.mempty)
 -- | Represents a response of the operation 'postServers_Id_ActionsDisableRescue'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'PostServersIdActionsDisableRescueResponseError' is used.
-data PostServersIdActionsDisableRescueResponse =                                                   
-   PostServersIdActionsDisableRescueResponseError GHC.Base.String                                  -- ^ Means either no matching case available or a parse error
-  | PostServersIdActionsDisableRescueResponse201 PostServersIdActionsDisableRescueResponseBody201  -- ^ The \`action\` key in the reply contains an Action object with this structure
+data PostServersIdActionsDisableRescueResponse =
+   PostServersIdActionsDisableRescueResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | PostServersIdActionsDisableRescueResponse201 PostServersIdActionsDisableRescueResponseBody201 -- ^ The \`action\` key in the reply contains an Action object with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema PostServersIdActionsDisableRescueResponseBody201
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/disable_rescue.POST.responses.201.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDisableRescueResponseBody201 = PostServersIdActionsDisableRescueResponseBody201 {
@@ -106,39 +69,61 @@ data PostServersIdActionsDisableRescueResponseBody201 = PostServersIdActionsDisa
   postServersIdActionsDisableRescueResponseBody201Action :: PostServersIdActionsDisableRescueResponseBody201Action
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDisableRescueResponseBody201
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "action" (postServersIdActionsDisableRescueResponseBody201Action obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "action" (postServersIdActionsDisableRescueResponseBody201Action obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDisableRescueResponseBody201
+    where toJSON obj = Data.Aeson.Types.Internal.object ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201Action obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("action" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201Action obj)
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDisableRescueResponseBody201
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDisableRescueResponseBody201" (\obj -> GHC.Base.pure PostServersIdActionsDisableRescueResponseBody201 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "action"))
--- | Defines the data type for the schema PostServersIdActionsDisableRescueResponseBody201Action
+-- | Create a new 'PostServersIdActionsDisableRescueResponseBody201' with all required fields.
+mkPostServersIdActionsDisableRescueResponseBody201 :: PostServersIdActionsDisableRescueResponseBody201Action -- ^ 'postServersIdActionsDisableRescueResponseBody201Action'
+  -> PostServersIdActionsDisableRescueResponseBody201
+mkPostServersIdActionsDisableRescueResponseBody201 postServersIdActionsDisableRescueResponseBody201Action = PostServersIdActionsDisableRescueResponseBody201{postServersIdActionsDisableRescueResponseBody201Action = postServersIdActionsDisableRescueResponseBody201Action}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/disable_rescue.POST.responses.201.content.application\/json.schema.properties.action@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDisableRescueResponseBody201Action = PostServersIdActionsDisableRescueResponseBody201Action {
   -- | command: Command executed in the Action
   postServersIdActionsDisableRescueResponseBody201ActionCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , postServersIdActionsDisableRescueResponseBody201ActionError :: PostServersIdActionsDisableRescueResponseBody201ActionError
+  , postServersIdActionsDisableRescueResponseBody201ActionError :: (GHC.Maybe.Maybe PostServersIdActionsDisableRescueResponseBody201ActionError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , postServersIdActionsDisableRescueResponseBody201ActionFinished :: Data.Text.Internal.Text
+  , postServersIdActionsDisableRescueResponseBody201ActionFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , postServersIdActionsDisableRescueResponseBody201ActionId :: GHC.Integer.Type.Integer
+  , postServersIdActionsDisableRescueResponseBody201ActionId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , postServersIdActionsDisableRescueResponseBody201ActionProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , postServersIdActionsDisableRescueResponseBody201ActionResources :: ([] PostServersIdActionsDisableRescueResponseBody201ActionResources)
+  , postServersIdActionsDisableRescueResponseBody201ActionResources :: ([PostServersIdActionsDisableRescueResponseBody201ActionResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , postServersIdActionsDisableRescueResponseBody201ActionStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , postServersIdActionsDisableRescueResponseBody201ActionStatus :: PostServersIdActionsDisableRescueResponseBody201ActionStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDisableRescueResponseBody201Action
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (postServersIdActionsDisableRescueResponseBody201ActionCommand obj) : (Data.Aeson..=) "error" (postServersIdActionsDisableRescueResponseBody201ActionError obj) : (Data.Aeson..=) "finished" (postServersIdActionsDisableRescueResponseBody201ActionFinished obj) : (Data.Aeson..=) "id" (postServersIdActionsDisableRescueResponseBody201ActionId obj) : (Data.Aeson..=) "progress" (postServersIdActionsDisableRescueResponseBody201ActionProgress obj) : (Data.Aeson..=) "resources" (postServersIdActionsDisableRescueResponseBody201ActionResources obj) : (Data.Aeson..=) "started" (postServersIdActionsDisableRescueResponseBody201ActionStarted obj) : (Data.Aeson..=) "status" (postServersIdActionsDisableRescueResponseBody201ActionStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (postServersIdActionsDisableRescueResponseBody201ActionCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (postServersIdActionsDisableRescueResponseBody201ActionError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (postServersIdActionsDisableRescueResponseBody201ActionFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (postServersIdActionsDisableRescueResponseBody201ActionId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (postServersIdActionsDisableRescueResponseBody201ActionProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (postServersIdActionsDisableRescueResponseBody201ActionResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (postServersIdActionsDisableRescueResponseBody201ActionStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (postServersIdActionsDisableRescueResponseBody201ActionStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDisableRescueResponseBody201Action
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionCommand obj : "error" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionError obj : "finished" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionFinished obj : "id" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionId obj : "progress" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionProgress obj : "resources" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionResources obj : "started" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionStarted obj : "status" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDisableRescueResponseBody201Action
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDisableRescueResponseBody201Action" (\obj -> (((((((GHC.Base.pure PostServersIdActionsDisableRescueResponseBody201Action GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema PostServersIdActionsDisableRescueResponseBody201ActionError
+-- | Create a new 'PostServersIdActionsDisableRescueResponseBody201Action' with all required fields.
+mkPostServersIdActionsDisableRescueResponseBody201Action :: Data.Text.Internal.Text -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionCommand'
+  -> GHC.Maybe.Maybe PostServersIdActionsDisableRescueResponseBody201ActionError -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionFinished'
+  -> GHC.Types.Int -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionId'
+  -> GHC.Types.Double -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionProgress'
+  -> [PostServersIdActionsDisableRescueResponseBody201ActionResources] -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionResources'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionStarted'
+  -> PostServersIdActionsDisableRescueResponseBody201ActionStatus -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionStatus'
+  -> PostServersIdActionsDisableRescueResponseBody201Action
+mkPostServersIdActionsDisableRescueResponseBody201Action postServersIdActionsDisableRescueResponseBody201ActionCommand postServersIdActionsDisableRescueResponseBody201ActionError postServersIdActionsDisableRescueResponseBody201ActionFinished postServersIdActionsDisableRescueResponseBody201ActionId postServersIdActionsDisableRescueResponseBody201ActionProgress postServersIdActionsDisableRescueResponseBody201ActionResources postServersIdActionsDisableRescueResponseBody201ActionStarted postServersIdActionsDisableRescueResponseBody201ActionStatus = PostServersIdActionsDisableRescueResponseBody201Action{postServersIdActionsDisableRescueResponseBody201ActionCommand = postServersIdActionsDisableRescueResponseBody201ActionCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionError = postServersIdActionsDisableRescueResponseBody201ActionError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionFinished = postServersIdActionsDisableRescueResponseBody201ActionFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionId = postServersIdActionsDisableRescueResponseBody201ActionId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionProgress = postServersIdActionsDisableRescueResponseBody201ActionProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionResources = postServersIdActionsDisableRescueResponseBody201ActionResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionStarted = postServersIdActionsDisableRescueResponseBody201ActionStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              postServersIdActionsDisableRescueResponseBody201ActionStatus = postServersIdActionsDisableRescueResponseBody201ActionStatus}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/disable_rescue.POST.responses.201.content.application\/json.schema.properties.action.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data PostServersIdActionsDisableRescueResponseBody201ActionError = PostServersIdActionsDisableRescueResponseBody201ActionError {
@@ -148,47 +133,80 @@ data PostServersIdActionsDisableRescueResponseBody201ActionError = PostServersId
   , postServersIdActionsDisableRescueResponseBody201ActionErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDisableRescueResponseBody201ActionError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (postServersIdActionsDisableRescueResponseBody201ActionErrorCode obj) : (Data.Aeson..=) "message" (postServersIdActionsDisableRescueResponseBody201ActionErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (postServersIdActionsDisableRescueResponseBody201ActionErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (postServersIdActionsDisableRescueResponseBody201ActionErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDisableRescueResponseBody201ActionError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionErrorCode obj : "message" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDisableRescueResponseBody201ActionError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDisableRescueResponseBody201ActionError" (\obj -> (GHC.Base.pure PostServersIdActionsDisableRescueResponseBody201ActionError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema PostServersIdActionsDisableRescueResponseBody201ActionResources
+-- | Create a new 'PostServersIdActionsDisableRescueResponseBody201ActionError' with all required fields.
+mkPostServersIdActionsDisableRescueResponseBody201ActionError :: Data.Text.Internal.Text -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionErrorMessage'
+  -> PostServersIdActionsDisableRescueResponseBody201ActionError
+mkPostServersIdActionsDisableRescueResponseBody201ActionError postServersIdActionsDisableRescueResponseBody201ActionErrorCode postServersIdActionsDisableRescueResponseBody201ActionErrorMessage = PostServersIdActionsDisableRescueResponseBody201ActionError{postServersIdActionsDisableRescueResponseBody201ActionErrorCode = postServersIdActionsDisableRescueResponseBody201ActionErrorCode,
+                                                                                                                                                                                                                                                               postServersIdActionsDisableRescueResponseBody201ActionErrorMessage = postServersIdActionsDisableRescueResponseBody201ActionErrorMessage}
+-- | Defines the object schema located at @paths.\/servers\/{id}\/actions\/disable_rescue.POST.responses.201.content.application\/json.schema.properties.action.properties.resources.items@ in the specification.
 -- 
 -- 
 data PostServersIdActionsDisableRescueResponseBody201ActionResources = PostServersIdActionsDisableRescueResponseBody201ActionResources {
   -- | id: ID of the Resource
-  postServersIdActionsDisableRescueResponseBody201ActionResourcesId :: GHC.Integer.Type.Integer
+  postServersIdActionsDisableRescueResponseBody201ActionResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , postServersIdActionsDisableRescueResponseBody201ActionResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDisableRescueResponseBody201ActionResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (postServersIdActionsDisableRescueResponseBody201ActionResourcesId obj) : (Data.Aeson..=) "type" (postServersIdActionsDisableRescueResponseBody201ActionResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (postServersIdActionsDisableRescueResponseBody201ActionResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (postServersIdActionsDisableRescueResponseBody201ActionResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDisableRescueResponseBody201ActionResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionResourcesId obj : "type" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= postServersIdActionsDisableRescueResponseBody201ActionResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDisableRescueResponseBody201ActionResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "PostServersIdActionsDisableRescueResponseBody201ActionResources" (\obj -> (GHC.Base.pure PostServersIdActionsDisableRescueResponseBody201ActionResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema PostServersIdActionsDisableRescueResponseBody201ActionStatus
+-- | Create a new 'PostServersIdActionsDisableRescueResponseBody201ActionResources' with all required fields.
+mkPostServersIdActionsDisableRescueResponseBody201ActionResources :: GHC.Types.Int -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'postServersIdActionsDisableRescueResponseBody201ActionResourcesType'
+  -> PostServersIdActionsDisableRescueResponseBody201ActionResources
+mkPostServersIdActionsDisableRescueResponseBody201ActionResources postServersIdActionsDisableRescueResponseBody201ActionResourcesId postServersIdActionsDisableRescueResponseBody201ActionResourcesType = PostServersIdActionsDisableRescueResponseBody201ActionResources{postServersIdActionsDisableRescueResponseBody201ActionResourcesId = postServersIdActionsDisableRescueResponseBody201ActionResourcesId,
+                                                                                                                                                                                                                                                                          postServersIdActionsDisableRescueResponseBody201ActionResourcesType = postServersIdActionsDisableRescueResponseBody201ActionResourcesType}
+-- | Defines the enum schema located at @paths.\/servers\/{id}\/actions\/disable_rescue.POST.responses.201.content.application\/json.schema.properties.action.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data PostServersIdActionsDisableRescueResponseBody201ActionStatus
-    = PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumOther Data.Aeson.Types.Internal.Value
-    | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumTyped Data.Text.Internal.Text
-    | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringError
-    | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringRunning
-    | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON PostServersIdActionsDisableRescueResponseBody201ActionStatus
-    where toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON PostServersIdActionsDisableRescueResponseBody201ActionStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumStringSuccess
-                                                      else PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumOther val)
+data PostServersIdActionsDisableRescueResponseBody201ActionStatus =
+   PostServersIdActionsDisableRescueResponseBody201ActionStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | PostServersIdActionsDisableRescueResponseBody201ActionStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON PostServersIdActionsDisableRescueResponseBody201ActionStatus
+    where toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusOther val) = val
+          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumSuccess) = "success"
+          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumRunning) = "running"
+          toJSON (PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON PostServersIdActionsDisableRescueResponseBody201ActionStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> PostServersIdActionsDisableRescueResponseBody201ActionStatusEnumError
+                                            | GHC.Base.otherwise -> PostServersIdActionsDisableRescueResponseBody201ActionStatusOther val)
+-- | > POST /servers/{id}/actions/disable_rescue
+-- 
+-- The same as 'postServers_Id_ActionsDisableRescue' but accepts an explicit configuration.
+postServers_Id_ActionsDisableRescueWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response PostServersIdActionsDisableRescueResponse) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDisableRescueWithConfiguration config
+                                                     id = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either PostServersIdActionsDisableRescueResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 201) (Network.HTTP.Client.Types.responseStatus response) -> PostServersIdActionsDisableRescueResponse201 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       PostServersIdActionsDisableRescueResponseBody201)
+                                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/disable_rescue
+-- 
+-- The same as 'postServers_Id_ActionsDisableRescue' but returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsDisableRescueRaw :: forall m . HCloud.Common.MonadHTTP m => GHC.Types.Int -- ^ id: ID of the Server
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDisableRescueRaw id = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) GHC.Base.mempty)
+-- | > POST /servers/{id}/actions/disable_rescue
+-- 
+-- The same as 'postServers_Id_ActionsDisableRescue' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+postServers_Id_ActionsDisableRescueWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GHC.Types.Int -- ^ id: ID of the Server
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+postServers_Id_ActionsDisableRescueWithConfigurationRaw config
+                                                        id = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "POST") (Data.Text.pack ("/servers/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions/disable_rescue"))) GHC.Base.mempty)

@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getFirewalls_Id_Actions
 module HCloud.Operations.GetFirewallsIdActions where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,122 +45,205 @@ import HCloud.Types
 -- | > GET /firewalls/{id}/actions
 -- 
 -- Returns all Action objects for a Firewall. You can sort the results by using the \`sort\` URI parameter, and filter them with the \`status\` parameter.
-getFirewalls_Id_Actions :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Integer.Type.Integer                                                                                                            -- ^ id: ID of the Resource
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                             -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                             -- ^ status: Can be used multiple times, the response will contain only Actions with specified statuses
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetFirewallsIdActionsResponse))   -- ^ Monad containing the result of the operation
-getFirewalls_Id_Actions config
-                        id
-                        sort
-                        status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFirewallsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                     GetFirewallsIdActionsResponseBody200)
-                                                                                                                                                                                                | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /firewalls/{id}/actions
+getFirewalls_Id_Actions :: forall m . HCloud.Common.MonadHTTP m => GetFirewallsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetFirewallsIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getFirewalls_Id_Actions parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFirewallsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                          GetFirewallsIdActionsResponseBody200)
+                                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFirewallsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.parameters@ in the specification.
 -- 
--- The same as 'getFirewalls_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'
-getFirewalls_Id_ActionsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                            HCloud.Common.SecurityScheme s) =>
-                              HCloud.Common.Configuration s ->
-                              GHC.Integer.Type.Integer ->
-                              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                              GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                              m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                    (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFirewalls_Id_ActionsRaw config
-                           id
-                           sort
-                           status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                              HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /firewalls/{id}/actions
 -- 
--- Monadic version of 'getFirewalls_Id_Actions' (use with 'HCloud.Common.runWithConfiguration')
-getFirewalls_Id_ActionsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                          HCloud.Common.SecurityScheme s) =>
-                            GHC.Integer.Type.Integer ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                            Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                               m
-                                                               (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                   (Network.HTTP.Client.Types.Response GetFirewallsIdActionsResponse))
-getFirewalls_Id_ActionsM id
-                         sort
-                         status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFirewallsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                                                      GetFirewallsIdActionsResponseBody200)
-                                                                                                                                                                                                 | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
--- | > GET /firewalls/{id}/actions
+data GetFirewallsIdActionsParameters = GetFirewallsIdActionsParameters {
+  -- | pathId: Represents the parameter named \'id\'
+  -- 
+  -- ID of the Resource
+  getFirewallsIdActionsParametersPathId :: GHC.Types.Int
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getFirewallsIdActionsParametersQuerySort :: (GHC.Maybe.Maybe GetFirewallsIdActionsParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times, the response will contain only Actions with specified statuses
+  , getFirewallsIdActionsParametersQueryStatus :: (GHC.Maybe.Maybe GetFirewallsIdActionsParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pathId" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsParametersPathId obj : "querySort" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("pathId" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsParametersPathId obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsParametersQueryStatus obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsParameters" (\obj -> ((GHC.Base.pure GetFirewallsIdActionsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pathId")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetFirewallsIdActionsParameters' with all required fields.
+mkGetFirewallsIdActionsParameters :: GHC.Types.Int -- ^ 'getFirewallsIdActionsParametersPathId'
+  -> GetFirewallsIdActionsParameters
+mkGetFirewallsIdActionsParameters getFirewallsIdActionsParametersPathId = GetFirewallsIdActionsParameters{getFirewallsIdActionsParametersPathId = getFirewallsIdActionsParametersPathId,
+                                                                                                          getFirewallsIdActionsParametersQuerySort = GHC.Maybe.Nothing,
+                                                                                                          getFirewallsIdActionsParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/firewalls\/{id}\/actions.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getFirewalls_Id_ActionsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getFirewalls_Id_ActionsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                             HCloud.Common.SecurityScheme s) =>
-                               GHC.Integer.Type.Integer ->
-                               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                                  m
-                                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                                      (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFirewalls_Id_ActionsRawM id
-                            sort
-                            status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel id)) GHC.Base.++ "/actions"))) ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetFirewallsIdActionsParametersQuerySort =
+   GetFirewallsIdActionsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsIdActionsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsIdActionsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetFirewallsIdActionsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumCommand -- ^ Represents the JSON value @"command"@
+  | GetFirewallsIdActionsParametersQuerySortEnumCommandAsc -- ^ Represents the JSON value @"command:asc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumCommandDesc -- ^ Represents the JSON value @"command:desc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumStatus -- ^ Represents the JSON value @"status"@
+  | GetFirewallsIdActionsParametersQuerySortEnumStatusAsc -- ^ Represents the JSON value @"status:asc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumStatusDesc -- ^ Represents the JSON value @"status:desc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumProgress -- ^ Represents the JSON value @"progress"@
+  | GetFirewallsIdActionsParametersQuerySortEnumProgressAsc -- ^ Represents the JSON value @"progress:asc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumProgressDesc -- ^ Represents the JSON value @"progress:desc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumStarted -- ^ Represents the JSON value @"started"@
+  | GetFirewallsIdActionsParametersQuerySortEnumStartedAsc -- ^ Represents the JSON value @"started:asc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumStartedDesc -- ^ Represents the JSON value @"started:desc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumFinished -- ^ Represents the JSON value @"finished"@
+  | GetFirewallsIdActionsParametersQuerySortEnumFinishedAsc -- ^ Represents the JSON value @"finished:asc"@
+  | GetFirewallsIdActionsParametersQuerySortEnumFinishedDesc -- ^ Represents the JSON value @"finished:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsParametersQuerySort
+    where toJSON (GetFirewallsIdActionsParametersQuerySortOther val) = val
+          toJSON (GetFirewallsIdActionsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumId) = "id"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumCommand) = "command"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumCommandAsc) = "command:asc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumCommandDesc) = "command:desc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumStatus) = "status"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumStatusAsc) = "status:asc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumStatusDesc) = "status:desc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumProgress) = "progress"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumProgressAsc) = "progress:asc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumProgressDesc) = "progress:desc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumStarted) = "started"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumStartedAsc) = "started:asc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumStartedDesc) = "started:desc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumFinished) = "finished"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumFinishedAsc) = "finished:asc"
+          toJSON (GetFirewallsIdActionsParametersQuerySortEnumFinishedDesc) = "finished:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetFirewallsIdActionsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetFirewallsIdActionsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetFirewallsIdActionsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "command" -> GetFirewallsIdActionsParametersQuerySortEnumCommand
+                                            | val GHC.Classes.== "command:asc" -> GetFirewallsIdActionsParametersQuerySortEnumCommandAsc
+                                            | val GHC.Classes.== "command:desc" -> GetFirewallsIdActionsParametersQuerySortEnumCommandDesc
+                                            | val GHC.Classes.== "status" -> GetFirewallsIdActionsParametersQuerySortEnumStatus
+                                            | val GHC.Classes.== "status:asc" -> GetFirewallsIdActionsParametersQuerySortEnumStatusAsc
+                                            | val GHC.Classes.== "status:desc" -> GetFirewallsIdActionsParametersQuerySortEnumStatusDesc
+                                            | val GHC.Classes.== "progress" -> GetFirewallsIdActionsParametersQuerySortEnumProgress
+                                            | val GHC.Classes.== "progress:asc" -> GetFirewallsIdActionsParametersQuerySortEnumProgressAsc
+                                            | val GHC.Classes.== "progress:desc" -> GetFirewallsIdActionsParametersQuerySortEnumProgressDesc
+                                            | val GHC.Classes.== "started" -> GetFirewallsIdActionsParametersQuerySortEnumStarted
+                                            | val GHC.Classes.== "started:asc" -> GetFirewallsIdActionsParametersQuerySortEnumStartedAsc
+                                            | val GHC.Classes.== "started:desc" -> GetFirewallsIdActionsParametersQuerySortEnumStartedDesc
+                                            | val GHC.Classes.== "finished" -> GetFirewallsIdActionsParametersQuerySortEnumFinished
+                                            | val GHC.Classes.== "finished:asc" -> GetFirewallsIdActionsParametersQuerySortEnumFinishedAsc
+                                            | val GHC.Classes.== "finished:desc" -> GetFirewallsIdActionsParametersQuerySortEnumFinishedDesc
+                                            | GHC.Base.otherwise -> GetFirewallsIdActionsParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/firewalls\/{id}\/actions.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times, the response will contain only Actions with specified statuses
+data GetFirewallsIdActionsParametersQueryStatus =
+   GetFirewallsIdActionsParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsIdActionsParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsIdActionsParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetFirewallsIdActionsParametersQueryStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetFirewallsIdActionsParametersQueryStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsParametersQueryStatus
+    where toJSON (GetFirewallsIdActionsParametersQueryStatusOther val) = val
+          toJSON (GetFirewallsIdActionsParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsIdActionsParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetFirewallsIdActionsParametersQueryStatusEnumSuccess) = "success"
+          toJSON (GetFirewallsIdActionsParametersQueryStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetFirewallsIdActionsParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "success" -> GetFirewallsIdActionsParametersQueryStatusEnumSuccess
+                                            | val GHC.Classes.== "error" -> GetFirewallsIdActionsParametersQueryStatusEnumError
+                                            | GHC.Base.otherwise -> GetFirewallsIdActionsParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getFirewalls_Id_Actions'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetFirewallsIdActionsResponseError' is used.
-data GetFirewallsIdActionsResponse =                                       
-   GetFirewallsIdActionsResponseError GHC.Base.String                      -- ^ Means either no matching case available or a parse error
-  | GetFirewallsIdActionsResponse200 GetFirewallsIdActionsResponseBody200  -- ^ The \`actions\` key contains a list of Actions
+data GetFirewallsIdActionsResponse =
+   GetFirewallsIdActionsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetFirewallsIdActionsResponse200 GetFirewallsIdActionsResponseBody200 -- ^ The \`actions\` key contains a list of Actions
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetFirewallsIdActionsResponseBody200
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetFirewallsIdActionsResponseBody200 = GetFirewallsIdActionsResponseBody200 {
   -- | actions
-  getFirewallsIdActionsResponseBody200Actions :: ([] GetFirewallsIdActionsResponseBody200Actions)
+  getFirewallsIdActionsResponseBody200Actions :: ([GetFirewallsIdActionsResponseBody200Actions])
   -- | meta
   , getFirewallsIdActionsResponseBody200Meta :: (GHC.Maybe.Maybe GetFirewallsIdActionsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "actions" (getFirewallsIdActionsResponseBody200Actions obj) : (Data.Aeson..=) "meta" (getFirewallsIdActionsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "actions" (getFirewallsIdActionsResponseBody200Actions obj) GHC.Base.<> (Data.Aeson..=) "meta" (getFirewallsIdActionsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("actions" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200Actions obj : "meta" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("actions" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200Actions obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsResponseBody200" (\obj -> (GHC.Base.pure GetFirewallsIdActionsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "actions")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetFirewallsIdActionsResponseBody200Actions
+-- | Create a new 'GetFirewallsIdActionsResponseBody200' with all required fields.
+mkGetFirewallsIdActionsResponseBody200 :: [GetFirewallsIdActionsResponseBody200Actions] -- ^ 'getFirewallsIdActionsResponseBody200Actions'
+  -> GetFirewallsIdActionsResponseBody200
+mkGetFirewallsIdActionsResponseBody200 getFirewallsIdActionsResponseBody200Actions = GetFirewallsIdActionsResponseBody200{getFirewallsIdActionsResponseBody200Actions = getFirewallsIdActionsResponseBody200Actions,
+                                                                                                                          getFirewallsIdActionsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items@ in the specification.
 -- 
 -- 
 data GetFirewallsIdActionsResponseBody200Actions = GetFirewallsIdActionsResponseBody200Actions {
   -- | command: Command executed in the Action
   getFirewallsIdActionsResponseBody200ActionsCommand :: Data.Text.Internal.Text
   -- | error: Error message for the Action if error occurred, otherwise null
-  , getFirewallsIdActionsResponseBody200ActionsError :: GetFirewallsIdActionsResponseBody200ActionsError
+  , getFirewallsIdActionsResponseBody200ActionsError :: (GHC.Maybe.Maybe GetFirewallsIdActionsResponseBody200ActionsError)
   -- | finished: Point in time when the Action was finished (in ISO-8601 format). Only set if the Action is finished otherwise null.
-  , getFirewallsIdActionsResponseBody200ActionsFinished :: Data.Text.Internal.Text
+  , getFirewallsIdActionsResponseBody200ActionsFinished :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | id: ID of the Resource
-  , getFirewallsIdActionsResponseBody200ActionsId :: GHC.Integer.Type.Integer
+  , getFirewallsIdActionsResponseBody200ActionsId :: GHC.Types.Int
   -- | progress: Progress of Action in percent
   , getFirewallsIdActionsResponseBody200ActionsProgress :: GHC.Types.Double
   -- | resources: Resources the Action relates to
-  , getFirewallsIdActionsResponseBody200ActionsResources :: ([] GetFirewallsIdActionsResponseBody200ActionsResources)
+  , getFirewallsIdActionsResponseBody200ActionsResources :: ([GetFirewallsIdActionsResponseBody200ActionsResources])
   -- | started: Point in time when the Action was started (in ISO-8601 format)
   , getFirewallsIdActionsResponseBody200ActionsStarted :: Data.Text.Internal.Text
   -- | status: Status of the Action
   , getFirewallsIdActionsResponseBody200ActionsStatus :: GetFirewallsIdActionsResponseBody200ActionsStatus
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200Actions
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "command" (getFirewallsIdActionsResponseBody200ActionsCommand obj) : (Data.Aeson..=) "error" (getFirewallsIdActionsResponseBody200ActionsError obj) : (Data.Aeson..=) "finished" (getFirewallsIdActionsResponseBody200ActionsFinished obj) : (Data.Aeson..=) "id" (getFirewallsIdActionsResponseBody200ActionsId obj) : (Data.Aeson..=) "progress" (getFirewallsIdActionsResponseBody200ActionsProgress obj) : (Data.Aeson..=) "resources" (getFirewallsIdActionsResponseBody200ActionsResources obj) : (Data.Aeson..=) "started" (getFirewallsIdActionsResponseBody200ActionsStarted obj) : (Data.Aeson..=) "status" (getFirewallsIdActionsResponseBody200ActionsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "command" (getFirewallsIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> ((Data.Aeson..=) "error" (getFirewallsIdActionsResponseBody200ActionsError obj) GHC.Base.<> ((Data.Aeson..=) "finished" (getFirewallsIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> ((Data.Aeson..=) "id" (getFirewallsIdActionsResponseBody200ActionsId obj) GHC.Base.<> ((Data.Aeson..=) "progress" (getFirewallsIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> ((Data.Aeson..=) "resources" (getFirewallsIdActionsResponseBody200ActionsResources obj) GHC.Base.<> ((Data.Aeson..=) "started" (getFirewallsIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> (Data.Aeson..=) "status" (getFirewallsIdActionsResponseBody200ActionsStatus obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200Actions
+    where toJSON obj = Data.Aeson.Types.Internal.object ("command" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsCommand obj : "error" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsError obj : "finished" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsFinished obj : "id" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsId obj : "progress" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsProgress obj : "resources" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsResources obj : "started" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsStarted obj : "status" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("command" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsCommand obj) GHC.Base.<> (("error" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsError obj) GHC.Base.<> (("finished" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsFinished obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsId obj) GHC.Base.<> (("progress" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsProgress obj) GHC.Base.<> (("resources" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsResources obj) GHC.Base.<> (("started" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsStarted obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsStatus obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200Actions
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsResponseBody200Actions" (\obj -> (((((((GHC.Base.pure GetFirewallsIdActionsResponseBody200Actions GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "command")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "error")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "finished")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "progress")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "resources")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "started")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status"))
--- | Defines the data type for the schema GetFirewallsIdActionsResponseBody200ActionsError
+-- | Create a new 'GetFirewallsIdActionsResponseBody200Actions' with all required fields.
+mkGetFirewallsIdActionsResponseBody200Actions :: Data.Text.Internal.Text -- ^ 'getFirewallsIdActionsResponseBody200ActionsCommand'
+  -> GHC.Maybe.Maybe GetFirewallsIdActionsResponseBody200ActionsError -- ^ 'getFirewallsIdActionsResponseBody200ActionsError'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getFirewallsIdActionsResponseBody200ActionsFinished'
+  -> GHC.Types.Int -- ^ 'getFirewallsIdActionsResponseBody200ActionsId'
+  -> GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200ActionsProgress'
+  -> [GetFirewallsIdActionsResponseBody200ActionsResources] -- ^ 'getFirewallsIdActionsResponseBody200ActionsResources'
+  -> Data.Text.Internal.Text -- ^ 'getFirewallsIdActionsResponseBody200ActionsStarted'
+  -> GetFirewallsIdActionsResponseBody200ActionsStatus -- ^ 'getFirewallsIdActionsResponseBody200ActionsStatus'
+  -> GetFirewallsIdActionsResponseBody200Actions
+mkGetFirewallsIdActionsResponseBody200Actions getFirewallsIdActionsResponseBody200ActionsCommand getFirewallsIdActionsResponseBody200ActionsError getFirewallsIdActionsResponseBody200ActionsFinished getFirewallsIdActionsResponseBody200ActionsId getFirewallsIdActionsResponseBody200ActionsProgress getFirewallsIdActionsResponseBody200ActionsResources getFirewallsIdActionsResponseBody200ActionsStarted getFirewallsIdActionsResponseBody200ActionsStatus = GetFirewallsIdActionsResponseBody200Actions{getFirewallsIdActionsResponseBody200ActionsCommand = getFirewallsIdActionsResponseBody200ActionsCommand,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsError = getFirewallsIdActionsResponseBody200ActionsError,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsFinished = getFirewallsIdActionsResponseBody200ActionsFinished,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsId = getFirewallsIdActionsResponseBody200ActionsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsProgress = getFirewallsIdActionsResponseBody200ActionsProgress,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsResources = getFirewallsIdActionsResponseBody200ActionsResources,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsStarted = getFirewallsIdActionsResponseBody200ActionsStarted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                getFirewallsIdActionsResponseBody200ActionsStatus = getFirewallsIdActionsResponseBody200ActionsStatus}
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.error@ in the specification.
 -- 
 -- Error message for the Action if error occurred, otherwise null
 data GetFirewallsIdActionsResponseBody200ActionsError = GetFirewallsIdActionsResponseBody200ActionsError {
@@ -170,51 +253,60 @@ data GetFirewallsIdActionsResponseBody200ActionsError = GetFirewallsIdActionsRes
   , getFirewallsIdActionsResponseBody200ActionsErrorMessage :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200ActionsError
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "code" (getFirewallsIdActionsResponseBody200ActionsErrorCode obj) : (Data.Aeson..=) "message" (getFirewallsIdActionsResponseBody200ActionsErrorMessage obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "code" (getFirewallsIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> (Data.Aeson..=) "message" (getFirewallsIdActionsResponseBody200ActionsErrorMessage obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200ActionsError
+    where toJSON obj = Data.Aeson.Types.Internal.object ("code" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsErrorCode obj : "message" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsErrorMessage obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("code" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsErrorCode obj) GHC.Base.<> ("message" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsErrorMessage obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200ActionsError
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsResponseBody200ActionsError" (\obj -> (GHC.Base.pure GetFirewallsIdActionsResponseBody200ActionsError GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "code")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "message"))
--- | Defines the data type for the schema GetFirewallsIdActionsResponseBody200ActionsResources
+-- | Create a new 'GetFirewallsIdActionsResponseBody200ActionsError' with all required fields.
+mkGetFirewallsIdActionsResponseBody200ActionsError :: Data.Text.Internal.Text -- ^ 'getFirewallsIdActionsResponseBody200ActionsErrorCode'
+  -> Data.Text.Internal.Text -- ^ 'getFirewallsIdActionsResponseBody200ActionsErrorMessage'
+  -> GetFirewallsIdActionsResponseBody200ActionsError
+mkGetFirewallsIdActionsResponseBody200ActionsError getFirewallsIdActionsResponseBody200ActionsErrorCode getFirewallsIdActionsResponseBody200ActionsErrorMessage = GetFirewallsIdActionsResponseBody200ActionsError{getFirewallsIdActionsResponseBody200ActionsErrorCode = getFirewallsIdActionsResponseBody200ActionsErrorCode,
+                                                                                                                                                                                                                   getFirewallsIdActionsResponseBody200ActionsErrorMessage = getFirewallsIdActionsResponseBody200ActionsErrorMessage}
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.resources.items@ in the specification.
 -- 
 -- 
 data GetFirewallsIdActionsResponseBody200ActionsResources = GetFirewallsIdActionsResponseBody200ActionsResources {
   -- | id: ID of the Resource
-  getFirewallsIdActionsResponseBody200ActionsResourcesId :: GHC.Integer.Type.Integer
+  getFirewallsIdActionsResponseBody200ActionsResourcesId :: GHC.Types.Int
   -- | type: Type of resource referenced
   , getFirewallsIdActionsResponseBody200ActionsResourcesType :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200ActionsResources
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getFirewallsIdActionsResponseBody200ActionsResourcesId obj) : (Data.Aeson..=) "type" (getFirewallsIdActionsResponseBody200ActionsResourcesType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getFirewallsIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> (Data.Aeson..=) "type" (getFirewallsIdActionsResponseBody200ActionsResourcesType obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200ActionsResources
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsResourcesId obj : "type" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsResourcesType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsResourcesId obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200ActionsResourcesType obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200ActionsResources
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsResponseBody200ActionsResources" (\obj -> (GHC.Base.pure GetFirewallsIdActionsResponseBody200ActionsResources GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetFirewallsIdActionsResponseBody200ActionsStatus
+-- | Create a new 'GetFirewallsIdActionsResponseBody200ActionsResources' with all required fields.
+mkGetFirewallsIdActionsResponseBody200ActionsResources :: GHC.Types.Int -- ^ 'getFirewallsIdActionsResponseBody200ActionsResourcesId'
+  -> Data.Text.Internal.Text -- ^ 'getFirewallsIdActionsResponseBody200ActionsResourcesType'
+  -> GetFirewallsIdActionsResponseBody200ActionsResources
+mkGetFirewallsIdActionsResponseBody200ActionsResources getFirewallsIdActionsResponseBody200ActionsResourcesId getFirewallsIdActionsResponseBody200ActionsResourcesType = GetFirewallsIdActionsResponseBody200ActionsResources{getFirewallsIdActionsResponseBody200ActionsResourcesId = getFirewallsIdActionsResponseBody200ActionsResourcesId,
+                                                                                                                                                                                                                              getFirewallsIdActionsResponseBody200ActionsResourcesType = getFirewallsIdActionsResponseBody200ActionsResourcesType}
+-- | Defines the enum schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.actions.items.properties.status@ in the specification.
 -- 
 -- Status of the Action
-data GetFirewallsIdActionsResponseBody200ActionsStatus
-    = GetFirewallsIdActionsResponseBody200ActionsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetFirewallsIdActionsResponseBody200ActionsStatusEnumTyped Data.Text.Internal.Text
-    | GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringError
-    | GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringRunning
-    | GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringSuccess
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200ActionsStatus
-    where toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringError) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error"
-          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringSuccess) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success"
-instance Data.Aeson.FromJSON GetFirewallsIdActionsResponseBody200ActionsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "error")
-                                          then GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringError
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                then GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringRunning
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "success")
-                                                      then GetFirewallsIdActionsResponseBody200ActionsStatusEnumStringSuccess
-                                                      else GetFirewallsIdActionsResponseBody200ActionsStatusEnumOther val)
--- | Defines the data type for the schema GetFirewallsIdActionsResponseBody200Meta
+data GetFirewallsIdActionsResponseBody200ActionsStatus =
+   GetFirewallsIdActionsResponseBody200ActionsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFirewallsIdActionsResponseBody200ActionsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFirewallsIdActionsResponseBody200ActionsStatusEnumSuccess -- ^ Represents the JSON value @"success"@
+  | GetFirewallsIdActionsResponseBody200ActionsStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetFirewallsIdActionsResponseBody200ActionsStatusEnumError -- ^ Represents the JSON value @"error"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200ActionsStatus
+    where toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusOther val) = val
+          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumSuccess) = "success"
+          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumRunning) = "running"
+          toJSON (GetFirewallsIdActionsResponseBody200ActionsStatusEnumError) = "error"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200ActionsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "success" -> GetFirewallsIdActionsResponseBody200ActionsStatusEnumSuccess
+                                            | val GHC.Classes.== "running" -> GetFirewallsIdActionsResponseBody200ActionsStatusEnumRunning
+                                            | val GHC.Classes.== "error" -> GetFirewallsIdActionsResponseBody200ActionsStatusEnumError
+                                            | GHC.Base.otherwise -> GetFirewallsIdActionsResponseBody200ActionsStatusOther val)
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetFirewallsIdActionsResponseBody200Meta = GetFirewallsIdActionsResponseBody200Meta {
@@ -222,31 +314,76 @@ data GetFirewallsIdActionsResponseBody200Meta = GetFirewallsIdActionsResponseBod
   getFirewallsIdActionsResponseBody200MetaPagination :: GetFirewallsIdActionsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getFirewallsIdActionsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getFirewallsIdActionsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsResponseBody200Meta" (\obj -> GHC.Base.pure GetFirewallsIdActionsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetFirewallsIdActionsResponseBody200MetaPagination
+-- | Create a new 'GetFirewallsIdActionsResponseBody200Meta' with all required fields.
+mkGetFirewallsIdActionsResponseBody200Meta :: GetFirewallsIdActionsResponseBody200MetaPagination -- ^ 'getFirewallsIdActionsResponseBody200MetaPagination'
+  -> GetFirewallsIdActionsResponseBody200Meta
+mkGetFirewallsIdActionsResponseBody200Meta getFirewallsIdActionsResponseBody200MetaPagination = GetFirewallsIdActionsResponseBody200Meta{getFirewallsIdActionsResponseBody200MetaPagination = getFirewallsIdActionsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/firewalls\/{id}\/actions.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetFirewallsIdActionsResponseBody200MetaPagination = GetFirewallsIdActionsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getFirewallsIdActionsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getFirewallsIdActionsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getFirewallsIdActionsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getFirewallsIdActionsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getFirewallsIdActionsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getFirewallsIdActionsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFirewallsIdActionsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getFirewallsIdActionsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getFirewallsIdActionsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getFirewallsIdActionsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getFirewallsIdActionsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getFirewallsIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getFirewallsIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getFirewallsIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getFirewallsIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFirewallsIdActionsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFirewallsIdActionsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFirewallsIdActionsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetFirewallsIdActionsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetFirewallsIdActionsResponseBody200MetaPagination' with all required fields.
+mkGetFirewallsIdActionsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries'
+  -> GetFirewallsIdActionsResponseBody200MetaPagination
+mkGetFirewallsIdActionsResponseBody200MetaPagination getFirewallsIdActionsResponseBody200MetaPaginationLastPage getFirewallsIdActionsResponseBody200MetaPaginationNextPage getFirewallsIdActionsResponseBody200MetaPaginationPage getFirewallsIdActionsResponseBody200MetaPaginationPerPage getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries = GetFirewallsIdActionsResponseBody200MetaPagination{getFirewallsIdActionsResponseBody200MetaPaginationLastPage = getFirewallsIdActionsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFirewallsIdActionsResponseBody200MetaPaginationNextPage = getFirewallsIdActionsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFirewallsIdActionsResponseBody200MetaPaginationPage = getFirewallsIdActionsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFirewallsIdActionsResponseBody200MetaPaginationPerPage = getFirewallsIdActionsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage = getFirewallsIdActionsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries = getFirewallsIdActionsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /firewalls/{id}/actions
+-- 
+-- The same as 'getFirewalls_Id_Actions' but accepts an explicit configuration.
+getFirewalls_Id_ActionsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFirewallsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetFirewallsIdActionsResponse) -- ^ Monadic computation which returns the result of the operation
+getFirewalls_Id_ActionsWithConfiguration config
+                                         parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFirewallsIdActionsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFirewallsIdActionsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                                           GetFirewallsIdActionsResponseBody200)
+                                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFirewallsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /firewalls/{id}/actions
+-- 
+-- The same as 'getFirewalls_Id_Actions' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getFirewalls_Id_ActionsRaw :: forall m . HCloud.Common.MonadHTTP m => GetFirewallsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFirewalls_Id_ActionsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFirewallsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /firewalls/{id}/actions
+-- 
+-- The same as 'getFirewalls_Id_Actions' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getFirewalls_Id_ActionsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFirewallsIdActionsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFirewalls_Id_ActionsWithConfigurationRaw config
+                                            parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack ("/firewalls/" GHC.Base.++ (Data.ByteString.Char8.unpack (Network.HTTP.Types.URI.urlEncode GHC.Types.True GHC.Base.$ (Data.ByteString.Char8.pack GHC.Base.$ HCloud.Common.stringifyModel (getFirewallsIdActionsParametersPathId parameters))) GHC.Base.++ "/actions"))) [HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFirewallsIdActionsParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

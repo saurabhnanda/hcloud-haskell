@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getFloatingIps
 module HCloud.Operations.GetFloatingIps where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,99 +45,101 @@ import HCloud.Types
 -- | > GET /floating_ips
 -- 
 -- Returns all Floating IP objects.
-getFloatingIps :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                    -- ^ name: Can be used to filter Floating IPs by their name. The response will only contain the Floating IP matching the specified name.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                    -- ^ label_selector: Can be used to filter Floating IPs by labels. The response will only contain Floating IPs matching the label selector.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                    -- ^ sort: Can be used multiple times. Choices id id:asc id:desc created created:asc created:desc
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetFloatingIpsResponse)) -- ^ Monad containing the result of the operation
-getFloatingIps config
-               name
-               labelSelector
-               sort = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                            GetFloatingIpsResponseBody200)
-                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> sort) : []))))
--- | > GET /floating_ips
+getFloatingIps :: forall m . HCloud.Common.MonadHTTP m => GetFloatingIpsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetFloatingIpsResponse) -- ^ Monadic computation which returns the result of the operation
+getFloatingIps parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                   GetFloatingIpsResponseBody200)
+                                                                                                                                                                     | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                      HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/floating_ips.GET.parameters@ in the specification.
 -- 
--- The same as 'getFloatingIps' but returns the raw 'Data.ByteString.Char8.ByteString'
-getFloatingIpsRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                                   HCloud.Common.SecurityScheme s) =>
-                     HCloud.Common.Configuration s ->
-                     GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                     GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                     GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                     m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                           (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFloatingIpsRaw config
-                  name
-                  labelSelector
-                  sort = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") ((Data.Text.pack "name",
-                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> sort) : []))))
--- | > GET /floating_ips
 -- 
--- Monadic version of 'getFloatingIps' (use with 'HCloud.Common.runWithConfiguration')
-getFloatingIpsM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                 HCloud.Common.SecurityScheme s) =>
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                   Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                      m
-                                                      (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                          (Network.HTTP.Client.Types.Response GetFloatingIpsResponse))
-getFloatingIpsM name
-                labelSelector
-                sort = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                             GetFloatingIpsResponseBody200)
-                                                                                                                                                                               | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> sort) : []))))
--- | > GET /floating_ips
+data GetFloatingIpsParameters = GetFloatingIpsParameters {
+  -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+  -- 
+  -- Can be used to filter Floating IPs by labels. The response will only contain Floating IPs matching the label selector.
+  getFloatingIpsParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryName: Represents the parameter named \'name\'
+  -- 
+  -- Can be used to filter Floating IPs by their name. The response will only contain the Floating IP matching the specified name.
+  , getFloatingIpsParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times. Choices id id:asc id:desc created created:asc created:desc
+  , getFloatingIpsParametersQuerySort :: (GHC.Maybe.Maybe GetFloatingIpsParametersQuerySort)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryLabel_selector" Data.Aeson.Types.ToJSON..= getFloatingIpsParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getFloatingIpsParametersQueryName obj : "querySort" Data.Aeson.Types.ToJSON..= getFloatingIpsParametersQuerySort obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getFloatingIpsParametersQueryLabelSelector obj) GHC.Base.<> (("queryName" Data.Aeson.Types.ToJSON..= getFloatingIpsParametersQueryName obj) GHC.Base.<> ("querySort" Data.Aeson.Types.ToJSON..= getFloatingIpsParametersQuerySort obj)))
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsParameters" (\obj -> ((GHC.Base.pure GetFloatingIpsParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort"))
+-- | Create a new 'GetFloatingIpsParameters' with all required fields.
+mkGetFloatingIpsParameters :: GetFloatingIpsParameters
+mkGetFloatingIpsParameters = GetFloatingIpsParameters{getFloatingIpsParametersQueryLabelSelector = GHC.Maybe.Nothing,
+                                                      getFloatingIpsParametersQueryName = GHC.Maybe.Nothing,
+                                                      getFloatingIpsParametersQuerySort = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/floating_ips.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getFloatingIpsRaw' (use with 'HCloud.Common.runWithConfiguration')
-getFloatingIpsRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                    HCloud.Common.SecurityScheme s) =>
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                      Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                         m
-                                                         (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                             (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getFloatingIpsRawM name
-                   labelSelector
-                   sort = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") ((Data.Text.pack "name",
-                                                                                                                                                                      HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                 HCloud.Common.stringifyModel Data.Functor.<$> sort) : []))))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times. Choices id id:asc id:desc created created:asc created:desc
+data GetFloatingIpsParametersQuerySort =
+   GetFloatingIpsParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFloatingIpsParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFloatingIpsParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetFloatingIpsParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetFloatingIpsParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetFloatingIpsParametersQuerySortEnumCreated -- ^ Represents the JSON value @"created"@
+  | GetFloatingIpsParametersQuerySortEnumCreatedAsc -- ^ Represents the JSON value @"created:asc"@
+  | GetFloatingIpsParametersQuerySortEnumCreatedDesc -- ^ Represents the JSON value @"created:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsParametersQuerySort
+    where toJSON (GetFloatingIpsParametersQuerySortOther val) = val
+          toJSON (GetFloatingIpsParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFloatingIpsParametersQuerySortEnumId) = "id"
+          toJSON (GetFloatingIpsParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetFloatingIpsParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetFloatingIpsParametersQuerySortEnumCreated) = "created"
+          toJSON (GetFloatingIpsParametersQuerySortEnumCreatedAsc) = "created:asc"
+          toJSON (GetFloatingIpsParametersQuerySortEnumCreatedDesc) = "created:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetFloatingIpsParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetFloatingIpsParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetFloatingIpsParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "created" -> GetFloatingIpsParametersQuerySortEnumCreated
+                                            | val GHC.Classes.== "created:asc" -> GetFloatingIpsParametersQuerySortEnumCreatedAsc
+                                            | val GHC.Classes.== "created:desc" -> GetFloatingIpsParametersQuerySortEnumCreatedDesc
+                                            | GHC.Base.otherwise -> GetFloatingIpsParametersQuerySortOther val)
 -- | Represents a response of the operation 'getFloatingIps'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetFloatingIpsResponseError' is used.
-data GetFloatingIpsResponse =                                
-   GetFloatingIpsResponseError GHC.Base.String               -- ^ Means either no matching case available or a parse error
-  | GetFloatingIpsResponse200 GetFloatingIpsResponseBody200  -- ^ The \`floating_ips\` key in the reply contains an array of Floating IP objects with this structure
+data GetFloatingIpsResponse =
+   GetFloatingIpsResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetFloatingIpsResponse200 GetFloatingIpsResponseBody200 -- ^ The \`floating_ips\` key in the reply contains an array of Floating IP objects with this structure
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetFloatingIpsResponseBody200
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetFloatingIpsResponseBody200 = GetFloatingIpsResponseBody200 {
   -- | floating_ips
-  getFloatingIpsResponseBody200FloatingIps :: ([] GetFloatingIpsResponseBody200FloatingIps)
+  getFloatingIpsResponseBody200FloatingIps :: ([GetFloatingIpsResponseBody200FloatingIps])
   -- | meta
   , getFloatingIpsResponseBody200Meta :: (GHC.Maybe.Maybe GetFloatingIpsResponseBody200Meta)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "floating_ips" (getFloatingIpsResponseBody200FloatingIps obj) : (Data.Aeson..=) "meta" (getFloatingIpsResponseBody200Meta obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "floating_ips" (getFloatingIpsResponseBody200FloatingIps obj) GHC.Base.<> (Data.Aeson..=) "meta" (getFloatingIpsResponseBody200Meta obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("floating_ips" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIps obj : "meta" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200Meta obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("floating_ips" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIps obj) GHC.Base.<> ("meta" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200Meta obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200" (\obj -> (GHC.Base.pure GetFloatingIpsResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "floating_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta"))
--- | Defines the data type for the schema GetFloatingIpsResponseBody200Floating_ips
+-- | Create a new 'GetFloatingIpsResponseBody200' with all required fields.
+mkGetFloatingIpsResponseBody200 :: [GetFloatingIpsResponseBody200FloatingIps] -- ^ 'getFloatingIpsResponseBody200FloatingIps'
+  -> GetFloatingIpsResponseBody200
+mkGetFloatingIpsResponseBody200 getFloatingIpsResponseBody200FloatingIps = GetFloatingIpsResponseBody200{getFloatingIpsResponseBody200FloatingIps = getFloatingIpsResponseBody200FloatingIps,
+                                                                                                         getFloatingIpsResponseBody200Meta = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.floating_ips.items@ in the specification.
 -- 
 -- 
 data GetFloatingIpsResponseBody200FloatingIps = GetFloatingIpsResponseBody200FloatingIps {
@@ -146,33 +148,59 @@ data GetFloatingIpsResponseBody200FloatingIps = GetFloatingIpsResponseBody200Flo
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , getFloatingIpsResponseBody200FloatingIpsCreated :: Data.Text.Internal.Text
   -- | description: Description of the Resource
-  , getFloatingIpsResponseBody200FloatingIpsDescription :: Data.Text.Internal.Text
+  , getFloatingIpsResponseBody200FloatingIpsDescription :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | dns_ptr: Array of reverse DNS entries
-  , getFloatingIpsResponseBody200FloatingIpsDnsPtr :: ([] GetFloatingIpsResponseBody200FloatingIpsDnsPtr)
+  , getFloatingIpsResponseBody200FloatingIpsDnsPtr :: ([GetFloatingIpsResponseBody200FloatingIpsDnsPtr])
   -- | home_location: Location the Floating IP was created in. Routing is optimized for this Location.
   , getFloatingIpsResponseBody200FloatingIpsHomeLocation :: GetFloatingIpsResponseBody200FloatingIpsHomeLocation
   -- | id: ID of the Resource
-  , getFloatingIpsResponseBody200FloatingIpsId :: GHC.Integer.Type.Integer
+  , getFloatingIpsResponseBody200FloatingIpsId :: GHC.Types.Int
   -- | ip: IP address
   , getFloatingIpsResponseBody200FloatingIpsIp :: Data.Text.Internal.Text
   -- | labels: User-defined labels (key-value pairs)
-  , getFloatingIpsResponseBody200FloatingIpsLabels :: GetFloatingIpsResponseBody200FloatingIpsLabels
+  , getFloatingIpsResponseBody200FloatingIpsLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , getFloatingIpsResponseBody200FloatingIpsName :: Data.Text.Internal.Text
   -- | protection: Protection configuration for the Resource
   , getFloatingIpsResponseBody200FloatingIpsProtection :: GetFloatingIpsResponseBody200FloatingIpsProtection
   -- | server: ID of the Server the Floating IP is assigned to, null if it is not assigned at all
-  , getFloatingIpsResponseBody200FloatingIpsServer :: GHC.Integer.Type.Integer
+  , getFloatingIpsResponseBody200FloatingIpsServer :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | type: Type of the Floating IP
   , getFloatingIpsResponseBody200FloatingIpsType :: GetFloatingIpsResponseBody200FloatingIpsType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200FloatingIps
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "blocked" (getFloatingIpsResponseBody200FloatingIpsBlocked obj) : (Data.Aeson..=) "created" (getFloatingIpsResponseBody200FloatingIpsCreated obj) : (Data.Aeson..=) "description" (getFloatingIpsResponseBody200FloatingIpsDescription obj) : (Data.Aeson..=) "dns_ptr" (getFloatingIpsResponseBody200FloatingIpsDnsPtr obj) : (Data.Aeson..=) "home_location" (getFloatingIpsResponseBody200FloatingIpsHomeLocation obj) : (Data.Aeson..=) "id" (getFloatingIpsResponseBody200FloatingIpsId obj) : (Data.Aeson..=) "ip" (getFloatingIpsResponseBody200FloatingIpsIp obj) : (Data.Aeson..=) "labels" (getFloatingIpsResponseBody200FloatingIpsLabels obj) : (Data.Aeson..=) "name" (getFloatingIpsResponseBody200FloatingIpsName obj) : (Data.Aeson..=) "protection" (getFloatingIpsResponseBody200FloatingIpsProtection obj) : (Data.Aeson..=) "server" (getFloatingIpsResponseBody200FloatingIpsServer obj) : (Data.Aeson..=) "type" (getFloatingIpsResponseBody200FloatingIpsType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "blocked" (getFloatingIpsResponseBody200FloatingIpsBlocked obj) GHC.Base.<> ((Data.Aeson..=) "created" (getFloatingIpsResponseBody200FloatingIpsCreated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getFloatingIpsResponseBody200FloatingIpsDescription obj) GHC.Base.<> ((Data.Aeson..=) "dns_ptr" (getFloatingIpsResponseBody200FloatingIpsDnsPtr obj) GHC.Base.<> ((Data.Aeson..=) "home_location" (getFloatingIpsResponseBody200FloatingIpsHomeLocation obj) GHC.Base.<> ((Data.Aeson..=) "id" (getFloatingIpsResponseBody200FloatingIpsId obj) GHC.Base.<> ((Data.Aeson..=) "ip" (getFloatingIpsResponseBody200FloatingIpsIp obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getFloatingIpsResponseBody200FloatingIpsLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getFloatingIpsResponseBody200FloatingIpsName obj) GHC.Base.<> ((Data.Aeson..=) "protection" (getFloatingIpsResponseBody200FloatingIpsProtection obj) GHC.Base.<> ((Data.Aeson..=) "server" (getFloatingIpsResponseBody200FloatingIpsServer obj) GHC.Base.<> (Data.Aeson..=) "type" (getFloatingIpsResponseBody200FloatingIpsType obj))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200FloatingIps
+    where toJSON obj = Data.Aeson.Types.Internal.object ("blocked" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsBlocked obj : "created" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsCreated obj : "description" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDescription obj : "dns_ptr" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDnsPtr obj : "home_location" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocation obj : "id" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsId obj : "ip" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsIp obj : "labels" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsLabels obj : "name" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsName obj : "protection" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsProtection obj : "server" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsServer obj : "type" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("blocked" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsBlocked obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsCreated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDescription obj) GHC.Base.<> (("dns_ptr" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDnsPtr obj) GHC.Base.<> (("home_location" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocation obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsId obj) GHC.Base.<> (("ip" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsIp obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsName obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsProtection obj) GHC.Base.<> (("server" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsServer obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsType obj))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200FloatingIps
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200FloatingIps" (\obj -> (((((((((((GHC.Base.pure GetFloatingIpsResponseBody200FloatingIps GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "blocked")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "home_location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetFloatingIpsResponseBody200Floating_ipsDns_ptr
+-- | Create a new 'GetFloatingIpsResponseBody200FloatingIps' with all required fields.
+mkGetFloatingIpsResponseBody200FloatingIps :: GHC.Types.Bool -- ^ 'getFloatingIpsResponseBody200FloatingIpsBlocked'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsCreated'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsDescription'
+  -> [GetFloatingIpsResponseBody200FloatingIpsDnsPtr] -- ^ 'getFloatingIpsResponseBody200FloatingIpsDnsPtr'
+  -> GetFloatingIpsResponseBody200FloatingIpsHomeLocation -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocation'
+  -> GHC.Types.Int -- ^ 'getFloatingIpsResponseBody200FloatingIpsId'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsIp'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getFloatingIpsResponseBody200FloatingIpsLabels'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsName'
+  -> GetFloatingIpsResponseBody200FloatingIpsProtection -- ^ 'getFloatingIpsResponseBody200FloatingIpsProtection'
+  -> GHC.Maybe.Maybe GHC.Types.Int -- ^ 'getFloatingIpsResponseBody200FloatingIpsServer'
+  -> GetFloatingIpsResponseBody200FloatingIpsType -- ^ 'getFloatingIpsResponseBody200FloatingIpsType'
+  -> GetFloatingIpsResponseBody200FloatingIps
+mkGetFloatingIpsResponseBody200FloatingIps getFloatingIpsResponseBody200FloatingIpsBlocked getFloatingIpsResponseBody200FloatingIpsCreated getFloatingIpsResponseBody200FloatingIpsDescription getFloatingIpsResponseBody200FloatingIpsDnsPtr getFloatingIpsResponseBody200FloatingIpsHomeLocation getFloatingIpsResponseBody200FloatingIpsId getFloatingIpsResponseBody200FloatingIpsIp getFloatingIpsResponseBody200FloatingIpsLabels getFloatingIpsResponseBody200FloatingIpsName getFloatingIpsResponseBody200FloatingIpsProtection getFloatingIpsResponseBody200FloatingIpsServer getFloatingIpsResponseBody200FloatingIpsType = GetFloatingIpsResponseBody200FloatingIps{getFloatingIpsResponseBody200FloatingIpsBlocked = getFloatingIpsResponseBody200FloatingIpsBlocked,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsCreated = getFloatingIpsResponseBody200FloatingIpsCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsDescription = getFloatingIpsResponseBody200FloatingIpsDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsDnsPtr = getFloatingIpsResponseBody200FloatingIpsDnsPtr,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsHomeLocation = getFloatingIpsResponseBody200FloatingIpsHomeLocation,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsId = getFloatingIpsResponseBody200FloatingIpsId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsIp = getFloatingIpsResponseBody200FloatingIpsIp,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsLabels = getFloatingIpsResponseBody200FloatingIpsLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsName = getFloatingIpsResponseBody200FloatingIpsName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsProtection = getFloatingIpsResponseBody200FloatingIpsProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsServer = getFloatingIpsResponseBody200FloatingIpsServer,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               getFloatingIpsResponseBody200FloatingIpsType = getFloatingIpsResponseBody200FloatingIpsType}
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.floating_ips.items.properties.dns_ptr.items@ in the specification.
 -- 
 -- 
 data GetFloatingIpsResponseBody200FloatingIpsDnsPtr = GetFloatingIpsResponseBody200FloatingIpsDnsPtr {
@@ -182,12 +210,18 @@ data GetFloatingIpsResponseBody200FloatingIpsDnsPtr = GetFloatingIpsResponseBody
   , getFloatingIpsResponseBody200FloatingIpsDnsPtrIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200FloatingIpsDnsPtr
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr obj) : (Data.Aeson..=) "ip" (getFloatingIpsResponseBody200FloatingIpsDnsPtrIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (getFloatingIpsResponseBody200FloatingIpsDnsPtrIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200FloatingIpsDnsPtr
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDnsPtrIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsDnsPtrIp obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200FloatingIpsDnsPtr
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200FloatingIpsDnsPtr" (\obj -> (GHC.Base.pure GetFloatingIpsResponseBody200FloatingIpsDnsPtr GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema GetFloatingIpsResponseBody200Floating_ipsHome_location
+-- | Create a new 'GetFloatingIpsResponseBody200FloatingIpsDnsPtr' with all required fields.
+mkGetFloatingIpsResponseBody200FloatingIpsDnsPtr :: Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsDnsPtrIp'
+  -> GetFloatingIpsResponseBody200FloatingIpsDnsPtr
+mkGetFloatingIpsResponseBody200FloatingIpsDnsPtr getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr getFloatingIpsResponseBody200FloatingIpsDnsPtrIp = GetFloatingIpsResponseBody200FloatingIpsDnsPtr{getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr = getFloatingIpsResponseBody200FloatingIpsDnsPtrDnsPtr,
+                                                                                                                                                                                                        getFloatingIpsResponseBody200FloatingIpsDnsPtrIp = getFloatingIpsResponseBody200FloatingIpsDnsPtrIp}
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.floating_ips.items.properties.home_location@ in the specification.
 -- 
 -- Location the Floating IP was created in. Routing is optimized for this Location.
 data GetFloatingIpsResponseBody200FloatingIpsHomeLocation = GetFloatingIpsResponseBody200FloatingIpsHomeLocation {
@@ -209,24 +243,30 @@ data GetFloatingIpsResponseBody200FloatingIpsHomeLocation = GetFloatingIpsRespon
   , getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200FloatingIpsHomeLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (getFloatingIpsResponseBody200FloatingIpsHomeLocationCity obj) : (Data.Aeson..=) "country" (getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry obj) : (Data.Aeson..=) "description" (getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription obj) : (Data.Aeson..=) "id" (getFloatingIpsResponseBody200FloatingIpsHomeLocationId obj) : (Data.Aeson..=) "latitude" (getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude obj) : (Data.Aeson..=) "longitude" (getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude obj) : (Data.Aeson..=) "name" (getFloatingIpsResponseBody200FloatingIpsHomeLocationName obj) : (Data.Aeson..=) "network_zone" (getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (getFloatingIpsResponseBody200FloatingIpsHomeLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getFloatingIpsResponseBody200FloatingIpsHomeLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (getFloatingIpsResponseBody200FloatingIpsHomeLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200FloatingIpsHomeLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationCity obj : "country" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200FloatingIpsHomeLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200FloatingIpsHomeLocation" (\obj -> (((((((GHC.Base.pure GetFloatingIpsResponseBody200FloatingIpsHomeLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema GetFloatingIpsResponseBody200Floating_ipsLabels
--- 
--- User-defined labels (key-value pairs)
-data GetFloatingIpsResponseBody200FloatingIpsLabels = GetFloatingIpsResponseBody200FloatingIpsLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200FloatingIpsLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200FloatingIpsLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200FloatingIpsLabels" (\obj -> GHC.Base.pure GetFloatingIpsResponseBody200FloatingIpsLabels)
--- | Defines the data type for the schema GetFloatingIpsResponseBody200Floating_ipsProtection
+-- | Create a new 'GetFloatingIpsResponseBody200FloatingIpsHomeLocation' with all required fields.
+mkGetFloatingIpsResponseBody200FloatingIpsHomeLocation :: Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription'
+  -> GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationId'
+  -> GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude'
+  -> GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationName'
+  -> Data.Text.Internal.Text -- ^ 'getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone'
+  -> GetFloatingIpsResponseBody200FloatingIpsHomeLocation
+mkGetFloatingIpsResponseBody200FloatingIpsHomeLocation getFloatingIpsResponseBody200FloatingIpsHomeLocationCity getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription getFloatingIpsResponseBody200FloatingIpsHomeLocationId getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude getFloatingIpsResponseBody200FloatingIpsHomeLocationName getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone = GetFloatingIpsResponseBody200FloatingIpsHomeLocation{getFloatingIpsResponseBody200FloatingIpsHomeLocationCity = getFloatingIpsResponseBody200FloatingIpsHomeLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry = getFloatingIpsResponseBody200FloatingIpsHomeLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription = getFloatingIpsResponseBody200FloatingIpsHomeLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationId = getFloatingIpsResponseBody200FloatingIpsHomeLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude = getFloatingIpsResponseBody200FloatingIpsHomeLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude = getFloatingIpsResponseBody200FloatingIpsHomeLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationName = getFloatingIpsResponseBody200FloatingIpsHomeLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone = getFloatingIpsResponseBody200FloatingIpsHomeLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.floating_ips.items.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data GetFloatingIpsResponseBody200FloatingIpsProtection = GetFloatingIpsResponseBody200FloatingIpsProtection {
@@ -234,32 +274,34 @@ data GetFloatingIpsResponseBody200FloatingIpsProtection = GetFloatingIpsResponse
   getFloatingIpsResponseBody200FloatingIpsProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200FloatingIpsProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (getFloatingIpsResponseBody200FloatingIpsProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (getFloatingIpsResponseBody200FloatingIpsProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200FloatingIpsProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200FloatingIpsProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200FloatingIpsProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200FloatingIpsProtection" (\obj -> GHC.Base.pure GetFloatingIpsResponseBody200FloatingIpsProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema GetFloatingIpsResponseBody200Floating_ipsType
+-- | Create a new 'GetFloatingIpsResponseBody200FloatingIpsProtection' with all required fields.
+mkGetFloatingIpsResponseBody200FloatingIpsProtection :: GHC.Types.Bool -- ^ 'getFloatingIpsResponseBody200FloatingIpsProtectionDelete'
+  -> GetFloatingIpsResponseBody200FloatingIpsProtection
+mkGetFloatingIpsResponseBody200FloatingIpsProtection getFloatingIpsResponseBody200FloatingIpsProtectionDelete = GetFloatingIpsResponseBody200FloatingIpsProtection{getFloatingIpsResponseBody200FloatingIpsProtectionDelete = getFloatingIpsResponseBody200FloatingIpsProtectionDelete}
+-- | Defines the enum schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.floating_ips.items.properties.type@ in the specification.
 -- 
 -- Type of the Floating IP
-data GetFloatingIpsResponseBody200FloatingIpsType
-    = GetFloatingIpsResponseBody200FloatingIpsTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetFloatingIpsResponseBody200FloatingIpsTypeEnumTyped Data.Text.Internal.Text
-    | GetFloatingIpsResponseBody200FloatingIpsTypeEnumStringIpv4
-    | GetFloatingIpsResponseBody200FloatingIpsTypeEnumStringIpv6
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200FloatingIpsType
-    where toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeEnumStringIpv4) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv4"
-          toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeEnumStringIpv6) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv6"
-instance Data.Aeson.FromJSON GetFloatingIpsResponseBody200FloatingIpsType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv4")
-                                          then GetFloatingIpsResponseBody200FloatingIpsTypeEnumStringIpv4
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ipv6")
-                                                then GetFloatingIpsResponseBody200FloatingIpsTypeEnumStringIpv6
-                                                else GetFloatingIpsResponseBody200FloatingIpsTypeEnumOther val)
--- | Defines the data type for the schema GetFloatingIpsResponseBody200Meta
+data GetFloatingIpsResponseBody200FloatingIpsType =
+   GetFloatingIpsResponseBody200FloatingIpsTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetFloatingIpsResponseBody200FloatingIpsTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetFloatingIpsResponseBody200FloatingIpsTypeEnumIpv4 -- ^ Represents the JSON value @"ipv4"@
+  | GetFloatingIpsResponseBody200FloatingIpsTypeEnumIpv6 -- ^ Represents the JSON value @"ipv6"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200FloatingIpsType
+    where toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeOther val) = val
+          toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeEnumIpv4) = "ipv4"
+          toJSON (GetFloatingIpsResponseBody200FloatingIpsTypeEnumIpv6) = "ipv6"
+instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200FloatingIpsType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ipv4" -> GetFloatingIpsResponseBody200FloatingIpsTypeEnumIpv4
+                                            | val GHC.Classes.== "ipv6" -> GetFloatingIpsResponseBody200FloatingIpsTypeEnumIpv6
+                                            | GHC.Base.otherwise -> GetFloatingIpsResponseBody200FloatingIpsTypeOther val)
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetFloatingIpsResponseBody200Meta = GetFloatingIpsResponseBody200Meta {
@@ -267,31 +309,79 @@ data GetFloatingIpsResponseBody200Meta = GetFloatingIpsResponseBody200Meta {
   getFloatingIpsResponseBody200MetaPagination :: GetFloatingIpsResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getFloatingIpsResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getFloatingIpsResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200Meta" (\obj -> GHC.Base.pure GetFloatingIpsResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetFloatingIpsResponseBody200MetaPagination
+-- | Create a new 'GetFloatingIpsResponseBody200Meta' with all required fields.
+mkGetFloatingIpsResponseBody200Meta :: GetFloatingIpsResponseBody200MetaPagination -- ^ 'getFloatingIpsResponseBody200MetaPagination'
+  -> GetFloatingIpsResponseBody200Meta
+mkGetFloatingIpsResponseBody200Meta getFloatingIpsResponseBody200MetaPagination = GetFloatingIpsResponseBody200Meta{getFloatingIpsResponseBody200MetaPagination = getFloatingIpsResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/floating_ips.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetFloatingIpsResponseBody200MetaPagination = GetFloatingIpsResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getFloatingIpsResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getFloatingIpsResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getFloatingIpsResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getFloatingIpsResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getFloatingIpsResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getFloatingIpsResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getFloatingIpsResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getFloatingIpsResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getFloatingIpsResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getFloatingIpsResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetFloatingIpsResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getFloatingIpsResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getFloatingIpsResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getFloatingIpsResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getFloatingIpsResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getFloatingIpsResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getFloatingIpsResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getFloatingIpsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getFloatingIpsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getFloatingIpsResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getFloatingIpsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getFloatingIpsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getFloatingIpsResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetFloatingIpsResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getFloatingIpsResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetFloatingIpsResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetFloatingIpsResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetFloatingIpsResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
+-- | Create a new 'GetFloatingIpsResponseBody200MetaPagination' with all required fields.
+mkGetFloatingIpsResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getFloatingIpsResponseBody200MetaPaginationTotalEntries'
+  -> GetFloatingIpsResponseBody200MetaPagination
+mkGetFloatingIpsResponseBody200MetaPagination getFloatingIpsResponseBody200MetaPaginationLastPage getFloatingIpsResponseBody200MetaPaginationNextPage getFloatingIpsResponseBody200MetaPaginationPage getFloatingIpsResponseBody200MetaPaginationPerPage getFloatingIpsResponseBody200MetaPaginationPreviousPage getFloatingIpsResponseBody200MetaPaginationTotalEntries = GetFloatingIpsResponseBody200MetaPagination{getFloatingIpsResponseBody200MetaPaginationLastPage = getFloatingIpsResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                       getFloatingIpsResponseBody200MetaPaginationNextPage = getFloatingIpsResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                       getFloatingIpsResponseBody200MetaPaginationPage = getFloatingIpsResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                       getFloatingIpsResponseBody200MetaPaginationPerPage = getFloatingIpsResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                       getFloatingIpsResponseBody200MetaPaginationPreviousPage = getFloatingIpsResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                                                       getFloatingIpsResponseBody200MetaPaginationTotalEntries = getFloatingIpsResponseBody200MetaPaginationTotalEntries}
+-- | > GET /floating_ips
+-- 
+-- The same as 'getFloatingIps' but accepts an explicit configuration.
+getFloatingIpsWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFloatingIpsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetFloatingIpsResponse) -- ^ Monadic computation which returns the result of the operation
+getFloatingIpsWithConfiguration config
+                                parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetFloatingIpsResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetFloatingIpsResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                                    GetFloatingIpsResponseBody200)
+                                                                                                                                                                                      | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                             HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /floating_ips
+-- 
+-- The same as 'getFloatingIps' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getFloatingIpsRaw :: forall m . HCloud.Common.MonadHTTP m => GetFloatingIpsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFloatingIpsRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                          HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /floating_ips
+-- 
+-- The same as 'getFloatingIps' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getFloatingIpsWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetFloatingIpsParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getFloatingIpsWithConfigurationRaw config
+                                   parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/floating_ips") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getFloatingIpsParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False])

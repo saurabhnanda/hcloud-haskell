@@ -3,15 +3,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE MultiWayIf #-}
-{-# LANGUAGE DeriveGeneric #-}
 
 -- | Contains the different functions to run the operation getServers
 module HCloud.Operations.GetServers where
 
 import qualified Prelude as GHC.Integer.Type
 import qualified Prelude as GHC.Maybe
+import qualified Control.Monad.Fail
 import qualified Control.Monad.Trans.Reader
 import qualified Data.Aeson
+import qualified Data.Aeson as Data.Aeson.Encoding.Internal
 import qualified Data.Aeson as Data.Aeson.Types
 import qualified Data.Aeson as Data.Aeson.Types.FromJSON
 import qualified Data.Aeson as Data.Aeson.Types.ToJSON
@@ -28,7 +29,6 @@ import qualified Data.Time.LocalTime as Data.Time.LocalTime.Internal.ZonedTime
 import qualified Data.Vector
 import qualified GHC.Base
 import qualified GHC.Classes
-import qualified GHC.Generics
 import qualified GHC.Int
 import qualified GHC.Show
 import qualified GHC.Types
@@ -45,111 +45,157 @@ import HCloud.Types
 -- | > GET /servers
 -- 
 -- Returns all existing Server objects
-getServers :: forall m s . (HCloud.Common.MonadHTTP m, HCloud.Common.SecurityScheme s) => HCloud.Common.Configuration s  -- ^ The configuration to use in the request
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                -- ^ name: Can be used to filter resources by their name. The response will only contain the resources matching the specified name
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                -- ^ label_selector: Can be used to filter resources by labels. The response will only contain resources matching the label selector.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                -- ^ sort: Can be used multiple times.
-  -> GHC.Maybe.Maybe Data.Text.Internal.Text                                                                                -- ^ status: Can be used multiple times. The response will only contain Server matching the status
-  -> m (Data.Either.Either Network.HTTP.Client.Types.HttpException (Network.HTTP.Client.Types.Response GetServersResponse)) -- ^ Monad containing the result of the operation
-getServers config
-           name
-           labelSelector
-           sort
-           status = GHC.Base.fmap (GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetServersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                  GetServersResponseBody200)
-                                                                                                                                                                        | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0)) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                            HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                     HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))))
--- | > GET /servers
+getServers :: forall m . HCloud.Common.MonadHTTP m => GetServersParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response GetServersResponse) -- ^ Monadic computation which returns the result of the operation
+getServers parameters = GHC.Base.fmap (\response_0 -> GHC.Base.fmap (Data.Either.either GetServersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_1 -> Network.HTTP.Types.Status.statusCode status_1 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                       GetServersResponseBody200)
+                                                                                                                                                             | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_0) response_0) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                         HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | Defines the object schema located at @paths.\/servers.GET.parameters@ in the specification.
 -- 
--- The same as 'getServers' but returns the raw 'Data.ByteString.Char8.ByteString'
-getServersRaw :: forall m s . (HCloud.Common.MonadHTTP m,
-                               HCloud.Common.SecurityScheme s) =>
-                 HCloud.Common.Configuration s ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                 m (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                       (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getServersRaw config
-              name
-              labelSelector
-              sort
-              status = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") ((Data.Text.pack "name",
-                                                                                                                                                                    HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                             HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))))
--- | > GET /servers
 -- 
--- Monadic version of 'getServers' (use with 'HCloud.Common.runWithConfiguration')
-getServersM :: forall m s . (HCloud.Common.MonadHTTP m,
-                             HCloud.Common.SecurityScheme s) =>
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               GHC.Maybe.Maybe Data.Text.Internal.Text ->
-               Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                  m
-                                                  (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                      (Network.HTTP.Client.Types.Response GetServersResponse))
-getServersM name
-            labelSelector
-            sort
-            status = GHC.Base.fmap (GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetServersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
-                                                                                                                                                                                                                                                                                                                                                                                                                   GetServersResponseBody200)
-                                                                                                                                                                         | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2)) (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") ((Data.Text.pack "name",
-                                                                                                                                                                                                                                                                                                                                                                                                       HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))))
--- | > GET /servers
+data GetServersParameters = GetServersParameters {
+  -- | queryLabel_selector: Represents the parameter named \'label_selector\'
+  -- 
+  -- Can be used to filter resources by labels. The response will only contain resources matching the label selector.
+  getServersParametersQueryLabelSelector :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | queryName: Represents the parameter named \'name\'
+  -- 
+  -- Can be used to filter resources by their name. The response will only contain the resources matching the specified name
+  , getServersParametersQueryName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
+  -- | querySort: Represents the parameter named \'sort\'
+  -- 
+  -- Can be used multiple times.
+  , getServersParametersQuerySort :: (GHC.Maybe.Maybe GetServersParametersQuerySort)
+  -- | queryStatus: Represents the parameter named \'status\'
+  -- 
+  -- Can be used multiple times. The response will only contain Server matching the status
+  , getServersParametersQueryStatus :: (GHC.Maybe.Maybe GetServersParametersQueryStatus)
+  } deriving (GHC.Show.Show
+  , GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersParameters
+    where toJSON obj = Data.Aeson.Types.Internal.object ("queryLabel_selector" Data.Aeson.Types.ToJSON..= getServersParametersQueryLabelSelector obj : "queryName" Data.Aeson.Types.ToJSON..= getServersParametersQueryName obj : "querySort" Data.Aeson.Types.ToJSON..= getServersParametersQuerySort obj : "queryStatus" Data.Aeson.Types.ToJSON..= getServersParametersQueryStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("queryLabel_selector" Data.Aeson.Types.ToJSON..= getServersParametersQueryLabelSelector obj) GHC.Base.<> (("queryName" Data.Aeson.Types.ToJSON..= getServersParametersQueryName obj) GHC.Base.<> (("querySort" Data.Aeson.Types.ToJSON..= getServersParametersQuerySort obj) GHC.Base.<> ("queryStatus" Data.Aeson.Types.ToJSON..= getServersParametersQueryStatus obj))))
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersParameters
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersParameters" (\obj -> (((GHC.Base.pure GetServersParameters GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryLabel_selector")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryName")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "querySort")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "queryStatus"))
+-- | Create a new 'GetServersParameters' with all required fields.
+mkGetServersParameters :: GetServersParameters
+mkGetServersParameters = GetServersParameters{getServersParametersQueryLabelSelector = GHC.Maybe.Nothing,
+                                              getServersParametersQueryName = GHC.Maybe.Nothing,
+                                              getServersParametersQuerySort = GHC.Maybe.Nothing,
+                                              getServersParametersQueryStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/servers.GET.parameters.properties.querySort@ in the specification.
 -- 
--- Monadic version of 'getServersRaw' (use with 'HCloud.Common.runWithConfiguration')
-getServersRawM :: forall m s . (HCloud.Common.MonadHTTP m,
-                                HCloud.Common.SecurityScheme s) =>
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  GHC.Maybe.Maybe Data.Text.Internal.Text ->
-                  Control.Monad.Trans.Reader.ReaderT (HCloud.Common.Configuration s)
-                                                     m
-                                                     (Data.Either.Either Network.HTTP.Client.Types.HttpException
-                                                                         (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString))
-getServersRawM name
-               labelSelector
-               sort
-               status = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") ((Data.Text.pack "name",
-                                                                                                                                                               HCloud.Common.stringifyModel Data.Functor.<$> name) : ((Data.Text.pack "label_selector",
-                                                                                                                                                                                                                        HCloud.Common.stringifyModel Data.Functor.<$> labelSelector) : ((Data.Text.pack "sort",
-                                                                                                                                                                                                                                                                                          HCloud.Common.stringifyModel Data.Functor.<$> sort) : ((Data.Text.pack "status",
-                                                                                                                                                                                                                                                                                                                                                   HCloud.Common.stringifyModel Data.Functor.<$> status) : [])))))
+-- Represents the parameter named \'sort\'
+-- 
+-- Can be used multiple times.
+data GetServersParametersQuerySort =
+   GetServersParametersQuerySortOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersParametersQuerySortTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersParametersQuerySortEnumId -- ^ Represents the JSON value @"id"@
+  | GetServersParametersQuerySortEnumIdAsc -- ^ Represents the JSON value @"id:asc"@
+  | GetServersParametersQuerySortEnumIdDesc -- ^ Represents the JSON value @"id:desc"@
+  | GetServersParametersQuerySortEnumName -- ^ Represents the JSON value @"name"@
+  | GetServersParametersQuerySortEnumNameAsc -- ^ Represents the JSON value @"name:asc"@
+  | GetServersParametersQuerySortEnumNameDesc -- ^ Represents the JSON value @"name:desc"@
+  | GetServersParametersQuerySortEnumCreated -- ^ Represents the JSON value @"created"@
+  | GetServersParametersQuerySortEnumCreatedAsc -- ^ Represents the JSON value @"created:asc"@
+  | GetServersParametersQuerySortEnumCreatedDesc -- ^ Represents the JSON value @"created:desc"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersParametersQuerySort
+    where toJSON (GetServersParametersQuerySortOther val) = val
+          toJSON (GetServersParametersQuerySortTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersParametersQuerySortEnumId) = "id"
+          toJSON (GetServersParametersQuerySortEnumIdAsc) = "id:asc"
+          toJSON (GetServersParametersQuerySortEnumIdDesc) = "id:desc"
+          toJSON (GetServersParametersQuerySortEnumName) = "name"
+          toJSON (GetServersParametersQuerySortEnumNameAsc) = "name:asc"
+          toJSON (GetServersParametersQuerySortEnumNameDesc) = "name:desc"
+          toJSON (GetServersParametersQuerySortEnumCreated) = "created"
+          toJSON (GetServersParametersQuerySortEnumCreatedAsc) = "created:asc"
+          toJSON (GetServersParametersQuerySortEnumCreatedDesc) = "created:desc"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersParametersQuerySort
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "id" -> GetServersParametersQuerySortEnumId
+                                            | val GHC.Classes.== "id:asc" -> GetServersParametersQuerySortEnumIdAsc
+                                            | val GHC.Classes.== "id:desc" -> GetServersParametersQuerySortEnumIdDesc
+                                            | val GHC.Classes.== "name" -> GetServersParametersQuerySortEnumName
+                                            | val GHC.Classes.== "name:asc" -> GetServersParametersQuerySortEnumNameAsc
+                                            | val GHC.Classes.== "name:desc" -> GetServersParametersQuerySortEnumNameDesc
+                                            | val GHC.Classes.== "created" -> GetServersParametersQuerySortEnumCreated
+                                            | val GHC.Classes.== "created:asc" -> GetServersParametersQuerySortEnumCreatedAsc
+                                            | val GHC.Classes.== "created:desc" -> GetServersParametersQuerySortEnumCreatedDesc
+                                            | GHC.Base.otherwise -> GetServersParametersQuerySortOther val)
+-- | Defines the enum schema located at @paths.\/servers.GET.parameters.properties.queryStatus@ in the specification.
+-- 
+-- Represents the parameter named \'status\'
+-- 
+-- Can be used multiple times. The response will only contain Server matching the status
+data GetServersParametersQueryStatus =
+   GetServersParametersQueryStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersParametersQueryStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersParametersQueryStatusEnumInitializing -- ^ Represents the JSON value @"initializing"@
+  | GetServersParametersQueryStatusEnumStarting -- ^ Represents the JSON value @"starting"@
+  | GetServersParametersQueryStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetServersParametersQueryStatusEnumStopping -- ^ Represents the JSON value @"stopping"@
+  | GetServersParametersQueryStatusEnumOff -- ^ Represents the JSON value @"off"@
+  | GetServersParametersQueryStatusEnumDeleting -- ^ Represents the JSON value @"deleting"@
+  | GetServersParametersQueryStatusEnumRebuilding -- ^ Represents the JSON value @"rebuilding"@
+  | GetServersParametersQueryStatusEnumMigrating -- ^ Represents the JSON value @"migrating"@
+  | GetServersParametersQueryStatusEnumUnknown -- ^ Represents the JSON value @"unknown"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersParametersQueryStatus
+    where toJSON (GetServersParametersQueryStatusOther val) = val
+          toJSON (GetServersParametersQueryStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersParametersQueryStatusEnumInitializing) = "initializing"
+          toJSON (GetServersParametersQueryStatusEnumStarting) = "starting"
+          toJSON (GetServersParametersQueryStatusEnumRunning) = "running"
+          toJSON (GetServersParametersQueryStatusEnumStopping) = "stopping"
+          toJSON (GetServersParametersQueryStatusEnumOff) = "off"
+          toJSON (GetServersParametersQueryStatusEnumDeleting) = "deleting"
+          toJSON (GetServersParametersQueryStatusEnumRebuilding) = "rebuilding"
+          toJSON (GetServersParametersQueryStatusEnumMigrating) = "migrating"
+          toJSON (GetServersParametersQueryStatusEnumUnknown) = "unknown"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersParametersQueryStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "initializing" -> GetServersParametersQueryStatusEnumInitializing
+                                            | val GHC.Classes.== "starting" -> GetServersParametersQueryStatusEnumStarting
+                                            | val GHC.Classes.== "running" -> GetServersParametersQueryStatusEnumRunning
+                                            | val GHC.Classes.== "stopping" -> GetServersParametersQueryStatusEnumStopping
+                                            | val GHC.Classes.== "off" -> GetServersParametersQueryStatusEnumOff
+                                            | val GHC.Classes.== "deleting" -> GetServersParametersQueryStatusEnumDeleting
+                                            | val GHC.Classes.== "rebuilding" -> GetServersParametersQueryStatusEnumRebuilding
+                                            | val GHC.Classes.== "migrating" -> GetServersParametersQueryStatusEnumMigrating
+                                            | val GHC.Classes.== "unknown" -> GetServersParametersQueryStatusEnumUnknown
+                                            | GHC.Base.otherwise -> GetServersParametersQueryStatusOther val)
 -- | Represents a response of the operation 'getServers'.
 -- 
 -- The response constructor is chosen by the status code of the response. If no case matches (no specific case for the response code, no range case, no default case), 'GetServersResponseError' is used.
-data GetServersResponse =                            
-   GetServersResponseError GHC.Base.String           -- ^ Means either no matching case available or a parse error
-  | GetServersResponse200 GetServersResponseBody200  -- ^ A paged array of servers
+data GetServersResponse =
+   GetServersResponseError GHC.Base.String -- ^ Means either no matching case available or a parse error
+  | GetServersResponse200 GetServersResponseBody200 -- ^ A paged array of servers
   deriving (GHC.Show.Show, GHC.Classes.Eq)
--- | Defines the data type for the schema GetServersResponseBody200
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200 = GetServersResponseBody200 {
   -- | meta
   getServersResponseBody200Meta :: (GHC.Maybe.Maybe GetServersResponseBody200Meta)
   -- | servers
-  , getServersResponseBody200Servers :: ([] GetServersResponseBody200Servers)
+  , getServersResponseBody200Servers :: ([GetServersResponseBody200Servers])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "meta" (getServersResponseBody200Meta obj) : (Data.Aeson..=) "servers" (getServersResponseBody200Servers obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "meta" (getServersResponseBody200Meta obj) GHC.Base.<> (Data.Aeson..=) "servers" (getServersResponseBody200Servers obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200
+    where toJSON obj = Data.Aeson.Types.Internal.object ("meta" Data.Aeson.Types.ToJSON..= getServersResponseBody200Meta obj : "servers" Data.Aeson.Types.ToJSON..= getServersResponseBody200Servers obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("meta" Data.Aeson.Types.ToJSON..= getServersResponseBody200Meta obj) GHC.Base.<> ("servers" Data.Aeson.Types.ToJSON..= getServersResponseBody200Servers obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200" (\obj -> (GHC.Base.pure GetServersResponseBody200 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "meta")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers"))
--- | Defines the data type for the schema GetServersResponseBody200Meta
+-- | Create a new 'GetServersResponseBody200' with all required fields.
+mkGetServersResponseBody200 :: [GetServersResponseBody200Servers] -- ^ 'getServersResponseBody200Servers'
+  -> GetServersResponseBody200
+mkGetServersResponseBody200 getServersResponseBody200Servers = GetServersResponseBody200{getServersResponseBody200Meta = GHC.Maybe.Nothing,
+                                                                                         getServersResponseBody200Servers = getServersResponseBody200Servers}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.meta@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200Meta = GetServersResponseBody200Meta {
@@ -157,70 +203,88 @@ data GetServersResponseBody200Meta = GetServersResponseBody200Meta {
   getServersResponseBody200MetaPagination :: GetServersResponseBody200MetaPagination
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200Meta
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "pagination" (getServersResponseBody200MetaPagination obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "pagination" (getServersResponseBody200MetaPagination obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200Meta
+    where toJSON obj = Data.Aeson.Types.Internal.object ("pagination" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPagination obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("pagination" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPagination obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200Meta
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200Meta" (\obj -> GHC.Base.pure GetServersResponseBody200Meta GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "pagination"))
--- | Defines the data type for the schema GetServersResponseBody200MetaPagination
+-- | Create a new 'GetServersResponseBody200Meta' with all required fields.
+mkGetServersResponseBody200Meta :: GetServersResponseBody200MetaPagination -- ^ 'getServersResponseBody200MetaPagination'
+  -> GetServersResponseBody200Meta
+mkGetServersResponseBody200Meta getServersResponseBody200MetaPagination = GetServersResponseBody200Meta{getServersResponseBody200MetaPagination = getServersResponseBody200MetaPagination}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.meta.properties.pagination@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200MetaPagination = GetServersResponseBody200MetaPagination {
   -- | last_page: ID of the last page available. Can be null if the current page is the last one.
-  getServersResponseBody200MetaPaginationLastPage :: GHC.Types.Double
+  getServersResponseBody200MetaPaginationLastPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | next_page: ID of the next page. Can be null if the current page is the last one.
-  , getServersResponseBody200MetaPaginationNextPage :: GHC.Types.Double
+  , getServersResponseBody200MetaPaginationNextPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | page: Current page number
   , getServersResponseBody200MetaPaginationPage :: GHC.Types.Double
   -- | per_page: Maximum number of items shown per page in the response
   , getServersResponseBody200MetaPaginationPerPage :: GHC.Types.Double
   -- | previous_page: ID of the previous page. Can be null if the current page is the first one.
-  , getServersResponseBody200MetaPaginationPreviousPage :: GHC.Types.Double
+  , getServersResponseBody200MetaPaginationPreviousPage :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | total_entries: The total number of entries that exist in the database for this query. Nullable if unknown.
-  , getServersResponseBody200MetaPaginationTotalEntries :: GHC.Types.Double
+  , getServersResponseBody200MetaPaginationTotalEntries :: (GHC.Maybe.Maybe GHC.Types.Double)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200MetaPagination
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "last_page" (getServersResponseBody200MetaPaginationLastPage obj) : (Data.Aeson..=) "next_page" (getServersResponseBody200MetaPaginationNextPage obj) : (Data.Aeson..=) "page" (getServersResponseBody200MetaPaginationPage obj) : (Data.Aeson..=) "per_page" (getServersResponseBody200MetaPaginationPerPage obj) : (Data.Aeson..=) "previous_page" (getServersResponseBody200MetaPaginationPreviousPage obj) : (Data.Aeson..=) "total_entries" (getServersResponseBody200MetaPaginationTotalEntries obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "last_page" (getServersResponseBody200MetaPaginationLastPage obj) GHC.Base.<> ((Data.Aeson..=) "next_page" (getServersResponseBody200MetaPaginationNextPage obj) GHC.Base.<> ((Data.Aeson..=) "page" (getServersResponseBody200MetaPaginationPage obj) GHC.Base.<> ((Data.Aeson..=) "per_page" (getServersResponseBody200MetaPaginationPerPage obj) GHC.Base.<> ((Data.Aeson..=) "previous_page" (getServersResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> (Data.Aeson..=) "total_entries" (getServersResponseBody200MetaPaginationTotalEntries obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200MetaPagination
+    where toJSON obj = Data.Aeson.Types.Internal.object ("last_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationLastPage obj : "next_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationNextPage obj : "page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationPage obj : "per_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationPerPage obj : "previous_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationPreviousPage obj : "total_entries" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationTotalEntries obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("last_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationLastPage obj) GHC.Base.<> (("next_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationNextPage obj) GHC.Base.<> (("page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationPage obj) GHC.Base.<> (("per_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationPerPage obj) GHC.Base.<> (("previous_page" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationPreviousPage obj) GHC.Base.<> ("total_entries" Data.Aeson.Types.ToJSON..= getServersResponseBody200MetaPaginationTotalEntries obj))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200MetaPagination
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200MetaPagination" (\obj -> (((((GHC.Base.pure GetServersResponseBody200MetaPagination GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "last_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "next_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "per_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "previous_page")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "total_entries"))
--- | Defines the data type for the schema GetServersResponseBody200Servers
+-- | Create a new 'GetServersResponseBody200MetaPagination' with all required fields.
+mkGetServersResponseBody200MetaPagination :: GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200MetaPaginationLastPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200MetaPaginationNextPage'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200MetaPaginationPage'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200MetaPaginationPerPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200MetaPaginationPreviousPage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200MetaPaginationTotalEntries'
+  -> GetServersResponseBody200MetaPagination
+mkGetServersResponseBody200MetaPagination getServersResponseBody200MetaPaginationLastPage getServersResponseBody200MetaPaginationNextPage getServersResponseBody200MetaPaginationPage getServersResponseBody200MetaPaginationPerPage getServersResponseBody200MetaPaginationPreviousPage getServersResponseBody200MetaPaginationTotalEntries = GetServersResponseBody200MetaPagination{getServersResponseBody200MetaPaginationLastPage = getServersResponseBody200MetaPaginationLastPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200MetaPaginationNextPage = getServersResponseBody200MetaPaginationNextPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200MetaPaginationPage = getServersResponseBody200MetaPaginationPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200MetaPaginationPerPage = getServersResponseBody200MetaPaginationPerPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200MetaPaginationPreviousPage = getServersResponseBody200MetaPaginationPreviousPage,
+                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200MetaPaginationTotalEntries = getServersResponseBody200MetaPaginationTotalEntries}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200Servers = GetServersResponseBody200Servers {
   -- | backup_window: Time window (UTC) in which the backup will run, or null if the backups are not enabled
-  getServersResponseBody200ServersBackupWindow :: Data.Text.Internal.Text
+  getServersResponseBody200ServersBackupWindow :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , getServersResponseBody200ServersCreated :: Data.Text.Internal.Text
   -- | datacenter: Datacenter this Resource is located at
   , getServersResponseBody200ServersDatacenter :: GetServersResponseBody200ServersDatacenter
   -- | id: ID of the Resource
-  , getServersResponseBody200ServersId :: GHC.Integer.Type.Integer
+  , getServersResponseBody200ServersId :: GHC.Types.Int
   -- | image
-  , getServersResponseBody200ServersImage :: GetServersResponseBody200ServersImage
+  , getServersResponseBody200ServersImage :: (GHC.Maybe.Maybe GetServersResponseBody200ServersImage)
   -- | included_traffic: Free Traffic for the current billing period in bytes
-  , getServersResponseBody200ServersIncludedTraffic :: GHC.Types.Double
+  , getServersResponseBody200ServersIncludedTraffic :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | ingoing_traffic: Inbound Traffic for the current billing period in bytes
-  , getServersResponseBody200ServersIngoingTraffic :: GHC.Types.Double
+  , getServersResponseBody200ServersIngoingTraffic :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | iso: ISO Image that is attached to this Server. Null if no ISO is attached.
-  , getServersResponseBody200ServersIso :: GetServersResponseBody200ServersIso
+  , getServersResponseBody200ServersIso :: (GHC.Maybe.Maybe GetServersResponseBody200ServersIso)
   -- | labels: User-defined labels (key-value pairs)
-  , getServersResponseBody200ServersLabels :: GetServersResponseBody200ServersLabels
+  , getServersResponseBody200ServersLabels :: Data.Aeson.Types.Internal.Object
   -- | load_balancers
-  , getServersResponseBody200ServersLoadBalancers :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  , getServersResponseBody200ServersLoadBalancers :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   -- | locked: True if Server has been locked and is not available to user
   , getServersResponseBody200ServersLocked :: GHC.Types.Bool
   -- | name: Name of the Resource. Must be unique per Project.
   , getServersResponseBody200ServersName :: Data.Text.Internal.Text
   -- | outgoing_traffic: Outbound Traffic for the current billing period in bytes
-  , getServersResponseBody200ServersOutgoingTraffic :: GHC.Types.Double
+  , getServersResponseBody200ServersOutgoingTraffic :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | placement_group
   , getServersResponseBody200ServersPlacementGroup :: (GHC.Maybe.Maybe GetServersResponseBody200ServersPlacementGroup)
   -- | primary_disk_size: Size of the primary Disk
   , getServersResponseBody200ServersPrimaryDiskSize :: GHC.Types.Double
   -- | private_net: Private networks information
-  , getServersResponseBody200ServersPrivateNet :: ([] GetServersResponseBody200ServersPrivateNet)
+  , getServersResponseBody200ServersPrivateNet :: ([GetServersResponseBody200ServersPrivateNet])
   -- | protection: Protection configuration for the Server
   , getServersResponseBody200ServersProtection :: GetServersResponseBody200ServersProtection
   -- | public_net: Public network information. The Server\'s IPv4 address can be found in \`public_net->ipv4->ip\`
@@ -232,22 +296,65 @@ data GetServersResponseBody200Servers = GetServersResponseBody200Servers {
   -- | status: Status of the Server
   , getServersResponseBody200ServersStatus :: GetServersResponseBody200ServersStatus
   -- | volumes: IDs of Volumes assigned to this Server
-  , getServersResponseBody200ServersVolumes :: (GHC.Maybe.Maybe ([] GHC.Integer.Type.Integer))
+  , getServersResponseBody200ServersVolumes :: (GHC.Maybe.Maybe ([GHC.Types.Int]))
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200Servers
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "backup_window" (getServersResponseBody200ServersBackupWindow obj) : (Data.Aeson..=) "created" (getServersResponseBody200ServersCreated obj) : (Data.Aeson..=) "datacenter" (getServersResponseBody200ServersDatacenter obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersId obj) : (Data.Aeson..=) "image" (getServersResponseBody200ServersImage obj) : (Data.Aeson..=) "included_traffic" (getServersResponseBody200ServersIncludedTraffic obj) : (Data.Aeson..=) "ingoing_traffic" (getServersResponseBody200ServersIngoingTraffic obj) : (Data.Aeson..=) "iso" (getServersResponseBody200ServersIso obj) : (Data.Aeson..=) "labels" (getServersResponseBody200ServersLabels obj) : (Data.Aeson..=) "load_balancers" (getServersResponseBody200ServersLoadBalancers obj) : (Data.Aeson..=) "locked" (getServersResponseBody200ServersLocked obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersName obj) : (Data.Aeson..=) "outgoing_traffic" (getServersResponseBody200ServersOutgoingTraffic obj) : (Data.Aeson..=) "placement_group" (getServersResponseBody200ServersPlacementGroup obj) : (Data.Aeson..=) "primary_disk_size" (getServersResponseBody200ServersPrimaryDiskSize obj) : (Data.Aeson..=) "private_net" (getServersResponseBody200ServersPrivateNet obj) : (Data.Aeson..=) "protection" (getServersResponseBody200ServersProtection obj) : (Data.Aeson..=) "public_net" (getServersResponseBody200ServersPublicNet obj) : (Data.Aeson..=) "rescue_enabled" (getServersResponseBody200ServersRescueEnabled obj) : (Data.Aeson..=) "server_type" (getServersResponseBody200ServersServerType obj) : (Data.Aeson..=) "status" (getServersResponseBody200ServersStatus obj) : (Data.Aeson..=) "volumes" (getServersResponseBody200ServersVolumes obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "backup_window" (getServersResponseBody200ServersBackupWindow obj) GHC.Base.<> ((Data.Aeson..=) "created" (getServersResponseBody200ServersCreated obj) GHC.Base.<> ((Data.Aeson..=) "datacenter" (getServersResponseBody200ServersDatacenter obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersId obj) GHC.Base.<> ((Data.Aeson..=) "image" (getServersResponseBody200ServersImage obj) GHC.Base.<> ((Data.Aeson..=) "included_traffic" (getServersResponseBody200ServersIncludedTraffic obj) GHC.Base.<> ((Data.Aeson..=) "ingoing_traffic" (getServersResponseBody200ServersIngoingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "iso" (getServersResponseBody200ServersIso obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getServersResponseBody200ServersLabels obj) GHC.Base.<> ((Data.Aeson..=) "load_balancers" (getServersResponseBody200ServersLoadBalancers obj) GHC.Base.<> ((Data.Aeson..=) "locked" (getServersResponseBody200ServersLocked obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersName obj) GHC.Base.<> ((Data.Aeson..=) "outgoing_traffic" (getServersResponseBody200ServersOutgoingTraffic obj) GHC.Base.<> ((Data.Aeson..=) "placement_group" (getServersResponseBody200ServersPlacementGroup obj) GHC.Base.<> ((Data.Aeson..=) "primary_disk_size" (getServersResponseBody200ServersPrimaryDiskSize obj) GHC.Base.<> ((Data.Aeson..=) "private_net" (getServersResponseBody200ServersPrivateNet obj) GHC.Base.<> ((Data.Aeson..=) "protection" (getServersResponseBody200ServersProtection obj) GHC.Base.<> ((Data.Aeson..=) "public_net" (getServersResponseBody200ServersPublicNet obj) GHC.Base.<> ((Data.Aeson..=) "rescue_enabled" (getServersResponseBody200ServersRescueEnabled obj) GHC.Base.<> ((Data.Aeson..=) "server_type" (getServersResponseBody200ServersServerType obj) GHC.Base.<> ((Data.Aeson..=) "status" (getServersResponseBody200ServersStatus obj) GHC.Base.<> (Data.Aeson..=) "volumes" (getServersResponseBody200ServersVolumes obj))))))))))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200Servers
+    where toJSON obj = Data.Aeson.Types.Internal.object ("backup_window" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersBackupWindow obj : "created" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersCreated obj : "datacenter" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenter obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersId obj : "image" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImage obj : "included_traffic" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIncludedTraffic obj : "ingoing_traffic" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIngoingTraffic obj : "iso" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIso obj : "labels" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersLabels obj : "load_balancers" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersLoadBalancers obj : "locked" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersLocked obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersName obj : "outgoing_traffic" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersOutgoingTraffic obj : "placement_group" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroup obj : "primary_disk_size" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrimaryDiskSize obj : "private_net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNet obj : "protection" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersProtection obj : "public_net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNet obj : "rescue_enabled" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersRescueEnabled obj : "server_type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerType obj : "status" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersStatus obj : "volumes" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersVolumes obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("backup_window" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersBackupWindow obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersCreated obj) GHC.Base.<> (("datacenter" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenter obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersId obj) GHC.Base.<> (("image" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImage obj) GHC.Base.<> (("included_traffic" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIncludedTraffic obj) GHC.Base.<> (("ingoing_traffic" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIngoingTraffic obj) GHC.Base.<> (("iso" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIso obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersLabels obj) GHC.Base.<> (("load_balancers" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersLoadBalancers obj) GHC.Base.<> (("locked" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersLocked obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersName obj) GHC.Base.<> (("outgoing_traffic" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersOutgoingTraffic obj) GHC.Base.<> (("placement_group" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroup obj) GHC.Base.<> (("primary_disk_size" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrimaryDiskSize obj) GHC.Base.<> (("private_net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNet obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersProtection obj) GHC.Base.<> (("public_net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNet obj) GHC.Base.<> (("rescue_enabled" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersRescueEnabled obj) GHC.Base.<> (("server_type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerType obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersStatus obj) GHC.Base.<> ("volumes" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersVolumes obj))))))))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200Servers
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200Servers" (\obj -> (((((((((((((((((((((GHC.Base.pure GetServersResponseBody200Servers GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "backup_window")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "datacenter")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "included_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ingoing_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "iso")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "load_balancers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "locked")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "outgoing_traffic")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "placement_group")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "primary_disk_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "private_net")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "public_net")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "rescue_enabled")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "volumes"))
--- | Defines the data type for the schema GetServersResponseBody200ServersDatacenter
+-- | Create a new 'GetServersResponseBody200Servers' with all required fields.
+mkGetServersResponseBody200Servers :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersBackupWindow'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersCreated'
+  -> GetServersResponseBody200ServersDatacenter -- ^ 'getServersResponseBody200ServersDatacenter'
+  -> GHC.Types.Int -- ^ 'getServersResponseBody200ServersId'
+  -> GHC.Maybe.Maybe GetServersResponseBody200ServersImage -- ^ 'getServersResponseBody200ServersImage'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200ServersIncludedTraffic'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200ServersIngoingTraffic'
+  -> GHC.Maybe.Maybe GetServersResponseBody200ServersIso -- ^ 'getServersResponseBody200ServersIso'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getServersResponseBody200ServersLabels'
+  -> GHC.Types.Bool -- ^ 'getServersResponseBody200ServersLocked'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersName'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200ServersOutgoingTraffic'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersPrimaryDiskSize'
+  -> [GetServersResponseBody200ServersPrivateNet] -- ^ 'getServersResponseBody200ServersPrivateNet'
+  -> GetServersResponseBody200ServersProtection -- ^ 'getServersResponseBody200ServersProtection'
+  -> GetServersResponseBody200ServersPublicNet -- ^ 'getServersResponseBody200ServersPublicNet'
+  -> GHC.Types.Bool -- ^ 'getServersResponseBody200ServersRescueEnabled'
+  -> GetServersResponseBody200ServersServerType -- ^ 'getServersResponseBody200ServersServerType'
+  -> GetServersResponseBody200ServersStatus -- ^ 'getServersResponseBody200ServersStatus'
+  -> GetServersResponseBody200Servers
+mkGetServersResponseBody200Servers getServersResponseBody200ServersBackupWindow getServersResponseBody200ServersCreated getServersResponseBody200ServersDatacenter getServersResponseBody200ServersId getServersResponseBody200ServersImage getServersResponseBody200ServersIncludedTraffic getServersResponseBody200ServersIngoingTraffic getServersResponseBody200ServersIso getServersResponseBody200ServersLabels getServersResponseBody200ServersLocked getServersResponseBody200ServersName getServersResponseBody200ServersOutgoingTraffic getServersResponseBody200ServersPrimaryDiskSize getServersResponseBody200ServersPrivateNet getServersResponseBody200ServersProtection getServersResponseBody200ServersPublicNet getServersResponseBody200ServersRescueEnabled getServersResponseBody200ServersServerType getServersResponseBody200ServersStatus = GetServersResponseBody200Servers{getServersResponseBody200ServersBackupWindow = getServersResponseBody200ServersBackupWindow,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersCreated = getServersResponseBody200ServersCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersDatacenter = getServersResponseBody200ServersDatacenter,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersId = getServersResponseBody200ServersId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersImage = getServersResponseBody200ServersImage,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersIncludedTraffic = getServersResponseBody200ServersIncludedTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersIngoingTraffic = getServersResponseBody200ServersIngoingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersIso = getServersResponseBody200ServersIso,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersLabels = getServersResponseBody200ServersLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersLoadBalancers = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersLocked = getServersResponseBody200ServersLocked,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersName = getServersResponseBody200ServersName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersOutgoingTraffic = getServersResponseBody200ServersOutgoingTraffic,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersPlacementGroup = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersPrimaryDiskSize = getServersResponseBody200ServersPrimaryDiskSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersPrivateNet = getServersResponseBody200ServersPrivateNet,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersProtection = getServersResponseBody200ServersProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersPublicNet = getServersResponseBody200ServersPublicNet,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersRescueEnabled = getServersResponseBody200ServersRescueEnabled,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersServerType = getServersResponseBody200ServersServerType,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersStatus = getServersResponseBody200ServersStatus,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersVolumes = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.datacenter@ in the specification.
 -- 
 -- Datacenter this Resource is located at
 data GetServersResponseBody200ServersDatacenter = GetServersResponseBody200ServersDatacenter {
   -- | description: Description of the Datacenter
   getServersResponseBody200ServersDatacenterDescription :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getServersResponseBody200ServersDatacenterId :: GHC.Integer.Type.Integer
+  , getServersResponseBody200ServersDatacenterId :: GHC.Types.Int
   -- | location
   , getServersResponseBody200ServersDatacenterLocation :: GetServersResponseBody200ServersDatacenterLocation
   -- | name: Unique identifier of the Datacenter
@@ -256,12 +363,24 @@ data GetServersResponseBody200ServersDatacenter = GetServersResponseBody200Serve
   , getServersResponseBody200ServersDatacenterServerTypes :: GetServersResponseBody200ServersDatacenterServerTypes
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersDatacenter
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "description" (getServersResponseBody200ServersDatacenterDescription obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersDatacenterId obj) : (Data.Aeson..=) "location" (getServersResponseBody200ServersDatacenterLocation obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersDatacenterName obj) : (Data.Aeson..=) "server_types" (getServersResponseBody200ServersDatacenterServerTypes obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "description" (getServersResponseBody200ServersDatacenterDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersDatacenterId obj) GHC.Base.<> ((Data.Aeson..=) "location" (getServersResponseBody200ServersDatacenterLocation obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersDatacenterName obj) GHC.Base.<> (Data.Aeson..=) "server_types" (getServersResponseBody200ServersDatacenterServerTypes obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersDatacenter
+    where toJSON obj = Data.Aeson.Types.Internal.object ("description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterDescription obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterId obj : "location" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocation obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterName obj : "server_types" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypes obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterId obj) GHC.Base.<> (("location" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocation obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterName obj) GHC.Base.<> ("server_types" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypes obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersDatacenter
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersDatacenter" (\obj -> ((((GHC.Base.pure GetServersResponseBody200ServersDatacenter GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "server_types"))
--- | Defines the data type for the schema GetServersResponseBody200ServersDatacenterLocation
+-- | Create a new 'GetServersResponseBody200ServersDatacenter' with all required fields.
+mkGetServersResponseBody200ServersDatacenter :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterDescription'
+  -> GHC.Types.Int -- ^ 'getServersResponseBody200ServersDatacenterId'
+  -> GetServersResponseBody200ServersDatacenterLocation -- ^ 'getServersResponseBody200ServersDatacenterLocation'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterName'
+  -> GetServersResponseBody200ServersDatacenterServerTypes -- ^ 'getServersResponseBody200ServersDatacenterServerTypes'
+  -> GetServersResponseBody200ServersDatacenter
+mkGetServersResponseBody200ServersDatacenter getServersResponseBody200ServersDatacenterDescription getServersResponseBody200ServersDatacenterId getServersResponseBody200ServersDatacenterLocation getServersResponseBody200ServersDatacenterName getServersResponseBody200ServersDatacenterServerTypes = GetServersResponseBody200ServersDatacenter{getServersResponseBody200ServersDatacenterDescription = getServersResponseBody200ServersDatacenterDescription,
+                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersDatacenterId = getServersResponseBody200ServersDatacenterId,
+                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersDatacenterLocation = getServersResponseBody200ServersDatacenterLocation,
+                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersDatacenterName = getServersResponseBody200ServersDatacenterName,
+                                                                                                                                                                                                                                                                                                                                                     getServersResponseBody200ServersDatacenterServerTypes = getServersResponseBody200ServersDatacenterServerTypes}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.datacenter.properties.location@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersDatacenterLocation = GetServersResponseBody200ServersDatacenterLocation {
@@ -283,60 +402,86 @@ data GetServersResponseBody200ServersDatacenterLocation = GetServersResponseBody
   , getServersResponseBody200ServersDatacenterLocationNetworkZone :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersDatacenterLocation
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "city" (getServersResponseBody200ServersDatacenterLocationCity obj) : (Data.Aeson..=) "country" (getServersResponseBody200ServersDatacenterLocationCountry obj) : (Data.Aeson..=) "description" (getServersResponseBody200ServersDatacenterLocationDescription obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersDatacenterLocationId obj) : (Data.Aeson..=) "latitude" (getServersResponseBody200ServersDatacenterLocationLatitude obj) : (Data.Aeson..=) "longitude" (getServersResponseBody200ServersDatacenterLocationLongitude obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersDatacenterLocationName obj) : (Data.Aeson..=) "network_zone" (getServersResponseBody200ServersDatacenterLocationNetworkZone obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "city" (getServersResponseBody200ServersDatacenterLocationCity obj) GHC.Base.<> ((Data.Aeson..=) "country" (getServersResponseBody200ServersDatacenterLocationCountry obj) GHC.Base.<> ((Data.Aeson..=) "description" (getServersResponseBody200ServersDatacenterLocationDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersDatacenterLocationId obj) GHC.Base.<> ((Data.Aeson..=) "latitude" (getServersResponseBody200ServersDatacenterLocationLatitude obj) GHC.Base.<> ((Data.Aeson..=) "longitude" (getServersResponseBody200ServersDatacenterLocationLongitude obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersDatacenterLocationName obj) GHC.Base.<> (Data.Aeson..=) "network_zone" (getServersResponseBody200ServersDatacenterLocationNetworkZone obj))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersDatacenterLocation
+    where toJSON obj = Data.Aeson.Types.Internal.object ("city" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationCity obj : "country" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationCountry obj : "description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationDescription obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationId obj : "latitude" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationLatitude obj : "longitude" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationLongitude obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationName obj : "network_zone" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationNetworkZone obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("city" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationCity obj) GHC.Base.<> (("country" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationCountry obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationId obj) GHC.Base.<> (("latitude" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationLatitude obj) GHC.Base.<> (("longitude" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationLongitude obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationName obj) GHC.Base.<> ("network_zone" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterLocationNetworkZone obj))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersDatacenterLocation
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersDatacenterLocation" (\obj -> (((((((GHC.Base.pure GetServersResponseBody200ServersDatacenterLocation GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "city")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "country")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "latitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "longitude")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "network_zone"))
--- | Defines the data type for the schema GetServersResponseBody200ServersDatacenterServer_types
+-- | Create a new 'GetServersResponseBody200ServersDatacenterLocation' with all required fields.
+mkGetServersResponseBody200ServersDatacenterLocation :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterLocationCity'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterLocationCountry'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterLocationDescription'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersDatacenterLocationId'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersDatacenterLocationLatitude'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersDatacenterLocationLongitude'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterLocationName'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersDatacenterLocationNetworkZone'
+  -> GetServersResponseBody200ServersDatacenterLocation
+mkGetServersResponseBody200ServersDatacenterLocation getServersResponseBody200ServersDatacenterLocationCity getServersResponseBody200ServersDatacenterLocationCountry getServersResponseBody200ServersDatacenterLocationDescription getServersResponseBody200ServersDatacenterLocationId getServersResponseBody200ServersDatacenterLocationLatitude getServersResponseBody200ServersDatacenterLocationLongitude getServersResponseBody200ServersDatacenterLocationName getServersResponseBody200ServersDatacenterLocationNetworkZone = GetServersResponseBody200ServersDatacenterLocation{getServersResponseBody200ServersDatacenterLocationCity = getServersResponseBody200ServersDatacenterLocationCity,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationCountry = getServersResponseBody200ServersDatacenterLocationCountry,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationDescription = getServersResponseBody200ServersDatacenterLocationDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationId = getServersResponseBody200ServersDatacenterLocationId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationLatitude = getServersResponseBody200ServersDatacenterLocationLatitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationLongitude = getServersResponseBody200ServersDatacenterLocationLongitude,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationName = getServersResponseBody200ServersDatacenterLocationName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersDatacenterLocationNetworkZone = getServersResponseBody200ServersDatacenterLocationNetworkZone}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.datacenter.properties.server_types@ in the specification.
 -- 
 -- The Server types the Datacenter can handle
 data GetServersResponseBody200ServersDatacenterServerTypes = GetServersResponseBody200ServersDatacenterServerTypes {
   -- | available: IDs of Server types that are supported and for which the Datacenter has enough resources left
-  getServersResponseBody200ServersDatacenterServerTypesAvailable :: ([] GHC.Types.Double)
+  getServersResponseBody200ServersDatacenterServerTypesAvailable :: ([GHC.Types.Double])
   -- | available_for_migration: IDs of Server types that are supported and for which the Datacenter has enough resources left
-  , getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration :: ([] GHC.Types.Double)
+  , getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration :: ([GHC.Types.Double])
   -- | supported: IDs of Server types that are supported in the Datacenter
-  , getServersResponseBody200ServersDatacenterServerTypesSupported :: ([] GHC.Types.Double)
+  , getServersResponseBody200ServersDatacenterServerTypesSupported :: ([GHC.Types.Double])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersDatacenterServerTypes
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "available" (getServersResponseBody200ServersDatacenterServerTypesAvailable obj) : (Data.Aeson..=) "available_for_migration" (getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration obj) : (Data.Aeson..=) "supported" (getServersResponseBody200ServersDatacenterServerTypesSupported obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "available" (getServersResponseBody200ServersDatacenterServerTypesAvailable obj) GHC.Base.<> ((Data.Aeson..=) "available_for_migration" (getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration obj) GHC.Base.<> (Data.Aeson..=) "supported" (getServersResponseBody200ServersDatacenterServerTypesSupported obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersDatacenterServerTypes
+    where toJSON obj = Data.Aeson.Types.Internal.object ("available" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypesAvailable obj : "available_for_migration" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration obj : "supported" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypesSupported obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("available" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypesAvailable obj) GHC.Base.<> (("available_for_migration" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration obj) GHC.Base.<> ("supported" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersDatacenterServerTypesSupported obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersDatacenterServerTypes
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersDatacenterServerTypes" (\obj -> ((GHC.Base.pure GetServersResponseBody200ServersDatacenterServerTypes GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "available")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "available_for_migration")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "supported"))
--- | Defines the data type for the schema GetServersResponseBody200ServersImage
+-- | Create a new 'GetServersResponseBody200ServersDatacenterServerTypes' with all required fields.
+mkGetServersResponseBody200ServersDatacenterServerTypes :: [GHC.Types.Double] -- ^ 'getServersResponseBody200ServersDatacenterServerTypesAvailable'
+  -> [GHC.Types.Double] -- ^ 'getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration'
+  -> [GHC.Types.Double] -- ^ 'getServersResponseBody200ServersDatacenterServerTypesSupported'
+  -> GetServersResponseBody200ServersDatacenterServerTypes
+mkGetServersResponseBody200ServersDatacenterServerTypes getServersResponseBody200ServersDatacenterServerTypesAvailable getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration getServersResponseBody200ServersDatacenterServerTypesSupported = GetServersResponseBody200ServersDatacenterServerTypes{getServersResponseBody200ServersDatacenterServerTypesAvailable = getServersResponseBody200ServersDatacenterServerTypesAvailable,
+                                                                                                                                                                                                                                                                                                                         getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration = getServersResponseBody200ServersDatacenterServerTypesAvailableForMigration,
+                                                                                                                                                                                                                                                                                                                         getServersResponseBody200ServersDatacenterServerTypesSupported = getServersResponseBody200ServersDatacenterServerTypesSupported}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.image@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersImage = GetServersResponseBody200ServersImage {
   -- | bound_to: ID of Server the Image is bound to. Only set for Images of type \`backup\`.
-  getServersResponseBody200ServersImageBoundTo :: GHC.Integer.Type.Integer
+  getServersResponseBody200ServersImageBoundTo :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | build_id: Build ID of the Image
   , getServersResponseBody200ServersImageBuildId :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   , getServersResponseBody200ServersImageCreated :: Data.Text.Internal.Text
   -- | created_from: Information about the Server the Image was created from
-  , getServersResponseBody200ServersImageCreatedFrom :: GetServersResponseBody200ServersImageCreatedFrom
+  , getServersResponseBody200ServersImageCreatedFrom :: (GHC.Maybe.Maybe GetServersResponseBody200ServersImageCreatedFrom)
   -- | deleted: Point in time where the Image was deleted (in ISO-8601 format)
-  , getServersResponseBody200ServersImageDeleted :: Data.Text.Internal.Text
+  , getServersResponseBody200ServersImageDeleted :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | deprecated: Point in time when the Image is considered to be deprecated (in ISO-8601 format)
-  , getServersResponseBody200ServersImageDeprecated :: Data.Text.Internal.Text
+  , getServersResponseBody200ServersImageDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the Image
   , getServersResponseBody200ServersImageDescription :: Data.Text.Internal.Text
   -- | disk_size: Size of the disk contained in the Image in GB
   , getServersResponseBody200ServersImageDiskSize :: GHC.Types.Double
   -- | id: ID of the Resource
-  , getServersResponseBody200ServersImageId :: GHC.Integer.Type.Integer
+  , getServersResponseBody200ServersImageId :: GHC.Types.Int
   -- | image_size: Size of the Image file in our storage in GB. For snapshot Images this is the value relevant for calculating costs for the Image.
-  , getServersResponseBody200ServersImageImageSize :: GHC.Types.Double
+  , getServersResponseBody200ServersImageImageSize :: (GHC.Maybe.Maybe GHC.Types.Double)
   -- | labels: User-defined labels (key-value pairs)
-  , getServersResponseBody200ServersImageLabels :: GetServersResponseBody200ServersImageLabels
+  , getServersResponseBody200ServersImageLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Unique identifier of the Image. This value is only set for system Images.
-  , getServersResponseBody200ServersImageName :: Data.Text.Internal.Text
+  , getServersResponseBody200ServersImageName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | os_flavor: Flavor of operating system contained in the Image
   , getServersResponseBody200ServersImageOsFlavor :: GetServersResponseBody200ServersImageOsFlavor
   -- | os_version: Operating system version
-  , getServersResponseBody200ServersImageOsVersion :: Data.Text.Internal.Text
+  , getServersResponseBody200ServersImageOsVersion :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | protection: Protection configuration for the Resource
   , getServersResponseBody200ServersImageProtection :: GetServersResponseBody200ServersImageProtection
   -- | rapid_deploy: Indicates that rapid deploy of the Image is available
@@ -347,71 +492,96 @@ data GetServersResponseBody200ServersImage = GetServersResponseBody200ServersIma
   , getServersResponseBody200ServersImageType :: GetServersResponseBody200ServersImageType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImage
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "bound_to" (getServersResponseBody200ServersImageBoundTo obj) : (Data.Aeson..=) "build_id" (getServersResponseBody200ServersImageBuildId obj) : (Data.Aeson..=) "created" (getServersResponseBody200ServersImageCreated obj) : (Data.Aeson..=) "created_from" (getServersResponseBody200ServersImageCreatedFrom obj) : (Data.Aeson..=) "deleted" (getServersResponseBody200ServersImageDeleted obj) : (Data.Aeson..=) "deprecated" (getServersResponseBody200ServersImageDeprecated obj) : (Data.Aeson..=) "description" (getServersResponseBody200ServersImageDescription obj) : (Data.Aeson..=) "disk_size" (getServersResponseBody200ServersImageDiskSize obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersImageId obj) : (Data.Aeson..=) "image_size" (getServersResponseBody200ServersImageImageSize obj) : (Data.Aeson..=) "labels" (getServersResponseBody200ServersImageLabels obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersImageName obj) : (Data.Aeson..=) "os_flavor" (getServersResponseBody200ServersImageOsFlavor obj) : (Data.Aeson..=) "os_version" (getServersResponseBody200ServersImageOsVersion obj) : (Data.Aeson..=) "protection" (getServersResponseBody200ServersImageProtection obj) : (Data.Aeson..=) "rapid_deploy" (getServersResponseBody200ServersImageRapidDeploy obj) : (Data.Aeson..=) "status" (getServersResponseBody200ServersImageStatus obj) : (Data.Aeson..=) "type" (getServersResponseBody200ServersImageType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "bound_to" (getServersResponseBody200ServersImageBoundTo obj) GHC.Base.<> ((Data.Aeson..=) "build_id" (getServersResponseBody200ServersImageBuildId obj) GHC.Base.<> ((Data.Aeson..=) "created" (getServersResponseBody200ServersImageCreated obj) GHC.Base.<> ((Data.Aeson..=) "created_from" (getServersResponseBody200ServersImageCreatedFrom obj) GHC.Base.<> ((Data.Aeson..=) "deleted" (getServersResponseBody200ServersImageDeleted obj) GHC.Base.<> ((Data.Aeson..=) "deprecated" (getServersResponseBody200ServersImageDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getServersResponseBody200ServersImageDescription obj) GHC.Base.<> ((Data.Aeson..=) "disk_size" (getServersResponseBody200ServersImageDiskSize obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersImageId obj) GHC.Base.<> ((Data.Aeson..=) "image_size" (getServersResponseBody200ServersImageImageSize obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getServersResponseBody200ServersImageLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersImageName obj) GHC.Base.<> ((Data.Aeson..=) "os_flavor" (getServersResponseBody200ServersImageOsFlavor obj) GHC.Base.<> ((Data.Aeson..=) "os_version" (getServersResponseBody200ServersImageOsVersion obj) GHC.Base.<> ((Data.Aeson..=) "protection" (getServersResponseBody200ServersImageProtection obj) GHC.Base.<> ((Data.Aeson..=) "rapid_deploy" (getServersResponseBody200ServersImageRapidDeploy obj) GHC.Base.<> ((Data.Aeson..=) "status" (getServersResponseBody200ServersImageStatus obj) GHC.Base.<> (Data.Aeson..=) "type" (getServersResponseBody200ServersImageType obj))))))))))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersImage
+    where toJSON obj = Data.Aeson.Types.Internal.object ("bound_to" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageBoundTo obj : "build_id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageBuildId obj : "created" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreated obj : "created_from" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreatedFrom obj : "deleted" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDeleted obj : "deprecated" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDescription obj : "disk_size" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDiskSize obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageId obj : "image_size" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageImageSize obj : "labels" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageLabels obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageName obj : "os_flavor" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageOsFlavor obj : "os_version" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageOsVersion obj : "protection" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageProtection obj : "rapid_deploy" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageRapidDeploy obj : "status" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageStatus obj : "type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("bound_to" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageBoundTo obj) GHC.Base.<> (("build_id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageBuildId obj) GHC.Base.<> (("created" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreated obj) GHC.Base.<> (("created_from" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreatedFrom obj) GHC.Base.<> (("deleted" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDeleted obj) GHC.Base.<> (("deprecated" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDescription obj) GHC.Base.<> (("disk_size" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageDiskSize obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageId obj) GHC.Base.<> (("image_size" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageImageSize obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageName obj) GHC.Base.<> (("os_flavor" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageOsFlavor obj) GHC.Base.<> (("os_version" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageOsVersion obj) GHC.Base.<> (("protection" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageProtection obj) GHC.Base.<> (("rapid_deploy" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageRapidDeploy obj) GHC.Base.<> (("status" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageStatus obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageType obj))))))))))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImage
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersImage" (\obj -> (((((((((((((((((GHC.Base.pure GetServersResponseBody200ServersImage GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "bound_to")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "build_id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created_from")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deleted")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "disk_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "image_size")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_flavor")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "os_version")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "protection")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "rapid_deploy")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "status")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetServersResponseBody200ServersImageCreated_from
+-- | Create a new 'GetServersResponseBody200ServersImage' with all required fields.
+mkGetServersResponseBody200ServersImage :: GHC.Maybe.Maybe GHC.Types.Int -- ^ 'getServersResponseBody200ServersImageBoundTo'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageCreated'
+  -> GHC.Maybe.Maybe GetServersResponseBody200ServersImageCreatedFrom -- ^ 'getServersResponseBody200ServersImageCreatedFrom'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageDeleted'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageDescription'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersImageDiskSize'
+  -> GHC.Types.Int -- ^ 'getServersResponseBody200ServersImageId'
+  -> GHC.Maybe.Maybe GHC.Types.Double -- ^ 'getServersResponseBody200ServersImageImageSize'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getServersResponseBody200ServersImageLabels'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageName'
+  -> GetServersResponseBody200ServersImageOsFlavor -- ^ 'getServersResponseBody200ServersImageOsFlavor'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageOsVersion'
+  -> GetServersResponseBody200ServersImageProtection -- ^ 'getServersResponseBody200ServersImageProtection'
+  -> GetServersResponseBody200ServersImageStatus -- ^ 'getServersResponseBody200ServersImageStatus'
+  -> GetServersResponseBody200ServersImageType -- ^ 'getServersResponseBody200ServersImageType'
+  -> GetServersResponseBody200ServersImage
+mkGetServersResponseBody200ServersImage getServersResponseBody200ServersImageBoundTo getServersResponseBody200ServersImageCreated getServersResponseBody200ServersImageCreatedFrom getServersResponseBody200ServersImageDeleted getServersResponseBody200ServersImageDeprecated getServersResponseBody200ServersImageDescription getServersResponseBody200ServersImageDiskSize getServersResponseBody200ServersImageId getServersResponseBody200ServersImageImageSize getServersResponseBody200ServersImageLabels getServersResponseBody200ServersImageName getServersResponseBody200ServersImageOsFlavor getServersResponseBody200ServersImageOsVersion getServersResponseBody200ServersImageProtection getServersResponseBody200ServersImageStatus getServersResponseBody200ServersImageType = GetServersResponseBody200ServersImage{getServersResponseBody200ServersImageBoundTo = getServersResponseBody200ServersImageBoundTo,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageBuildId = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageCreated = getServersResponseBody200ServersImageCreated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageCreatedFrom = getServersResponseBody200ServersImageCreatedFrom,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageDeleted = getServersResponseBody200ServersImageDeleted,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageDeprecated = getServersResponseBody200ServersImageDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageDescription = getServersResponseBody200ServersImageDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageDiskSize = getServersResponseBody200ServersImageDiskSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageId = getServersResponseBody200ServersImageId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageImageSize = getServersResponseBody200ServersImageImageSize,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageLabels = getServersResponseBody200ServersImageLabels,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageName = getServersResponseBody200ServersImageName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageOsFlavor = getServersResponseBody200ServersImageOsFlavor,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageOsVersion = getServersResponseBody200ServersImageOsVersion,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageProtection = getServersResponseBody200ServersImageProtection,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageRapidDeploy = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageStatus = getServersResponseBody200ServersImageStatus,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersImageType = getServersResponseBody200ServersImageType}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.image.properties.created_from@ in the specification.
 -- 
 -- Information about the Server the Image was created from
 data GetServersResponseBody200ServersImageCreatedFrom = GetServersResponseBody200ServersImageCreatedFrom {
   -- | id: ID of the Server the Image was created from
-  getServersResponseBody200ServersImageCreatedFromId :: GHC.Integer.Type.Integer
+  getServersResponseBody200ServersImageCreatedFromId :: GHC.Types.Int
   -- | name: Server name at the time the Image was created
   , getServersResponseBody200ServersImageCreatedFromName :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImageCreatedFrom
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getServersResponseBody200ServersImageCreatedFromId obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersImageCreatedFromName obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getServersResponseBody200ServersImageCreatedFromId obj) GHC.Base.<> (Data.Aeson..=) "name" (getServersResponseBody200ServersImageCreatedFromName obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersImageCreatedFrom
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreatedFromId obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreatedFromName obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreatedFromId obj) GHC.Base.<> ("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageCreatedFromName obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImageCreatedFrom
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersImageCreatedFrom" (\obj -> (GHC.Base.pure GetServersResponseBody200ServersImageCreatedFrom GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name"))
--- | Defines the data type for the schema GetServersResponseBody200ServersImageLabels
--- 
--- User-defined labels (key-value pairs)
-data GetServersResponseBody200ServersImageLabels = GetServersResponseBody200ServersImageLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImageLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImageLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersImageLabels" (\obj -> GHC.Base.pure GetServersResponseBody200ServersImageLabels)
--- | Defines the enum schema GetServersResponseBody200ServersImageOs_flavor
+-- | Create a new 'GetServersResponseBody200ServersImageCreatedFrom' with all required fields.
+mkGetServersResponseBody200ServersImageCreatedFrom :: GHC.Types.Int -- ^ 'getServersResponseBody200ServersImageCreatedFromId'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersImageCreatedFromName'
+  -> GetServersResponseBody200ServersImageCreatedFrom
+mkGetServersResponseBody200ServersImageCreatedFrom getServersResponseBody200ServersImageCreatedFromId getServersResponseBody200ServersImageCreatedFromName = GetServersResponseBody200ServersImageCreatedFrom{getServersResponseBody200ServersImageCreatedFromId = getServersResponseBody200ServersImageCreatedFromId,
+                                                                                                                                                                                                              getServersResponseBody200ServersImageCreatedFromName = getServersResponseBody200ServersImageCreatedFromName}
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.image.properties.os_flavor@ in the specification.
 -- 
 -- Flavor of operating system contained in the Image
-data GetServersResponseBody200ServersImageOsFlavor
-    = GetServersResponseBody200ServersImageOsFlavorEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersImageOsFlavorEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersImageOsFlavorEnumStringCentos
-    | GetServersResponseBody200ServersImageOsFlavorEnumStringDebian
-    | GetServersResponseBody200ServersImageOsFlavorEnumStringFedora
-    | GetServersResponseBody200ServersImageOsFlavorEnumStringUbuntu
-    | GetServersResponseBody200ServersImageOsFlavorEnumStringUnknown
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImageOsFlavor
-    where toJSON (GetServersResponseBody200ServersImageOsFlavorEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumStringCentos) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos"
-          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumStringDebian) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian"
-          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumStringFedora) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora"
-          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumStringUbuntu) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu"
-          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumStringUnknown) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersImageOsFlavor
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "centos")
-                                          then GetServersResponseBody200ServersImageOsFlavorEnumStringCentos
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "debian")
-                                                then GetServersResponseBody200ServersImageOsFlavorEnumStringDebian
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "fedora")
-                                                      then GetServersResponseBody200ServersImageOsFlavorEnumStringFedora
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "ubuntu")
-                                                            then GetServersResponseBody200ServersImageOsFlavorEnumStringUbuntu
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown")
-                                                                  then GetServersResponseBody200ServersImageOsFlavorEnumStringUnknown
-                                                                  else GetServersResponseBody200ServersImageOsFlavorEnumOther val)
--- | Defines the data type for the schema GetServersResponseBody200ServersImageProtection
+data GetServersResponseBody200ServersImageOsFlavor =
+   GetServersResponseBody200ServersImageOsFlavorOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersImageOsFlavorTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersImageOsFlavorEnumUbuntu -- ^ Represents the JSON value @"ubuntu"@
+  | GetServersResponseBody200ServersImageOsFlavorEnumCentos -- ^ Represents the JSON value @"centos"@
+  | GetServersResponseBody200ServersImageOsFlavorEnumDebian -- ^ Represents the JSON value @"debian"@
+  | GetServersResponseBody200ServersImageOsFlavorEnumFedora -- ^ Represents the JSON value @"fedora"@
+  | GetServersResponseBody200ServersImageOsFlavorEnumUnknown -- ^ Represents the JSON value @"unknown"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersImageOsFlavor
+    where toJSON (GetServersResponseBody200ServersImageOsFlavorOther val) = val
+          toJSON (GetServersResponseBody200ServersImageOsFlavorTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumUbuntu) = "ubuntu"
+          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumCentos) = "centos"
+          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumDebian) = "debian"
+          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumFedora) = "fedora"
+          toJSON (GetServersResponseBody200ServersImageOsFlavorEnumUnknown) = "unknown"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImageOsFlavor
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "ubuntu" -> GetServersResponseBody200ServersImageOsFlavorEnumUbuntu
+                                            | val GHC.Classes.== "centos" -> GetServersResponseBody200ServersImageOsFlavorEnumCentos
+                                            | val GHC.Classes.== "debian" -> GetServersResponseBody200ServersImageOsFlavorEnumDebian
+                                            | val GHC.Classes.== "fedora" -> GetServersResponseBody200ServersImageOsFlavorEnumFedora
+                                            | val GHC.Classes.== "unknown" -> GetServersResponseBody200ServersImageOsFlavorEnumUnknown
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersImageOsFlavorOther val)
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.image.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Resource
 data GetServersResponseBody200ServersImageProtection = GetServersResponseBody200ServersImageProtection {
@@ -419,191 +589,173 @@ data GetServersResponseBody200ServersImageProtection = GetServersResponseBody200
   getServersResponseBody200ServersImageProtectionDelete :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImageProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (getServersResponseBody200ServersImageProtectionDelete obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (getServersResponseBody200ServersImageProtectionDelete obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersImageProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageProtectionDelete obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs ("delete" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersImageProtectionDelete obj)
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImageProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersImageProtection" (\obj -> GHC.Base.pure GetServersResponseBody200ServersImageProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete"))
--- | Defines the enum schema GetServersResponseBody200ServersImageStatus
+-- | Create a new 'GetServersResponseBody200ServersImageProtection' with all required fields.
+mkGetServersResponseBody200ServersImageProtection :: GHC.Types.Bool -- ^ 'getServersResponseBody200ServersImageProtectionDelete'
+  -> GetServersResponseBody200ServersImageProtection
+mkGetServersResponseBody200ServersImageProtection getServersResponseBody200ServersImageProtectionDelete = GetServersResponseBody200ServersImageProtection{getServersResponseBody200ServersImageProtectionDelete = getServersResponseBody200ServersImageProtectionDelete}
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.image.properties.status@ in the specification.
 -- 
 -- Whether the Image can be used or if it\'s still being created or unavailable
-data GetServersResponseBody200ServersImageStatus
-    = GetServersResponseBody200ServersImageStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersImageStatusEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersImageStatusEnumStringAvailable
-    | GetServersResponseBody200ServersImageStatusEnumStringCreating
-    | GetServersResponseBody200ServersImageStatusEnumStringUnavailable
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImageStatus
-    where toJSON (GetServersResponseBody200ServersImageStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersImageStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersImageStatusEnumStringAvailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available"
-          toJSON (GetServersResponseBody200ServersImageStatusEnumStringCreating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating"
-          toJSON (GetServersResponseBody200ServersImageStatusEnumStringUnavailable) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersImageStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "available")
-                                          then GetServersResponseBody200ServersImageStatusEnumStringAvailable
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "creating")
-                                                then GetServersResponseBody200ServersImageStatusEnumStringCreating
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unavailable")
-                                                      then GetServersResponseBody200ServersImageStatusEnumStringUnavailable
-                                                      else GetServersResponseBody200ServersImageStatusEnumOther val)
--- | Defines the enum schema GetServersResponseBody200ServersImageType
+data GetServersResponseBody200ServersImageStatus =
+   GetServersResponseBody200ServersImageStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersImageStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersImageStatusEnumAvailable -- ^ Represents the JSON value @"available"@
+  | GetServersResponseBody200ServersImageStatusEnumCreating -- ^ Represents the JSON value @"creating"@
+  | GetServersResponseBody200ServersImageStatusEnumUnavailable -- ^ Represents the JSON value @"unavailable"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersImageStatus
+    where toJSON (GetServersResponseBody200ServersImageStatusOther val) = val
+          toJSON (GetServersResponseBody200ServersImageStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersImageStatusEnumAvailable) = "available"
+          toJSON (GetServersResponseBody200ServersImageStatusEnumCreating) = "creating"
+          toJSON (GetServersResponseBody200ServersImageStatusEnumUnavailable) = "unavailable"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImageStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "available" -> GetServersResponseBody200ServersImageStatusEnumAvailable
+                                            | val GHC.Classes.== "creating" -> GetServersResponseBody200ServersImageStatusEnumCreating
+                                            | val GHC.Classes.== "unavailable" -> GetServersResponseBody200ServersImageStatusEnumUnavailable
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersImageStatusOther val)
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.image.properties.type@ in the specification.
 -- 
 -- Type of the Image
-data GetServersResponseBody200ServersImageType
-    = GetServersResponseBody200ServersImageTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersImageTypeEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersImageTypeEnumStringApp
-    | GetServersResponseBody200ServersImageTypeEnumStringBackup
-    | GetServersResponseBody200ServersImageTypeEnumStringSnapshot
-    | GetServersResponseBody200ServersImageTypeEnumStringSystem
-    | GetServersResponseBody200ServersImageTypeEnumStringTemporary
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersImageType
-    where toJSON (GetServersResponseBody200ServersImageTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersImageTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersImageTypeEnumStringApp) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app"
-          toJSON (GetServersResponseBody200ServersImageTypeEnumStringBackup) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup"
-          toJSON (GetServersResponseBody200ServersImageTypeEnumStringSnapshot) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot"
-          toJSON (GetServersResponseBody200ServersImageTypeEnumStringSystem) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system"
-          toJSON (GetServersResponseBody200ServersImageTypeEnumStringTemporary) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersImageType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "app")
-                                          then GetServersResponseBody200ServersImageTypeEnumStringApp
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "backup")
-                                                then GetServersResponseBody200ServersImageTypeEnumStringBackup
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "snapshot")
-                                                      then GetServersResponseBody200ServersImageTypeEnumStringSnapshot
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "system")
-                                                            then GetServersResponseBody200ServersImageTypeEnumStringSystem
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "temporary")
-                                                                  then GetServersResponseBody200ServersImageTypeEnumStringTemporary
-                                                                  else GetServersResponseBody200ServersImageTypeEnumOther val)
--- | Defines the data type for the schema GetServersResponseBody200ServersIso
+data GetServersResponseBody200ServersImageType =
+   GetServersResponseBody200ServersImageTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersImageTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersImageTypeEnumSystem -- ^ Represents the JSON value @"system"@
+  | GetServersResponseBody200ServersImageTypeEnumApp -- ^ Represents the JSON value @"app"@
+  | GetServersResponseBody200ServersImageTypeEnumSnapshot -- ^ Represents the JSON value @"snapshot"@
+  | GetServersResponseBody200ServersImageTypeEnumBackup -- ^ Represents the JSON value @"backup"@
+  | GetServersResponseBody200ServersImageTypeEnumTemporary -- ^ Represents the JSON value @"temporary"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersImageType
+    where toJSON (GetServersResponseBody200ServersImageTypeOther val) = val
+          toJSON (GetServersResponseBody200ServersImageTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersImageTypeEnumSystem) = "system"
+          toJSON (GetServersResponseBody200ServersImageTypeEnumApp) = "app"
+          toJSON (GetServersResponseBody200ServersImageTypeEnumSnapshot) = "snapshot"
+          toJSON (GetServersResponseBody200ServersImageTypeEnumBackup) = "backup"
+          toJSON (GetServersResponseBody200ServersImageTypeEnumTemporary) = "temporary"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersImageType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "system" -> GetServersResponseBody200ServersImageTypeEnumSystem
+                                            | val GHC.Classes.== "app" -> GetServersResponseBody200ServersImageTypeEnumApp
+                                            | val GHC.Classes.== "snapshot" -> GetServersResponseBody200ServersImageTypeEnumSnapshot
+                                            | val GHC.Classes.== "backup" -> GetServersResponseBody200ServersImageTypeEnumBackup
+                                            | val GHC.Classes.== "temporary" -> GetServersResponseBody200ServersImageTypeEnumTemporary
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersImageTypeOther val)
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.iso@ in the specification.
 -- 
 -- ISO Image that is attached to this Server. Null if no ISO is attached.
 data GetServersResponseBody200ServersIso = GetServersResponseBody200ServersIso {
   -- | deprecated: ISO 8601 timestamp of deprecation, null if ISO is still available. After the deprecation time it will no longer be possible to attach the ISO to Servers.
-  getServersResponseBody200ServersIsoDeprecated :: Data.Text.Internal.Text
+  getServersResponseBody200ServersIsoDeprecated :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | description: Description of the ISO
   , getServersResponseBody200ServersIsoDescription :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getServersResponseBody200ServersIsoId :: GHC.Integer.Type.Integer
+  , getServersResponseBody200ServersIsoId :: GHC.Types.Int
   -- | name: Unique identifier of the ISO. Only set for public ISOs
-  , getServersResponseBody200ServersIsoName :: Data.Text.Internal.Text
+  , getServersResponseBody200ServersIsoName :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | type: Type of the ISO
   , getServersResponseBody200ServersIsoType :: GetServersResponseBody200ServersIsoType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersIso
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "deprecated" (getServersResponseBody200ServersIsoDeprecated obj) : (Data.Aeson..=) "description" (getServersResponseBody200ServersIsoDescription obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersIsoId obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersIsoName obj) : (Data.Aeson..=) "type" (getServersResponseBody200ServersIsoType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "deprecated" (getServersResponseBody200ServersIsoDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getServersResponseBody200ServersIsoDescription obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersIsoId obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersIsoName obj) GHC.Base.<> (Data.Aeson..=) "type" (getServersResponseBody200ServersIsoType obj)))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersIso
+    where toJSON obj = Data.Aeson.Types.Internal.object ("deprecated" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoDescription obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoId obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoName obj : "type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("deprecated" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoDescription obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoId obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoName obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersIsoType obj)))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersIso
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersIso" (\obj -> ((((GHC.Base.pure GetServersResponseBody200ServersIso GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the enum schema GetServersResponseBody200ServersIsoType
+-- | Create a new 'GetServersResponseBody200ServersIso' with all required fields.
+mkGetServersResponseBody200ServersIso :: GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersIsoDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersIsoDescription'
+  -> GHC.Types.Int -- ^ 'getServersResponseBody200ServersIsoId'
+  -> GHC.Maybe.Maybe Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersIsoName'
+  -> GetServersResponseBody200ServersIsoType -- ^ 'getServersResponseBody200ServersIsoType'
+  -> GetServersResponseBody200ServersIso
+mkGetServersResponseBody200ServersIso getServersResponseBody200ServersIsoDeprecated getServersResponseBody200ServersIsoDescription getServersResponseBody200ServersIsoId getServersResponseBody200ServersIsoName getServersResponseBody200ServersIsoType = GetServersResponseBody200ServersIso{getServersResponseBody200ServersIsoDeprecated = getServersResponseBody200ServersIsoDeprecated,
+                                                                                                                                                                                                                                                                                               getServersResponseBody200ServersIsoDescription = getServersResponseBody200ServersIsoDescription,
+                                                                                                                                                                                                                                                                                               getServersResponseBody200ServersIsoId = getServersResponseBody200ServersIsoId,
+                                                                                                                                                                                                                                                                                               getServersResponseBody200ServersIsoName = getServersResponseBody200ServersIsoName,
+                                                                                                                                                                                                                                                                                               getServersResponseBody200ServersIsoType = getServersResponseBody200ServersIsoType}
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.iso.properties.type@ in the specification.
 -- 
 -- Type of the ISO
-data GetServersResponseBody200ServersIsoType
-    = GetServersResponseBody200ServersIsoTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersIsoTypeEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersIsoTypeEnumStringPrivate
-    | GetServersResponseBody200ServersIsoTypeEnumStringPublic
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersIsoType
-    where toJSON (GetServersResponseBody200ServersIsoTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersIsoTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersIsoTypeEnumStringPrivate) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "private"
-          toJSON (GetServersResponseBody200ServersIsoTypeEnumStringPublic) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "public"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersIsoType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "private")
-                                          then GetServersResponseBody200ServersIsoTypeEnumStringPrivate
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "public")
-                                                then GetServersResponseBody200ServersIsoTypeEnumStringPublic
-                                                else GetServersResponseBody200ServersIsoTypeEnumOther val)
--- | Defines the data type for the schema GetServersResponseBody200ServersLabels
--- 
--- User-defined labels (key-value pairs)
-data GetServersResponseBody200ServersLabels = GetServersResponseBody200ServersLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersLabels" (\obj -> GHC.Base.pure GetServersResponseBody200ServersLabels)
--- | Defines the data type for the schema GetServersResponseBody200ServersPlacement_group
+data GetServersResponseBody200ServersIsoType =
+   GetServersResponseBody200ServersIsoTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersIsoTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersIsoTypeEnumPublic -- ^ Represents the JSON value @"public"@
+  | GetServersResponseBody200ServersIsoTypeEnumPrivate -- ^ Represents the JSON value @"private"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersIsoType
+    where toJSON (GetServersResponseBody200ServersIsoTypeOther val) = val
+          toJSON (GetServersResponseBody200ServersIsoTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersIsoTypeEnumPublic) = "public"
+          toJSON (GetServersResponseBody200ServersIsoTypeEnumPrivate) = "private"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersIsoType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "public" -> GetServersResponseBody200ServersIsoTypeEnumPublic
+                                            | val GHC.Classes.== "private" -> GetServersResponseBody200ServersIsoTypeEnumPrivate
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersIsoTypeOther val)
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.placement_group@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersPlacementGroup = GetServersResponseBody200ServersPlacementGroup {
   -- | created: Point in time when the Resource was created (in ISO-8601 format)
   getServersResponseBody200ServersPlacementGroupCreated :: Data.Text.Internal.Text
   -- | id: ID of the Resource
-  , getServersResponseBody200ServersPlacementGroupId :: GHC.Integer.Type.Integer
+  , getServersResponseBody200ServersPlacementGroupId :: GHC.Types.Int
   -- | labels: User-defined labels (key-value pairs)
-  , getServersResponseBody200ServersPlacementGroupLabels :: GetServersResponseBody200ServersPlacementGroupLabels
+  , getServersResponseBody200ServersPlacementGroupLabels :: Data.Aeson.Types.Internal.Object
   -- | name: Name of the Resource. Must be unique per Project.
   , getServersResponseBody200ServersPlacementGroupName :: Data.Text.Internal.Text
   -- | servers: Array of IDs of Servers that are part of this Placement Group
-  , getServersResponseBody200ServersPlacementGroupServers :: ([] GHC.Integer.Type.Integer)
-  -- | type: Type of the Placement Group
-  , getServersResponseBody200ServersPlacementGroupType :: GetServersResponseBody200ServersPlacementGroupType
+  , getServersResponseBody200ServersPlacementGroupServers :: ([GHC.Types.Int])
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPlacementGroup
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "created" (getServersResponseBody200ServersPlacementGroupCreated obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersPlacementGroupId obj) : (Data.Aeson..=) "labels" (getServersResponseBody200ServersPlacementGroupLabels obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersPlacementGroupName obj) : (Data.Aeson..=) "servers" (getServersResponseBody200ServersPlacementGroupServers obj) : (Data.Aeson..=) "type" (getServersResponseBody200ServersPlacementGroupType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "created" (getServersResponseBody200ServersPlacementGroupCreated obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersPlacementGroupId obj) GHC.Base.<> ((Data.Aeson..=) "labels" (getServersResponseBody200ServersPlacementGroupLabels obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersPlacementGroupName obj) GHC.Base.<> ((Data.Aeson..=) "servers" (getServersResponseBody200ServersPlacementGroupServers obj) GHC.Base.<> (Data.Aeson..=) "type" (getServersResponseBody200ServersPlacementGroupType obj))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPlacementGroup
+    where toJSON obj = Data.Aeson.Types.Internal.object ("created" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupCreated obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupId obj : "labels" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupLabels obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupName obj : "servers" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupServers obj : "type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread" : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("created" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupCreated obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupId obj) GHC.Base.<> (("labels" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupLabels obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupName obj) GHC.Base.<> (("servers" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPlacementGroupServers obj) GHC.Base.<> ("type" Data.Aeson.Types.ToJSON..= Data.Aeson.Types.Internal.String "spread"))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPlacementGroup
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPlacementGroup" (\obj -> (((((GHC.Base.pure GetServersResponseBody200ServersPlacementGroup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "type"))
--- | Defines the data type for the schema GetServersResponseBody200ServersPlacement_groupLabels
--- 
--- User-defined labels (key-value pairs)
-data GetServersResponseBody200ServersPlacementGroupLabels = GetServersResponseBody200ServersPlacementGroupLabels {
-  
-  } deriving (GHC.Show.Show
-  , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPlacementGroupLabels
-    where toJSON obj = Data.Aeson.object []
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "string" ("string" :: GHC.Base.String))
-instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPlacementGroupLabels
-    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPlacementGroupLabels" (\obj -> GHC.Base.pure GetServersResponseBody200ServersPlacementGroupLabels)
--- | Defines the enum schema GetServersResponseBody200ServersPlacement_groupType
--- 
--- Type of the Placement Group
-data GetServersResponseBody200ServersPlacementGroupType
-    = GetServersResponseBody200ServersPlacementGroupTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersPlacementGroupTypeEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersPlacementGroupTypeEnumStringSpread
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPlacementGroupType
-    where toJSON (GetServersResponseBody200ServersPlacementGroupTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersPlacementGroupTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersPlacementGroupTypeEnumStringSpread) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersPlacementGroupType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "spread")
-                                          then GetServersResponseBody200ServersPlacementGroupTypeEnumStringSpread
-                                          else GetServersResponseBody200ServersPlacementGroupTypeEnumOther val)
--- | Defines the data type for the schema GetServersResponseBody200ServersPrivate_net
+    where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPlacementGroup" (\obj -> ((((GHC.Base.pure GetServersResponseBody200ServersPlacementGroup GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "created")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "labels")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "servers"))
+-- | Create a new 'GetServersResponseBody200ServersPlacementGroup' with all required fields.
+mkGetServersResponseBody200ServersPlacementGroup :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPlacementGroupCreated'
+  -> GHC.Types.Int -- ^ 'getServersResponseBody200ServersPlacementGroupId'
+  -> Data.Aeson.Types.Internal.Object -- ^ 'getServersResponseBody200ServersPlacementGroupLabels'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPlacementGroupName'
+  -> [GHC.Types.Int] -- ^ 'getServersResponseBody200ServersPlacementGroupServers'
+  -> GetServersResponseBody200ServersPlacementGroup
+mkGetServersResponseBody200ServersPlacementGroup getServersResponseBody200ServersPlacementGroupCreated getServersResponseBody200ServersPlacementGroupId getServersResponseBody200ServersPlacementGroupLabels getServersResponseBody200ServersPlacementGroupName getServersResponseBody200ServersPlacementGroupServers = GetServersResponseBody200ServersPlacementGroup{getServersResponseBody200ServersPlacementGroupCreated = getServersResponseBody200ServersPlacementGroupCreated,
+                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersPlacementGroupId = getServersResponseBody200ServersPlacementGroupId,
+                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersPlacementGroupLabels = getServersResponseBody200ServersPlacementGroupLabels,
+                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersPlacementGroupName = getServersResponseBody200ServersPlacementGroupName,
+                                                                                                                                                                                                                                                                                                                                                                       getServersResponseBody200ServersPlacementGroupServers = getServersResponseBody200ServersPlacementGroupServers}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.private_net.items@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersPrivateNet = GetServersResponseBody200ServersPrivateNet {
   -- | alias_ips
-  getServersResponseBody200ServersPrivateNetAliasIps :: (GHC.Maybe.Maybe ([] Data.Text.Internal.Text))
+  getServersResponseBody200ServersPrivateNetAliasIps :: (GHC.Maybe.Maybe ([Data.Text.Internal.Text]))
   -- | ip
   , getServersResponseBody200ServersPrivateNetIp :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | mac_address
   , getServersResponseBody200ServersPrivateNetMacAddress :: (GHC.Maybe.Maybe Data.Text.Internal.Text)
   -- | network
-  , getServersResponseBody200ServersPrivateNetNetwork :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  , getServersResponseBody200ServersPrivateNetNetwork :: (GHC.Maybe.Maybe GHC.Types.Int)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPrivateNet
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "alias_ips" (getServersResponseBody200ServersPrivateNetAliasIps obj) : (Data.Aeson..=) "ip" (getServersResponseBody200ServersPrivateNetIp obj) : (Data.Aeson..=) "mac_address" (getServersResponseBody200ServersPrivateNetMacAddress obj) : (Data.Aeson..=) "network" (getServersResponseBody200ServersPrivateNetNetwork obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "alias_ips" (getServersResponseBody200ServersPrivateNetAliasIps obj) GHC.Base.<> ((Data.Aeson..=) "ip" (getServersResponseBody200ServersPrivateNetIp obj) GHC.Base.<> ((Data.Aeson..=) "mac_address" (getServersResponseBody200ServersPrivateNetMacAddress obj) GHC.Base.<> (Data.Aeson..=) "network" (getServersResponseBody200ServersPrivateNetNetwork obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPrivateNet
+    where toJSON obj = Data.Aeson.Types.Internal.object ("alias_ips" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetAliasIps obj : "ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetIp obj : "mac_address" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetMacAddress obj : "network" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetNetwork obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("alias_ips" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetAliasIps obj) GHC.Base.<> (("ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetIp obj) GHC.Base.<> (("mac_address" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetMacAddress obj) GHC.Base.<> ("network" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPrivateNetNetwork obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPrivateNet
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPrivateNet" (\obj -> (((GHC.Base.pure GetServersResponseBody200ServersPrivateNet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "alias_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "ip")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "mac_address")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "network"))
--- | Defines the data type for the schema GetServersResponseBody200ServersProtection
+-- | Create a new 'GetServersResponseBody200ServersPrivateNet' with all required fields.
+mkGetServersResponseBody200ServersPrivateNet :: GetServersResponseBody200ServersPrivateNet
+mkGetServersResponseBody200ServersPrivateNet = GetServersResponseBody200ServersPrivateNet{getServersResponseBody200ServersPrivateNetAliasIps = GHC.Maybe.Nothing,
+                                                                                          getServersResponseBody200ServersPrivateNetIp = GHC.Maybe.Nothing,
+                                                                                          getServersResponseBody200ServersPrivateNetMacAddress = GHC.Maybe.Nothing,
+                                                                                          getServersResponseBody200ServersPrivateNetNetwork = GHC.Maybe.Nothing}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.protection@ in the specification.
 -- 
 -- Protection configuration for the Server
 data GetServersResponseBody200ServersProtection = GetServersResponseBody200ServersProtection {
@@ -613,66 +765,83 @@ data GetServersResponseBody200ServersProtection = GetServersResponseBody200Serve
   , getServersResponseBody200ServersProtectionRebuild :: GHC.Types.Bool
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersProtection
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "delete" (getServersResponseBody200ServersProtectionDelete obj) : (Data.Aeson..=) "rebuild" (getServersResponseBody200ServersProtectionRebuild obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "delete" (getServersResponseBody200ServersProtectionDelete obj) GHC.Base.<> (Data.Aeson..=) "rebuild" (getServersResponseBody200ServersProtectionRebuild obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersProtection
+    where toJSON obj = Data.Aeson.Types.Internal.object ("delete" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersProtectionDelete obj : "rebuild" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersProtectionRebuild obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("delete" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersProtectionDelete obj) GHC.Base.<> ("rebuild" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersProtectionRebuild obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersProtection
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersProtection" (\obj -> (GHC.Base.pure GetServersResponseBody200ServersProtection GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "delete")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "rebuild"))
--- | Defines the data type for the schema GetServersResponseBody200ServersPublic_net
+-- | Create a new 'GetServersResponseBody200ServersProtection' with all required fields.
+mkGetServersResponseBody200ServersProtection :: GHC.Types.Bool -- ^ 'getServersResponseBody200ServersProtectionDelete'
+  -> GHC.Types.Bool -- ^ 'getServersResponseBody200ServersProtectionRebuild'
+  -> GetServersResponseBody200ServersProtection
+mkGetServersResponseBody200ServersProtection getServersResponseBody200ServersProtectionDelete getServersResponseBody200ServersProtectionRebuild = GetServersResponseBody200ServersProtection{getServersResponseBody200ServersProtectionDelete = getServersResponseBody200ServersProtectionDelete,
+                                                                                                                                                                                             getServersResponseBody200ServersProtectionRebuild = getServersResponseBody200ServersProtectionRebuild}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.public_net@ in the specification.
 -- 
 -- Public network information. The Server\'s IPv4 address can be found in \`public_net->ipv4->ip\`
 data GetServersResponseBody200ServersPublicNet = GetServersResponseBody200ServersPublicNet {
   -- | firewalls: Firewalls applied to the public network interface of this Server
-  getServersResponseBody200ServersPublicNetFirewalls :: (GHC.Maybe.Maybe ([] GetServersResponseBody200ServersPublicNetFirewalls))
+  getServersResponseBody200ServersPublicNetFirewalls :: (GHC.Maybe.Maybe ([GetServersResponseBody200ServersPublicNetFirewalls]))
   -- | floating_ips: IDs of Floating IPs assigned to this Server
-  , getServersResponseBody200ServersPublicNetFloatingIps :: ([] GHC.Integer.Type.Integer)
+  , getServersResponseBody200ServersPublicNetFloatingIps :: ([GHC.Types.Int])
   -- | ipv4: IP address (v4) and its reverse DNS entry of this Server
   , getServersResponseBody200ServersPublicNetIpv4 :: GetServersResponseBody200ServersPublicNetIpv4
   -- | ipv6: IPv6 network assigned to this Server and its reverse DNS entry
   , getServersResponseBody200ServersPublicNetIpv6 :: GetServersResponseBody200ServersPublicNetIpv6
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPublicNet
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "firewalls" (getServersResponseBody200ServersPublicNetFirewalls obj) : (Data.Aeson..=) "floating_ips" (getServersResponseBody200ServersPublicNetFloatingIps obj) : (Data.Aeson..=) "ipv4" (getServersResponseBody200ServersPublicNetIpv4 obj) : (Data.Aeson..=) "ipv6" (getServersResponseBody200ServersPublicNetIpv6 obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "firewalls" (getServersResponseBody200ServersPublicNetFirewalls obj) GHC.Base.<> ((Data.Aeson..=) "floating_ips" (getServersResponseBody200ServersPublicNetFloatingIps obj) GHC.Base.<> ((Data.Aeson..=) "ipv4" (getServersResponseBody200ServersPublicNetIpv4 obj) GHC.Base.<> (Data.Aeson..=) "ipv6" (getServersResponseBody200ServersPublicNetIpv6 obj))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPublicNet
+    where toJSON obj = Data.Aeson.Types.Internal.object ("firewalls" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFirewalls obj : "floating_ips" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFloatingIps obj : "ipv4" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4 obj : "ipv6" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6 obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("firewalls" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFirewalls obj) GHC.Base.<> (("floating_ips" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFloatingIps obj) GHC.Base.<> (("ipv4" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4 obj) GHC.Base.<> ("ipv6" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6 obj))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPublicNet
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPublicNet" (\obj -> (((GHC.Base.pure GetServersResponseBody200ServersPublicNet GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "firewalls")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "floating_ips")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ipv4")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ipv6"))
--- | Defines the data type for the schema GetServersResponseBody200ServersPublic_netFirewalls
+-- | Create a new 'GetServersResponseBody200ServersPublicNet' with all required fields.
+mkGetServersResponseBody200ServersPublicNet :: [GHC.Types.Int] -- ^ 'getServersResponseBody200ServersPublicNetFloatingIps'
+  -> GetServersResponseBody200ServersPublicNetIpv4 -- ^ 'getServersResponseBody200ServersPublicNetIpv4'
+  -> GetServersResponseBody200ServersPublicNetIpv6 -- ^ 'getServersResponseBody200ServersPublicNetIpv6'
+  -> GetServersResponseBody200ServersPublicNet
+mkGetServersResponseBody200ServersPublicNet getServersResponseBody200ServersPublicNetFloatingIps getServersResponseBody200ServersPublicNetIpv4 getServersResponseBody200ServersPublicNetIpv6 = GetServersResponseBody200ServersPublicNet{getServersResponseBody200ServersPublicNetFirewalls = GHC.Maybe.Nothing,
+                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetFloatingIps = getServersResponseBody200ServersPublicNetFloatingIps,
+                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetIpv4 = getServersResponseBody200ServersPublicNetIpv4,
+                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetIpv6 = getServersResponseBody200ServersPublicNetIpv6}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.public_net.properties.firewalls.items@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersPublicNetFirewalls = GetServersResponseBody200ServersPublicNetFirewalls {
   -- | id: ID of the Resource
-  getServersResponseBody200ServersPublicNetFirewallsId :: (GHC.Maybe.Maybe GHC.Integer.Type.Integer)
+  getServersResponseBody200ServersPublicNetFirewallsId :: (GHC.Maybe.Maybe GHC.Types.Int)
   -- | status: Status of the Firewall on the Server
   , getServersResponseBody200ServersPublicNetFirewallsStatus :: (GHC.Maybe.Maybe GetServersResponseBody200ServersPublicNetFirewallsStatus)
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPublicNetFirewalls
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "id" (getServersResponseBody200ServersPublicNetFirewallsId obj) : (Data.Aeson..=) "status" (getServersResponseBody200ServersPublicNetFirewallsStatus obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "id" (getServersResponseBody200ServersPublicNetFirewallsId obj) GHC.Base.<> (Data.Aeson..=) "status" (getServersResponseBody200ServersPublicNetFirewallsStatus obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPublicNetFirewalls
+    where toJSON obj = Data.Aeson.Types.Internal.object ("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFirewallsId obj : "status" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFirewallsStatus obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFirewallsId obj) GHC.Base.<> ("status" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetFirewallsStatus obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPublicNetFirewalls
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPublicNetFirewalls" (\obj -> (GHC.Base.pure GetServersResponseBody200ServersPublicNetFirewalls GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..:? "status"))
--- | Defines the enum schema GetServersResponseBody200ServersPublic_netFirewallsStatus
+-- | Create a new 'GetServersResponseBody200ServersPublicNetFirewalls' with all required fields.
+mkGetServersResponseBody200ServersPublicNetFirewalls :: GetServersResponseBody200ServersPublicNetFirewalls
+mkGetServersResponseBody200ServersPublicNetFirewalls = GetServersResponseBody200ServersPublicNetFirewalls{getServersResponseBody200ServersPublicNetFirewallsId = GHC.Maybe.Nothing,
+                                                                                                          getServersResponseBody200ServersPublicNetFirewallsStatus = GHC.Maybe.Nothing}
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.public_net.properties.firewalls.items.properties.status@ in the specification.
 -- 
 -- Status of the Firewall on the Server
-data GetServersResponseBody200ServersPublicNetFirewallsStatus
-    = GetServersResponseBody200ServersPublicNetFirewallsStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersPublicNetFirewallsStatusEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersPublicNetFirewallsStatusEnumStringApplied
-    | GetServersResponseBody200ServersPublicNetFirewallsStatusEnumStringPending
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPublicNetFirewallsStatus
-    where toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusEnumStringApplied) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "applied"
-          toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusEnumStringPending) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersPublicNetFirewallsStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "applied")
-                                          then GetServersResponseBody200ServersPublicNetFirewallsStatusEnumStringApplied
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "pending")
-                                                then GetServersResponseBody200ServersPublicNetFirewallsStatusEnumStringPending
-                                                else GetServersResponseBody200ServersPublicNetFirewallsStatusEnumOther val)
--- | Defines the data type for the schema GetServersResponseBody200ServersPublic_netIpv4
+data GetServersResponseBody200ServersPublicNetFirewallsStatus =
+   GetServersResponseBody200ServersPublicNetFirewallsStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersPublicNetFirewallsStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersPublicNetFirewallsStatusEnumApplied -- ^ Represents the JSON value @"applied"@
+  | GetServersResponseBody200ServersPublicNetFirewallsStatusEnumPending -- ^ Represents the JSON value @"pending"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPublicNetFirewallsStatus
+    where toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusOther val) = val
+          toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusEnumApplied) = "applied"
+          toJSON (GetServersResponseBody200ServersPublicNetFirewallsStatusEnumPending) = "pending"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPublicNetFirewallsStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "applied" -> GetServersResponseBody200ServersPublicNetFirewallsStatusEnumApplied
+                                            | val GHC.Classes.== "pending" -> GetServersResponseBody200ServersPublicNetFirewallsStatusEnumPending
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersPublicNetFirewallsStatusOther val)
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.public_net.properties.ipv4@ in the specification.
 -- 
 -- IP address (v4) and its reverse DNS entry of this Server
 data GetServersResponseBody200ServersPublicNetIpv4 = GetServersResponseBody200ServersPublicNetIpv4 {
@@ -684,29 +853,45 @@ data GetServersResponseBody200ServersPublicNetIpv4 = GetServersResponseBody200Se
   , getServersResponseBody200ServersPublicNetIpv4Ip :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPublicNetIpv4
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "blocked" (getServersResponseBody200ServersPublicNetIpv4Blocked obj) : (Data.Aeson..=) "dns_ptr" (getServersResponseBody200ServersPublicNetIpv4DnsPtr obj) : (Data.Aeson..=) "ip" (getServersResponseBody200ServersPublicNetIpv4Ip obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "blocked" (getServersResponseBody200ServersPublicNetIpv4Blocked obj) GHC.Base.<> ((Data.Aeson..=) "dns_ptr" (getServersResponseBody200ServersPublicNetIpv4DnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (getServersResponseBody200ServersPublicNetIpv4Ip obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPublicNetIpv4
+    where toJSON obj = Data.Aeson.Types.Internal.object ("blocked" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4Blocked obj : "dns_ptr" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4DnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4Ip obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("blocked" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4Blocked obj) GHC.Base.<> (("dns_ptr" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4DnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv4Ip obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPublicNetIpv4
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPublicNetIpv4" (\obj -> ((GHC.Base.pure GetServersResponseBody200ServersPublicNetIpv4 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "blocked")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema GetServersResponseBody200ServersPublic_netIpv6
+-- | Create a new 'GetServersResponseBody200ServersPublicNetIpv4' with all required fields.
+mkGetServersResponseBody200ServersPublicNetIpv4 :: GHC.Types.Bool -- ^ 'getServersResponseBody200ServersPublicNetIpv4Blocked'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPublicNetIpv4DnsPtr'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPublicNetIpv4Ip'
+  -> GetServersResponseBody200ServersPublicNetIpv4
+mkGetServersResponseBody200ServersPublicNetIpv4 getServersResponseBody200ServersPublicNetIpv4Blocked getServersResponseBody200ServersPublicNetIpv4DnsPtr getServersResponseBody200ServersPublicNetIpv4Ip = GetServersResponseBody200ServersPublicNetIpv4{getServersResponseBody200ServersPublicNetIpv4Blocked = getServersResponseBody200ServersPublicNetIpv4Blocked,
+                                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetIpv4DnsPtr = getServersResponseBody200ServersPublicNetIpv4DnsPtr,
+                                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetIpv4Ip = getServersResponseBody200ServersPublicNetIpv4Ip}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.public_net.properties.ipv6@ in the specification.
 -- 
 -- IPv6 network assigned to this Server and its reverse DNS entry
 data GetServersResponseBody200ServersPublicNetIpv6 = GetServersResponseBody200ServersPublicNetIpv6 {
   -- | blocked: If the IP is blocked by our anti abuse dept
   getServersResponseBody200ServersPublicNetIpv6Blocked :: GHC.Types.Bool
   -- | dns_ptr: Reverse DNS PTR entries for the IPv6 addresses of this Server, \`null\` by default
-  , getServersResponseBody200ServersPublicNetIpv6DnsPtr :: ([] GetServersResponseBody200ServersPublicNetIpv6DnsPtr)
+  , getServersResponseBody200ServersPublicNetIpv6DnsPtr :: (GHC.Maybe.Maybe ([GetServersResponseBody200ServersPublicNetIpv6DnsPtr]))
   -- | ip: IP address (v4) of this Server
   , getServersResponseBody200ServersPublicNetIpv6Ip :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPublicNetIpv6
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "blocked" (getServersResponseBody200ServersPublicNetIpv6Blocked obj) : (Data.Aeson..=) "dns_ptr" (getServersResponseBody200ServersPublicNetIpv6DnsPtr obj) : (Data.Aeson..=) "ip" (getServersResponseBody200ServersPublicNetIpv6Ip obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "blocked" (getServersResponseBody200ServersPublicNetIpv6Blocked obj) GHC.Base.<> ((Data.Aeson..=) "dns_ptr" (getServersResponseBody200ServersPublicNetIpv6DnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (getServersResponseBody200ServersPublicNetIpv6Ip obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPublicNetIpv6
+    where toJSON obj = Data.Aeson.Types.Internal.object ("blocked" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6Blocked obj : "dns_ptr" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6DnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6Ip obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("blocked" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6Blocked obj) GHC.Base.<> (("dns_ptr" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6DnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6Ip obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPublicNetIpv6
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPublicNetIpv6" (\obj -> ((GHC.Base.pure GetServersResponseBody200ServersPublicNetIpv6 GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "blocked")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema GetServersResponseBody200ServersPublic_netIpv6Dns_ptr
+-- | Create a new 'GetServersResponseBody200ServersPublicNetIpv6' with all required fields.
+mkGetServersResponseBody200ServersPublicNetIpv6 :: GHC.Types.Bool -- ^ 'getServersResponseBody200ServersPublicNetIpv6Blocked'
+  -> GHC.Maybe.Maybe ([GetServersResponseBody200ServersPublicNetIpv6DnsPtr]) -- ^ 'getServersResponseBody200ServersPublicNetIpv6DnsPtr'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPublicNetIpv6Ip'
+  -> GetServersResponseBody200ServersPublicNetIpv6
+mkGetServersResponseBody200ServersPublicNetIpv6 getServersResponseBody200ServersPublicNetIpv6Blocked getServersResponseBody200ServersPublicNetIpv6DnsPtr getServersResponseBody200ServersPublicNetIpv6Ip = GetServersResponseBody200ServersPublicNetIpv6{getServersResponseBody200ServersPublicNetIpv6Blocked = getServersResponseBody200ServersPublicNetIpv6Blocked,
+                                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetIpv6DnsPtr = getServersResponseBody200ServersPublicNetIpv6DnsPtr,
+                                                                                                                                                                                                                                                         getServersResponseBody200ServersPublicNetIpv6Ip = getServersResponseBody200ServersPublicNetIpv6Ip}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.public_net.properties.ipv6.properties.dns_ptr.items@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersPublicNetIpv6DnsPtr = GetServersResponseBody200ServersPublicNetIpv6DnsPtr {
@@ -716,12 +901,18 @@ data GetServersResponseBody200ServersPublicNetIpv6DnsPtr = GetServersResponseBod
   , getServersResponseBody200ServersPublicNetIpv6DnsPtrIp :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersPublicNetIpv6DnsPtr
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "dns_ptr" (getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr obj) : (Data.Aeson..=) "ip" (getServersResponseBody200ServersPublicNetIpv6DnsPtrIp obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "dns_ptr" (getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr obj) GHC.Base.<> (Data.Aeson..=) "ip" (getServersResponseBody200ServersPublicNetIpv6DnsPtrIp obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersPublicNetIpv6DnsPtr
+    where toJSON obj = Data.Aeson.Types.Internal.object ("dns_ptr" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr obj : "ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6DnsPtrIp obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("dns_ptr" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr obj) GHC.Base.<> ("ip" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersPublicNetIpv6DnsPtrIp obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersPublicNetIpv6DnsPtr
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersPublicNetIpv6DnsPtr" (\obj -> (GHC.Base.pure GetServersResponseBody200ServersPublicNetIpv6DnsPtr GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "dns_ptr")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "ip"))
--- | Defines the data type for the schema GetServersResponseBody200ServersServer_type
+-- | Create a new 'GetServersResponseBody200ServersPublicNetIpv6DnsPtr' with all required fields.
+mkGetServersResponseBody200ServersPublicNetIpv6DnsPtr :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersPublicNetIpv6DnsPtrIp'
+  -> GetServersResponseBody200ServersPublicNetIpv6DnsPtr
+mkGetServersResponseBody200ServersPublicNetIpv6DnsPtr getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr getServersResponseBody200ServersPublicNetIpv6DnsPtrIp = GetServersResponseBody200ServersPublicNetIpv6DnsPtr{getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr = getServersResponseBody200ServersPublicNetIpv6DnsPtrDnsPtr,
+                                                                                                                                                                                                                            getServersResponseBody200ServersPublicNetIpv6DnsPtrIp = getServersResponseBody200ServersPublicNetIpv6DnsPtrIp}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.server_type@ in the specification.
 -- 
 -- Type of Server - determines how much ram, disk and cpu a Server has
 data GetServersResponseBody200ServersServerType = GetServersResponseBody200ServersServerType {
@@ -736,43 +927,63 @@ data GetServersResponseBody200ServersServerType = GetServersResponseBody200Serve
   -- | disk: Disk size a Server of this type will have in GB
   , getServersResponseBody200ServersServerTypeDisk :: GHC.Types.Double
   -- | id: ID of the Server type
-  , getServersResponseBody200ServersServerTypeId :: GHC.Integer.Type.Integer
+  , getServersResponseBody200ServersServerTypeId :: GHC.Types.Int
   -- | memory: Memory a Server of this type will have in GB
   , getServersResponseBody200ServersServerTypeMemory :: GHC.Types.Double
   -- | name: Unique identifier of the Server type
   , getServersResponseBody200ServersServerTypeName :: Data.Text.Internal.Text
   -- | prices: Prices in different Locations
-  , getServersResponseBody200ServersServerTypePrices :: ([] GetServersResponseBody200ServersServerTypePrices)
+  , getServersResponseBody200ServersServerTypePrices :: ([GetServersResponseBody200ServersServerTypePrices])
   -- | storage_type: Type of Server boot drive. Local has higher speed. Network has better availability.
   , getServersResponseBody200ServersServerTypeStorageType :: GetServersResponseBody200ServersServerTypeStorageType
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersServerType
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "cores" (getServersResponseBody200ServersServerTypeCores obj) : (Data.Aeson..=) "cpu_type" (getServersResponseBody200ServersServerTypeCpuType obj) : (Data.Aeson..=) "deprecated" (getServersResponseBody200ServersServerTypeDeprecated obj) : (Data.Aeson..=) "description" (getServersResponseBody200ServersServerTypeDescription obj) : (Data.Aeson..=) "disk" (getServersResponseBody200ServersServerTypeDisk obj) : (Data.Aeson..=) "id" (getServersResponseBody200ServersServerTypeId obj) : (Data.Aeson..=) "memory" (getServersResponseBody200ServersServerTypeMemory obj) : (Data.Aeson..=) "name" (getServersResponseBody200ServersServerTypeName obj) : (Data.Aeson..=) "prices" (getServersResponseBody200ServersServerTypePrices obj) : (Data.Aeson..=) "storage_type" (getServersResponseBody200ServersServerTypeStorageType obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "cores" (getServersResponseBody200ServersServerTypeCores obj) GHC.Base.<> ((Data.Aeson..=) "cpu_type" (getServersResponseBody200ServersServerTypeCpuType obj) GHC.Base.<> ((Data.Aeson..=) "deprecated" (getServersResponseBody200ServersServerTypeDeprecated obj) GHC.Base.<> ((Data.Aeson..=) "description" (getServersResponseBody200ServersServerTypeDescription obj) GHC.Base.<> ((Data.Aeson..=) "disk" (getServersResponseBody200ServersServerTypeDisk obj) GHC.Base.<> ((Data.Aeson..=) "id" (getServersResponseBody200ServersServerTypeId obj) GHC.Base.<> ((Data.Aeson..=) "memory" (getServersResponseBody200ServersServerTypeMemory obj) GHC.Base.<> ((Data.Aeson..=) "name" (getServersResponseBody200ServersServerTypeName obj) GHC.Base.<> ((Data.Aeson..=) "prices" (getServersResponseBody200ServersServerTypePrices obj) GHC.Base.<> (Data.Aeson..=) "storage_type" (getServersResponseBody200ServersServerTypeStorageType obj))))))))))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersServerType
+    where toJSON obj = Data.Aeson.Types.Internal.object ("cores" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeCores obj : "cpu_type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeCpuType obj : "deprecated" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeDeprecated obj : "description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeDescription obj : "disk" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeDisk obj : "id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeId obj : "memory" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeMemory obj : "name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeName obj : "prices" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePrices obj : "storage_type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeStorageType obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("cores" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeCores obj) GHC.Base.<> (("cpu_type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeCpuType obj) GHC.Base.<> (("deprecated" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeDeprecated obj) GHC.Base.<> (("description" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeDescription obj) GHC.Base.<> (("disk" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeDisk obj) GHC.Base.<> (("id" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeId obj) GHC.Base.<> (("memory" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeMemory obj) GHC.Base.<> (("name" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeName obj) GHC.Base.<> (("prices" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePrices obj) GHC.Base.<> ("storage_type" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypeStorageType obj))))))))))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersServerType
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersServerType" (\obj -> (((((((((GHC.Base.pure GetServersResponseBody200ServersServerType GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cores")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "cpu_type")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "deprecated")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "description")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "disk")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "id")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "memory")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "name")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "prices")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "storage_type"))
--- | Defines the enum schema GetServersResponseBody200ServersServer_typeCpu_type
+-- | Create a new 'GetServersResponseBody200ServersServerType' with all required fields.
+mkGetServersResponseBody200ServersServerType :: GHC.Types.Double -- ^ 'getServersResponseBody200ServersServerTypeCores'
+  -> GetServersResponseBody200ServersServerTypeCpuType -- ^ 'getServersResponseBody200ServersServerTypeCpuType'
+  -> GHC.Types.Bool -- ^ 'getServersResponseBody200ServersServerTypeDeprecated'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypeDescription'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersServerTypeDisk'
+  -> GHC.Types.Int -- ^ 'getServersResponseBody200ServersServerTypeId'
+  -> GHC.Types.Double -- ^ 'getServersResponseBody200ServersServerTypeMemory'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypeName'
+  -> [GetServersResponseBody200ServersServerTypePrices] -- ^ 'getServersResponseBody200ServersServerTypePrices'
+  -> GetServersResponseBody200ServersServerTypeStorageType -- ^ 'getServersResponseBody200ServersServerTypeStorageType'
+  -> GetServersResponseBody200ServersServerType
+mkGetServersResponseBody200ServersServerType getServersResponseBody200ServersServerTypeCores getServersResponseBody200ServersServerTypeCpuType getServersResponseBody200ServersServerTypeDeprecated getServersResponseBody200ServersServerTypeDescription getServersResponseBody200ServersServerTypeDisk getServersResponseBody200ServersServerTypeId getServersResponseBody200ServersServerTypeMemory getServersResponseBody200ServersServerTypeName getServersResponseBody200ServersServerTypePrices getServersResponseBody200ServersServerTypeStorageType = GetServersResponseBody200ServersServerType{getServersResponseBody200ServersServerTypeCores = getServersResponseBody200ServersServerTypeCores,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeCpuType = getServersResponseBody200ServersServerTypeCpuType,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeDeprecated = getServersResponseBody200ServersServerTypeDeprecated,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeDescription = getServersResponseBody200ServersServerTypeDescription,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeDisk = getServersResponseBody200ServersServerTypeDisk,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeId = getServersResponseBody200ServersServerTypeId,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeMemory = getServersResponseBody200ServersServerTypeMemory,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeName = getServersResponseBody200ServersServerTypeName,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypePrices = getServersResponseBody200ServersServerTypePrices,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          getServersResponseBody200ServersServerTypeStorageType = getServersResponseBody200ServersServerTypeStorageType}
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.server_type.properties.cpu_type@ in the specification.
 -- 
 -- Type of cpu
-data GetServersResponseBody200ServersServerTypeCpuType
-    = GetServersResponseBody200ServersServerTypeCpuTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersServerTypeCpuTypeEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersServerTypeCpuTypeEnumStringDedicated
-    | GetServersResponseBody200ServersServerTypeCpuTypeEnumStringShared
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersServerTypeCpuType
-    where toJSON (GetServersResponseBody200ServersServerTypeCpuTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersServerTypeCpuTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersServerTypeCpuTypeEnumStringDedicated) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "dedicated"
-          toJSON (GetServersResponseBody200ServersServerTypeCpuTypeEnumStringShared) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "shared"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersServerTypeCpuType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "dedicated")
-                                          then GetServersResponseBody200ServersServerTypeCpuTypeEnumStringDedicated
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "shared")
-                                                then GetServersResponseBody200ServersServerTypeCpuTypeEnumStringShared
-                                                else GetServersResponseBody200ServersServerTypeCpuTypeEnumOther val)
--- | Defines the data type for the schema GetServersResponseBody200ServersServer_typePrices
+data GetServersResponseBody200ServersServerTypeCpuType =
+   GetServersResponseBody200ServersServerTypeCpuTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersServerTypeCpuTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersServerTypeCpuTypeEnumShared -- ^ Represents the JSON value @"shared"@
+  | GetServersResponseBody200ServersServerTypeCpuTypeEnumDedicated -- ^ Represents the JSON value @"dedicated"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersServerTypeCpuType
+    where toJSON (GetServersResponseBody200ServersServerTypeCpuTypeOther val) = val
+          toJSON (GetServersResponseBody200ServersServerTypeCpuTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersServerTypeCpuTypeEnumShared) = "shared"
+          toJSON (GetServersResponseBody200ServersServerTypeCpuTypeEnumDedicated) = "dedicated"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersServerTypeCpuType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "shared" -> GetServersResponseBody200ServersServerTypeCpuTypeEnumShared
+                                            | val GHC.Classes.== "dedicated" -> GetServersResponseBody200ServersServerTypeCpuTypeEnumDedicated
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersServerTypeCpuTypeOther val)
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.server_type.properties.prices.items@ in the specification.
 -- 
 -- 
 data GetServersResponseBody200ServersServerTypePrices = GetServersResponseBody200ServersServerTypePrices {
@@ -784,12 +995,20 @@ data GetServersResponseBody200ServersServerTypePrices = GetServersResponseBody20
   , getServersResponseBody200ServersServerTypePricesPriceMonthly :: GetServersResponseBody200ServersServerTypePricesPriceMonthly
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersServerTypePrices
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "location" (getServersResponseBody200ServersServerTypePricesLocation obj) : (Data.Aeson..=) "price_hourly" (getServersResponseBody200ServersServerTypePricesPriceHourly obj) : (Data.Aeson..=) "price_monthly" (getServersResponseBody200ServersServerTypePricesPriceMonthly obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "location" (getServersResponseBody200ServersServerTypePricesLocation obj) GHC.Base.<> ((Data.Aeson..=) "price_hourly" (getServersResponseBody200ServersServerTypePricesPriceHourly obj) GHC.Base.<> (Data.Aeson..=) "price_monthly" (getServersResponseBody200ServersServerTypePricesPriceMonthly obj)))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersServerTypePrices
+    where toJSON obj = Data.Aeson.Types.Internal.object ("location" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesLocation obj : "price_hourly" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceHourly obj : "price_monthly" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceMonthly obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("location" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesLocation obj) GHC.Base.<> (("price_hourly" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceHourly obj) GHC.Base.<> ("price_monthly" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceMonthly obj)))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersServerTypePrices
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersServerTypePrices" (\obj -> ((GHC.Base.pure GetServersResponseBody200ServersServerTypePrices GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "location")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_hourly")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "price_monthly"))
--- | Defines the data type for the schema GetServersResponseBody200ServersServer_typePricesPrice_hourly
+-- | Create a new 'GetServersResponseBody200ServersServerTypePrices' with all required fields.
+mkGetServersResponseBody200ServersServerTypePrices :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypePricesLocation'
+  -> GetServersResponseBody200ServersServerTypePricesPriceHourly -- ^ 'getServersResponseBody200ServersServerTypePricesPriceHourly'
+  -> GetServersResponseBody200ServersServerTypePricesPriceMonthly -- ^ 'getServersResponseBody200ServersServerTypePricesPriceMonthly'
+  -> GetServersResponseBody200ServersServerTypePrices
+mkGetServersResponseBody200ServersServerTypePrices getServersResponseBody200ServersServerTypePricesLocation getServersResponseBody200ServersServerTypePricesPriceHourly getServersResponseBody200ServersServerTypePricesPriceMonthly = GetServersResponseBody200ServersServerTypePrices{getServersResponseBody200ServersServerTypePricesLocation = getServersResponseBody200ServersServerTypePricesLocation,
+                                                                                                                                                                                                                                                                                        getServersResponseBody200ServersServerTypePricesPriceHourly = getServersResponseBody200ServersServerTypePricesPriceHourly,
+                                                                                                                                                                                                                                                                                        getServersResponseBody200ServersServerTypePricesPriceMonthly = getServersResponseBody200ServersServerTypePricesPriceMonthly}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.server_type.properties.prices.items.properties.price_hourly@ in the specification.
 -- 
 -- Hourly costs for a Server type in this Location
 data GetServersResponseBody200ServersServerTypePricesPriceHourly = GetServersResponseBody200ServersServerTypePricesPriceHourly {
@@ -799,12 +1018,18 @@ data GetServersResponseBody200ServersServerTypePricesPriceHourly = GetServersRes
   , getServersResponseBody200ServersServerTypePricesPriceHourlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersServerTypePricesPriceHourly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getServersResponseBody200ServersServerTypePricesPriceHourlyGross obj) : (Data.Aeson..=) "net" (getServersResponseBody200ServersServerTypePricesPriceHourlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getServersResponseBody200ServersServerTypePricesPriceHourlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getServersResponseBody200ServersServerTypePricesPriceHourlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersServerTypePricesPriceHourly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceHourlyGross obj : "net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceHourlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceHourlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceHourlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersServerTypePricesPriceHourly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersServerTypePricesPriceHourly" (\obj -> (GHC.Base.pure GetServersResponseBody200ServersServerTypePricesPriceHourly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the data type for the schema GetServersResponseBody200ServersServer_typePricesPrice_monthly
+-- | Create a new 'GetServersResponseBody200ServersServerTypePricesPriceHourly' with all required fields.
+mkGetServersResponseBody200ServersServerTypePricesPriceHourly :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypePricesPriceHourlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypePricesPriceHourlyNet'
+  -> GetServersResponseBody200ServersServerTypePricesPriceHourly
+mkGetServersResponseBody200ServersServerTypePricesPriceHourly getServersResponseBody200ServersServerTypePricesPriceHourlyGross getServersResponseBody200ServersServerTypePricesPriceHourlyNet = GetServersResponseBody200ServersServerTypePricesPriceHourly{getServersResponseBody200ServersServerTypePricesPriceHourlyGross = getServersResponseBody200ServersServerTypePricesPriceHourlyGross,
+                                                                                                                                                                                                                                                            getServersResponseBody200ServersServerTypePricesPriceHourlyNet = getServersResponseBody200ServersServerTypePricesPriceHourlyNet}
+-- | Defines the object schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.server_type.properties.prices.items.properties.price_monthly@ in the specification.
 -- 
 -- Monthly costs for a Server type in this Location
 data GetServersResponseBody200ServersServerTypePricesPriceMonthly = GetServersResponseBody200ServersServerTypePricesPriceMonthly {
@@ -814,76 +1039,104 @@ data GetServersResponseBody200ServersServerTypePricesPriceMonthly = GetServersRe
   , getServersResponseBody200ServersServerTypePricesPriceMonthlyNet :: Data.Text.Internal.Text
   } deriving (GHC.Show.Show
   , GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersServerTypePricesPriceMonthly
-    where toJSON obj = Data.Aeson.object ((Data.Aeson..=) "gross" (getServersResponseBody200ServersServerTypePricesPriceMonthlyGross obj) : (Data.Aeson..=) "net" (getServersResponseBody200ServersServerTypePricesPriceMonthlyNet obj) : [])
-          toEncoding obj = Data.Aeson.pairs ((Data.Aeson..=) "gross" (getServersResponseBody200ServersServerTypePricesPriceMonthlyGross obj) GHC.Base.<> (Data.Aeson..=) "net" (getServersResponseBody200ServersServerTypePricesPriceMonthlyNet obj))
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersServerTypePricesPriceMonthly
+    where toJSON obj = Data.Aeson.Types.Internal.object ("gross" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceMonthlyGross obj : "net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceMonthlyNet obj : GHC.Base.mempty)
+          toEncoding obj = Data.Aeson.Encoding.Internal.pairs (("gross" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceMonthlyGross obj) GHC.Base.<> ("net" Data.Aeson.Types.ToJSON..= getServersResponseBody200ServersServerTypePricesPriceMonthlyNet obj))
 instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersServerTypePricesPriceMonthly
     where parseJSON = Data.Aeson.Types.FromJSON.withObject "GetServersResponseBody200ServersServerTypePricesPriceMonthly" (\obj -> (GHC.Base.pure GetServersResponseBody200ServersServerTypePricesPriceMonthly GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "gross")) GHC.Base.<*> (obj Data.Aeson.Types.FromJSON..: "net"))
--- | Defines the enum schema GetServersResponseBody200ServersServer_typeStorage_type
+-- | Create a new 'GetServersResponseBody200ServersServerTypePricesPriceMonthly' with all required fields.
+mkGetServersResponseBody200ServersServerTypePricesPriceMonthly :: Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypePricesPriceMonthlyGross'
+  -> Data.Text.Internal.Text -- ^ 'getServersResponseBody200ServersServerTypePricesPriceMonthlyNet'
+  -> GetServersResponseBody200ServersServerTypePricesPriceMonthly
+mkGetServersResponseBody200ServersServerTypePricesPriceMonthly getServersResponseBody200ServersServerTypePricesPriceMonthlyGross getServersResponseBody200ServersServerTypePricesPriceMonthlyNet = GetServersResponseBody200ServersServerTypePricesPriceMonthly{getServersResponseBody200ServersServerTypePricesPriceMonthlyGross = getServersResponseBody200ServersServerTypePricesPriceMonthlyGross,
+                                                                                                                                                                                                                                                                getServersResponseBody200ServersServerTypePricesPriceMonthlyNet = getServersResponseBody200ServersServerTypePricesPriceMonthlyNet}
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.server_type.properties.storage_type@ in the specification.
 -- 
 -- Type of Server boot drive. Local has higher speed. Network has better availability.
-data GetServersResponseBody200ServersServerTypeStorageType
-    = GetServersResponseBody200ServersServerTypeStorageTypeEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersServerTypeStorageTypeEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersServerTypeStorageTypeEnumStringLocal
-    | GetServersResponseBody200ServersServerTypeStorageTypeEnumStringNetwork
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersServerTypeStorageType
-    where toJSON (GetServersResponseBody200ServersServerTypeStorageTypeEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersServerTypeStorageTypeEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersServerTypeStorageTypeEnumStringLocal) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "local"
-          toJSON (GetServersResponseBody200ServersServerTypeStorageTypeEnumStringNetwork) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "network"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersServerTypeStorageType
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "local")
-                                          then GetServersResponseBody200ServersServerTypeStorageTypeEnumStringLocal
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "network")
-                                                then GetServersResponseBody200ServersServerTypeStorageTypeEnumStringNetwork
-                                                else GetServersResponseBody200ServersServerTypeStorageTypeEnumOther val)
--- | Defines the enum schema GetServersResponseBody200ServersStatus
+data GetServersResponseBody200ServersServerTypeStorageType =
+   GetServersResponseBody200ServersServerTypeStorageTypeOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersServerTypeStorageTypeTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersServerTypeStorageTypeEnumLocal -- ^ Represents the JSON value @"local"@
+  | GetServersResponseBody200ServersServerTypeStorageTypeEnumNetwork -- ^ Represents the JSON value @"network"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersServerTypeStorageType
+    where toJSON (GetServersResponseBody200ServersServerTypeStorageTypeOther val) = val
+          toJSON (GetServersResponseBody200ServersServerTypeStorageTypeTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersServerTypeStorageTypeEnumLocal) = "local"
+          toJSON (GetServersResponseBody200ServersServerTypeStorageTypeEnumNetwork) = "network"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersServerTypeStorageType
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "local" -> GetServersResponseBody200ServersServerTypeStorageTypeEnumLocal
+                                            | val GHC.Classes.== "network" -> GetServersResponseBody200ServersServerTypeStorageTypeEnumNetwork
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersServerTypeStorageTypeOther val)
+-- | Defines the enum schema located at @paths.\/servers.GET.responses.200.content.application\/json.schema.properties.servers.items.properties.status@ in the specification.
 -- 
 -- Status of the Server
-data GetServersResponseBody200ServersStatus
-    = GetServersResponseBody200ServersStatusEnumOther Data.Aeson.Types.Internal.Value
-    | GetServersResponseBody200ServersStatusEnumTyped Data.Text.Internal.Text
-    | GetServersResponseBody200ServersStatusEnumStringDeleting
-    | GetServersResponseBody200ServersStatusEnumStringInitializing
-    | GetServersResponseBody200ServersStatusEnumStringMigrating
-    | GetServersResponseBody200ServersStatusEnumStringOff
-    | GetServersResponseBody200ServersStatusEnumStringRebuilding
-    | GetServersResponseBody200ServersStatusEnumStringRunning
-    | GetServersResponseBody200ServersStatusEnumStringStarting
-    | GetServersResponseBody200ServersStatusEnumStringStopping
-    | GetServersResponseBody200ServersStatusEnumStringUnknown
-    deriving (GHC.Show.Show, GHC.Classes.Eq)
-instance Data.Aeson.ToJSON GetServersResponseBody200ServersStatus
-    where toJSON (GetServersResponseBody200ServersStatusEnumOther patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersStatusEnumTyped patternName) = Data.Aeson.Types.ToJSON.toJSON patternName
-          toJSON (GetServersResponseBody200ServersStatusEnumStringDeleting) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "deleting"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringInitializing) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "initializing"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringMigrating) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "migrating"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringOff) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "off"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringRebuilding) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "rebuilding"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringRunning) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringStarting) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "starting"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringStopping) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "stopping"
-          toJSON (GetServersResponseBody200ServersStatusEnumStringUnknown) = Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown"
-instance Data.Aeson.FromJSON GetServersResponseBody200ServersStatus
-    where parseJSON val = GHC.Base.pure (if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "deleting")
-                                          then GetServersResponseBody200ServersStatusEnumStringDeleting
-                                          else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "initializing")
-                                                then GetServersResponseBody200ServersStatusEnumStringInitializing
-                                                else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "migrating")
-                                                      then GetServersResponseBody200ServersStatusEnumStringMigrating
-                                                      else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "off")
-                                                            then GetServersResponseBody200ServersStatusEnumStringOff
-                                                            else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "rebuilding")
-                                                                  then GetServersResponseBody200ServersStatusEnumStringRebuilding
-                                                                  else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "running")
-                                                                        then GetServersResponseBody200ServersStatusEnumStringRunning
-                                                                        else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "starting")
-                                                                              then GetServersResponseBody200ServersStatusEnumStringStarting
-                                                                              else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "stopping")
-                                                                                    then GetServersResponseBody200ServersStatusEnumStringStopping
-                                                                                    else if val GHC.Classes.== (Data.Aeson.Types.Internal.String GHC.Base.$ Data.Text.pack "unknown")
-                                                                                          then GetServersResponseBody200ServersStatusEnumStringUnknown
-                                                                                          else GetServersResponseBody200ServersStatusEnumOther val)
+data GetServersResponseBody200ServersStatus =
+   GetServersResponseBody200ServersStatusOther Data.Aeson.Types.Internal.Value -- ^ This case is used if the value encountered during decoding does not match any of the provided cases in the specification.
+  | GetServersResponseBody200ServersStatusTyped Data.Text.Internal.Text -- ^ This constructor can be used to send values to the server which are not present in the specification yet.
+  | GetServersResponseBody200ServersStatusEnumRunning -- ^ Represents the JSON value @"running"@
+  | GetServersResponseBody200ServersStatusEnumInitializing -- ^ Represents the JSON value @"initializing"@
+  | GetServersResponseBody200ServersStatusEnumStarting -- ^ Represents the JSON value @"starting"@
+  | GetServersResponseBody200ServersStatusEnumStopping -- ^ Represents the JSON value @"stopping"@
+  | GetServersResponseBody200ServersStatusEnumOff -- ^ Represents the JSON value @"off"@
+  | GetServersResponseBody200ServersStatusEnumDeleting -- ^ Represents the JSON value @"deleting"@
+  | GetServersResponseBody200ServersStatusEnumMigrating -- ^ Represents the JSON value @"migrating"@
+  | GetServersResponseBody200ServersStatusEnumRebuilding -- ^ Represents the JSON value @"rebuilding"@
+  | GetServersResponseBody200ServersStatusEnumUnknown -- ^ Represents the JSON value @"unknown"@
+  deriving (GHC.Show.Show, GHC.Classes.Eq)
+instance Data.Aeson.Types.ToJSON.ToJSON GetServersResponseBody200ServersStatus
+    where toJSON (GetServersResponseBody200ServersStatusOther val) = val
+          toJSON (GetServersResponseBody200ServersStatusTyped val) = Data.Aeson.Types.ToJSON.toJSON val
+          toJSON (GetServersResponseBody200ServersStatusEnumRunning) = "running"
+          toJSON (GetServersResponseBody200ServersStatusEnumInitializing) = "initializing"
+          toJSON (GetServersResponseBody200ServersStatusEnumStarting) = "starting"
+          toJSON (GetServersResponseBody200ServersStatusEnumStopping) = "stopping"
+          toJSON (GetServersResponseBody200ServersStatusEnumOff) = "off"
+          toJSON (GetServersResponseBody200ServersStatusEnumDeleting) = "deleting"
+          toJSON (GetServersResponseBody200ServersStatusEnumMigrating) = "migrating"
+          toJSON (GetServersResponseBody200ServersStatusEnumRebuilding) = "rebuilding"
+          toJSON (GetServersResponseBody200ServersStatusEnumUnknown) = "unknown"
+instance Data.Aeson.Types.FromJSON.FromJSON GetServersResponseBody200ServersStatus
+    where parseJSON val = GHC.Base.pure (if | val GHC.Classes.== "running" -> GetServersResponseBody200ServersStatusEnumRunning
+                                            | val GHC.Classes.== "initializing" -> GetServersResponseBody200ServersStatusEnumInitializing
+                                            | val GHC.Classes.== "starting" -> GetServersResponseBody200ServersStatusEnumStarting
+                                            | val GHC.Classes.== "stopping" -> GetServersResponseBody200ServersStatusEnumStopping
+                                            | val GHC.Classes.== "off" -> GetServersResponseBody200ServersStatusEnumOff
+                                            | val GHC.Classes.== "deleting" -> GetServersResponseBody200ServersStatusEnumDeleting
+                                            | val GHC.Classes.== "migrating" -> GetServersResponseBody200ServersStatusEnumMigrating
+                                            | val GHC.Classes.== "rebuilding" -> GetServersResponseBody200ServersStatusEnumRebuilding
+                                            | val GHC.Classes.== "unknown" -> GetServersResponseBody200ServersStatusEnumUnknown
+                                            | GHC.Base.otherwise -> GetServersResponseBody200ServersStatusOther val)
+-- | > GET /servers
+-- 
+-- The same as 'getServers' but accepts an explicit configuration.
+getServersWithConfiguration :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetServersParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response GetServersResponse) -- ^ Monadic computation which returns the result of the operation
+getServersWithConfiguration config
+                            parameters = GHC.Base.fmap (\response_2 -> GHC.Base.fmap (Data.Either.either GetServersResponseError GHC.Base.id GHC.Base.. (\response body -> if | (\status_3 -> Network.HTTP.Types.Status.statusCode status_3 GHC.Classes.== 200) (Network.HTTP.Client.Types.responseStatus response) -> GetServersResponse200 Data.Functor.<$> (Data.Aeson.eitherDecodeStrict body :: Data.Either.Either GHC.Base.String
+                                                                                                                                                                                                                                                                                                                                                                                                                        GetServersResponseBody200)
+                                                                                                                                                                              | GHC.Base.otherwise -> Data.Either.Left "Missing default response type") response_2) response_2) (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                                                                                                                                                                                                                                                HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /servers
+-- 
+-- The same as 'getServers' but returns the raw 'Data.ByteString.Char8.ByteString'.
+getServersRaw :: forall m . HCloud.Common.MonadHTTP m => GetServersParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> HCloud.Common.HttpT m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getServersRaw parameters = GHC.Base.id (HCloud.Common.doCallWithConfigurationM (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                 HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])
+-- | > GET /servers
+-- 
+-- The same as 'getServers' but accepts an explicit configuration and returns the raw 'Data.ByteString.Char8.ByteString'.
+getServersWithConfigurationRaw :: forall m . HCloud.Common.MonadHTTP m => HCloud.Common.Configuration -- ^ The configuration to use in the request
+  -> GetServersParameters -- ^ Contains all available parameters of this operation (query and path parameters)
+  -> m (Network.HTTP.Client.Types.Response Data.ByteString.Internal.ByteString) -- ^ Monadic computation which returns the result of the operation
+getServersWithConfigurationRaw config
+                               parameters = GHC.Base.id (HCloud.Common.doCallWithConfiguration config (Data.Text.toUpper GHC.Base.$ Data.Text.pack "GET") (Data.Text.pack "/servers") [HCloud.Common.QueryParameter (Data.Text.pack "name") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryName parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "label_selector") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryLabelSelector parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "sort") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQuerySort parameters) (Data.Text.pack "form") GHC.Types.False,
+                                                                                                                                                                                        HCloud.Common.QueryParameter (Data.Text.pack "status") (Data.Aeson.Types.ToJSON.toJSON Data.Functor.<$> getServersParametersQueryStatus parameters) (Data.Text.pack "form") GHC.Types.False])

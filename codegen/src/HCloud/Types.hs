@@ -2,7 +2,7 @@
 
 -- | Rexports all type modules (used in the operation modules).
 module HCloud.Types (
-  module HCloud.CyclicTypes,
+  module HCloud.TypeAlias,
   ) where
 
-import HCloud.CyclicTypes
+import HCloud.TypeAlias
