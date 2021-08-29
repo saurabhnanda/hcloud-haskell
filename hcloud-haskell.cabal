@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 946bfeef676fb0537ed1c56fa8fa26de07006e270b099a73ac7cf7ffafa743e4
+-- hash: 57c6a67182e85feef502b07386dc322a0d82ad83e4f5e3a848cee4f49053bf87
 
 name:           hcloud-haskell
 version:        0.1.0.0
@@ -19,12 +19,166 @@ build-type:     Simple
 extra-source-files:
     README.md
 
-executable hcloud-haskell
-  main-is: Main.hs
+library
+  exposed-modules:
+      HCloud
+      HCloud.Common
+      HCloud.Configuration
+      HCloud.CyclicTypes
+      HCloud.Operations.DeleteCertificatesId_
+      HCloud.Operations.DeleteFirewallsId_
+      HCloud.Operations.DeleteFloatingIpsId_
+      HCloud.Operations.DeleteImagesId_
+      HCloud.Operations.DeleteLoadBalancersId_
+      HCloud.Operations.DeleteNetworksId_
+      HCloud.Operations.DeletePlacementGroupsId_
+      HCloud.Operations.DeleteServersId_
+      HCloud.Operations.DeleteSshKeysId_
+      HCloud.Operations.DeleteVolumesId_
+      HCloud.Operations.GetActions
+      HCloud.Operations.GetActionsId_
+      HCloud.Operations.GetCertificates
+      HCloud.Operations.GetCertificatesId_
+      HCloud.Operations.GetCertificatesIdActions
+      HCloud.Operations.GetCertificatesIdActionsActionId_
+      HCloud.Operations.GetDatacenters
+      HCloud.Operations.GetDatacentersId_
+      HCloud.Operations.GetFirewalls
+      HCloud.Operations.GetFirewallsId_
+      HCloud.Operations.GetFirewallsIdActions
+      HCloud.Operations.GetFirewallsIdActionsActionId_
+      HCloud.Operations.GetFloatingIps
+      HCloud.Operations.GetFloatingIpsId_
+      HCloud.Operations.GetFloatingIpsIdActions
+      HCloud.Operations.GetFloatingIpsIdActionsActionId_
+      HCloud.Operations.GetImages
+      HCloud.Operations.GetImagesId_
+      HCloud.Operations.GetImagesIdActions
+      HCloud.Operations.GetImagesIdActionsActionId_
+      HCloud.Operations.GetIsos
+      HCloud.Operations.GetIsosId_
+      HCloud.Operations.GetLoadBalancers
+      HCloud.Operations.GetLoadBalancersId_
+      HCloud.Operations.GetLoadBalancersIdActions
+      HCloud.Operations.GetLoadBalancersIdActionsActionId_
+      HCloud.Operations.GetLoadBalancersIdMetrics
+      HCloud.Operations.GetLoadBalancerTypes
+      HCloud.Operations.GetLoadBalancerTypesId_
+      HCloud.Operations.GetLocations
+      HCloud.Operations.GetLocationsId_
+      HCloud.Operations.GetNetworks
+      HCloud.Operations.GetNetworksId_
+      HCloud.Operations.GetNetworksIdActions
+      HCloud.Operations.GetNetworksIdActionsActionId_
+      HCloud.Operations.GetPlacementGroups
+      HCloud.Operations.GetPlacementGroupsId_
+      HCloud.Operations.GetPricing
+      HCloud.Operations.GetServers
+      HCloud.Operations.GetServersId_
+      HCloud.Operations.GetServersIdActions
+      HCloud.Operations.GetServersIdActionsActionId_
+      HCloud.Operations.GetServersIdMetrics
+      HCloud.Operations.GetServerTypes
+      HCloud.Operations.GetServerTypesId_
+      HCloud.Operations.GetSshKeys
+      HCloud.Operations.GetSshKeysId_
+      HCloud.Operations.GetVolumes
+      HCloud.Operations.GetVolumesId_
+      HCloud.Operations.GetVolumesIdActions
+      HCloud.Operations.GetVolumesIdActionsActionId_
+      HCloud.Operations.PostCertificates
+      HCloud.Operations.PostCertificatesIdActionsRetry
+      HCloud.Operations.PostFirewalls
+      HCloud.Operations.PostFirewallsIdActionsApplyToResources
+      HCloud.Operations.PostFirewallsIdActionsRemoveFromResources
+      HCloud.Operations.PostFirewallsIdActionsSetRules
+      HCloud.Operations.PostFloatingIps
+      HCloud.Operations.PostFloatingIpsIdActionsAssign
+      HCloud.Operations.PostFloatingIpsIdActionsChangeDnsPtr
+      HCloud.Operations.PostFloatingIpsIdActionsChangeProtection
+      HCloud.Operations.PostFloatingIpsIdActionsUnassign
+      HCloud.Operations.PostImagesIdActionsChangeProtection
+      HCloud.Operations.PostLoadBalancers
+      HCloud.Operations.PostLoadBalancersIdActionsAddService
+      HCloud.Operations.PostLoadBalancersIdActionsAddTarget
+      HCloud.Operations.PostLoadBalancersIdActionsAttachToNetwork
+      HCloud.Operations.PostLoadBalancersIdActionsChangeAlgorithm
+      HCloud.Operations.PostLoadBalancersIdActionsChangeDnsPtr
+      HCloud.Operations.PostLoadBalancersIdActionsChangeProtection
+      HCloud.Operations.PostLoadBalancersIdActionsChangeType
+      HCloud.Operations.PostLoadBalancersIdActionsDeleteService
+      HCloud.Operations.PostLoadBalancersIdActionsDetachFromNetwork
+      HCloud.Operations.PostLoadBalancersIdActionsDisablePublicInterface
+      HCloud.Operations.PostLoadBalancersIdActionsEnablePublicInterface
+      HCloud.Operations.PostLoadBalancersIdActionsRemoveTarget
+      HCloud.Operations.PostLoadBalancersIdActionsUpdateService
+      HCloud.Operations.PostNetworks
+      HCloud.Operations.PostNetworksIdActionsAddRoute
+      HCloud.Operations.PostNetworksIdActionsAddSubnet
+      HCloud.Operations.PostNetworksIdActionsChangeIpRange
+      HCloud.Operations.PostNetworksIdActionsChangeProtection
+      HCloud.Operations.PostNetworksIdActionsDeleteRoute
+      HCloud.Operations.PostNetworksIdActionsDeleteSubnet
+      HCloud.Operations.PostPlacementGroups
+      HCloud.Operations.PostServers
+      HCloud.Operations.PostServersIdActionsAddToPlacementGroup
+      HCloud.Operations.PostServersIdActionsAttachIso
+      HCloud.Operations.PostServersIdActionsAttachToNetwork
+      HCloud.Operations.PostServersIdActionsChangeAliasIps
+      HCloud.Operations.PostServersIdActionsChangeDnsPtr
+      HCloud.Operations.PostServersIdActionsChangeProtection
+      HCloud.Operations.PostServersIdActionsChangeType
+      HCloud.Operations.PostServersIdActionsCreateImage
+      HCloud.Operations.PostServersIdActionsDetachFromNetwork
+      HCloud.Operations.PostServersIdActionsDetachIso
+      HCloud.Operations.PostServersIdActionsDisableBackup
+      HCloud.Operations.PostServersIdActionsDisableRescue
+      HCloud.Operations.PostServersIdActionsEnableBackup
+      HCloud.Operations.PostServersIdActionsEnableRescue
+      HCloud.Operations.PostServersIdActionsPoweroff
+      HCloud.Operations.PostServersIdActionsPoweron
+      HCloud.Operations.PostServersIdActionsReboot
+      HCloud.Operations.PostServersIdActionsRebuild
+      HCloud.Operations.PostServersIdActionsRemoveFromPlacementGroup
+      HCloud.Operations.PostServersIdActionsRequestConsole
+      HCloud.Operations.PostServersIdActionsReset
+      HCloud.Operations.PostServersIdActionsResetPassword
+      HCloud.Operations.PostServersIdActionsShutdown
+      HCloud.Operations.PostSshKeys
+      HCloud.Operations.PostVolumes
+      HCloud.Operations.PostVolumesIdActionsAttach
+      HCloud.Operations.PostVolumesIdActionsChangeProtection
+      HCloud.Operations.PostVolumesIdActionsDetach
+      HCloud.Operations.PostVolumesIdActionsResize
+      HCloud.Operations.PutCertificatesId_
+      HCloud.Operations.PutFirewallsId_
+      HCloud.Operations.PutFloatingIpsId_
+      HCloud.Operations.PutImagesId_
+      HCloud.Operations.PutLoadBalancersId_
+      HCloud.Operations.PutNetworksId_
+      HCloud.Operations.PutPlacementGroupsId_
+      HCloud.Operations.PutServersId_
+      HCloud.Operations.PutSshKeysId_
+      HCloud.Operations.PutVolumesId_
+      HCloud.SecuritySchemes
+      HCloud.Types
   other-modules:
       Paths_hcloud_haskell
   hs-source-dirs:
-      src
+      codegen/src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , ghc-prim
+    , http-client
+    , http-conduit
+    , http-types
+    , mtl
+    , scientific
+    , text
+    , time
+    , transformers
+    , unordered-containers
+    , vector
   default-language: Haskell2010
